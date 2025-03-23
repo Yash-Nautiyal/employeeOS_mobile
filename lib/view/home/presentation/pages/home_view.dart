@@ -115,7 +115,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           const SliverToBoxAdapter(
             child: HomeHero(),
           ),
-          SliverToBoxAdapter(child: MinimalFeatures())
+          SliverToBoxAdapter(
+            child: HomeMinimal(
+              theme: theme,
+            ),
+          ),
         ],
       ),
     );

@@ -1,124 +1,95 @@
+import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class MinimalFeatures extends StatelessWidget {
-  const MinimalFeatures({super.key});
+class HomeMinimal extends StatelessWidget {
+  final ThemeData theme;
+  const HomeMinimal({super.key, required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.purple.withOpacity(0.3),
-            width: 1,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header text
+          Text(
+            'VISUALIZING SUCCESS',
+            style: theme.textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.w800),
           ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+
+          const SizedBox(height: 16),
+
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const SizedBox(height: 16),
-              // Top divider
-              Container(
-                width: 40,
-                height: 3,
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(1.5),
-                ),
+              Text(
+                "What's in ",
+                style: theme.textTheme.displayMedium?.copyWith(fontSize: 28),
               ),
-              const SizedBox(height: 24),
-
-              // Header text
-              const Text(
-                'VISUALIZING SUCCESS',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                  letterSpacing: 1.5,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Title with gradient
-              RichText(
-                text: const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "What's in ",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E2B3C),
-                      ),
+              Text(
+                "EmployeeOS?",
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontSize: 28,
+                  foreground: Paint()
+                    ..shader = const LinearGradient(
+                      colors: [AppPallete.white, AppPallete.grey800],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ).createShader(
+                      const Rect.fromLTWH(0.0, 0.0, 500.0, 120.0),
                     ),
-                    TextSpan(
-                      text: "Minimal?",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Feature items
-              const FeatureItem(
-                icon: Icons.extension_outlined,
-                title: 'Branding',
-                description:
-                    'Consistent design makes it easy to brand your own.',
-              ),
-              const SizedBox(height: 24),
-
-              const FeatureItem(
-                icon: Icons.grid_3x3_outlined,
-                title: 'UI & UX Design',
-                description:
-                    'The kit is built on the principles of the atomic design system.',
-              ),
-              const SizedBox(height: 24),
-
-              const FeatureItem(
-                icon: Icons.code_outlined,
-                title: 'Development',
-                description:
-                    'Easy to customize and extend, saving you time and money.',
-              ),
-              const SizedBox(height: 32),
-
-              // Bottom divider
-              Container(
-                width: 40,
-                height: 3,
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(1.5),
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 32),
+
+          // Feature items
+          FeatureItem(
+              image:
+                  'assets/icons/${theme.brightness.toString().split('.')[1].toLowerCase()}/ic-make-brand.svg',
+              title: 'Branding',
+              description: 'Consistent design makes it easy to brand your own.',
+              theme: theme),
+          const SizedBox(height: 24),
+
+          FeatureItem(
+              image:
+                  'assets/icons/${theme.brightness.toString().split('.')[1].toLowerCase()}/ic-design.svg',
+              title: 'UI & UX Design',
+              description:
+                  'The kit is built on the principles of the atomic design system.',
+              theme: theme),
+          const SizedBox(height: 24),
+
+          FeatureItem(
+              image:
+                  'assets/icons/${theme.brightness.toString().split('.')[1].toLowerCase()}/ic-development.svg',
+              title: 'Development',
+              description:
+                  'Easy to customize and extend, saving you time and money.',
+              theme: theme),
+          const SizedBox(height: 32),
+        ],
       ),
     );
   }
 }
 
 class FeatureItem extends StatelessWidget {
-  final IconData icon;
+  final String image;
   final String title;
   final String description;
-
+  final ThemeData theme;
   const FeatureItem({
     super.key,
-    required this.icon,
+    required this.image,
     required this.title,
+    required this.theme,
     required this.description,
   });
 
@@ -127,17 +98,10 @@ class FeatureItem extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1.5),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            size: 24,
-          ),
+        SvgPicture.asset(
+          image,
+          width: 35,
+          height: 35,
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -146,21 +110,10 @@ class FeatureItem extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E2B3C),
-                ),
+                style: theme.textTheme.displayMedium?.copyWith(fontSize: 18),
               ),
               const SizedBox(height: 4),
-              Text(
-                description,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                  height: 1.4,
-                ),
-              ),
+              Text(description, style: theme.textTheme.bodyMedium),
             ],
           ),
         ),
