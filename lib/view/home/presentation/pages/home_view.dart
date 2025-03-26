@@ -1,10 +1,7 @@
-import 'dart:ui';
-
+import 'package:employeeos/core/common/nav/home_nav.dart';
 import 'package:employeeos/view/home/presentation/widgets/home_hero.dart';
 import 'package:employeeos/view/home/presentation/widgets/home_minimal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -16,16 +13,6 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   final _scrollController = ScrollController();
   bool _showBackToTop = false;
-
-  late final AnimationController _controller = AnimationController(
-    duration: const Duration(seconds: 5),
-    vsync: this,
-  )..repeat();
-
-  final Tween<double> turnsTween = Tween<double>(
-    begin: 0,
-    end: 1,
-  );
 
   @override
   void initState() {
@@ -53,7 +40,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -63,64 +49,22 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: CustomScrollView(
+      appBar: HomeNav(theme: theme, signinPage: false),
+      extendBodyBehindAppBar: true,
+      extendBody: true,
+      body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(
             decelerationRate: ScrollDecelerationRate.normal),
         controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            centerTitle: true,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 5),
-              child: Image.asset(
-                'assets/logo/employeeos-logo.png',
-              ),
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 20,
             ),
-            leadingWidth: 70,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            toolbarHeight: 70,
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: theme.brightness == Brightness.dark
-                  ? Brightness.light
-                  : Brightness.dark,
-            ),
-            flexibleSpace: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(
-                  color: theme.scaffoldBackgroundColor.withOpacity(0.5),
-                ),
-              ),
-            ),
-            actionsPadding: const EdgeInsets.only(right: 10),
-            actions: [
-              IconButton(
-                icon: RotationTransition(
-                  turns: turnsTween.animate(_controller),
-                  child: SvgPicture.asset('assets/icons/ic-settings.svg',
-                      width: 24, height: 24),
-                ),
-                onPressed: () {},
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text('Sign In',
-                    style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15)),
-              )
-            ],
-          ),
-          const SliverToBoxAdapter(
-            child: HomeHero(),
-          ),
-          SliverToBoxAdapter(
-            child: HomeMinimal(
-              theme: theme,
-            ),
-          ),
-        ],
+            const HomeHero(),
+            HomeMinimal(theme: theme)
+          ],
+        ),
       ),
     );
   }

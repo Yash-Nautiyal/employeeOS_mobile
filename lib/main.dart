@@ -1,8 +1,13 @@
+import 'dart:ui';
+
 import 'package:employeeos/app.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  PlatformDispatcher.instance.onPlatformConfigurationChanged = () {};
+
   runApp(const MyApp());
 }
 

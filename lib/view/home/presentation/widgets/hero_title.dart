@@ -35,8 +35,8 @@ class _HeroTitleState extends State<HeroTitle>
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isLarge = size.width > 900;
+    // final size = MediaQuery.of(context).size;
+    // final isLarge = size.width > 900;
 
     return Wrap(
       alignment: WrapAlignment.center,

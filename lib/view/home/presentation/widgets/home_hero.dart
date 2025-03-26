@@ -11,9 +11,8 @@ class HomeHero extends StatelessWidget {
 
     return Stack(
       children: [
-        // Background with animated elements
-        Container(
-          height: size.height * 0.5, // 50vh equivalent
+        SizedBox(
+          height: size.height * 0.65,
           width: double.infinity,
           child: Image.asset('assets/images/Bg.png', fit: BoxFit.cover),
         ),
@@ -60,4 +59,3 @@ class HomeHero extends StatelessWidget {
     );
   }
 }
-

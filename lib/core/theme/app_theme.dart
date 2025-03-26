@@ -1,9 +1,11 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
     brightness: Brightness.light,
     primaryColor: AppPallete.primaryMain,
     scaffoldBackgroundColor: AppPallete.white,
@@ -27,8 +29,11 @@ class AppTheme {
     ),
     cardColor: AppPallete.white,
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppPallete.white,
+      backgroundColor: Colors.transparent,
       iconTheme: IconThemeData(color: AppPallete.grey800),
+      systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark),
     ),
     colorScheme: const ColorScheme.light(
       primary: AppPallete.primaryMain,
@@ -40,8 +45,18 @@ class AppTheme {
       error: AppPallete.errorMain,
       errorContainer: AppPallete.errorLighter,
       surface: AppPallete.white,
+      tertiary: AppPallete.grey900,
     ),
     shadowColor: AppPallete.black.withOpacity(0.2),
+    inputDecorationTheme: InputDecorationTheme(
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: AppPallete.grey500),
+        borderRadius: BorderRadius.circular(7),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(7),
+      ),
+    ),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
@@ -49,7 +64,7 @@ class AppTheme {
             borderRadius: BorderRadius.all(
               Radius.circular(10),
             ),
-            side: BorderSide(color: AppPallete.grey300, width: 1),
+            side: BorderSide(color: AppPallete.grey600, width: 1.5),
           ),
         ),
       ),
@@ -80,8 +95,11 @@ class AppTheme {
     ),
     cardColor: AppPallete.grey800,
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppPallete.grey900,
+      backgroundColor: Colors.transparent,
       iconTheme: IconThemeData(color: AppPallete.white),
+      systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light),
     ),
     colorScheme: const ColorScheme.dark(
       primary: AppPallete.primaryDark,
@@ -93,8 +111,18 @@ class AppTheme {
       error: AppPallete.errorDark,
       errorContainer: AppPallete.errorLighter,
       surface: AppPallete.grey800,
+      tertiary: AppPallete.white,
     ),
     shadowColor: AppPallete.black.withOpacity(0.1),
+    inputDecorationTheme: InputDecorationTheme(
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: AppPallete.grey500),
+        borderRadius: BorderRadius.circular(7),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(7),
+      ),
+    ),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
@@ -102,7 +130,7 @@ class AppTheme {
             borderRadius: BorderRadius.all(
               Radius.circular(10),
             ),
-            side: BorderSide(color: AppPallete.grey300, width: 1),
+            side: BorderSide(color: AppPallete.grey600, width: 1.5),
           ),
         ),
       ),
