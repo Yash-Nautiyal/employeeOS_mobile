@@ -12,7 +12,9 @@ class AuthView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: HomeNav(theme: theme, signinPage: true),
+      appBar: HomeNav(
+        theme: theme,
+      ),
       extendBody: true,
       body: SingleChildScrollView(
         child: Padding(

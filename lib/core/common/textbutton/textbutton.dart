@@ -14,11 +14,11 @@ class CustomTextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-        onPressed: () {},
+        onPressed: () => onClick(),
         style: backgroundColor != null
             ? ButtonStyle(
                 backgroundColor: WidgetStatePropertyAll(backgroundColor),
-              )
+                side: const WidgetStatePropertyAll(BorderSide.none))
             : null,
         child: Padding(
           padding: const EdgeInsets.all(4.0),

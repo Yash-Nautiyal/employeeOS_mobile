@@ -64,4 +64,6 @@ class AppPallete {
   // Common Colors
   static const Color black = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);
+
+  static const Color containerColor = Color(0xFF28323D);
 }

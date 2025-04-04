@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       title: 'EmployeeOS',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,
       home: const App(),
     );

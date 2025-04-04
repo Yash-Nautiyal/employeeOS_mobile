@@ -1,8 +1,11 @@
 import 'package:employeeos/core/common/textbutton/textbutton.dart';
 import 'package:employeeos/core/common/textfield/textfield.dart';
+import 'package:employeeos/core/common/toast/custom_toast.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:toastification/toastification.dart';
 
 class AuthPage extends StatefulWidget {
   final TextEditingController emailController;
@@ -67,8 +70,8 @@ class _AuthPageState extends State<AuthPage> {
             });
           },
           theme: theme,
-          hintText: "6+ characters",
-          labelText: "Password",
+          hintText: "Password",
+          labelText: "6+ characters",
           onClickPasswordVisisble: () {
             setState(() {
               isPasswordVisible = !isPasswordVisible;
@@ -93,7 +96,21 @@ class _AuthPageState extends State<AuthPage> {
           children: [
             Expanded(
               child: CustomTextButton(
-                onClick: () {},
+                onClick: () {
+                  showCustomToast(
+                    context: context,
+                    type: ToastificationType.success,
+                    title: "Success",
+                    description: "Operation completed successfully.",
+                  );
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Layout(),
+                    ),
+                    (route) => false,
+                  );
+                },
                 backgroundColor: theme.colorScheme.tertiary,
                 child: Text(
                   "Sign in",
@@ -125,25 +142,26 @@ class _AuthPageState extends State<AuthPage> {
           children: [
             Expanded(
               child: CustomTextButton(
-                  onClick: () {},
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/logo/ic-google.svg',
-                        width: 30,
-                      ),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        "Continue with Google",
-                        style: theme.textTheme.labelLarge?.copyWith(
-                            color: theme.colorScheme.tertiary, fontSize: 16),
-                      ),
-                    ],
-                  )),
+                onClick: () {},
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/logo/ic-google.svg',
+                      width: 30,
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "Continue with Google",
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.tertiary, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         )

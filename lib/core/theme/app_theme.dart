@@ -7,7 +7,7 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    primaryColor: AppPallete.primaryMain,
+    primaryColor: AppPallete.primaryDarker,
     scaffoldBackgroundColor: AppPallete.white,
     dividerColor: AppPallete.grey300,
     fontFamily: AppTypography.primaryFont,
@@ -38,16 +38,19 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: AppPallete.primaryMain,
       primaryFixedDim: AppPallete.primaryLight,
-      primaryContainer: AppPallete.primaryLighter,
+      primaryContainer: AppPallete.primaryDark,
       secondary: AppPallete.secondaryMain,
       secondaryFixedDim: AppPallete.secondaryLight,
       secondaryContainer: AppPallete.secondaryLighter,
       error: AppPallete.errorMain,
-      errorContainer: AppPallete.errorLighter,
+      errorContainer: AppPallete.errorLight,
       surface: AppPallete.white,
       tertiary: AppPallete.grey900,
+      surfaceContainer: AppPallete.grey200,
+      surfaceDim: AppPallete.grey300,
     ),
-    shadowColor: AppPallete.black.withOpacity(0.2),
+    shadowColor: AppPallete.black.withOpacity(0.5),
+    disabledColor: AppPallete.grey600,
     inputDecorationTheme: InputDecorationTheme(
       enabledBorder: OutlineInputBorder(
         borderSide: const BorderSide(color: AppPallete.grey500),
@@ -57,6 +60,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(7),
       ),
     ),
+    hoverColor: AppPallete.grey300,
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
@@ -64,9 +68,15 @@ class AppTheme {
             borderRadius: BorderRadius.all(
               Radius.circular(10),
             ),
-            side: BorderSide(color: AppPallete.grey600, width: 1.5),
+            side: BorderSide(color: AppPallete.grey400, width: 1),
           ),
         ),
+      ),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      side: const BorderSide(color: AppPallete.grey500, width: 1.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
       ),
     ),
   );
@@ -74,7 +84,7 @@ class AppTheme {
 // Theme Data for Dark Mode
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: AppPallete.primaryDark,
+    primaryColor: AppPallete.primaryDarker,
     scaffoldBackgroundColor: AppPallete.grey900,
     dividerColor: AppPallete.grey700,
     fontFamily: AppTypography.primaryFont,
@@ -103,17 +113,19 @@ class AppTheme {
     ),
     colorScheme: const ColorScheme.dark(
       primary: AppPallete.primaryDark,
-      primaryFixedDim: AppPallete.primaryDarker,
+      primaryFixedDim: AppPallete.primaryLight,
       primaryContainer: AppPallete.primaryLighter,
       secondary: AppPallete.secondaryDark,
       secondaryFixedDim: AppPallete.secondaryDarker,
       secondaryContainer: AppPallete.secondaryLighter,
       error: AppPallete.errorDark,
-      errorContainer: AppPallete.errorLighter,
+      errorContainer: AppPallete.errorMain,
       surface: AppPallete.grey800,
       tertiary: AppPallete.white,
+      surfaceContainer: AppPallete.containerColor,
+      surfaceDim: AppPallete.grey700,
     ),
-    shadowColor: AppPallete.black.withOpacity(0.1),
+    shadowColor: AppPallete.containerColor,
     inputDecorationTheme: InputDecorationTheme(
       enabledBorder: OutlineInputBorder(
         borderSide: const BorderSide(color: AppPallete.grey500),
@@ -123,6 +135,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(7),
       ),
     ),
+    hoverColor: AppPallete.grey800,
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
@@ -133,6 +146,12 @@ class AppTheme {
             side: BorderSide(color: AppPallete.grey600, width: 1.5),
           ),
         ),
+      ),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      side: const BorderSide(color: AppPallete.grey500, width: 1.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
       ),
     ),
   );

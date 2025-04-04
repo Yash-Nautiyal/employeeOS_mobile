@@ -3,6 +3,8 @@ import 'package:employeeos/view/home/presentation/widgets/home_hero.dart';
 import 'package:employeeos/view/home/presentation/widgets/home_minimal.dart';
 import 'package:flutter/material.dart';
 
+import '../../../auth/presentation/pages/auth_view.dart';
+
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -49,7 +51,16 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: HomeNav(theme: theme, signinPage: false),
+      appBar: HomeNav(
+        theme: theme,
+        signinPage: true,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AuthView()),
+          );
+        },
+      ),
       extendBodyBehindAppBar: true,
       extendBody: true,
       body: SingleChildScrollView(

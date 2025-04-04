@@ -1,4 +1,4 @@
-import 'package:employeeos/view/home/presentation/pages/home_view.dart';
+import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -6,6 +6,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeView();
+    return const Layout();
   }
 }
