@@ -5,14 +5,14 @@ void showCustomToast({
   required BuildContext context,
   required ToastificationType type,
   required String title,
-  required String description,
+  String? description,
 }) {
   toastification.show(
     context: context,
     type: type,
     style: ToastificationStyle.fillColored,
     title: Text(title),
-    description: Text(description),
+    description: description != null ? Text(description) : null,
     alignment: Alignment.topCenter,
     autoCloseDuration: const Duration(seconds: 4),
     animationBuilder: (context, animation, alignment, child) {

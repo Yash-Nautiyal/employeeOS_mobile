@@ -4,11 +4,13 @@ class CustomTextButton extends StatelessWidget {
   final Widget child;
   final Function onClick;
   final Color? backgroundColor;
+  final double? padding;
   const CustomTextButton({
     super.key,
     required this.child,
     required this.onClick,
     this.backgroundColor,
+    this.padding = 4,
   });
 
   @override
@@ -21,7 +23,7 @@ class CustomTextButton extends StatelessWidget {
                 side: const WidgetStatePropertyAll(BorderSide.none))
             : null,
         child: Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: EdgeInsets.all(padding!),
           child: child,
         ));
   }

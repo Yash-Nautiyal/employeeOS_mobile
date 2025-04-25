@@ -100,7 +100,7 @@ class _MenuItemState extends State<MenuItem>
               selected: isSelected,
               leading: SvgPicture.asset(
                 widget.icon,
-                width: 24,
+                width: 22,
                 color: isSelected
                     ? widget.theme.colorScheme.primaryContainer
                     : widget.theme.disabledColor,
@@ -222,12 +222,12 @@ class SubMenuLinePainter extends CustomPainter {
 
     final paint = Paint()
       ..color = theme.hoverColor
-      ..strokeWidth = 3
+      ..strokeWidth = 2.6
       ..style = PaintingStyle.stroke;
 
     // Draw vertical line
-    final startPoint = Offset(35, -23);
-    final endPoint = Offset(35, -10);
+    const startPoint = Offset(35, -23);
+    const endPoint = Offset(35, -10);
 
     // Draw horizontal line connecting to first submenu item
     final horizontalStartPoint = startPoint;
@@ -239,9 +239,9 @@ class SubMenuLinePainter extends CustomPainter {
       ..moveTo(endPoint.dx, endPoint.dy)
       ..quadraticBezierTo(
         endPoint.dx + 0, // Control point x
-        endPoint.dy + 16, // Control point y
+        endPoint.dy + 15, // Control point y
         endPoint.dx + 20, // End point x
-        endPoint.dy + 16, // End point y
+        endPoint.dy + 14, // End point y
       );
     canvas.drawPath(curvePath, paint);
 

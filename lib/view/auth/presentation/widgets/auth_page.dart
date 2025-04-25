@@ -49,7 +49,7 @@ class _AuthPageState extends State<AuthPage> {
         ),
         const SizedBox(height: 24),
         CustomTextfield(
-            passwordController: widget.emailController,
+            controller: widget.emailController,
             theme: theme,
             hintText: "Email address",
             labelText: "Email Address",
@@ -62,7 +62,7 @@ class _AuthPageState extends State<AuthPage> {
         const SizedBox(height: 16),
         CustomTextfield(
           keyboardType: TextInputType.visiblePassword,
-          passwordController: widget.passwordController,
+          controller: widget.passwordController,
           isPasswordVisible: isPasswordVisible,
           onchange: (text) {
             setState(() {

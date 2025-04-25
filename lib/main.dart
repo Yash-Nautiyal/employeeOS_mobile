@@ -2,12 +2,13 @@ import 'dart:ui';
 
 import 'package:employeeos/app.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   PlatformDispatcher.instance.onPlatformConfigurationChanged = () {};
-
+  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 7));
   runApp(const MyApp());
 }
 
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'EmployeeOS',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       home: const App(),
     );

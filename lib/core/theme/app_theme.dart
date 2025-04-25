@@ -135,13 +135,13 @@ class AppTheme {
         borderRadius: BorderRadius.circular(7),
       ),
     ),
-    hoverColor: AppPallete.grey800,
+    hoverColor: const Color.fromARGB(255, 33, 41, 49),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
           const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
-              Radius.circular(10),
+              Radius.circular(12),
             ),
             side: BorderSide(color: AppPallete.grey600, width: 1.5),
           ),
@@ -152,6 +152,12 @@ class AppTheme {
       side: const BorderSide(color: AppPallete.grey500, width: 1.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
+      ),
+    ),
+    iconButtonTheme: const IconButtonThemeData(
+      style: ButtonStyle(
+        padding: WidgetStatePropertyAll(EdgeInsets.all(5)),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     ),
   );

@@ -20,6 +20,12 @@ class KanbanGroupItem extends KanbanBoardGroupItem {
   final String date;
   final int completedTasks;
   final int totalTasks;
+  final String assignedBy;
+  final String assignedTo;
+  final String dueDate;
+  final String priority;
+  final String description;
+  final List<String> attachments;
 
   KanbanGroupItem({
     required this.itemId,
@@ -27,6 +33,12 @@ class KanbanGroupItem extends KanbanBoardGroupItem {
     required this.date,
     required this.completedTasks,
     required this.totalTasks,
+    required this.assignedBy,
+    required this.assignedTo,
+    required this.dueDate,
+    required this.priority,
+    required this.description,
+    required this.attachments,
   });
 
   @override
@@ -40,20 +52,27 @@ Map<String, dynamic> _kanbanData = {
       {
         'title': 'Making A New Trend In Poster',
         'date': '17 Dec 2022',
-        'tasks': '30/48'
+        'tasks': '30/48',
+        'assignedBy': 'Amanpreet',
+        'assignedTo': 'Shreyas Ladhe',
+        'dueDate': '14 - 15 Mar 2025',
+        'priority': 'High',
+        'description': 'Design a new poster that trends on social media.',
+        'attachments': [],
       },
-      {'title': 'Create Remarkable', 'date': '17 Nov 2022', 'tasks': '15/56'},
       {
-        'title': 'Advertisers Embrace Rich Media',
-        'date': '22 Oct 2022',
-        'tasks': '18/67'
+        'title': 'Create Remarkable',
+        'date': '17 Nov 2022',
+        'tasks': '15/56',
+        'assignedBy': 'Amanpreet',
+        'assignedTo': 'Shreyas Ladhe',
+        'dueDate': '14 - 15 Mar 2025',
+        'priority': 'Medium',
+        'description': 'Develop a creative campaign for remarkable products.',
+        'attachments': [],
       },
-      {
-        'title': 'Meet the People Who Train',
-        'date': '15 Dec 2022',
-        'tasks': '24/46'
-      }
-    ]
+      // ... add more tasks as needed
+    ],
   },
   'In progress': {
     'color': const Color.fromRGBO(255, 230, 168, 1),
@@ -62,33 +81,15 @@ Map<String, dynamic> _kanbanData = {
         'title': 'Advertising Outdoors',
         'date': '17 Dec 2022',
         'tasks': '53/70',
+        'assignedBy': 'Amanpreet',
+        'assignedTo': 'Shreyas Ladhe',
+        'dueDate': '20 Mar 2025',
+        'priority': 'Low',
+        'description': 'Outdoor advertising campaign planning.',
+        'attachments': [],
       },
-      {
-        'title': 'Digital Marketing Campaign',
-        'date': '21 Dec 2022',
-        'tasks': '34/60',
-      },
-      {
-        'title': 'Social Media Strategy',
-        'date': '15 Dec 2022',
-        'tasks': '28/45',
-      },
-      {
-        'title': 'Content Creation Plan',
-        'date': '19 Dec 2022',
-        'tasks': '41/65',
-      },
-      {
-        'title': 'Email Newsletter Design',
-        'date': '22 Dec 2022',
-        'tasks': '37/50',
-      },
-      {
-        'title': 'Brand Identity Update',
-        'date': '18 Dec 2022',
-        'tasks': '45/75',
-      },
-    ]
+      // ... add more tasks as needed
+    ],
   },
   'Testing': {
     'color': const Color.fromARGB(255, 235, 235, 148),
@@ -96,19 +97,15 @@ Map<String, dynamic> _kanbanData = {
       {
         'title': 'Creative Outdoor Ads',
         'date': '23 Dec 2022',
-        'tasks': '20/20'
+        'tasks': '20/20',
+        'assignedBy': 'Amanpreet',
+        'assignedTo': 'Shreyas Ladhe',
+        'dueDate': '10 Apr 2025',
+        'priority': 'Medium',
+        'description': 'Test new creative designs for outdoor ads.',
+        'attachments': [],
       },
-      {
-        'title': 'Promotional Advertising Speciality',
-        'date': '17 Nov 2022',
-        'tasks': '15/15'
-      },
-      {
-        'title': 'Search Engine OPtimization',
-        'date': '22 Oct 2022',
-        'tasks': '67/67'
-      },
-    ]
+    ],
   },
   'Done': {
     'color': const Color.fromRGBO(148, 235, 168, 1),
@@ -116,17 +113,35 @@ Map<String, dynamic> _kanbanData = {
       {
         'title': 'Creative Outdoor Ads',
         'date': '23 Dec 2022',
-        'tasks': '20/20'
+        'tasks': '20/20',
+        'assignedBy': 'Amanpreet',
+        'assignedTo': 'Shreyas Ladhe',
+        'dueDate': '10 Apr 2025',
+        'priority': 'High',
+        'description': 'Finalized creative designs for outdoor ads.',
+        'attachments': [],
       },
       {
-        'title': 'Promotional Advertising Speciality',
+        'title': 'Advertising Outdoors',
+        'date': '17 Dec 2022',
+        'tasks': '53/70',
+        'assignedBy': 'Amanpreet',
+        'assignedTo': 'Shreyas Ladhe',
+        'dueDate': '20 Mar 2025',
+        'priority': 'Low',
+        'description': 'Completed outdoor advertising campaign.',
+        'attachments': [],
+      },
+      {
+        'title': 'Create Kanban',
         'date': '17 Nov 2022',
-        'tasks': '15/15'
-      },
-      {
-        'title': 'Search Engine OPtimization',
-        'date': '22 Oct 2022',
-        'tasks': '67/67'
+        'tasks': '15/56',
+        'assignedBy': 'Amanpreet',
+        'assignedTo': 'Shreyas Ladhe',
+        'dueDate': '14 - 15 Mar 2025',
+        'priority': 'Medium',
+        'description': 'Remarkable products campaign completed.',
+        'attachments': [],
       },
     ]
   },
@@ -144,16 +159,96 @@ List<KanbanBoardGroup<KanbanGroup, KanbanGroupItem>> kanbanGroups =
     id: _kanbanData.keys.elementAt(index),
     name: _kanbanData.keys.elementAt(index),
     items: (_kanbanData.values.elementAt(index)['items'] as List)
-        .indexed
-        .map<KanbanGroupItem>((item) {
+        .asMap()
+        .entries
+        .map<KanbanGroupItem>((entry) {
+      final i = entry.key;
+      final item = entry.value;
       return KanbanGroupItem(
-        itemId: item.$1.toString(),
-        title: item.$2['title'],
-        date: item.$2['date'],
-        // avatar: avatars[item.$1 % 4],
-        completedTasks: int.parse(item.$2['tasks'].toString().split('/').first),
-        totalTasks: int.parse(item.$2['tasks'].toString().split('/').last),
+        itemId: i.toString(),
+        title: item['title'],
+        date: item['date'],
+        completedTasks: int.parse(item['tasks'].toString().split('/').first),
+        totalTasks: int.parse(item['tasks'].toString().split('/').last),
+        assignedBy: item['assignedBy'] ?? 'Unknown',
+        assignedTo: item['assignedTo'] ?? 'Unknown',
+        dueDate: item['dueDate'] ?? '',
+        priority: item['priority'] ?? 'Low',
+        description: item['description'] ?? '',
+        attachments: List<String>.from(item['attachments'] ?? []),
       );
     }).toList(),
   ),
 );
+
+class KanbanDataManager {
+  /// Add a new column if it doesn’t already exist.
+  static void addColumn(String columnName, Color color) {
+    if (_kanbanData.containsKey(columnName)) return;
+    _kanbanData[columnName] = {
+      'color': color,
+      'items': [],
+    };
+    _rebuildKanbanGroups();
+  }
+
+  /// Add a new task to the specified column.
+  /// [taskData] must include keys: title, date, tasks, assignedBy, assignedTo,
+  /// dueDate, priority, description, and attachments.
+  static void addTask(String columnName, Map<String, dynamic> taskData) {
+    if (!_kanbanData.containsKey(columnName)) return;
+    (_kanbanData[columnName]['items'] as List).add(taskData);
+    _rebuildKanbanGroups();
+  }
+
+  /// Modify an existing task in the specified column.
+  /// [updatedData] should contain keys to update.
+  /// Here, taskId is assumed to be the index (as a string) in the column’s items list.
+  static void modifyTask(
+      String columnName, String taskId, Map<String, dynamic> updatedData) {
+    if (!_kanbanData.containsKey(columnName)) return;
+    List items = _kanbanData[columnName]['items'];
+    int index = int.tryParse(taskId) ?? -1;
+    if (index >= 0 && index < items.length) {
+      items[index] = {...items[index], ...updatedData};
+      _rebuildKanbanGroups();
+    }
+  }
+
+  /// Rebuild the global [kanbanGroups] list based on the updated [_kanbanData].
+  static void _rebuildKanbanGroups() {
+    kanbanGroups = List.generate(
+      _kanbanData.length,
+      (index) => KanbanBoardGroup(
+        customData: KanbanGroup(
+          id: _kanbanData.keys.elementAt(index),
+          title: _kanbanData.keys.elementAt(index),
+          color: _kanbanData.values.elementAt(index)['color'],
+        ),
+        id: _kanbanData.keys.elementAt(index),
+        name: _kanbanData.keys.elementAt(index),
+        items: (_kanbanData.values.elementAt(index)['items'] as List)
+            .asMap()
+            .entries
+            .map<KanbanGroupItem>((entry) {
+          final i = entry.key;
+          final item = entry.value;
+          return KanbanGroupItem(
+            itemId: i.toString(),
+            title: item['title'],
+            date: item['date'],
+            completedTasks:
+                int.parse(item['tasks'].toString().split('/').first),
+            totalTasks: int.parse(item['tasks'].toString().split('/').last),
+            assignedBy: item['assignedBy'] ?? 'Unknown',
+            assignedTo: item['assignedTo'] ?? 'Unknown',
+            dueDate: item['dueDate'] ?? '',
+            priority: item['priority'] ?? 'Low',
+            description: item['description'] ?? '',
+            attachments: List<String>.from(item['attachments'] ?? []),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}

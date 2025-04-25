@@ -18,7 +18,7 @@ class _KanbanViewState extends State<KanbanView> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Use a key based on the theme's brightness to force a rebuild when it changes.
+    // Using a key based on theme brightness so that the board rebuilds when theme changes.
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -26,9 +26,6 @@ class _KanbanViewState extends State<KanbanView> with TickerProviderStateMixin {
             Expanded(
               child: KanbanBoard(
                 key: ValueKey(theme.brightness),
-                onGroupMove: (oldListIndex, newListIndex) {},
-                onGroupItemMove:
-                    (oldCardIndex, newCardIndex, oldListIndex, newListIndex) {},
                 controller: _controller,
                 groups: kanbanGroups,
                 groupHeaderBuilder: (context, groupId) =>
@@ -87,6 +84,7 @@ class _KanbanViewState extends State<KanbanView> with TickerProviderStateMixin {
       theme: theme,
       title: groupItem.title,
       date: groupItem.date,
+      task: groupItem,
     );
   }
 
