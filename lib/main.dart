@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   PlatformDispatcher.instance.onPlatformConfigurationChanged = () {};
-  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 7));
+  await FastCachedImageConfig.init(
+      clearCacheAfter: const Duration(days: 7), subDir: 'employeeos');
   runApp(const MyApp());
 }
 

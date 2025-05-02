@@ -10,12 +10,14 @@ class ChatMessageList extends StatefulWidget {
   final List<ChatMessage> messages;
   final String currentUserId;
   final ThemeData theme;
+  final Function(ChatMessage message) onSwipeMessage;
 
   const ChatMessageList({
     super.key,
     required this.messages,
     required this.theme,
     required this.currentUserId,
+    required this.onSwipeMessage,
   });
 
   @override
@@ -25,13 +27,39 @@ class ChatMessageList extends StatefulWidget {
 
 class _ChatMessageListState extends State<ChatMessageList> {
   final ScrollController _controller = ScrollController();
+  final Map<String, String> _imagesUrlsandFileName = {};
   String? _stickyDate;
   bool _showSticky = false;
   Timer? _fadeTimer;
 
+  void _getallurls() {
+    for (var message in widget.messages) {
+      if (message is ImageMessage) {
+        _imagesUrlsandFileName[message.url] = message.name;
+      }
+    }
+  }
+
+  void addReaction({
+    required String messageId,
+    required String reaction,
+  }) {
+    setState(() {
+      final message = widget.messages.firstWhere((msg) => msg.id == messageId);
+      if (message.reactions[widget.currentUserId] == reaction) {
+        // If the same reaction is sent by the same user, clear the reaction
+        message.reactions.remove(widget.currentUserId);
+      } else {
+        // Otherwise, add or update the reaction
+        message.reactions[widget.currentUserId] = reaction;
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _getallurls();
     if (widget.messages.isNotEmpty) {
       _stickyDate = formatDate(widget.messages.first.createdAt);
     }
@@ -59,7 +87,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
           child: ListView(
             controller: _controller,
             reverse: true,
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 16),
             children: [
               for (int i = 0; i < widget.messages.length; i++) ...[
                 () {
@@ -139,6 +167,11 @@ class _ChatMessageListState extends State<ChatMessageList> {
                               showTimestamp: true,
                               repliedMessage: repliedMessage,
                               batch: batch,
+                              onSwipeMessage: widget.onSwipeMessage,
+                              imageUrlsandFileName: _imagesUrlsandFileName,
+                              handleReaction: (reaction, messageId) =>
+                                  addReaction(
+                                      messageId: messageId, reaction: reaction),
                             ),
                           ),
                         ],
@@ -176,6 +209,10 @@ class _ChatMessageListState extends State<ChatMessageList> {
                           currentUserId: widget.currentUserId,
                           showTimestamp: showTimestamp,
                           repliedMessage: repliedMessage,
+                          onSwipeMessage: widget.onSwipeMessage,
+                          imageUrlsandFileName: _imagesUrlsandFileName,
+                          handleReaction: (reaction, messageId) => addReaction(
+                              messageId: messageId, reaction: reaction),
                         ),
                       ),
                     ],
@@ -200,7 +237,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                   decoration: BoxDecoration(
-                    color: widget.theme.scaffoldBackgroundColor,
+                    color: widget.theme.colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

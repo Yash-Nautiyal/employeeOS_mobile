@@ -4,6 +4,7 @@ import 'package:employeeos/core/common/actions/file_actions.dart'
     show formatFileSize, getFileIcon;
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
+import 'package:employeeos/view/chat/presentation/widget/chat_image_show.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
@@ -14,6 +15,7 @@ class ChatMessages extends StatelessWidget {
   final ChatMessage message;
   final bool isMe;
   final Color bgColor;
+  final Map<String, String> imageUrlsandFileName;
   final List<ImageMessage>?
       batch; // Add this if you want to handle batch messages
 
@@ -22,6 +24,7 @@ class ChatMessages extends StatelessWidget {
     required this.message,
     required this.isMe,
     required this.bgColor,
+    this.imageUrlsandFileName = const {},
     this.batch,
   });
 
@@ -41,32 +44,80 @@ class ChatMessages extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: maxWidth),
           child: Row(
             children: [
-              Expanded(
-                flex: 2,
-                child: SizedBox(
-                    height: double.maxFinite,
-                    width: double.maxFinite,
-                    child: _buildGridImage(batch![0], fillMode: BoxFit.cover)),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatImageShow(
+                      imageUrl: batch![0].url,
+                      fileName: batch![0].name,
+                      imageUrlsandFileName: imageUrlsandFileName,
+                      index: imageUrlsandFileName.keys
+                          .toList()
+                          .indexOf(batch![0].url),
+                    ),
+                  ),
+                ),
+                child: Expanded(
+                  flex: 2,
+                  child: SizedBox(
+                      height: double.maxFinite,
+                      width: double.maxFinite,
+                      child: _buildGridImage(batch![0], context,
+                          fillMode: BoxFit.cover)),
+                ),
               ),
               const SizedBox(width: 4),
               Expanded(
                 flex: 1,
                 child: Column(
                   children: [
-                    Expanded(
-                      child: SizedBox(
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatImageShow(
+                            imageUrl: batch![1].url,
+                            fileName: batch![1].name,
+                            imageUrlsandFileName: imageUrlsandFileName,
+                            index: imageUrlsandFileName.keys
+                                .toList()
+                                .indexOf(batch![1].url),
+                          ),
+                        ),
+                      ),
+                      child: Expanded(
+                        child: SizedBox(
                           height: double.maxFinite,
                           width: double.maxFinite,
-                          child: _buildGridImage(batch![1],
-                              fillMode: BoxFit.cover)),
+                          child: _buildGridImage(batch![1], context,
+                              fillMode: BoxFit.cover),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 4),
-                    Expanded(
-                      child: SizedBox(
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatImageShow(
+                            imageUrl: batch![2].url,
+                            fileName: batch![2].name,
+                            imageUrlsandFileName: imageUrlsandFileName,
+                            index: imageUrlsandFileName.keys
+                                .toList()
+                                .indexOf(batch![2].url),
+                          ),
+                        ),
+                      ),
+                      child: Expanded(
+                        child: SizedBox(
                           height: double.maxFinite,
                           width: double.maxFinite,
-                          child: _buildGridImage(batch![2],
-                              fillMode: BoxFit.cover)),
+                          child: _buildGridImage(batch![2], context,
+                              fillMode: BoxFit.cover),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -90,7 +141,7 @@ class ChatMessages extends StatelessWidget {
           itemCount: display.length,
           itemBuilder: (_, idx) {
             final img = display[idx];
-            Widget tile = _buildGridImage(img);
+            Widget tile = _buildGridImage(img, context);
             if (idx == 3 && count > 4) {
               // overlay +N
               tile = Stack(
@@ -104,6 +155,7 @@ class ChatMessages extends StatelessWidget {
                       '+${count - 3}',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
+                        color: AppPallete.white,
                       ),
                     ),
                   ),
@@ -133,7 +185,7 @@ class ChatMessages extends StatelessWidget {
             ),
             child: Text(
               m.text,
-              style: TextStyle(
+              style: theme.textTheme.bodySmall?.copyWith(
                 color: isMe ? AppPallete.grey900 : theme.colorScheme.onSurface,
               ),
             ),
@@ -141,40 +193,62 @@ class ChatMessages extends StatelessWidget {
         );
       case MessageType.image:
         final m = message as ImageMessage;
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.7,
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatImageShow(
+                  imageUrl: m.url,
+                  fileName: m.name,
+                  imageUrlsandFileName: imageUrlsandFileName,
+                  index: imageUrlsandFileName.keys.toList().indexOf(m.url),
+                ),
+              ),
+            );
+          },
+          child: Align(
+            alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: isMe
+                      ? MediaQuery.of(context).size.width * 0.7
+                      : MediaQuery.of(context).size.width * .65,
+                ),
+                child: m.url.startsWith('http')
+                    ? FastCachedImage(
+                        url: m.url,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.error,
+                            color: AppPallete.errorMain,
+                            size: 50,
+                          );
+                        },
+                        loadingBuilder: (context, progress) {
+                          return Shimmer.fromColors(
+                            enabled: true,
+                            baseColor: AppPallete.grey400.withOpacity(0.5),
+                            highlightColor: AppPallete.grey400.withOpacity(0.2),
+                            child: Container(
+                              width: isMe
+                                  ? MediaQuery.of(context).size.width * 0.7
+                                  : MediaQuery.of(context).size.width * .65,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: AppPallete.grey400.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Image.file(File(m.url)),
+              ),
             ),
-            child: m.url.startsWith('http')
-                ? FastCachedImage(
-                    url: m.url,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        Icons.error,
-                        color: AppPallete.errorMain,
-                        size: 50,
-                      );
-                    },
-                    loadingBuilder: (context, progress) {
-                      return Shimmer.fromColors(
-                        enabled: true,
-                        baseColor: AppPallete.grey400.withOpacity(0.5),
-                        highlightColor: AppPallete.grey400.withOpacity(0.2),
-                        child: Container(
-                          width: 100,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: AppPallete.grey400.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                : Image.file(File(m.url)),
           ),
         );
       case MessageType.file:
@@ -191,7 +265,7 @@ class ChatMessages extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppPallete.containerColor,
+                  color: theme.colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: SvgPicture.asset(iconPath, width: 24, height: 24),
@@ -247,37 +321,53 @@ class ChatMessages extends StatelessWidget {
     }
   }
 
-  Widget _buildGridImage(ImageMessage img, {BoxFit fillMode = BoxFit.cover}) {
+  Widget _buildGridImage(ImageMessage img, BuildContext context,
+      {BoxFit fillMode = BoxFit.cover}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: img.url.startsWith('http')
-          ? FastCachedImage(
-              url: img.url,
-              fit: fillMode,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.error,
-                  color: AppPallete.errorMain,
-                  size: 50,
-                );
-              },
-              loadingBuilder: (context, progress) {
-                return Shimmer.fromColors(
-                  enabled: true,
-                  baseColor: AppPallete.grey400.withOpacity(0.5),
-                  highlightColor: AppPallete.grey400.withOpacity(0.2),
-                  child: Container(
-                    width: 100,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: AppPallete.grey400.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(8),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatImageShow(
+                imageUrl: img.url,
+                fileName: img.name,
+                imageUrlsandFileName: imageUrlsandFileName,
+                index: imageUrlsandFileName.keys.toList().indexOf(img.url),
+              ),
+            ),
+          );
+        },
+        child: img.url.startsWith('http')
+            ? FastCachedImage(
+                url: img.url,
+                fit: fillMode,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.error,
+                    color: AppPallete.errorMain,
+                    size: 50,
+                  );
+                },
+                loadingBuilder: (context, progress) {
+                  return Shimmer.fromColors(
+                    enabled: true,
+                    baseColor: AppPallete.grey400.withOpacity(0.5),
+                    highlightColor: AppPallete.grey400.withOpacity(0.2),
+                    child: Container(
+                      width: 100,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppPallete.grey400.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                  ),
-                );
-              },
-            )
-          : Image.file(File(img.url), fit: BoxFit.cover),
+                  );
+                },
+              )
+            : Image.file(File(img.url), fit: BoxFit.cover),
+      ),
     );
   }
 }

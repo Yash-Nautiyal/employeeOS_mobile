@@ -16,14 +16,16 @@ abstract class ChatMessage {
   final DateTime createdAt;
   final MessageType type;
   final String? replyTo;
+  final Map<String, String> reactions;
 
   ChatMessage({
     required this.id,
     required this.authorId,
     required this.createdAt,
     required this.type,
+    Map<String, String>? reactions,
     this.replyTo,
-  });
+  }) : reactions = reactions ?? <String, String>{};
 
   Map<String, dynamic> toJson();
 }
@@ -36,6 +38,7 @@ class TextMessage extends ChatMessage {
     required super.id,
     required super.authorId,
     required super.createdAt,
+    super.reactions,
     super.replyTo,
     required this.text,
   }) : super(
@@ -50,6 +53,7 @@ class TextMessage extends ChatMessage {
         'type': type.toString(),
         'replyTo': replyTo,
         'text': text,
+        'reactions': reactions
       };
 
   factory TextMessage.fromJson(Map<String, dynamic> json) => TextMessage(
@@ -58,6 +62,8 @@ class TextMessage extends ChatMessage {
         createdAt: DateTime.parse(json['createdAt'] as String),
         replyTo: json['replyTo'] as String?,
         text: json['text'] as String,
+        reactions: (json['reactions'] as Map<String, dynamic>?)
+            ?.map((key, value) => MapEntry(key, value as String)),
       );
 }
 
@@ -67,15 +73,16 @@ class ImageMessage extends ChatMessage {
   final String name;
   final int size;
 
-  ImageMessage({
-    required super.id,
-    required super.authorId,
-    required super.createdAt,
-    super.replyTo,
-    required this.url,
-    required this.name,
-    required this.size,
-  }) : super(
+  ImageMessage(
+      {required super.id,
+      required super.authorId,
+      required super.createdAt,
+      required this.url,
+      required this.name,
+      required this.size,
+      super.replyTo,
+      super.reactions})
+      : super(
           type: MessageType.image,
         );
 
@@ -89,6 +96,7 @@ class ImageMessage extends ChatMessage {
         'url': url,
         'name': name,
         'size': size,
+        'reactions': reactions,
       };
 
   factory ImageMessage.fromJson(Map<String, dynamic> json) => ImageMessage(
@@ -99,6 +107,8 @@ class ImageMessage extends ChatMessage {
         url: json['url'] as String,
         name: json['name'] as String,
         size: json['size'] as int,
+        reactions: (json['reactions'] as Map<String, dynamic>?)
+            ?.map((key, value) => MapEntry(key, value as String)),
       );
 }
 
@@ -113,11 +123,12 @@ class FileMessage extends ChatMessage {
     required super.id,
     required super.authorId,
     required super.createdAt,
-    super.replyTo,
     required this.url,
     required this.name,
     required this.size,
     required this.fileType,
+    super.replyTo,
+    super.reactions,
   }) : super(
           type: MessageType.file,
         );
@@ -132,6 +143,7 @@ class FileMessage extends ChatMessage {
         'url': url,
         'name': name,
         'size': size,
+        'reactions': reactions,
       };
 
   factory FileMessage.fromJson(Map<String, dynamic> json) => FileMessage(
@@ -143,6 +155,8 @@ class FileMessage extends ChatMessage {
         name: json['name'] as String,
         fileType: json['fileType'] as String,
         size: json['size'] as int,
+        reactions: (json['reactions'] as Map<String, dynamic>?)
+            ?.map((key, value) => MapEntry(key, value as String)),
       );
 }
 
@@ -220,6 +234,12 @@ List<ChatMessage> getMockChatMessages({required String currentUserId}) {
       createdAt: now.subtract(const Duration(days: 1, minutes: 1)),
       text: 'Replying to file message from yesterday',
       replyTo: '8',
+      reactions: {
+        'user-123': '😂',
+        'user_2': '😂',
+        'user_3': '❤️',
+        'user_4': '👍',
+      },
     ),
     TextMessage(
       id: rnd(),
@@ -256,24 +276,33 @@ List<ChatMessage> getMockChatMessages({required String currentUserId}) {
       name: 'yesterday_placeholder.png',
       size: 1024,
     ),
-    ImageMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-      url:
-          'https://images.unsplash.com/photo-1745294279347-e1bcbcb30f8c?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'wave.png',
-      size: 1024,
-    ),
-    ImageMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-      url:
-          'https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'pen.png',
-      size: 1024,
-    ),
+    // ImageMessage(
+    //   id: rnd(),
+    //   authorId: currentUserId,
+    //   createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
+    //   url:
+    //       'https://images.unsplash.com/photo-1745294279347-e1bcbcb30f8c?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    //   name: 'wave.png',
+    //   size: 1024,
+    // ),
+    // ImageMessage(
+    //   id: rnd(),
+    //   authorId: currentUserId,
+    //   createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
+    //   url:
+    //       'https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    //   name: 'pen.png',
+    //   size: 1024,
+    // ),
+    // ImageMessage(
+    //   id: rnd(),
+    //   authorId: currentUserId,
+    //   createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
+    //   url:
+    //       'https://images.unsplash.com/photo-1706287087833-2db8010fd435?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    //   name: 'image2.png',
+    //   size: 1024,
+    // ),
     FileMessage(
       id: rnd(),
       authorId: 'user_2',
@@ -289,8 +318,8 @@ List<ChatMessage> getMockChatMessages({required String currentUserId}) {
       authorId: 'user_2',
       createdAt: now.subtract(const Duration(days: 2, minutes: 3)),
       url:
-          'https://plus.unsplash.com/premium_photo-1683865776032-07bf70b0add1?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'yesterday_placeholder.png',
+          'https://plus.unsplash.com/premium_photo-1676487748067-4da1e9afa701?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      name: 'mountains.png',
       size: 1024,
     ),
     ImageMessage(
@@ -298,9 +327,9 @@ List<ChatMessage> getMockChatMessages({required String currentUserId}) {
       authorId: 'user_2',
       createdAt: now.subtract(const Duration(days: 2, minutes: 3)),
       url:
-          'https://images.unsplash.com/photo-1745294279347-e1bcbcb30f8c?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'wave.png',
-      size: 1024,
+          'https://images.pexels.com/photos/31636919/pexels-photo-31636919/free-photo-of-coastal-breakwater-against-ocean-waves.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      name: 'leaf.png',
+      size: 22200,
     ),
   ];
 

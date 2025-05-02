@@ -79,6 +79,12 @@ class AppTheme {
         borderRadius: BorderRadius.circular(5),
       ),
     ),
+    iconButtonTheme: const IconButtonThemeData(
+      style: ButtonStyle(
+        padding: WidgetStatePropertyAll(EdgeInsets.all(5)),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    ),
   );
 
 // Theme Data for Dark Mode

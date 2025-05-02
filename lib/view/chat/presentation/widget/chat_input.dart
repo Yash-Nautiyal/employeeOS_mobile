@@ -1,18 +1,28 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
+import 'package:employeeos/view/chat/presentation/widget/chat_reply.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class ChatInput extends StatefulWidget {
   final ThemeData theme;
   final void Function(String text) onSendText;
+  final String currentUserId;
   final VoidCallback onPickImage;
   final VoidCallback onPickFile;
-  const ChatInput(
-      {super.key,
-      required this.theme,
-      required this.onSendText,
-      required this.onPickImage,
-      required this.onPickFile});
+  final ChatMessage? replyMessage; 
+  final VoidCallback onCancelReply;
+
+  const ChatInput({
+    super.key,
+    required this.theme,
+    required this.onSendText,
+    required this.onPickImage,
+    required this.onPickFile,
+    required this.currentUserId,
+    this.replyMessage,
+    required this.onCancelReply,
+  });
 
   @override
   State<ChatInput> createState() => _ChatInputState();
@@ -30,53 +40,83 @@ class _ChatInputState extends State<ChatInput> {
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),
         ),
-        color: widget.theme.colorScheme.surfaceContainer,
+        border: Border(
+          top: BorderSide(color: widget.theme.dividerColor),
+        ),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Reply Preview Section
+          if (widget.replyMessage != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 5.0, right: 5),
+              child: Badge(
+                padding: const EdgeInsets.all(3),
+                offset: const Offset(0, 0),
+                backgroundColor: widget.theme.colorScheme.surfaceContainer,
+                label: IconButton(
+                  onPressed: widget.onCancelReply,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: Icon(
+                    Icons.close,
+                    color: widget.theme.colorScheme.tertiary,
+                    size: 16,
+                  ),
+                ),
+                child: ChatReply(
+                  currentUserId: widget.currentUserId,
+                  repliedMessage: widget.replyMessage!,
+                  preview: true,
+                ),
+              ),
+            ),
+          // Input Field Section
           Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  
+                },
                 constraints: const BoxConstraints(
-                  maxWidth: 32,
-                  maxHeight: 32,
+                  maxWidth: 38,
+                  maxHeight: 38,
                 ),
                 icon: SvgPicture.asset(
                   "assets/icons/common/solid/ic-eva_smiling-face-outline.svg",
                   color: AppPallete.grey600,
-                  width: 23,
-                  height: 23,
                 ),
               ),
               Expanded(
-                  child: TextField(
-                controller: controller,
-                onChanged: (value) {
-                  setState(() {
-                    controller.text = value;
-                  });
-                },
-                onTapOutside: (event) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                minLines: 1,
-                maxLines: 3,
-                keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
-                  hintText: "Type a message",
-                  hintStyle: widget.theme.textTheme.bodyMedium?.copyWith(
-                    color: AppPallete.grey600,
-                  ),
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 10,
+                child: TextField(
+                  controller: controller,
+                  onChanged: (value) {
+                    setState(() {
+                      controller.text = value;
+                    });
+                  },
+                  onTapOutside: (event) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
+                  minLines: 1,
+                  maxLines: 3,
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    hintText: "Type a message",
+                    hintStyle: widget.theme.textTheme.bodyMedium?.copyWith(
+                      color: AppPallete.grey600,
+                    ),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 10,
+                    ),
                   ),
                 ),
-              )),
+              ),
               IconButton(
                 onPressed: () {
                   final text = controller.text.trim();
@@ -137,6 +177,85 @@ class _ChatInputState extends State<ChatInput> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PreviewMessage extends StatelessWidget {
+  const PreviewMessage({
+    super.key,
+    required this.widget,
+  });
+
+  final ChatInput widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: widget.theme.brightness == Brightness.dark
+            ? widget.theme.scaffoldBackgroundColor
+            : AppPallete.grey200,
+        borderRadius: BorderRadius.circular(8),
+        border: Border(
+          left: BorderSide(
+              color: widget.theme.colorScheme.primaryContainer, width: 2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.replyMessage!.authorId == widget.currentUserId
+                      ? "You"
+                      : widget.replyMessage!.authorId,
+                  style: widget.theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: widget.theme.disabledColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (widget.replyMessage is TextMessage)
+                  Text(
+                    (widget.replyMessage as TextMessage).text,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: widget.theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: widget.theme.disabledColor,
+                    ),
+                  )
+                else if (widget.replyMessage is ImageMessage)
+                  Text(
+                    "Image",
+                    style: widget.theme.textTheme.bodySmall,
+                  )
+                else if (widget.replyMessage is FileMessage)
+                  Text(
+                    "File: ${(widget.replyMessage as FileMessage).name}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: widget.theme.textTheme.bodySmall,
+                  )
+                else
+                  Text(
+                    "Unsupported message type",
+                    style: widget.theme.textTheme.bodySmall,
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: widget.onCancelReply, // Cancel reply callback
+            icon: const Icon(Icons.close, size: 20),
           ),
         ],
       ),
