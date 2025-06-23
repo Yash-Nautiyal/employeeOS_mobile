@@ -1,6 +1,6 @@
-import 'package:employeeos/core/common/textbutton/textbutton.dart';
-import 'package:employeeos/core/common/textfield/textfield.dart';
-import 'package:employeeos/core/common/toast/custom_toast.dart';
+import 'package:employeeos/core/common/components/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/core/common/components/custom_toast.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:flutter/material.dart';

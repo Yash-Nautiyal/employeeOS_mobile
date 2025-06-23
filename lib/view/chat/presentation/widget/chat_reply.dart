@@ -12,19 +12,20 @@ class ChatReply extends StatelessWidget {
   final ChatMessage repliedMessage;
   final String currentUserId;
   final bool preview;
+  final ThemeData theme;
 
   const ChatReply({
     super.key,
     required this.repliedMessage,
     required this.currentUserId,
+    required this.theme,
     this.preview = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final theme = Theme.of(context);
-
+    final isMe = repliedMessage.authorId == currentUserId;
     return Container(
       constraints: BoxConstraints(
         maxWidth: preview == false ? screenWidth * 0.5 : double.infinity,
@@ -34,11 +35,13 @@ class ChatReply extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.brightness == Brightness.dark
             ? theme.scaffoldBackgroundColor
-            : AppPallete.grey200,
+            : AppPallete.grey300,
         border: Border(
           left: BorderSide(
-            color: theme.colorScheme.primaryContainer,
-            width: 2,
+            color: isMe
+                ? theme.colorScheme.primaryContainer
+                : theme.colorScheme.secondaryContainer,
+            width: 3,
           ),
         ),
         borderRadius: BorderRadius.circular(8),
@@ -124,7 +127,7 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppPallete.containerColor,
+                        color: theme.colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: SvgPicture.asset(

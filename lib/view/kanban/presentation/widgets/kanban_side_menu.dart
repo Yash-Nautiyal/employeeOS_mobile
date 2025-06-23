@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:cool_dropdown/cool_dropdown.dart';
 import 'package:cool_dropdown/models/cool_dropdown_item.dart';
-import 'package:employeeos/core/common/textbutton/textbutton.dart';
-import 'package:employeeos/core/common/textfield/textfield.dart';
+import 'package:employeeos/core/common/components/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/custom_textfield.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_group.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +71,6 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                           duration: Duration(milliseconds: 100),
                         ),
                         resultOptions: ResultOptions(
-                          
                           openBoxDecoration: BoxDecoration(
                             color: Theme.of(context).dividerColor,
                             borderRadius:
@@ -223,10 +222,10 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                                 children: [
                                   SvgPicture.asset(
                                     level == 'Low'
-                                        ? 'assets/icons/common/ic-solar_double-alt-arrow-down-bold-duotone.svg'
+                                        ? 'assets/icons/arrow/ic-solar_double-alt-arrow-down-bold-duotone.svg'
                                         : level == 'Medium'
-                                            ? 'assets/icons/common/ic-solar_double-alt-arrow-right-bold-duotone.svg'
-                                            : 'assets/icons/common/ic-solar_double-alt-arrow-up-bold-duotone.svg',
+                                            ? 'assets/icons/arrow/ic-solar_double-alt-arrow-right-bold-duotone.svg'
+                                            : 'assets/icons/arrow/ic-solar_double-alt-arrow-up-bold-duotone.svg',
                                     color: level == 'Low'
                                         ? AppPallete.infoMain
                                         : level == 'Medium'

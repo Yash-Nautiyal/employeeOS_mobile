@@ -1,4 +1,4 @@
-import 'package:employeeos/core/common/nav/home_nav.dart';
+import 'package:employeeos/core/common/components/home_nav.dart';
 import 'package:employeeos/view/auth/presentation/widgets/auth_page.dart';
 import 'package:flutter/material.dart';
 

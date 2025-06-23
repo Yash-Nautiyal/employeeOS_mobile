@@ -43,7 +43,7 @@ class KanbanGroupCard extends StatelessWidget {
                         style: theme.textTheme.labelLarge),
                   ),
                   SvgPicture.asset(
-                    'assets/icons/common/ic-solar_double-alt-arrow-down-bold-duotone.svg',
+                    'assets/icons/arrow/ic-solar_double-alt-arrow-down-bold-duotone.svg',
                     color: AppPallete.infoMain,
                   )
                 ],

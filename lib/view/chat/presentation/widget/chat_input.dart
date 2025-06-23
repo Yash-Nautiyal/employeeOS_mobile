@@ -10,7 +10,7 @@ class ChatInput extends StatefulWidget {
   final String currentUserId;
   final VoidCallback onPickImage;
   final VoidCallback onPickFile;
-  final ChatMessage? replyMessage; 
+  final ChatMessage? replyMessage;
   final VoidCallback onCancelReply;
 
   const ChatInput({
@@ -55,7 +55,7 @@ class _ChatInputState extends State<ChatInput> {
               child: Badge(
                 padding: const EdgeInsets.all(3),
                 offset: const Offset(0, 0),
-                backgroundColor: widget.theme.colorScheme.surfaceContainer,
+                backgroundColor: widget.theme.colorScheme.surface,
                 label: IconButton(
                   onPressed: widget.onCancelReply,
                   padding: EdgeInsets.zero,
@@ -69,6 +69,7 @@ class _ChatInputState extends State<ChatInput> {
                 child: ChatReply(
                   currentUserId: widget.currentUserId,
                   repliedMessage: widget.replyMessage!,
+                  theme: widget.theme,
                   preview: true,
                 ),
               ),
@@ -77,9 +78,7 @@ class _ChatInputState extends State<ChatInput> {
           Row(
             children: [
               IconButton(
-                onPressed: () {
-                  
-                },
+                onPressed: () {},
                 constraints: const BoxConstraints(
                   maxWidth: 38,
                   maxHeight: 38,
@@ -177,85 +176,6 @@ class _ChatInputState extends State<ChatInput> {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class PreviewMessage extends StatelessWidget {
-  const PreviewMessage({
-    super.key,
-    required this.widget,
-  });
-
-  final ChatInput widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: widget.theme.brightness == Brightness.dark
-            ? widget.theme.scaffoldBackgroundColor
-            : AppPallete.grey200,
-        borderRadius: BorderRadius.circular(8),
-        border: Border(
-          left: BorderSide(
-              color: widget.theme.colorScheme.primaryContainer, width: 2),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.replyMessage!.authorId == widget.currentUserId
-                      ? "You"
-                      : widget.replyMessage!.authorId,
-                  style: widget.theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: widget.theme.disabledColor,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                if (widget.replyMessage is TextMessage)
-                  Text(
-                    (widget.replyMessage as TextMessage).text,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: widget.theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: widget.theme.disabledColor,
-                    ),
-                  )
-                else if (widget.replyMessage is ImageMessage)
-                  Text(
-                    "Image",
-                    style: widget.theme.textTheme.bodySmall,
-                  )
-                else if (widget.replyMessage is FileMessage)
-                  Text(
-                    "File: ${(widget.replyMessage as FileMessage).name}",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: widget.theme.textTheme.bodySmall,
-                  )
-                else
-                  Text(
-                    "Unsupported message type",
-                    style: widget.theme.textTheme.bodySmall,
-                  ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: widget.onCancelReply, // Cancel reply callback
-            icon: const Icon(Icons.close, size: 20),
           ),
         ],
       ),

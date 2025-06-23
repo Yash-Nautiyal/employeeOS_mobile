@@ -276,33 +276,25 @@ List<ChatMessage> getMockChatMessages({required String currentUserId}) {
       name: 'yesterday_placeholder.png',
       size: 1024,
     ),
-    // ImageMessage(
-    //   id: rnd(),
-    //   authorId: currentUserId,
-    //   createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-    //   url:
-    //       'https://images.unsplash.com/photo-1745294279347-e1bcbcb30f8c?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    //   name: 'wave.png',
-    //   size: 1024,
-    // ),
-    // ImageMessage(
-    //   id: rnd(),
-    //   authorId: currentUserId,
-    //   createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-    //   url:
-    //       'https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    //   name: 'pen.png',
-    //   size: 1024,
-    // ),
-    // ImageMessage(
-    //   id: rnd(),
-    //   authorId: currentUserId,
-    //   createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-    //   url:
-    //       'https://images.unsplash.com/photo-1706287087833-2db8010fd435?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    //   name: 'image2.png',
-    //   size: 1024,
-    // ),
+    ImageMessage(
+      id: rnd(),
+      authorId: currentUserId,
+      createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
+      url:
+          'https://images.unsplash.com/photo-1745294279347-e1bcbcb30f8c?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      name: 'wave.png',
+      size: 1024,
+    ),
+    ImageMessage(
+      id: rnd(),
+      authorId: currentUserId,
+      createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
+      url:
+          'https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      name: 'pen.png',
+      size: 1024,
+    ),
+    
     FileMessage(
       id: rnd(),
       authorId: 'user_2',

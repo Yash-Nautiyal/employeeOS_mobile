@@ -184,7 +184,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                     children: [
                       if (showDateDivider)
                         Padding(
-                          padding: const EdgeInsets.only(top: 20),
+                          padding: const EdgeInsets.only(top: 30),
                           child: Center(
                             child: Text(
                               formatDate(msg.createdAt),
@@ -193,15 +193,15 @@ class _ChatMessageListState extends State<ChatMessageList> {
                                   .bodySmall
                                   ?.copyWith(
                                     color: widget.theme.colorScheme.tertiary,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w700,
                                   ),
                             ),
                           ),
                         ),
                       Padding(
                         padding: EdgeInsets.only(
-                          top: showTimestamp ? 30 : 2,
-                          bottom: 2,
+                          top: showTimestamp ? 30 : 1,
+                          bottom: 1,
                         ),
                         child: ChatMessageItem(
                           message: msg,

@@ -63,9 +63,7 @@ class ChatMessageItem extends StatelessWidget {
                   middle: EmojiPickerItem.emojiView,
                   bottom: EmojiPickerItem.categoryBar,
                 ),
-                skinToneConfig: const SkinToneConfig(
-                  
-                ),
+                skinToneConfig: const SkinToneConfig(),
                 categoryViewConfig: CategoryViewConfig(
                   backgroundColor: theme.colorScheme.surfaceContainer,
                   iconColorSelected: AppPallete.primaryMain,
@@ -75,9 +73,7 @@ class ChatMessageItem extends StatelessWidget {
                   backgroundColor: theme.colorScheme.surfaceDim,
                   buttonColor: Colors.transparent,
                 ),
-                searchViewConfig: const SearchViewConfig(
-                  
-                ),
+                searchViewConfig: const SearchViewConfig(),
               ),
               onEmojiSelected: ((category, emoji) {
                 // pop the bottom sheet
@@ -107,7 +103,7 @@ class ChatMessageItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: isUserReaction
-                ? AppPallete.primaryLight
+                ? theme.colorScheme.primaryFixedDim
                 : theme.colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(50),
           ),
@@ -121,7 +117,7 @@ class ChatMessageItem extends StatelessWidget {
                   '×$cnt',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: AppPallete.grey600,
+                    color: AppPallete.grey700,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -166,6 +162,7 @@ class ChatMessageItem extends StatelessWidget {
                     ChatReply(
                       repliedMessage: repliedMessage!,
                       currentUserId: currentUserId,
+                      theme: theme,
                     ),
                   if (batch != null && batch!.isNotEmpty)
                     ChatMessages(
@@ -219,15 +216,11 @@ class ChatMessageItem extends StatelessWidget {
                         },
                         child: Hero(
                           tag: message.id,
-                          child: Column(
-                            children: [
-                              ChatMessages(
-                                message: message,
-                                isMe: isMe,
-                                bgColor: bgColor,
-                                imageUrlsandFileName: imageUrlsandFileName,
-                              ),
-                            ],
+                          child: ChatMessages(
+                            message: message,
+                            isMe: isMe,
+                            bgColor: bgColor,
+                            imageUrlsandFileName: imageUrlsandFileName,
                           ),
                         ),
                       ),

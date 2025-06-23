@@ -39,131 +39,142 @@ class ChatMessages extends StatelessWidget {
           : MediaQuery.of(context).size.width * 0.6;
       // 3-image special layout
       if (count == 3) {
-        return Container(
-          height: 200,
-          constraints: BoxConstraints(maxWidth: maxWidth),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatImageShow(
-                      imageUrl: batch![0].url,
-                      fileName: batch![0].name,
-                      imageUrlsandFileName: imageUrlsandFileName,
-                      index: imageUrlsandFileName.keys
-                          .toList()
-                          .indexOf(batch![0].url),
+        return Align(
+          alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+          child: Container(
+            height: 200,
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: Row(
+              children: [
+                // FIRST IMAGE (2/3 width)
+                Expanded(
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatImageShow(
+                          imageUrl: batch![0].url,
+                          fileName: batch![0].name,
+                          imageUrlsandFileName: imageUrlsandFileName,
+                          index: imageUrlsandFileName.keys
+                              .toList()
+                              .indexOf(batch![0].url),
+                        ),
+                      ),
+                    ),
+                    child: SizedBox(
+                      height: double.infinity,
+                      width: double.infinity,
+                      child: _buildGridImage(batch![0], context,
+                          fillMode: BoxFit.cover),
                     ),
                   ),
                 ),
-                child: Expanded(
-                  flex: 2,
-                  child: SizedBox(
-                      height: double.maxFinite,
-                      width: double.maxFinite,
-                      child: _buildGridImage(batch![0], context,
-                          fillMode: BoxFit.cover)),
-                ),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatImageShow(
-                            imageUrl: batch![1].url,
-                            fileName: batch![1].name,
-                            imageUrlsandFileName: imageUrlsandFileName,
-                            index: imageUrlsandFileName.keys
-                                .toList()
-                                .indexOf(batch![1].url),
+                const SizedBox(width: 4),
+                // SECOND COLUMN (1/3 width)
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      // Top half
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatImageShow(
+                                imageUrl: batch![1].url,
+                                fileName: batch![1].name,
+                                imageUrlsandFileName: imageUrlsandFileName,
+                                index: imageUrlsandFileName.keys
+                                    .toList()
+                                    .indexOf(batch![1].url),
+                              ),
+                            ),
+                          ),
+                          child: SizedBox(
+                            height: double.infinity,
+                            width: double.infinity,
+                            child: _buildGridImage(batch![1], context,
+                                fillMode: BoxFit.cover),
                           ),
                         ),
                       ),
-                      child: Expanded(
-                        child: SizedBox(
-                          height: double.maxFinite,
-                          width: double.maxFinite,
-                          child: _buildGridImage(batch![1], context,
-                              fillMode: BoxFit.cover),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatImageShow(
-                            imageUrl: batch![2].url,
-                            fileName: batch![2].name,
-                            imageUrlsandFileName: imageUrlsandFileName,
-                            index: imageUrlsandFileName.keys
-                                .toList()
-                                .indexOf(batch![2].url),
+                      const SizedBox(height: 4),
+                      // Bottom half
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatImageShow(
+                                imageUrl: batch![2].url,
+                                fileName: batch![2].name,
+                                imageUrlsandFileName: imageUrlsandFileName,
+                                index: imageUrlsandFileName.keys
+                                    .toList()
+                                    .indexOf(batch![2].url),
+                              ),
+                            ),
+                          ),
+                          child: SizedBox(
+                            height: double.infinity,
+                            width: double.infinity,
+                            child: _buildGridImage(batch![2], context,
+                                fillMode: BoxFit.cover),
                           ),
                         ),
                       ),
-                      child: Expanded(
-                        child: SizedBox(
-                          height: double.maxFinite,
-                          width: double.maxFinite,
-                          child: _buildGridImage(batch![2], context,
-                              fillMode: BoxFit.cover),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       }
       final display = batch!.take(4).toList();
-      return Container(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: GridView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-          ),
-          itemCount: display.length,
-          itemBuilder: (_, idx) {
-            final img = display[idx];
-            Widget tile = _buildGridImage(img, context);
-            if (idx == 3 && count > 4) {
-              // overlay +N
-              tile = Stack(
-                fit: StackFit.expand,
-                children: [
-                  tile,
-                  Container(
-                    color: Colors.black45,
-                    alignment: Alignment.center,
-                    child: Text(
-                      '+${count - 3}',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: AppPallete.white,
+      return Align(
+        alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: GridView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+            ),
+            itemCount: display.length,
+            itemBuilder: (_, idx) {
+              final img = display[idx];
+              Widget tile = _buildGridImage(img, context);
+              if (idx == 3 && count > 4) {
+                // overlay +N
+                tile = Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    tile,
+                    Container(
+                      color: Colors.black45,
+                      alignment: Alignment.center,
+                      child: Text(
+                        '+${count - 3}',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppPallete.white,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            }
-            return tile;
-          },
+                  ],
+                );
+              }
+              return tile;
+            },
+          ),
         ),
       );
     }

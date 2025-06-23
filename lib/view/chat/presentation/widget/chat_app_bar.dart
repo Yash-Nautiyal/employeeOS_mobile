@@ -5,10 +5,16 @@ import 'package:flutter_svg/svg.dart';
 
 class ChatAppBar extends StatefulWidget {
   final ThemeData theme;
+  final String name;
+  final String subTitle;
+  final String avatar;
 
   const ChatAppBar({
     super.key,
     required this.theme,
+    required this.name,
+    required this.subTitle,
+    required this.avatar,
   });
 
   @override
@@ -42,8 +48,9 @@ class _ChatAppBarState extends State<ChatAppBar> {
             badgeStyle:
                 const badges.BadgeStyle(badgeColor: AppPallete.primaryMain),
             position: badges.BadgePosition.bottomEnd(bottom: 0, end: 0),
-            child: const CircleAvatar(
+            child: CircleAvatar(
               radius: 20,
+              child: Text(widget.avatar),
             ),
           ),
           const SizedBox(width: 10),
@@ -51,13 +58,13 @@ class _ChatAppBarState extends State<ChatAppBar> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Simform",
+                widget.name,
                 style: widget.theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                "Online",
+                widget.subTitle,
                 style: widget.theme.textTheme.bodySmall
                     ?.copyWith(color: widget.theme.disabledColor),
               )

@@ -1,4 +1,4 @@
-import 'package:employeeos/core/common/nav/home_nav.dart';
+import 'package:employeeos/core/common/components/home_nav.dart';
 import 'package:employeeos/view/home/presentation/widgets/home_hero.dart';
 import 'package:employeeos/view/home/presentation/widgets/home_minimal.dart';
 import 'package:flutter/material.dart';
@@ -32,13 +32,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     }
   }
 
-  void _scrollToTop() {
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
-  }
+  // void _scrollToTop() {
+  //   _scrollController.animateTo(
+  //     0,
+  //     duration: const Duration(milliseconds: 500),
+  //     curve: Curves.easeInOut,
+  //   );
+  // }
 
   @override
   void dispose() {
@@ -64,8 +64,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       extendBodyBehindAppBar: true,
       extendBody: true,
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(
-            decelerationRate: ScrollDecelerationRate.normal),
+        physics: const RangeMaintainingScrollPhysics(
+          parent: BouncingScrollPhysics(
+              decelerationRate: ScrollDecelerationRate.fast),
+        ),
         controller: _scrollController,
         child: Column(
           children: [

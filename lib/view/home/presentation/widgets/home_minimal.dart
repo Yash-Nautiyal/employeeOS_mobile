@@ -50,29 +50,29 @@ class HomeMinimal extends StatelessWidget {
 
           // Feature items
           FeatureItem(
-              image:
-                  'assets/icons/${theme.brightness.toString().split('.')[1].toLowerCase()}/ic-make-brand.svg',
-              title: 'Branding',
-              description: 'Consistent design makes it easy to brand your own.',
-              theme: theme),
+            image: 'assets/icons/common/ic-make-brand.svg',
+            title: 'Branding',
+            description: 'Consistent design makes it easy to brand your own.',
+            theme: theme,
+          ),
           const SizedBox(height: 24),
 
           FeatureItem(
-              image:
-                  'assets/icons/${theme.brightness.toString().split('.')[1].toLowerCase()}/ic-design.svg',
-              title: 'UI & UX Design',
-              description:
-                  'The kit is built on the principles of the atomic design system.',
-              theme: theme),
+            image: 'assets/icons/common/ic-design.svg',
+            title: 'UI & UX Design',
+            description:
+                'The kit is built on the principles of the atomic design system.',
+            theme: theme,
+          ),
           const SizedBox(height: 24),
 
           FeatureItem(
-              image:
-                  'assets/icons/${theme.brightness.toString().split('.')[1].toLowerCase()}/ic-development.svg',
-              title: 'Development',
-              description:
-                  'Easy to customize and extend, saving you time and money.',
-              theme: theme),
+            image: 'assets/icons/common/ic-development.svg',
+            title: 'Development',
+            description:
+                'Easy to customize and extend, saving you time and money.',
+            theme: theme,
+          ),
           const SizedBox(height: 32),
         ],
       ),
@@ -102,6 +102,8 @@ class FeatureItem extends StatelessWidget {
           image,
           width: 35,
           height: 35,
+          colorFilter:
+              ColorFilter.mode(theme.colorScheme.tertiary, BlendMode.srcIn),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -121,11 +123,3 @@ class FeatureItem extends StatelessWidget {
     );
   }
 }
-
-// Usage:
-// void main() {
-//   runApp(MaterialApp(
-//     debugShowCheckedModeBanner: false,
-//     home: MinimalFeatures(),
-//   ));
-// }

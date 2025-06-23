@@ -7,9 +7,10 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    primaryColor: AppPallete.primaryDarker,
+    primaryColor: AppPallete.primaryMain,
     scaffoldBackgroundColor: AppPallete.white,
-    dividerColor: AppPallete.grey300,
+    dividerColor: AppPallete.grey500,
+    disabledColor: AppPallete.grey600,
     fontFamily: AppTypography.primaryFont,
     textTheme: TextTheme(
       displayLarge:
@@ -41,16 +42,15 @@ class AppTheme {
       primaryContainer: AppPallete.primaryDark,
       secondary: AppPallete.secondaryMain,
       secondaryFixedDim: AppPallete.secondaryLight,
-      secondaryContainer: AppPallete.secondaryLighter,
-      error: AppPallete.errorMain,
+      secondaryContainer: AppPallete.secondaryDark,
+      error: AppPallete.errorDark,
       errorContainer: AppPallete.errorLight,
-      surface: AppPallete.white,
+      surface: AppPallete.grey200,
       tertiary: AppPallete.grey900,
-      surfaceContainer: AppPallete.grey200,
+      surfaceContainer: AppPallete.grey300,
       surfaceDim: AppPallete.grey300,
     ),
     shadowColor: AppPallete.black.withOpacity(0.5),
-    disabledColor: AppPallete.grey600,
     inputDecorationTheme: InputDecorationTheme(
       enabledBorder: OutlineInputBorder(
         borderSide: const BorderSide(color: AppPallete.grey500),
@@ -85,14 +85,40 @@ class AppTheme {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     ),
+    datePickerTheme: DatePickerThemeData(
+      dividerColor: AppPallete.grey500,
+      dayStyle: AppTypography.bodyMedium,
+      headerHeadlineStyle: AppTypography.headingMedium,
+      yearStyle: AppTypography.bodyMedium,
+      weekdayStyle: AppTypography.bodyMedium,
+      confirmButtonStyle: ButtonStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        backgroundColor: const WidgetStatePropertyAll(AppPallete.grey800),
+        foregroundColor: const WidgetStatePropertyAll(AppPallete.white),
+      ),
+      cancelButtonStyle: ButtonStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        foregroundColor: const WidgetStatePropertyAll(AppPallete.grey500),
+      ),
+    ),
+    switchTheme: const SwitchThemeData(
+      thumbColor: WidgetStatePropertyAll(AppPallete.white),
+      trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
+      trackColor: WidgetStatePropertyAll(AppPallete.grey400),
+    ),
   );
 
 // Theme Data for Dark Mode
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: AppPallete.primaryDarker,
+    primaryColor: AppPallete.primaryMain,
     scaffoldBackgroundColor: AppPallete.grey900,
-    dividerColor: AppPallete.grey700,
+    dividerColor: AppPallete.grey600,
+    disabledColor: AppPallete.grey500,
     fontFamily: AppTypography.primaryFont,
     textTheme: TextTheme(
       displayLarge:
@@ -124,7 +150,7 @@ class AppTheme {
       secondary: AppPallete.secondaryDark,
       secondaryFixedDim: AppPallete.secondaryDarker,
       secondaryContainer: AppPallete.secondaryLighter,
-      error: AppPallete.errorDark,
+      error: AppPallete.errorLight,
       errorContainer: AppPallete.errorMain,
       surface: AppPallete.grey800,
       tertiary: AppPallete.white,
@@ -165,6 +191,31 @@ class AppTheme {
         padding: WidgetStatePropertyAll(EdgeInsets.all(5)),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
+    ),
+    datePickerTheme: DatePickerThemeData(
+      dividerColor: AppPallete.grey500,
+      dayStyle: AppTypography.bodyMedium,
+      headerHeadlineStyle: AppTypography.headingMedium,
+      yearStyle: AppTypography.bodyMedium,
+      weekdayStyle: AppTypography.bodyMedium,
+      confirmButtonStyle: ButtonStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        backgroundColor: const WidgetStatePropertyAll(AppPallete.white),
+        foregroundColor: const WidgetStatePropertyAll(AppPallete.grey800),
+      ),
+      cancelButtonStyle: ButtonStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        foregroundColor: const WidgetStatePropertyAll(AppPallete.grey500),
+      ),
+    ),
+    switchTheme: const SwitchThemeData(
+      thumbColor: WidgetStatePropertyAll(AppPallete.black),
+      trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
+      trackColor: WidgetStatePropertyAll(AppPallete.white),
     ),
   );
 }
