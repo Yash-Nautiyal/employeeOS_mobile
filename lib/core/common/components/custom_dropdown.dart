@@ -48,10 +48,10 @@ class _CustomDropdownState extends State<CustomDropdown> {
                   ? const Color.fromARGB(255, 84, 47, 45)
                   : AppPallete.errorLighter,
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color.fromARGB(255, 27, 31, 37).withAlpha(245)
+                  ? const Color.fromARGB(255, 27, 31, 37)
                   : const Color.fromARGB(255, 251, 251, 251),
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color.fromARGB(255, 25, 29, 37).withAlpha(245)
+                  ? const Color.fromARGB(255, 25, 29, 37)
                   : const Color.fromARGB(255, 251, 251, 251),
               Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 37, 59, 67)

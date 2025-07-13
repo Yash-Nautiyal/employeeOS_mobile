@@ -31,8 +31,7 @@ class BirthdayContainer extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 20)
-              .copyWith(right: 10, left: 20),
+          padding: const EdgeInsets.only(right: 0, left: 20),
           constraints: BoxConstraints(maxHeight: maxHeight),
           child: Column(
             children: [
@@ -42,8 +41,8 @@ class BirthdayContainer extends StatelessWidget {
                     flex: 4,
                     child: Text(
                       'Upcoming Birthdays',
-                      style: theme.textTheme.displayLarge
-                          ?.copyWith(color: AppPallete.white),
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800, fontSize: 30),
                     ),
                   ),
                   Flexible(

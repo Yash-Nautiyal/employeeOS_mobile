@@ -9,9 +9,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   PlatformDispatcher.instance.onPlatformConfigurationChanged = () {};
+  final themeBloc = await ThemeBloc.create();
   await FastCachedImageConfig.init(
       clearCacheAfter: const Duration(days: 7), subDir: 'employeeos');
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: themeBloc),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -20,20 +28,19 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ThemeBloc(),
-      child: BlocBuilder<ThemeBloc, ThemeState>(
-        builder: (context, state) => AnimatedTheme(
-          data: state.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
-          duration: const Duration(milliseconds: 100),
-          child: MaterialApp(
-            title: 'EmployeeOS',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            home: const Layout(), // your root screen
-          ),
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, state) => AnimatedTheme(
+        data: buildTheme(
+          preset: state.preset,
+          brightness: state.brightness,
+        ),
+        duration: const Duration(milliseconds: 100),
+        child: MaterialApp(
+          title: 'EmployeeOS',
+          debugShowCheckedModeBanner: false,
+          theme: state.themeData,
+
+          home: const Layout(), // your root screen
         ),
       ),
     );

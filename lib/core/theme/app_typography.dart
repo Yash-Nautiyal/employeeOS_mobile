@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
 
+enum Fonts { publicSans, inter, dmSans, nunitoSans }
+
 class AppTypography {
-  // Primary and Secondary Font Families
-  static const String primaryFont = 'PublicSans';
+  // remove const so this can change at runtime:
+  static String primaryFont = 'PublicSans';
   static const String secondaryFont = 'Barlow';
 
+  // helper to map enum → actual family name:
+  static String fontFamily(Fonts font) {
+    switch (font) {
+      case Fonts.inter:
+        return 'Inter';
+      case Fonts.dmSans:
+        return 'DM Sans';
+      case Fonts.nunitoSans:
+        return 'Nunito Sans';
+      case Fonts.publicSans:
+        return 'Public Sans';
+    }
+  }
+
+  // optional setter you can call from the bloc:
+  static void setPrimaryFont(Fonts font) {
+    primaryFont = fontFamily(font);
+  }
+
+  static Map<Fonts, String> fontMap = {
+    Fonts.publicSans: 'Public Sans',
+    Fonts.inter: 'Inter',
+    Fonts.dmSans: 'DM Sans',
+    Fonts.nunitoSans: 'Nunito Sans',
+  };
   // Font Weights
   static const FontWeight light = FontWeight.w300;
   static const FontWeight regular = FontWeight.w400;
@@ -49,20 +76,11 @@ class AppTypography {
   );
 
   // Body Text
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16,
-    height: 1.5,
-  );
+  static const TextStyle bodyLarge = TextStyle(fontSize: 16, height: 1.5);
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,
-    height: 22 / 14,
-  );
+  static const TextStyle bodyMedium = TextStyle(fontSize: 14, height: 22 / 14);
 
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 12,
-    height: 1.5,
-  );
+  static const TextStyle bodySmall = TextStyle(fontSize: 12, height: 1.5);
 
   // Button Text
   static const TextStyle button = TextStyle(

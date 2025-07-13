@@ -1,7 +1,53 @@
 import 'package:flutter/material.dart';
 
+enum Presets { blue, green, purple, orange, red, darkBlue }
+
 class AppPallete {
   // Primary Colors
+  static const blue = {
+    "Lighter": infoLighter,
+    "Light": infoLight,
+    "Main": infoMain,
+    "Dark": infoDark,
+    "Darker": infoDarker,
+  };
+  static const green = {
+    "Lighter": successLighter,
+    "Light": successLight,
+    "Main": successMain,
+    "Dark": successDark,
+    "Darker": successDarker,
+  };
+  static const purple = {
+    "Lighter": secondaryLighter,
+    "Light": secondaryLight,
+    "Main": secondaryMain,
+    "Dark": secondaryDark,
+    "Darker": secondaryDarker,
+  };
+  static const orange = {
+    "Lighter": warningLighter,
+    "Light": warningLight,
+    "Main": warningMain,
+    "Dark": warningDark,
+    "Darker": warningDarker,
+  };
+  static const red = {
+    "Lighter": errorLighter,
+    "Light": errorLight,
+    "Main": errorMain,
+    "Dark": errorDark,
+    "Darker": errorDarker,
+  };
+
+  static const darkBlue = {
+    "Lighter": Color(0xFFD6E4FF),
+    "Light": Color(0xFF84A9FF),
+    "Main": Color(0xFF3366FF),
+    "Dark": Color(0xFF1939B7),
+    "Darker": Color(0xFF091A7A),
+  };
+
   static const Color primaryLighter = Color(0xFFC8FAD6);
   static const Color primaryLight = Color(0xFF5BE49B);
   static const Color primaryMain = Color(0xFF00A76F);
@@ -66,4 +112,13 @@ class AppPallete {
   static const Color white = Color(0xFFFFFFFF);
 
   static const Color containerColor = Color(0xFF28323D);
+
+  static const Map<Presets, dynamic> primaryPresets = {
+    Presets.blue: blue,
+    Presets.green: green,
+    Presets.orange: orange,
+    Presets.purple: purple,
+    Presets.red: red,
+    Presets.darkBlue: darkBlue,
+  };
 }

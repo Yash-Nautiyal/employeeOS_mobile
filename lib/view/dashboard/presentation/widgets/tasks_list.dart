@@ -43,7 +43,7 @@ class _TasksListState extends State<TasksList> {
       child: Scrollbar(
         child: Container(
           width: double.maxFinite,
-          padding: const EdgeInsets.all(25),
+          padding: const EdgeInsets.all(12),
           constraints: BoxConstraints(maxHeight: widget.maxHeight),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -55,7 +55,7 @@ class _TasksListState extends State<TasksList> {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 7, bottom: 15),
+                padding: const EdgeInsets.only(bottom: 15),
                 child: Text(
                   "${_tasks.length} Pending Tasks",
                   style: widget.theme.textTheme.bodyMedium
@@ -149,7 +149,7 @@ class _TasksListState extends State<TasksList> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 2.0, vertical: 10),
                                   child: CustomDivider(
-                                    color: widget.theme.disabledColor,
+                                    color: widget.theme.dividerColor,
                                   ),
                                 ),
                             ],

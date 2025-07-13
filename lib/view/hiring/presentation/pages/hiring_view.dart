@@ -3,7 +3,7 @@ import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/hiring/presentation/widget/hiring_filters.dart';
 import 'package:employeeos/view/hiring/presentation/widget/hiring_job_chart.dart';
 import 'package:employeeos/view/hiring/presentation/widget/hiring_job_pipelines.dart';
-import 'package:employeeos/view/hiring/presentation/widget/hiring_pipeline_metric.dart';
+import 'package:employeeos/view/hiring/presentation/widget/hiring_pipeline_container.dart';
 import 'package:employeeos/view/hiring/presentation/widget/hiring_stats_card.dart';
 import 'package:flutter/material.dart';
 
@@ -100,150 +100,10 @@ class _HiringViewState extends State<HiringView> {
                             ),
                             const SizedBox(height: 20),
                             Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.surface,
-                                  border: Border(
-                                    top: BorderSide(
-                                      color: theme.dividerColor.withAlpha(100),
-                                    ),
-                                  ),
-                                  borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(16),
-                                    bottomRight: Radius.circular(16),
-                                  ),
-                                ),
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  right: 20,
-                                  top: 20,
-                                  bottom: 20,
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Headers with proper spacing
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Application Progress',
-                                            style: theme.textTheme.titleSmall
-                                                ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            'Interview Progress',
-                                            style: theme.textTheme.titleSmall
-                                                ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-
-                                    // Metrics in a flexible layout that uses full height
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          // Row 1
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: HiringPipelineMetric(
-                                                  title: 'Shortlisted',
-                                                  value: '10',
-                                                  showCircle: true,
-                                                  circleColor: Colors.orange,
-                                                  theme: theme,
-                                                  big: true,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 20),
-                                              Expanded(
-                                                child: HiringPipelineMetric(
-                                                  title: 'Telephonic',
-                                                  value: '10',
-                                                  showCircle: true,
-                                                  circleColor: Colors.blue,
-                                                  theme: theme,
-                                                  subtitle: true,
-                                                  big: true,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-
-                                          // Row 2
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: HiringPipelineMetric(
-                                                  title: 'Technical',
-                                                  value: '10',
-                                                  showCircle: true,
-                                                  circleColor: Colors.green,
-                                                  theme: theme,
-                                                  big: true,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 20),
-                                              Expanded(
-                                                child: HiringPipelineMetric(
-                                                  title: 'Onboarding',
-                                                  value: '10',
-                                                  showCircle: true,
-                                                  circleColor: Colors.purple,
-                                                  theme: theme,
-                                                  subtitle: true,
-                                                  big: true,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-
-                                          // Row 3
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: HiringPipelineMetric(
-                                                  title: 'Pending',
-                                                  value: '10',
-                                                  showCircle: true,
-                                                  theme: theme,
-                                                  big: true,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 20),
-                                              Expanded(
-                                                child: HiringPipelineMetric(
-                                                  title: 'Rejected',
-                                                  value: '10',
-                                                  showCircle: true,
-                                                  theme: theme,
-                                                  subtitle: true,
-                                                  big: true,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                                child: HiringPipelineContainer(
+                              theme: theme,
+                              big: true,
+                            )),
                           ],
                         ),
                       )

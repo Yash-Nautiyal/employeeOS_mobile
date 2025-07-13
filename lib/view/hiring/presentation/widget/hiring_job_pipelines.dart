@@ -1,4 +1,4 @@
-import 'package:employeeos/view/hiring/presentation/widget/hiring_pipeline_metric.dart';
+import 'package:employeeos/view/hiring/presentation/widget/hiring_pipeline_container.dart';
 import 'package:flutter/material.dart';
 
 // Data model for hiring pipeline
@@ -165,120 +165,11 @@ class _HiringJobPipelinesState extends State<HiringJobPipelines>
                         child: child,
                       ),
                       child: Container(
-                        key: ValueKey('expanded-$index'),
-                        decoration: BoxDecoration(
-                          color: widget.theme.scaffoldBackgroundColor,
-                          border: Border(
-                            top: BorderSide(
-                              color: widget.theme.dividerColor.withAlpha(100),
-                            ),
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(16),
-                            bottomRight: Radius.circular(16),
-                          ),
-                        ),
-                        padding: const EdgeInsets.only(
-                            left: 20, right: 20, bottom: 24, top: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Application Progress and Interview Progress Headers
-                            Row(
-                              children: [
-                                Text(
-                                  'Application Progress',
-                                  style: widget.theme.textTheme.titleSmall
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  'Interview Progress',
-                                  style: widget.theme.textTheme.titleSmall
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            // Example metrics for demo
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: HiringPipelineMetric(
-                                    title: 'Shortlisted',
-                                    value: job.shortlisted.toString(),
-                                    showCircle: true,
-                                    circleColor: Colors.orange,
-                                    theme: widget.theme,
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: HiringPipelineMetric(
-                                    title: 'Telephonic',
-                                    value: job.telephonic.toString(),
-                                    showCircle: true,
-                                    circleColor: Colors.blue,
-                                    theme: widget.theme,
-                                    subtitle: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: HiringPipelineMetric(
-                                    title: 'Technical',
-                                    value: job.technical.toString(),
-                                    showCircle: true,
-                                    circleColor: Colors.green,
-                                    theme: widget.theme,
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: HiringPipelineMetric(
-                                    title: 'Onboarding',
-                                    value: job.onboarding.toString(),
-                                    showCircle: true,
-                                    circleColor: Colors.purple,
-                                    theme: widget.theme,
-                                    subtitle: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: HiringPipelineMetric(
-                                    title: 'Pending',
-                                    value: job.pending.toString(),
-                                    showCircle: true,
-                                    theme: widget.theme,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: HiringPipelineMetric(
-                                    title: 'Rejected',
-                                    value: job.rejected.toString(),
-                                    showCircle: true,
-                                    theme: widget.theme,
-                                    subtitle: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                          constraints: const BoxConstraints(maxHeight: 350),
+                          child: HiringPipelineContainer(
+                            theme: widget.theme,
+                            key: ValueKey('expanded-$index'),
+                          )),
                     )
                   : const SizedBox.shrink(),
             ),

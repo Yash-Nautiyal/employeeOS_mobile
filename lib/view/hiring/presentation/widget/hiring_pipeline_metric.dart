@@ -3,7 +3,7 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class HiringPipelineMetric extends StatelessWidget {
   final String title;
-  final bool? subtitle;
+  final String? subtitle;
   final String value;
   final Color? circleColor;
   final bool? showCircle;
@@ -13,7 +13,7 @@ class HiringPipelineMetric extends StatelessWidget {
     super.key,
     this.circleColor,
     this.showCircle = false,
-    this.subtitle = false,
+    this.subtitle,
     this.big = false,
     required this.title,
     required this.value,
@@ -46,7 +46,7 @@ class HiringPipelineMetric extends StatelessWidget {
                     RangePointer(
                       value: 86.6,
                       width: 4,
-                      cornerStyle: CornerStyle.endCurve,
+                      cornerStyle: CornerStyle.bothCurve,
                       pointerOffset: -.5,
                       color: circleColor ?? Colors.amber,
                     ),
@@ -65,15 +65,22 @@ class HiringPipelineMetric extends StatelessWidget {
             children: [
               Text(title, style: theme.textTheme.labelLarge),
               const SizedBox(height: 2),
-              subtitle!
-                  ? Text(
-                      "$value scheduled/completed out of 10 eligible",
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: value,
+                      style: theme.textTheme.labelLarge
+                          ?.copyWith(color: theme.disabledColor),
+                    ),
+                    TextSpan(
+                      text: subtitle != null ? ' $subtitle' : ' of 18',
                       style: theme.textTheme.bodySmall
                           ?.copyWith(fontWeight: FontWeight.w700),
-                    )
-                  : Text('$value of 18',
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(fontWeight: FontWeight.w700)),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
         ),

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:employeeos/core/common/components/custom_bagde.dart';
 import 'package:employeeos/core/common/components/header/profile.dart';
-import 'package:employeeos/core/common/components/header/settings.dart';
+import 'package:employeeos/core/common/components/header/settings/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

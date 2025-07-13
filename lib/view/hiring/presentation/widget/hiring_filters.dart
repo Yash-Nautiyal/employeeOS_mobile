@@ -115,32 +115,48 @@ class _HiringFiltersState extends State<HiringFilters>
     return Container(
       decoration: BoxDecoration(
         color: widget.theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: widget.theme.colorScheme.outline.withOpacity(0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: widget.theme.colorScheme.shadow.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
           // Header with toggle button
           InkWell(
             onTap: _toggleExpanded,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
+            borderRadius: BorderRadius.circular(16),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.filter_alt_outlined,
-                    color: widget.theme.colorScheme.primary,
-                    size: 20,
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: widget.theme.colorScheme.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.tune_rounded,
+                      color: widget.theme.colorScheme.primary,
+                      size: 18,
+                    ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   Text(
                     'Filters',
                     style: widget.theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: widget.theme.colorScheme.onSurface,
+                      fontSize: 16,
                     ),
                   ),
                   const Spacer(),
@@ -148,23 +164,38 @@ class _HiringFiltersState extends State<HiringFilters>
                   if (_hasActiveFilters())
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
+                        horizontal: 10,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color:
-                            widget.theme.colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                            widget.theme.colorScheme.primary.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Text(
-                        _getActiveFiltersCount().toString(),
-                        style: widget.theme.textTheme.bodySmall?.copyWith(
-                          color: widget.theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: widget.theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${_getActiveFiltersCount()}',
+                            style: widget.theme.textTheme.bodySmall?.copyWith(
+                              color: widget.theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   // Animated chevron icon
                   AnimatedBuilder(
                     animation: _iconRotationAnimation,
@@ -172,8 +203,10 @@ class _HiringFiltersState extends State<HiringFilters>
                       return Transform.rotate(
                         angle: _iconRotationAnimation.value * 2 * 3.14159,
                         child: Icon(
-                          Icons.keyboard_arrow_down,
-                          color: widget.theme.colorScheme.onSurface,
+                          Icons.keyboard_arrow_down_rounded,
+                          color: widget.theme.colorScheme.onSurface
+                              .withOpacity(0.7),
+                          size: 20,
                         ),
                       );
                     },
@@ -188,7 +221,7 @@ class _HiringFiltersState extends State<HiringFilters>
             builder: (context, child) {
               return Container(
                 height: _expandAnimation.value * 1,
-                color: widget.theme.colorScheme.outline.withOpacity(0.2),
+                color: widget.theme.disabledColor.withAlpha(100),
               );
             },
           ),
@@ -196,181 +229,185 @@ class _HiringFiltersState extends State<HiringFilters>
           SizeTransition(
             sizeFactor: _expandAnimation,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 12,
-                    runSpacing: 14,
+                  // Job Position & HR Section
+                  _buildFilterSection(
+                    title: 'Job Information',
                     children: [
-                      SizedBox(
-                        height: 50,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 4,
-                              child: CustomDropdown(
-                                items: [
-                                  'Developer',
-                                  'Designer',
-                                  'Manager',
-                                  'Analyst'
-                                ]
-                                    .map((job) => DropdownMenuItem(
-                                          value: job,
-                                          child: Text(
-                                            job,
-                                            style: widget
-                                                .theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomDropdown(
+                              items: [
+                                'Developer',
+                                'Designer',
+                                'Manager',
+                                'Analyst'
+                              ]
+                                  .map((job) => DropdownMenuItem(
+                                        value: job,
+                                        child: Text(
+                                          job,
+                                          style: widget
+                                              .theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                        ))
-                                    .toList(),
-                                onChange: (value) {
-                                  setState(() {
-                                    selectedJob = value;
-                                  });
-                                },
-                                value: selectedJob,
-                                label: 'Select Job',
-                                theme: widget.theme,
-                              ),
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChange: (value) {
+                                setState(() {
+                                  selectedJob = value;
+                                });
+                              },
+                              value: selectedJob,
+                              label: 'Job Position',
+                              theme: widget.theme,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              flex: 5,
-                              child: CustomDropdown(
-                                label: 'Filter by HR',
-                                items: [
-                                  'HR Manager 1',
-                                  'HR Manager 2',
-                                  'HR Manager 3'
-                                ]
-                                    .map((hr) => DropdownMenuItem(
-                                          value: hr,
-                                          child: Text(
-                                            hr,
-                                            style: widget
-                                                .theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: CustomDropdown(
+                              label: 'HR Manager',
+                              items: [
+                                'HR Manager 1',
+                                'HR Manager 2',
+                                'HR Manager 3'
+                              ]
+                                  .map((hr) => DropdownMenuItem(
+                                        value: hr,
+                                        child: Text(
+                                          hr,
+                                          style: widget
+                                              .theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                        ))
-                                    .toList(),
-                                theme: widget.theme,
-                                value: selectedHR,
-                                onChange: (value) {
-                                  setState(() {
-                                    selectedHR = value;
-                                  });
-                                },
-                              ),
+                                        ),
+                                      ))
+                                  .toList(),
+                              theme: widget.theme,
+                              value: selectedHR,
+                              onChange: (value) {
+                                setState(() {
+                                  selectedHR = value;
+                                });
+                              },
                             ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        child: IntrinsicWidth(
-                          stepWidth: 53,
-                          child: CustomTextfield(
-                            controller: _postingDateFromController,
-                            keyboardType: TextInputType.datetime,
-                            theme: widget.theme,
-                            onchange: (value) {
-                              // Handle date change
-                            },
-                            hintText: 'Posting Date From',
-                            labelText: 'Posting Date From',
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime.now(),
                           ),
-                        ),
+                        ],
                       ),
-                      SizedBox(
-                        height: 50,
-                        child: IntrinsicWidth(
-                          stepWidth: 38,
-                          child: CustomTextfield(
-                            controller: _postingDateToController,
-                            keyboardType: TextInputType.datetime,
-                            theme: widget.theme,
-                            onchange: (value) {
-                              // Handle date change
-                            },
-                            hintText: 'Posting Date To',
-                            labelText: 'Posting Date To',
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime.now(),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Posting Date Section
+                  _buildFilterSection(
+                    title: 'Posting Date Range',
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextfield(
+                              controller: _postingDateFromController,
+                              keyboardType: TextInputType.datetime,
+                              theme: widget.theme,
+                              onchange: (value) {
+                                // Handle date change
+                              },
+                              hintText: 'Select start date',
+                              labelText: 'From Date',
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                            ),
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        child: IntrinsicWidth(
-                          stepWidth: 30,
-                          child: CustomTextfield(
-                            controller: _lastDateFromController,
-                            keyboardType: TextInputType.datetime,
-                            theme: widget.theme,
-                            onchange: (value) {
-                              // Handle date change
-                            },
-                            hintText: 'Last Date From',
-                            labelText: 'Last Date From',
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2030),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: CustomTextfield(
+                              controller: _postingDateToController,
+                              keyboardType: TextInputType.datetime,
+                              theme: widget.theme,
+                              onchange: (value) {
+                                // Handle date change
+                              },
+                              hintText: 'Select end date',
+                              labelText: 'To Date',
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      SizedBox(
-                        height: 50,
-                        child: IntrinsicWidth(
-                          stepWidth: 40,
-                          child: CustomTextfield(
-                            controller: _lastDateToController,
-                            keyboardType: TextInputType.datetime,
-                            theme: widget.theme,
-                            onchange: (value) {
-                              // Handle date change
-                            },
-                            hintText: 'Last Date To',
-                            labelText: 'Last Date To',
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2030),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Application Deadline Section
+                  _buildFilterSection(
+                    title: 'Application Deadline',
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextfield(
+                              controller: _lastDateFromController,
+                              keyboardType: TextInputType.datetime,
+                              theme: widget.theme,
+                              onchange: (value) {
+                                // Handle date change
+                              },
+                              hintText: 'Select start date',
+                              labelText: 'From Date',
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2030),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: CustomTextfield(
+                              controller: _lastDateToController,
+                              keyboardType: TextInputType.datetime,
+                              theme: widget.theme,
+                              onchange: (value) {
+                                // Handle date change
+                              },
+                              hintText: 'Select end date',
+                              labelText: 'To Date',
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2030),
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(
-                        height: 45,
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Action Buttons
+                  Row(
+                    children: [
+                      Expanded(
                         child: CustomTextButton(
                           backgroundColor:
-                              widget.theme.colorScheme.errorContainer
-                                  // ignore: deprecated_member_use
-                                  .withOpacity(.5),
+                              widget.theme.colorScheme.error.withOpacity(0.2),
                           onClick: () => _clearFilters(),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SvgPicture.asset(
                                 'assets/icons/common/solid/ic-solar-eraser-bold.svg',
                                 color: widget.theme.colorScheme.error,
-                                height: 22,
                               ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 8),
                               Text(
-                                'Clear ',
-                                style: widget.theme.textTheme.bodyMedium
-                                    ?.copyWith(
-                                        color: widget.theme.colorScheme.error,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15),
+                                'Clear Filters',
+                                style:
+                                    widget.theme.textTheme.bodyMedium?.copyWith(
+                                  color: widget.theme.colorScheme.error,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),
@@ -384,6 +421,27 @@ class _HiringFiltersState extends State<HiringFilters>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFilterSection({
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: widget.theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: widget.theme.colorScheme.onSurface,
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...children,
+      ],
     );
   }
 

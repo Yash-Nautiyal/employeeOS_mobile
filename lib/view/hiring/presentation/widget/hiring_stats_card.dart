@@ -102,8 +102,8 @@ class HiringStatsCard extends StatelessWidget {
                 child: SvgPicture.asset(
                   iconPath,
                   color: valueColor != null
-                      ? valueColor!.withAlpha(35)
-                      : theme.dividerColor.withAlpha(55),
+                      ? valueColor!.withAlpha(25)
+                      : theme.dividerColor.withAlpha(35),
                   height: 100,
                   width: 50,
                 ),

@@ -28,7 +28,7 @@ class _LayoutState extends State<Layout> {
     'Profile': const Center(child: Text('Profile Page')),
     'Card': const Center(child: Text('Card Page')),
   };
-  String _selectedItem = 'Hirings';
+  String _selectedItem = 'User';
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

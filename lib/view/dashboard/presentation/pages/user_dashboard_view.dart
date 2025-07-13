@@ -16,7 +16,7 @@ class UserDashboardView extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(20.0).copyWith(top: 130),
+        padding: const EdgeInsets.all(20.0).copyWith(top: 120),
         child: Column(
           children: [
             WelcomeHeader(screenHeight: screenHeight, theme: theme),
@@ -63,7 +63,7 @@ class UserDashboardView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             TasksList(theme: theme, maxHeight: screenHeight * .5),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             BirthdayContainer(
               theme: theme,
               maxHeight: screenHeight * .5,

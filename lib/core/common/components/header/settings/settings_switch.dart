@@ -1,4 +1,4 @@
-import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
+import 'package:employeeos/core/theme/bloc/theme_bloc.dart' show ThemeBloc, ThemeState;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,7 +30,7 @@ class SettingsSwitch extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SvgPicture.asset(
@@ -40,13 +40,13 @@ class SettingsSwitch extends StatelessWidget {
                         ? theme.disabledColor
                         : null,
               ),
+              const SizedBox(width: 50),
               BlocBuilder<ThemeBloc, ThemeState>(
                 builder:
                     (context, state) => Transform.scale(
                       scale: 0.65,
                       child: Switch(
-                        value: state.isDarkMode,
-
+                        value: state.brightness == Brightness.dark,
                         onChanged: (_) => onSwitch(),
                       ),
                     ),
