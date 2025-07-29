@@ -14,7 +14,10 @@ class CustomTextfield extends StatelessWidget {
   final Widget? suffixIcon;
   final DateTime? firstDate;
   final DateTime? lastDate;
-
+  final double? fontSize;
+  final Widget? helper;
+  final Widget? prefix;
+  final bool? alwaysFloatingLabel;
   const CustomTextfield({
     super.key,
     required this.controller,
@@ -29,6 +32,10 @@ class CustomTextfield extends StatelessWidget {
     this.suffixIcon,
     this.firstDate,
     this.lastDate,
+    this.fontSize,
+    this.helper,
+    this.prefix,
+    this.alwaysFloatingLabel = false,
   });
 
   Future<void> _selectDate(BuildContext context) async {
@@ -60,13 +67,23 @@ class CustomTextfield extends StatelessWidget {
       readOnly: isDateTimeField,
       maxLines: maxLines,
       minLines: 1,
+      style: theme.textTheme.bodyMedium?.copyWith(
+          fontSize: fontSize ?? 15, color: theme.colorScheme.tertiary),
       decoration: InputDecoration(
-        labelText: labelText?.isNotEmpty == true ? labelText : null,
-        hintText: hintText,
-        hintStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
-        labelStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
-        suffixIcon: _buildSuffixIcon(isDateTimeField, context),
-      ),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+          prefixIconConstraints: BoxConstraints.loose(const Size(40, 40)),
+          prefixIcon: prefix,
+          helper: helper,
+          labelText: labelText?.isNotEmpty == true ? labelText : null,
+          hintText: hintText,
+          hintStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+          labelStyle: theme.textTheme.bodyMedium
+              ?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+          suffixIcon: _buildSuffixIcon(isDateTimeField, context),
+          floatingLabelBehavior: alwaysFloatingLabel ?? false
+              ? FloatingLabelBehavior.always
+              : null),
     );
   }
 
@@ -74,10 +91,11 @@ class CustomTextfield extends StatelessWidget {
     if (isPasswordVisible != null) {
       // Password visibility toggle
       return IconButton(
-        icon: Icon(
+        icon: SvgPicture.asset(
           (isPasswordVisible ?? false)
-              ? Icons.visibility
-              : Icons.visibility_off,
+              ? 'assets/icons/common/solid/ic-solar_eye-bold.svg'
+              : 'assets/icons/common/solid/ic-solar_eye-closed-bold.svg',
+          color: theme.colorScheme.tertiary,
         ),
         onPressed: () {
           if (onClickPasswordVisisble != null) {

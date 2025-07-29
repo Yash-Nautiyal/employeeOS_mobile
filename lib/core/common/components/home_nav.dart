@@ -126,7 +126,7 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
             Navigator.of(context).push(
               PageRouteBuilder(
                 opaque: false,
-                barrierColor: Colors.black38,
+                barrierColor: Colors.black54,
                 pageBuilder: (context, _, __) => const SettingsDialog(),
               ),
             );
@@ -138,7 +138,7 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
               Navigator.of(context).push(
                 PageRouteBuilder(
                   opaque: false,
-                  barrierColor: Colors.black38,
+                  barrierColor: Colors.black54,
                   pageBuilder: (context, _, __) =>
                       ProfileDialog(theme: widget.theme),
                 ),

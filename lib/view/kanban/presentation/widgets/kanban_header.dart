@@ -1,21 +1,23 @@
+import 'package:appflowy_board/appflowy_board.dart'
+    show AppFlowyBoardController, AppFlowyGroupData;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class KanbanHeader extends StatelessWidget {
   const KanbanHeader({
     super.key,
-    required this.title,
-    required this.stateColor,
     required this.theme,
+    required this.columnData,
+    required this.controller,
   });
-  final String title;
   final ThemeData theme;
-  final Color stateColor;
+  final AppFlowyGroupData<dynamic> columnData;
+  final AppFlowyBoardController controller;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20).copyWith(left: 10),
+      margin: const EdgeInsets.only(top: 20, left: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -33,8 +35,21 @@ class KanbanHeader extends StatelessWidget {
           const SizedBox(
             width: 10,
           ),
-          Text(title, style: theme.textTheme.displaySmall),
-          const Spacer(),
+          Flexible(
+            child: TextField(
+              decoration: const InputDecoration(
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide.none),
+              ),
+              controller: TextEditingController()
+                ..text = columnData.headerData.groupName,
+              keyboardType: TextInputType.text,
+              onChanged: (val) {
+                controller
+                    .getGroupController(columnData.headerData.groupId)!
+                    .updateGroupName(val);
+              },
+            ),
+          ),
           IconButton(
             onPressed: () {},
             icon: SvgPicture.asset(

@@ -121,4 +121,33 @@ class AppPallete {
     Presets.red: red,
     Presets.darkBlue: darkBlue,
   };
+
+  static LinearGradient lightBackgroundGradient = const LinearGradient(
+    colors: [
+      AppPallete.errorLighter,
+      Color.fromARGB(255, 251, 251, 251),
+      Color.fromARGB(255, 251, 251, 251),
+      Color.fromARGB(255, 212, 251, 251),
+    ],
+    stops: [0.05, 0.3, .7, 0.99],
+    begin: Alignment(-1.7, 1),
+    end: Alignment(1.2, -1),
+  );
+
+  static LinearGradient darkBackgroundGradient = const LinearGradient(
+    colors: [
+      Color.fromARGB(255, 62, 35, 33),
+      Color.fromARGB(
+        255,
+        18,
+        21,
+        25,
+      ),
+      Color.fromARGB(255, 14, 16, 19),
+      Color.fromARGB(255, 24, 46, 53),
+    ],
+    stops: [0.0, .17, .86, 1],
+    begin: Alignment(-1.7, 1),
+    end: Alignment(1.2, -1),
+  );
 }

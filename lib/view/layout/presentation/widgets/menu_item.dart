@@ -75,7 +75,7 @@ class _MenuItemState extends State<MenuItem>
           Container(
             decoration: BoxDecoration(
               color: isSelected
-                  ? widget.theme.colorScheme.primary.withOpacity(.2)
+                  ? widget.theme.colorScheme.primary.withAlpha(30)
                   : openDropDown
                       ? widget.theme.hoverColor
                       : Colors.transparent,
@@ -230,8 +230,8 @@ class SubMenuLinePainter extends CustomPainter {
     const endPoint = Offset(35, -10);
 
     // Draw horizontal line connecting to first submenu item
-    final horizontalStartPoint = startPoint;
-    final horizontalEndPoint = Offset(35, -10);
+    const horizontalStartPoint = startPoint;
+    const horizontalEndPoint = Offset(35, -10);
     canvas.drawLine(horizontalStartPoint, horizontalEndPoint, paint);
 
     // Draw curved line at the end

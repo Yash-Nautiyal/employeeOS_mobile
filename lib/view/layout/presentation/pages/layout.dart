@@ -6,6 +6,9 @@ import 'package:employeeos/view/filemanager/presentation/pages/filemanager_view.
 import 'package:employeeos/view/hiring/presentation/pages/hiring_view.dart';
 import 'package:employeeos/view/kanban/presentation/pages/kanban_view.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_item.dart';
+import 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
+import 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
+import 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';
 import 'package:flutter/material.dart';
 
 class Layout extends StatefulWidget {
@@ -24,11 +27,11 @@ class _LayoutState extends State<Layout> {
     'File Manager': const FilemanagerView(),
     'Calendar': const Center(child: Text('Calendar Page')),
     'Mail': const Center(child: Text('Mail Page')),
-    'Account': const Center(child: Text('Account Page')),
-    'Profile': const Center(child: Text('Profile Page')),
-    'Card': const Center(child: Text('Card Page')),
+    'Account': const UserAccount(),
+    'Profile': const UserProfile(),
+    'Card': const UserCards(),
   };
-  String _selectedItem = 'User';
+  String _selectedItem = 'Card';
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -38,36 +41,14 @@ class _LayoutState extends State<Layout> {
         theme: theme,
         dashboardPage: true,
       ),
+      drawerScrimColor: Colors.black54,
       drawer: ClipRRect(
         child: Container(
           width: 300,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).brightness == Brightness.dark
-                    ? const Color.fromARGB(255, 84, 47, 45)
-                    : AppPallete.errorLighter,
-                Theme.of(context).brightness == Brightness.dark
-                    ? const Color.fromARGB(
-                        255,
-                        18,
-                        21,
-                        25,
-                      ).withOpacity(.9)
-                    : const Color.fromARGB(255, 251, 251, 251),
-                Theme.of(context).brightness == Brightness.dark
-                    ? const Color.fromARGB(255, 18, 21, 25)
-                    : const Color.fromARGB(255, 251, 251, 251),
-                Theme.of(context).brightness == Brightness.dark
-                    ? const Color.fromARGB(255, 46, 76, 88)
-                    : const Color.fromARGB(255, 212, 251, 251),
-              ],
-              stops: theme.brightness == Brightness.dark
-                  ? [0.0, .17, .86, 1]
-                  : [0.05, 0.3, .7, 0.99],
-              begin: const Alignment(-1.7, 1),
-              end: const Alignment(1.2, -1),
-            ),
+            gradient: Theme.of(context).brightness == Brightness.dark
+                ? AppPallete.darkBackgroundGradient
+                : AppPallete.lightBackgroundGradient,
           ),
           child: SafeArea(
             child: Padding(

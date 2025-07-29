@@ -1,3 +1,4 @@
+import 'package:appflowy_board/appflowy_board.dart' show AppFlowyGroupData;
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_group.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_side_menu.dart';
@@ -11,23 +12,25 @@ class KanbanGroupCard extends StatelessWidget {
     required this.date,
     required this.theme,
     required this.task,
+    required this.group,
   });
   final ThemeData theme;
   final String title;
   final String date;
   final KanbanGroupItem task;
+  final AppFlowyGroupData<dynamic> group;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => showRightSideTaskDetails(context, title, date, task),
+      onTap: () => showRightSideTaskDetails(context, task),
       child: Container(
         constraints: const BoxConstraints(maxHeight: 300),
         decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(10),
         ),
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10).copyWith(bottom: 0),
         padding: const EdgeInsets.all(15),
         child: IntrinsicHeight(
           child: Column(
@@ -73,7 +76,7 @@ class KanbanGroupCard extends StatelessWidget {
   }
 
   Future<void> showRightSideTaskDetails(
-      BuildContext context, String title, String date, KanbanGroupItem task) {
+      BuildContext context, KanbanGroupItem task) {
     return showGeneralDialog(
       context: context,
       // Tapping outside the dialog will dismiss it
@@ -94,6 +97,7 @@ class KanbanGroupCard extends StatelessWidget {
               height: double.infinity,
               child: KanbanSideMenu(
                 task: task,
+                group: group,
               ),
             ),
           ),

@@ -1,9 +1,10 @@
 import 'dart:ui';
 
-import 'package:cool_dropdown/cool_dropdown.dart';
-import 'package:cool_dropdown/models/cool_dropdown_item.dart';
+import 'package:appflowy_board/appflowy_board.dart' show AppFlowyGroupData;
+import 'package:employeeos/core/common/components/custom_dropdown.dart';
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/core/common/components/custom_toggle_button.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_group.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,9 @@ import 'package:flutter_svg/svg.dart';
 
 class KanbanSideMenu extends StatefulWidget {
   final KanbanGroupItem task;
+  final AppFlowyGroupData<dynamic> group;
 
-  const KanbanSideMenu({super.key, required this.task});
+  const KanbanSideMenu({super.key, required this.task, required this.group});
 
   @override
   _KanbanSideMenuState createState() => _KanbanSideMenuState();
@@ -20,11 +22,15 @@ class KanbanSideMenu extends StatefulWidget {
 
 class _KanbanSideMenuState extends State<KanbanSideMenu> {
   late String _priority;
+  late String _group;
   late TextEditingController _descriptionController;
-  final dropdownController = DropdownController<String>();
+
+  bool showOverView = true;
+
   @override
   void initState() {
     super.initState();
+    _group = widget.group.headerData.groupName;
     _priority = widget.task.priority;
     _descriptionController =
         TextEditingController(text: widget.task.description);
@@ -39,112 +45,115 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    return Stack(
-      children: [
-        ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-            child: Container(
-              height: screenHeight,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xff161C23).withOpacity(.9)
-                  : Theme.of(context).scaffoldBackgroundColor.withOpacity(.85),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 50),
+    final theme = Theme.of(context);
+    return ClipRRect(
+      child: Container(
+        height: screenHeight,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              theme.brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 56, 32, 31)
+                  : AppPallete.errorLighter,
+              theme.brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 27, 31, 37)
+                  : const Color.fromARGB(255, 251, 251, 251),
+              theme.brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 24, 27, 32)
+                  : const Color.fromARGB(255, 251, 251, 251),
+              theme.brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 38, 55, 66)
+                  : const Color.fromARGB(255, 212, 251, 251),
+            ],
+            stops: theme.brightness == Brightness.dark
+                ? [0.0, .17, .84, .98]
+                : [0.05, 0.3, .7, 0.99],
+            begin: const Alignment(-1.7, 1),
+            end: const Alignment(1.2, -1),
+          ),
+        ),
+        padding: const EdgeInsets.only(top: 50),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row with column dropdown and close button.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Row(
+                children: [
+                  IntrinsicWidth(
+                    child: CustomDropdown(
+                      theme: theme,
+                      onChange: (value) {
+                        setState(() {
+                          _group = value;
+                        });
+                      },
+                      label: '',
+                      value: _group,
+                      items: ['Pending', 'In Progress', 'Testing', 'Done']
+                          .map((title) {
+                        return DropdownMenuItem(
+                          value: title,
+                          child: Text(
+                            title,
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            CustomToggleButton(
+              width: 343 / 2,
+              values: const ["Overview", "Subtasks"],
+              theme: theme,
+              initialIndex: showOverView ? 0 : 1,
+              onToggle: (value) {
+                setState(() {
+                  showOverView = value == 0;
+                });
+              },
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top row with column dropdown and close button.
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CoolDropdown<String>(
-                        key: ValueKey(Theme.of(context)),
-                        controller: dropdownController,
-                        dropdownTriangleOptions: const DropdownTriangleOptions(
-                          width: 10,
-                          height: 10,
-                          align: DropdownTriangleAlign.right,
-                        ),
-                        isMarquee: false,
-                        dropdownOptions: const DropdownOptions(
-                          duration: Duration(milliseconds: 100),
-                        ),
-                        resultOptions: ResultOptions(
-                          openBoxDecoration: BoxDecoration(
-                            color: Theme.of(context).dividerColor,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                          ),
-                          width: 150,
-                          boxDecoration: BoxDecoration(
-                            color:
-                                Theme.of(context).colorScheme.surfaceContainer,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                          ),
-                          duration: const Duration(milliseconds: 100),
-                          backDuration: const Duration(milliseconds: 100),
-                          marqueeDuration: const Duration(milliseconds: 100),
-                          isMarquee: true,
-                        ),
-                        dropdownItemOptions: DropdownItemOptions(
-                            pauseDuration: const Duration(milliseconds: 100),
-                            isMarquee: true,
-                            boxDecoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainer),
-                            duration: const Duration(milliseconds: 100),
-                            marqueeDuration: const Duration(milliseconds: 100),
-                            backDuration: const Duration(milliseconds: 100),
-                            selectedBoxDecoration: const BoxDecoration(
-                              color: AppPallete.grey400,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                            )),
-                        dropdownList: [
-                          CoolDropdownItem(label: 'Pending', value: 'Pending'),
-                          CoolDropdownItem(
-                              label: 'In progress', value: 'In progress'),
-                          CoolDropdownItem(label: 'Testing', value: 'Testing'),
-                          CoolDropdownItem(label: 'Done', value: 'Done'),
-                        ],
-                        onChange: (newValue) {
-                          // Optionally: call a function to move the task to a different column.
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
                   Text(
                     widget.task.title,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: theme.textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 30),
                   // Show assigned details
                   Row(
                     children: [
                       Text(
                         'Assigned By: ',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       const CircleAvatar(
-                        radius: 15,
+                        radius: 14,
                       ),
                       const SizedBox(width: 5),
                       Text(
                         widget.task.assignedBy,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.tertiary,
-                            ),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: theme.colorScheme.tertiary,
+                        ),
                       ),
                     ],
                   ),
@@ -153,20 +162,20 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                     children: [
                       Text(
                         'Assigned To: ',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       const CircleAvatar(
-                        radius: 15,
+                        radius: 14,
                       ),
                       const SizedBox(width: 5),
                       Text(
                         widget.task.assignedTo,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.tertiary,
-                            ),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: theme.colorScheme.tertiary,
+                        ),
                       ),
                     ],
                   ),
@@ -175,17 +184,16 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                     children: [
                       Text(
                         'Due Date: ',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      const SizedBox(width: 35),
+                      const SizedBox(width: 30),
                       Text(
                         widget.task.dueDate,
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: Theme.of(context).colorScheme.tertiary,
-                            ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.tertiary,
+                        ),
                       ),
                     ],
                   ),
@@ -195,9 +203,9 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                     children: [
                       Text(
                         'Priority:',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(width: 30),
                       Expanded(
@@ -207,8 +215,8 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                             return ChoiceChip(
                               side: BorderSide(
                                   color: _priority == level
-                                      ? Theme.of(context).colorScheme.tertiary
-                                      : Theme.of(context).dividerColor,
+                                      ? theme.colorScheme.tertiary
+                                      : theme.dividerColor,
                                   width: _priority == level ? 2 : 1),
                               backgroundColor: Colors.transparent,
                               selectedColor: Colors.transparent,
@@ -235,8 +243,7 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                                   const SizedBox(width: 5),
                                   Text(
                                     level,
-                                    style:
-                                        Theme.of(context).textTheme.labelLarge,
+                                    style: theme.textTheme.labelLarge,
                                   ),
                                 ],
                               ),
@@ -256,14 +263,14 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                   // Description TextField
                   Text(
                     'Description',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 5),
                   CustomTextfield(
                     controller: _descriptionController,
-                    theme: Theme.of(context),
+                    theme: theme,
                     hintText: 'Add discription here',
                     keyboardType: TextInputType.text,
                     maxLines: 3,
@@ -276,27 +283,22 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                           ? Align(
                               alignment: Alignment.centerRight,
                               child: CustomTextButton(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.tertiary,
+                                  backgroundColor: theme.colorScheme.tertiary,
                                   padding: 0,
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
                                         Icons.save_rounded,
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
+                                        color: theme.scaffoldBackgroundColor,
                                       ),
                                       const SizedBox(width: 5),
                                       Text(
                                         'Save',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelLarge
+                                        style: theme.textTheme.labelLarge
                                             ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                            ),
+                                          color: theme.scaffoldBackgroundColor,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -314,7 +316,7 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                     child: Container(
                       height: 100,
                       width: double.infinity,
-                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      color: theme.colorScheme.surfaceContainer,
                       alignment: Alignment.center,
                       child: const Text('Drop files here or click to browse'),
                     ),
@@ -322,21 +324,9 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                 ],
               ),
             ),
-          ),
+          ],
         ),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: Image.asset(
-            'assets/images/background/cyanblur.png',
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          child: Image.asset('assets/images/background/redblur.png'),
-        )
-      ],
+      ),
     );
   }
 }

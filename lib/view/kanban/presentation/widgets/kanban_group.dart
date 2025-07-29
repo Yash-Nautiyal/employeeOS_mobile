@@ -1,6 +1,7 @@
 import 'dart:ui';
-
-import 'package:kanban_board/kanban_board.dart';
+import 'package:appflowy_board/appflowy_board.dart'
+    show AppFlowyGroupData, AppFlowyGroupItem;
+import 'package:uuid/uuid.dart';
 
 class KanbanGroup {
   final String id;
@@ -14,7 +15,7 @@ class KanbanGroup {
   });
 }
 
-class KanbanGroupItem extends KanbanBoardGroupItem {
+class KanbanGroupItem extends AppFlowyGroupItem {
   final String itemId;
   final String title;
   final String date;
@@ -45,9 +46,9 @@ class KanbanGroupItem extends KanbanBoardGroupItem {
   String get id => itemId;
 }
 
-Map<String, dynamic> _kanbanData = {
+const uuid = Uuid();
+Map<String, dynamic> kanbanData = {
   'Pending': {
-    'color': const Color.fromRGBO(239, 147, 148, 1),
     'items': [
       {
         'title': 'Making A New Trend In Poster',
@@ -75,7 +76,6 @@ Map<String, dynamic> _kanbanData = {
     ],
   },
   'In progress': {
-    'color': const Color.fromRGBO(255, 230, 168, 1),
     'items': [
       {
         'title': 'Advertising Outdoors',
@@ -92,7 +92,6 @@ Map<String, dynamic> _kanbanData = {
     ],
   },
   'Testing': {
-    'color': const Color.fromARGB(255, 235, 235, 148),
     'items': [
       {
         'title': 'Creative Outdoor Ads',
@@ -108,7 +107,6 @@ Map<String, dynamic> _kanbanData = {
     ],
   },
   'Done': {
-    'color': const Color.fromRGBO(148, 235, 168, 1),
     'items': [
       {
         'title': 'Creative Outdoor Ads',
@@ -119,17 +117,6 @@ Map<String, dynamic> _kanbanData = {
         'dueDate': '10 Apr 2025',
         'priority': 'High',
         'description': 'Finalized creative designs for outdoor ads.',
-        'attachments': [],
-      },
-      {
-        'title': 'Advertising Outdoors',
-        'date': '17 Dec 2022',
-        'tasks': '53/70',
-        'assignedBy': 'Amanpreet',
-        'assignedTo': 'Shreyas Ladhe',
-        'dueDate': '20 Mar 2025',
-        'priority': 'Low',
-        'description': 'Completed outdoor advertising campaign.',
         'attachments': [],
       },
       {
@@ -147,25 +134,18 @@ Map<String, dynamic> _kanbanData = {
   },
 };
 
-List<KanbanBoardGroup<KanbanGroup, KanbanGroupItem>> kanbanGroups =
-    List.generate(
-  _kanbanData.length,
-  (index) => KanbanBoardGroup(
-    customData: KanbanGroup(
-      id: _kanbanData.keys.elementAt(index),
-      title: _kanbanData.keys.elementAt(index),
-      color: _kanbanData.values.elementAt(index)['color'],
-    ),
-    id: _kanbanData.keys.elementAt(index),
-    name: _kanbanData.keys.elementAt(index),
-    items: (_kanbanData.values.elementAt(index)['items'] as List)
+List<AppFlowyGroupData<AppFlowyGroupItem>> kanbanGroups = List.generate(
+  kanbanData.length,
+  (index) => AppFlowyGroupData(
+    id: uuid.v4().toString(),
+    name: kanbanData.keys.elementAt(index),
+    items: (kanbanData.values.elementAt(index)['items'] as List)
         .asMap()
         .entries
-        .map<KanbanGroupItem>((entry) {
-      final i = entry.key;
+        .map<AppFlowyGroupItem>((entry) {
       final item = entry.value;
       return KanbanGroupItem(
-        itemId: i.toString(),
+        itemId: uuid.v4().toString(),
         title: item['title'],
         date: item['date'],
         completedTasks: int.parse(item['tasks'].toString().split('/').first),
@@ -184,8 +164,8 @@ List<KanbanBoardGroup<KanbanGroup, KanbanGroupItem>> kanbanGroups =
 class KanbanDataManager {
   /// Add a new column if it doesn’t already exist.
   static void addColumn(String columnName, Color color) {
-    if (_kanbanData.containsKey(columnName)) return;
-    _kanbanData[columnName] = {
+    if (kanbanData.containsKey(columnName)) return;
+    kanbanData[columnName] = {
       'color': color,
       'items': [],
     };
@@ -196,8 +176,8 @@ class KanbanDataManager {
   /// [taskData] must include keys: title, date, tasks, assignedBy, assignedTo,
   /// dueDate, priority, description, and attachments.
   static void addTask(String columnName, Map<String, dynamic> taskData) {
-    if (!_kanbanData.containsKey(columnName)) return;
-    (_kanbanData[columnName]['items'] as List).add(taskData);
+    if (!kanbanData.containsKey(columnName)) return;
+    (kanbanData[columnName]['items'] as List).add(taskData);
     _rebuildKanbanGroups();
   }
 
@@ -206,8 +186,8 @@ class KanbanDataManager {
   /// Here, taskId is assumed to be the index (as a string) in the column’s items list.
   static void modifyTask(
       String columnName, String taskId, Map<String, dynamic> updatedData) {
-    if (!_kanbanData.containsKey(columnName)) return;
-    List items = _kanbanData[columnName]['items'];
+    if (!kanbanData.containsKey(columnName)) return;
+    List items = kanbanData[columnName]['items'];
     int index = int.tryParse(taskId) ?? -1;
     if (index >= 0 && index < items.length) {
       items[index] = {...items[index], ...updatedData};
@@ -215,19 +195,14 @@ class KanbanDataManager {
     }
   }
 
-  /// Rebuild the global [kanbanGroups] list based on the updated [_kanbanData].
+  /// Rebuild the global [kanbanGroups] list based on the updated [kanbanData].
   static void _rebuildKanbanGroups() {
     kanbanGroups = List.generate(
-      _kanbanData.length,
-      (index) => KanbanBoardGroup(
-        customData: KanbanGroup(
-          id: _kanbanData.keys.elementAt(index),
-          title: _kanbanData.keys.elementAt(index),
-          color: _kanbanData.values.elementAt(index)['color'],
-        ),
-        id: _kanbanData.keys.elementAt(index),
-        name: _kanbanData.keys.elementAt(index),
-        items: (_kanbanData.values.elementAt(index)['items'] as List)
+      kanbanData.length,
+      (index) => AppFlowyGroupData(
+        id: kanbanData.keys.elementAt(index),
+        name: kanbanData.keys.elementAt(index),
+        items: (kanbanData.values.elementAt(index)['items'] as List)
             .asMap()
             .entries
             .map<KanbanGroupItem>((entry) {

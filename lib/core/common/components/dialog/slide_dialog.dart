@@ -88,34 +88,10 @@ class _SlideDialogState extends State<SlideDialog>
                       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                       child: Container(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? const Color.fromARGB(255, 84, 47, 45)
-                                  : AppPallete.errorLighter,
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? const Color.fromARGB(
-                                    255,
-                                    18,
-                                    21,
-                                    25,
-                                  ).withOpacity(.9)
-                                  : const Color.fromARGB(255, 251, 251, 251),
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? const Color.fromARGB(255, 18, 21, 25)
-                                  : const Color.fromARGB(255, 251, 251, 251),
-                              Theme.of(context).brightness == Brightness.dark
-                                  ? const Color.fromARGB(255, 46, 76, 88)
-                                  : const Color.fromARGB(255, 212, 251, 251),
-                            ],
-                            stops:
-                                widget.theme.brightness == Brightness.dark
-                                    ? [0.0, .17, .86, 1]
-                                    : [0.05, 0.3, .7, 0.99],
-                            begin: const Alignment(-1.7, 1),
-                            end: const Alignment(1.2, -1),
-                          ),
-                        ),
+                            gradient:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? AppPallete.darkBackgroundGradient
+                                    : AppPallete.lightBackgroundGradient),
                         child: SafeArea(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
