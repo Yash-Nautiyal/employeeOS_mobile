@@ -6,6 +6,8 @@ import 'package:employeeos/view/filemanager/presentation/pages/filemanager_view.
 import 'package:employeeos/view/hiring/presentation/pages/hiring_view.dart';
 import 'package:employeeos/view/kanban/presentation/pages/kanban_view.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_item.dart';
+import 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
+import 'package:employeeos/view/recruitment/presentation/pages/job_posting_view.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';
@@ -25,13 +27,16 @@ class _LayoutState extends State<Layout> {
     'Kanban': const KanbanView(),
     'Chat': const ChatPage(),
     'File Manager': const FilemanagerView(),
-    'Calendar': const Center(child: Text('Calendar Page')),
-    'Mail': const Center(child: Text('Mail Page')),
+    // 'Calendar': const Center(child: Text('Calendar Page')),
+    // 'Mail': const Center(child: Text('Mail Page')),
+    'Job Posting': const JobPostingView(),
+    'Job Application': const JobApplicationView(),
+    'Interview Scheduling': const Center(child: Text('Interview Scheduling')),
     'Account': const UserAccount(),
     'Profile': const UserProfile(),
     'Card': const UserCards(),
   };
-  String _selectedItem = 'Card';
+  String _selectedItem = 'Chat';
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -154,9 +159,33 @@ class _LayoutState extends State<Layout> {
                       Navigator.pop(context); // Close the drawer
                     },
                   ),
+                  // MenuItem(
+                  //   icon: 'assets/icons/nav/ic-calendar.svg',
+                  //   title: 'Calendar',
+                  //   theme: theme,
+                  //   selectedItem: _selectedItem,
+                  //   onSelected: (item) {
+                  //     setState(() {
+                  //       _selectedItem = item;
+                  //     });
+                  //     Navigator.pop(context); // Close the drawer
+                  //   },
+                  // ),
+                  // MenuItem(
+                  //   icon: 'assets/icons/nav/ic-mail.svg',
+                  //   title: 'Mail',
+                  //   theme: theme,
+                  //   selectedItem: _selectedItem,
+                  //   onSelected: (item) {
+                  //     setState(() {
+                  //       _selectedItem = item;
+                  //     });
+                  //     Navigator.pop(context); // Close the drawer
+                  //   },
+                  // ),
                   MenuItem(
-                    icon: 'assets/icons/nav/ic-calendar.svg',
-                    title: 'Calendar',
+                    icon: 'assets/icons/nav/ic-recruitment.svg',
+                    title: 'Recruitment',
                     theme: theme,
                     selectedItem: _selectedItem,
                     onSelected: (item) {
@@ -165,18 +194,11 @@ class _LayoutState extends State<Layout> {
                       });
                       Navigator.pop(context); // Close the drawer
                     },
-                  ),
-                  MenuItem(
-                    icon: 'assets/icons/nav/ic-mail.svg',
-                    title: 'Mail',
-                    theme: theme,
-                    selectedItem: _selectedItem,
-                    onSelected: (item) {
-                      setState(() {
-                        _selectedItem = item;
-                      });
-                      Navigator.pop(context); // Close the drawer
-                    },
+                    submenuItems: const [
+                      'Job Posting',
+                      'Job Application',
+                      'Interview Scheduling'
+                    ],
                   ),
                   MenuItem(
                     icon: 'assets/icons/nav/ic-user-management.svg',

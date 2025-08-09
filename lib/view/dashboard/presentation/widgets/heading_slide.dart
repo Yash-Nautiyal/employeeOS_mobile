@@ -135,8 +135,8 @@ class _HeadingSlideState extends State<HeadingSlide> {
                       width: _currentPage == index ? 24 : 8,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? widget.theme.colorScheme.primaryContainer
-                            : widget.theme.primaryColor,
+                            ? widget.theme.primaryColor
+                            : widget.theme.colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -146,14 +146,14 @@ class _HeadingSlideState extends State<HeadingSlide> {
                     icon: const Icon(Icons.arrow_back_ios_rounded),
                     onPressed: _goToPreviousPage,
                     color: _currentPage > 0
-                        ? widget.theme.colorScheme.tertiary
+                        ? widget.theme.primaryColor
                         : widget.theme.disabledColor,
                   ),
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios_rounded),
                     onPressed: _goToNextPage,
                     color: _currentPage < _totalPages - 1
-                        ? widget.theme.colorScheme.tertiary
+                        ? widget.theme.primaryColor
                         : widget.theme.disabledColor,
                   ),
                 ],

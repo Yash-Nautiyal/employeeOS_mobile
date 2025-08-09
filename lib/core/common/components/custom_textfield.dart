@@ -18,6 +18,8 @@ class CustomTextfield extends StatelessWidget {
   final Widget? helper;
   final Widget? prefix;
   final bool? alwaysFloatingLabel;
+  final bool? close;
+  final Function? onClose;
   const CustomTextfield({
     super.key,
     required this.controller,
@@ -36,6 +38,8 @@ class CustomTextfield extends StatelessWidget {
     this.helper,
     this.prefix,
     this.alwaysFloatingLabel = false,
+    this.close = false,
+    this.onClose,
   });
 
   Future<void> _selectDate(BuildContext context) async {
@@ -77,7 +81,7 @@ class CustomTextfield extends StatelessWidget {
           helper: helper,
           labelText: labelText?.isNotEmpty == true ? labelText : null,
           hintText: hintText,
-          hintStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+          hintStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 15),
           labelStyle: theme.textTheme.bodyMedium
               ?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
           suffixIcon: _buildSuffixIcon(isDateTimeField, context),
@@ -112,6 +116,11 @@ class CustomTextfield extends StatelessWidget {
           height: 20,
           width: 20,
         ),
+      );
+    } else if (close!) {
+      return IconButton(
+        icon: Icon(Icons.close, color: theme.disabledColor, size: 18),
+        onPressed: () => onClose!(),
       );
     } else if (suffixIcon != null) {
       // Custom suffix icon

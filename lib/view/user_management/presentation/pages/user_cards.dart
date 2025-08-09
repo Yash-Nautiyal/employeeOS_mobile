@@ -1,5 +1,5 @@
+import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_cards_grid_card.dart';
-import 'package:employeeos/view/user_management/presentation/widgets/user_heading.dart';
 import 'package:flutter/material.dart';
 
 class UserCards extends StatefulWidget {
@@ -57,7 +57,11 @@ class _UserCardsState extends State<UserCards> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          UserHeading(theme: theme, page: 'Cards'),
+          CustomBreadCrumbs(
+            theme: theme,
+            routes: const ['Dashboard', 'User', 'Card'],
+            heading: 'User Cards',
+          ),
           const SizedBox(
             height: 20,
           ),

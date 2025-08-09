@@ -1,5 +1,5 @@
+import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_general.dart';
-import 'package:employeeos/view/user_management/presentation/widgets/user_heading.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_security.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_social_links.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_tab.dart';
@@ -82,9 +82,10 @@ class _UserAccountState extends State<UserAccount>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          UserHeading(
+          CustomBreadCrumbs(
             theme: theme,
-            page: 'Account',
+            routes: const ['Dashboard', 'User', 'Account'],
+            heading: 'User Account',
           ),
           const SizedBox(height: 30),
           UserAccountTab(

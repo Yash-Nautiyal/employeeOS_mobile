@@ -41,8 +41,10 @@ class BirthdayContainer extends StatelessWidget {
                     flex: 4,
                     child: Text(
                       'Upcoming Birthdays',
-                      style: theme.textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w800, fontSize: 30),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 30,
+                          color: theme.scaffoldBackgroundColor),
                     ),
                   ),
                   Flexible(

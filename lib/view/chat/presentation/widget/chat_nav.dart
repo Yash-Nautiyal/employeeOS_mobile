@@ -1,17 +1,14 @@
-import 'package:employeeos/core/common/actions/date_time_actions.dart'
-    show formatRelativeTime;
-import 'package:employeeos/core/common/components/custom_textfield.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/chat/domain/entities/chat_models.dart'
-    show TextMessage;
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart';
+import 'package:employeeos/view/chat/presentation/widget/chat_nav_header.dart';
+import 'package:employeeos/view/chat/presentation/widget/chat_nav_item.dart';
+import 'package:employeeos/view/chat/presentation/widget/chat_nav_online.dart';
+import 'package:employeeos/view/chat/presentation/widget/chat_nav_pinned.dart';
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart' as badges;
-import 'package:flutter_svg/flutter_svg.dart';
 
-class ChatNav extends StatelessWidget {
+class ChatNav extends StatefulWidget {
   final ThemeData theme;
   final List<Conversation> conversations;
+
   final void Function(Conversation) onConversationTap;
   const ChatNav({
     super.key,
@@ -21,136 +18,215 @@ class ChatNav extends StatelessWidget {
   });
 
   @override
+  State<ChatNav> createState() => _ChatNavState();
+}
+
+class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
+  late TabController tabController;
+  late AnimationController _searchController;
+  final FocusNode _searchFocusNode = FocusNode();
+  final scrollController = ScrollController();
+  final controller = TextEditingController();
+  bool _isSearchExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+
+    super.dispose();
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearchExpanded = true;
+      _searchController.forward();
+      _searchFocusNode.requestFocus();
+    });
+  }
+
+  void _closeAllFields() {
+    if (_isSearchExpanded) {
+      _searchController.reverse();
+      controller.clear();
+    }
+    setState(() {
+      _isSearchExpanded = false;
+    });
+  }
+
+  double get maxHeight => 30 + MediaQuery.of(context).padding.top;
+
+  double get minHeight => 20 + MediaQuery.of(context).padding.top;
+
+  @override
   Widget build(BuildContext context) {
-    final controller = TextEditingController();
-    final items = List<Conversation>.from(conversations)
+    final items = List<Conversation>.from(widget.conversations)
       ..sort((a, b) {
         final aTime = a.messages.first.createdAt;
         final bTime = b.messages.first.createdAt;
         return bTime.compareTo(aTime);
       });
-    return Scaffold(
-      resizeToAvoidBottomInset: false, // Prevent resizing
-      extendBody: true,
-      body: Container(
-        color: theme.scaffoldBackgroundColor,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8, left: 5),
-                  child: Row(
-                    children: [
-                      badges.Badge(
-                        badgeStyle: const badges.BadgeStyle(
-                          badgeColor: AppPallete.primaryMain,
-                        ),
-                        position:
-                            badges.BadgePosition.bottomEnd(bottom: 0, end: 0),
-                        child: const CircleAvatar(
-                          radius: 23,
+    return Column(
+      children: [
+        ChatNavHeader(
+            theme: widget.theme,
+            toggleSearch: _toggleSearch,
+            isSearchExpanded: _isSearchExpanded,
+            closeAllFields: _closeAllFields,
+            controller: controller),
+        Expanded(
+          child: NotificationListener<ScrollEndNotification>(
+            onNotification: (_) {
+              _snapAppbar();
+              return false;
+            },
+            child: CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverAppBar(
+                  primary: false,
+                  automaticallyImplyLeading: false,
+                  expandedHeight: 130,
+                  toolbarHeight: 0,
+                  collapsedHeight: 0,
+                  scrolledUnderElevation: 0,
+                  elevation: 0,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                      background: ChatNavOnline(theme: widget.theme)),
+                ),
+                SliverPersistentHeader(
+                  floating: true,
+                  pinned: true,
+                  delegate: _SliverAppBarDelegate(
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6)
+                          .copyWith(top: 10),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEEECEA),
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(40),
+                          topLeft: Radius.circular(40),
                         ),
                       ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: SvgPicture.asset(
-                          "assets/icons/arrow/ic-eva_arrow-ios-back-fill.svg",
-                          color: theme.disabledColor,
-                        ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TabBar(
+                            controller: tabController,
+                            tabs: const [
+                              Tab(
+                                text: 'All',
+                              ),
+                              Tab(
+                                text: 'Unread',
+                              ),
+                              Tab(
+                                text: 'Groups',
+                              ),
+                              Tab(
+                                text: 'Contacts',
+                              ),
+                            ],
+                            tabAlignment: TabAlignment.fill,
+                            labelStyle:
+                                widget.theme.textTheme.labelLarge?.copyWith(
+                              color: widget.theme.colorScheme.tertiary,
+                            ),
+                            unselectedLabelColor: widget.theme.disabledColor,
+                            indicatorSize: TabBarIndicatorSize.label,
+                            dividerColor: Colors.transparent,
+                            indicator: UnderlineTabIndicator(
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: widget.theme.colorScheme.tertiary,
+                              ),
+                              insets: const EdgeInsets.symmetric(horizontal: 4),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          )
+                        ],
                       ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: SvgPicture.asset(
-                          "assets/icons/common/solid/ic-solar_user-plus-bold.svg",
-                          color: theme.disabledColor,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomTextfield(
-                    controller: controller,
-                    keyboardType: TextInputType.text,
-                    theme: theme,
-                    onchange: (text) => controller.text = text,
-                    hintText: "Search Conversation"),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: items.length,
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) {
-                    final conv = items[index];
-                    final lastMsg = conv.messages.first;
-                    final snippet = lastMsg is TextMessage
-                        ? lastMsg.text
-                        : '[${lastMsg.type.name}]';
-                    final time = formatRelativeTime(lastMsg.createdAt);
-                    return GestureDetector(
-                      onTap: () => onConversationTap(conv),
-                      child: Container(
-                        height: 70,
-                        margin: const EdgeInsets.only(bottom: 10),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            badges.Badge(
-                              badgeStyle: const badges.BadgeStyle(
-                                badgeColor: AppPallete.primaryMain,
-                              ),
-                              position: badges.BadgePosition.bottomEnd(
-                                  bottom: 0, end: 0),
-                              child: CircleAvatar(
-                                radius: 23,
-                                child: Text(conv.name[0],
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(color: Colors.white)),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    conv.name,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: theme.colorScheme.tertiary),
-                                  ),
-                                  Text(snippet,
-                                      style: theme.textTheme.bodySmall,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1),
-                                ],
-                              ),
-                            ),
-                            Align(
-                              alignment:
-                                  Alignment.topLeft.add(const Alignment(0, .5)),
-                              child:
-                                  Text(time, style: theme.textTheme.bodySmall),
-                            )
-                          ],
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEEECEA),
+                    ),
+                    child: Column(
+                      children: [
+                        ChatNavPinned(
+                          theme: widget.theme,
+                          onConversationTap: widget.onConversationTap,
+                          items: items,
                         ),
-                      ),
-                    );
-                  },
-                ),
-              )
-            ],
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ChatNavItem(
+                          theme: widget.theme,
+                          onConversationTap: widget.onConversationTap,
+                          items: items,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
+
+  void _snapAppbar() {
+    final scrollDistance = maxHeight - minHeight;
+    if (scrollController.offset > 0 &&
+        scrollController.offset < scrollDistance + 120) {
+      final double snapOffset = scrollController.offset / scrollDistance;
+      Future.microtask(
+        () => scrollController.animateTo(snapOffset,
+            duration: const Duration(milliseconds: 200), curve: Curves.easeIn),
+      );
+    }
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget _child;
+  _SliverAppBarDelegate(this._child);
+
+  @override
+  double get minExtent => 70;
+  @override
+  double get maxExtent => 70;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: _child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _SliverAppBarDelegate oldDelegate) => false;
 }

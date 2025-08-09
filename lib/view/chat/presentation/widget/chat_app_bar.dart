@@ -8,13 +8,14 @@ class ChatAppBar extends StatefulWidget {
   final String name;
   final String subTitle;
   final String avatar;
-
+  final VoidCallback onBack;
   const ChatAppBar({
     super.key,
     required this.theme,
     required this.name,
     required this.subTitle,
     required this.avatar,
+    required this.onBack,
   });
 
   @override
@@ -33,17 +34,27 @@ class _ChatAppBarState extends State<ChatAppBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15).copyWith(right: 8),
+      padding: const EdgeInsets.all(15).copyWith(right: 8, left: 0),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: widget.theme.dividerColor,
+            color: widget.theme.dividerColor.withAlpha(100),
             width: 1,
           ),
         ),
       ),
       child: Row(
         children: [
+          IconButton(
+            onPressed: () => widget.onBack.call(),
+            icon: SvgPicture.asset(
+              'assets/icons/arrow/ic-eva_arrow-ios-back-fill.svg',
+              color: widget.theme.colorScheme.tertiary,
+            ),
+          ),
+          const SizedBox(
+            width: 5,
+          ),
           badges.Badge(
             badgeStyle:
                 const badges.BadgeStyle(badgeColor: AppPallete.primaryMain),

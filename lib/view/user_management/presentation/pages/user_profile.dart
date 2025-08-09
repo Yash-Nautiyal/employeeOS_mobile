@@ -1,4 +1,4 @@
-import 'package:employeeos/view/user_management/presentation/widgets/user_heading.dart';
+import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_profile_about.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_profile_contacts.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_profile_header.dart';
@@ -30,7 +30,11 @@ class _UserProfileState extends State<UserProfile>
       padding: const EdgeInsets.only(top: 120, bottom: 10),
       child: Column(
         children: [
-          UserHeading(theme: theme, page: 'Profile'),
+          CustomBreadCrumbs(
+            theme: theme,
+            routes: const ['Dashboard', 'User', 'Profile'],
+            heading: 'User Profile',
+          ),
           const SizedBox(
             height: 20,
           ),
