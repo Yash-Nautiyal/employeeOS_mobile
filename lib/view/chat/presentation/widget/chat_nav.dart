@@ -1,3 +1,4 @@
+import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_nav_header.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_nav_item.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 
 class ChatNav extends StatefulWidget {
   final ThemeData theme;
+  final String currentUserId;
   final List<Conversation> conversations;
 
   final void Function(Conversation) onConversationTap;
@@ -15,6 +17,7 @@ class ChatNav extends StatefulWidget {
     required this.theme,
     required this.conversations,
     required this.onConversationTap,
+    required this.currentUserId,
   });
 
   @override
@@ -92,6 +95,7 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
               return false;
             },
             child: CustomScrollView(
+              physics: const ClampingScrollPhysics(),
               controller: scrollController,
               slivers: [
                 SliverAppBar(
@@ -107,87 +111,111 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
                       background: ChatNavOnline(theme: widget.theme)),
                 ),
                 SliverPersistentHeader(
+                  key: ValueKey(widget.theme.brightness),
                   floating: true,
                   pinned: true,
                   delegate: _SliverAppBarDelegate(
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6)
-                          .copyWith(top: 10),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEEECEA),
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(40),
-                          topLeft: Radius.circular(40),
+                      color: widget.theme.scaffoldBackgroundColor,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6)
+                            .copyWith(top: 10),
+                        decoration: BoxDecoration(
+                          color: widget.theme.brightness == Brightness.dark
+                              ? AppPallete.grey800
+                              : const Color(0xFFEEECEA),
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(40),
+                            topLeft: Radius.circular(40),
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TabBar(
-                            controller: tabController,
-                            tabs: const [
-                              Tab(
-                                text: 'All',
-                              ),
-                              Tab(
-                                text: 'Unread',
-                              ),
-                              Tab(
-                                text: 'Groups',
-                              ),
-                              Tab(
-                                text: 'Contacts',
-                              ),
-                            ],
-                            tabAlignment: TabAlignment.fill,
-                            labelStyle:
-                                widget.theme.textTheme.labelLarge?.copyWith(
-                              color: widget.theme.colorScheme.tertiary,
-                            ),
-                            unselectedLabelColor: widget.theme.disabledColor,
-                            indicatorSize: TabBarIndicatorSize.label,
-                            dividerColor: Colors.transparent,
-                            indicator: UnderlineTabIndicator(
-                              borderSide: BorderSide(
-                                width: 2,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TabBar(
+                              controller: tabController,
+                              tabs: const [
+                                Tab(
+                                  text: 'All',
+                                ),
+                                Tab(
+                                  text: 'Unread',
+                                ),
+                                Tab(
+                                  text: 'Groups',
+                                ),
+                                Tab(
+                                  text: 'Contacts',
+                                ),
+                              ],
+                              tabAlignment: TabAlignment.fill,
+                              labelStyle:
+                                  widget.theme.textTheme.labelLarge?.copyWith(
                                 color: widget.theme.colorScheme.tertiary,
                               ),
-                              insets: const EdgeInsets.symmetric(horizontal: 4),
+                              unselectedLabelColor: widget.theme.disabledColor,
+                              indicatorSize: TabBarIndicatorSize.label,
+                              dividerColor: Colors.transparent,
+                              indicator: UnderlineTabIndicator(
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: widget.theme.colorScheme.tertiary,
+                                ),
+                                insets:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                              ),
                             ),
+                            const SizedBox(
+                              height: 12,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Replace the SliverList section with:
+                SliverToBoxAdapter(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height -
+                          292, // Adjust this value based on your header heights
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: widget.theme.brightness == Brightness.dark
+                            ? AppPallete.grey800
+                            : const Color(0xFFEEECEA),
+                      ),
+                      child: Column(
+                        children: [
+                          ChatNavPinned(
+                            currentUserId: widget.currentUserId,
+                            theme: widget.theme,
+                            onConversationTap: widget.onConversationTap,
+                            items: items,
                           ),
-                          const SizedBox(
-                            height: 12,
-                          )
+                          const SizedBox(height: 10),
+                          ChatNavItem(
+                            currentUserId: widget.currentUserId,
+                            theme: widget.theme,
+                            onConversationTap: widget.onConversationTap,
+                            items: items,
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(
+                SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEEECEA),
-                    ),
-                    child: Column(
-                      children: [
-                        ChatNavPinned(
-                          theme: widget.theme,
-                          onConversationTap: widget.onConversationTap,
-                          items: items,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        ChatNavItem(
-                          theme: widget.theme,
-                          onConversationTap: widget.onConversationTap,
-                          items: items,
-                        )
-                      ],
-                    ),
+                    color: widget.theme.brightness == Brightness.dark
+                        ? AppPallete.grey800
+                        : const Color(0xFFEEECEA),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -221,10 +249,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: _child,
-    );
+    return _child;
   }
 
   @override

@@ -1,21 +1,24 @@
+import 'package:avatar_stack/animated_avatar_stack.dart';
+import 'package:avatar_stack/positions.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/view/chat/domain/entities/conversation_models.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter_svg/svg.dart';
 
 class ChatAppBar extends StatefulWidget {
   final ThemeData theme;
-  final String name;
   final String subTitle;
-  final String avatar;
+  final String currentUserId;
+  final Conversation conversation;
   final VoidCallback onBack;
   const ChatAppBar({
     super.key,
     required this.theme,
-    required this.name,
     required this.subTitle,
-    required this.avatar,
     required this.onBack,
+    required this.conversation,
+    required this.currentUserId,
   });
 
   @override
@@ -55,21 +58,55 @@ class _ChatAppBarState extends State<ChatAppBar> {
           const SizedBox(
             width: 5,
           ),
-          badges.Badge(
-            badgeStyle:
-                const badges.BadgeStyle(badgeColor: AppPallete.primaryMain),
-            position: badges.BadgePosition.bottomEnd(bottom: 0, end: 0),
-            child: CircleAvatar(
-              radius: 20,
-              child: Text(widget.avatar),
-            ),
-          ),
+          widget.conversation.type == ConversationType.group
+              ? SizedBox(
+                  width: 60,
+                  height: 43,
+                  child: AnimatedAvatarStack(
+                    settings: RestrictedPositions(
+                      maxCoverage: 0.80,
+                    ),
+                    avatars: [
+                      for (var participant in widget.conversation.participants)
+                        if (participant.id != widget.currentUserId)
+                          NetworkImage(participant.avatarUrl),
+                    ],
+                  ),
+                )
+              : badges.Badge(
+                  badgeContent: CircleAvatar(
+                    radius: 7,
+                    backgroundColor: widget.theme.scaffoldBackgroundColor,
+                    child: const CircleAvatar(
+                      radius: 5,
+                      backgroundColor: AppPallete.successMain,
+                    ),
+                  ),
+                  badgeStyle:
+                      const badges.BadgeStyle(badgeColor: Colors.transparent),
+                  position:
+                      badges.BadgePosition.bottomEnd(end: -10, bottom: -1),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(widget
+                        .conversation.participants
+                        .firstWhere((p) => p.id != widget.currentUserId)
+                        .avatarUrl),
+                  ),
+                ),
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.name,
+                widget.conversation.type == ConversationType.group
+                    ? widget.conversation.participants
+                        .where((p) => p.id != widget.currentUserId)
+                        .map((p) => p.name)
+                        .join(", ")
+                    : widget.conversation.participants
+                        .firstWhere((p) => p.id == widget.currentUserId)
+                        .name,
                 style: widget.theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),

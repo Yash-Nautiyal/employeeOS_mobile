@@ -92,7 +92,7 @@ class _MenuItemState extends State<MenuItem>
                       child: Icon(
                         Icons.keyboard_arrow_down_rounded,
                         color: isSelected
-                            ? widget.theme.colorScheme.primaryContainer
+                            ? widget.theme.colorScheme.primaryFixed
                             : widget.theme.disabledColor,
                       ),
                     )
@@ -102,7 +102,7 @@ class _MenuItemState extends State<MenuItem>
                 widget.icon,
                 width: 22,
                 color: isSelected
-                    ? widget.theme.colorScheme.primaryContainer
+                    ? widget.theme.colorScheme.primaryFixed
                     : widget.theme.disabledColor,
               ),
               title: Text(
@@ -110,7 +110,7 @@ class _MenuItemState extends State<MenuItem>
                 style: widget.theme.textTheme.labelLarge?.copyWith(
                   fontSize: 15,
                   color: isSelected
-                      ? widget.theme.colorScheme.primaryContainer
+                      ? widget.theme.colorScheme.primaryFixed
                       : widget.theme.disabledColor,
                 ),
               ),

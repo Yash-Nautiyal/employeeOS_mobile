@@ -40,10 +40,17 @@ class ChatNavHeader extends StatelessWidget implements PreferredSizeWidget {
           Row(
             children: [
               badges.Badge(
-                badgeStyle: const badges.BadgeStyle(
-                  badgeColor: AppPallete.primaryMain,
+                badgeContent: CircleAvatar(
+                  radius: 6.7,
+                  backgroundColor: theme.scaffoldBackgroundColor,
+                  child: const CircleAvatar(
+                    radius: 5,
+                    backgroundColor: AppPallete.successMain,
+                  ),
                 ),
-                position: badges.BadgePosition.bottomEnd(bottom: 0, end: 0),
+                badgeStyle:
+                    const badges.BadgeStyle(badgeColor: Colors.transparent),
+                position: badges.BadgePosition.bottomEnd(end: -7, bottom: -2),
                 child: const CircleAvatar(
                   radius: 23,
                 ),
@@ -69,11 +76,13 @@ class ChatNavHeader extends StatelessWidget implements PreferredSizeWidget {
                         child: _buildSearchField(),
                       )
                     : IconButton(
-                        style: const ButtonStyle(
-                          padding: WidgetStatePropertyAll(EdgeInsets.all(12)),
-                          shape: WidgetStatePropertyAll(CircleBorder()),
+                        style: ButtonStyle(
+                          padding: const WidgetStatePropertyAll(EdgeInsets.all(12)),
+                          shape: const WidgetStatePropertyAll(CircleBorder()),
                           backgroundColor: WidgetStatePropertyAll(
-                            Color.fromARGB(119, 238, 236, 234),
+                            theme.brightness == Brightness.dark
+                                ? AppPallete.grey500.withAlpha(70)
+                                : const Color.fromARGB(119, 238, 236, 234),
                           ),
                         ),
                         key: const ValueKey('search-icon'),

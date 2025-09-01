@@ -127,27 +127,22 @@ class AppPallete {
       AppPallete.errorLighter,
       Color.fromARGB(255, 251, 251, 251),
       Color.fromARGB(255, 251, 251, 251),
-      Color.fromARGB(255, 212, 251, 251),
+      Color.fromARGB(255, 205, 248, 248),
     ],
-    stops: [0.05, 0.3, .7, 0.99],
-    begin: Alignment(-1.7, 1),
+    stops: [0.05, 0.3, .87, 0.99],
+    begin: Alignment(-2, 1),
     end: Alignment(1.2, -1),
   );
 
   static LinearGradient darkBackgroundGradient = const LinearGradient(
     colors: [
       Color.fromARGB(255, 62, 35, 33),
-      Color.fromARGB(
-        255,
-        18,
-        21,
-        25,
-      ),
-      Color.fromARGB(255, 14, 16, 19),
-      Color.fromARGB(255, 24, 46, 53),
+      Color.fromARGB(255, 25, 29, 35),
+      Color.fromARGB(255, 25, 29, 35),
+      Color.fromARGB(255, 33, 52, 62)
     ],
-    stops: [0.0, .17, .86, 1],
-    begin: Alignment(-1.7, 1),
+    stops: [0.0, .17, .88, 1],
+    begin: Alignment(-1.8, 1),
     end: Alignment(1.2, -1),
   );
 }

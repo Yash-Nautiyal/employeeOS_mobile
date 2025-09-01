@@ -5,10 +5,10 @@ packages:
     dependency: transitive
     description:
       name: animate_do
-      sha256: b6ff08dc6cf3cb5586a86d7f32a3b5f45502d2e08e3fb4f5a484c8421c9b3fc0
+      sha256: e5c8b92e8495cba5adfff17c0b017d50f46b2766226e9faaf68bc08c91aef034
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.9"
+    version: "4.2.0"
   animated_text_kit:
     dependency: "direct main"
     description:
@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.3"
+  animations:
+    dependency: "direct main"
+    description:
+      name: animations
+      sha256: d3d6dcfb218225bbe68e87ccf6378bbb2e32a94900722c5f81611dad089911cb
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.11"
   ansicolor:
     dependency: transitive
     description:
@@ -89,6 +97,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.12.0"
+  avatar_stack:
+    dependency: "direct main"
+    description:
+      name: avatar_stack
+      sha256: "354527ba139956fd6439e2c49199d8298d72afdaa6c4cd6f37f26b97faf21f7e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   badges:
     dependency: "direct main"
     description:
@@ -338,10 +354,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_chat_reactions
-      sha256: "1151ecce4a499f6b55babf870b19b0b19a48a003b004f21263b0747b765a17f7"
+      sha256: c7b3544327247fcae38b7d3523d2800b5a6eddff48fcb89e1350ed96e11c8781
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.2.6"
   flutter_dotenv:
     dependency: "direct main"
     description:

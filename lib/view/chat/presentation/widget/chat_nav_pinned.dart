@@ -7,18 +7,20 @@ class ChatNavPinned extends StatelessWidget {
   final ThemeData theme;
   final Function onConversationTap;
   final List<Conversation> items;
+  final String currentUserId;
   const ChatNavPinned(
       {super.key,
       required this.theme,
       required this.onConversationTap,
-      required this.items});
+      required this.items,
+      required this.currentUserId});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        color: theme.cardColor,
+        color: theme.scaffoldBackgroundColor,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
@@ -26,19 +28,21 @@ class ChatNavPinned extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 10),
+              padding: const EdgeInsets.only(top: 8.0, left: 15),
               child: Row(
                 children: [
                   SvgPicture.asset(
                     'assets/icons/common/solid/ic-solar-pin-bold.svg',
                     width: 17,
+                    color: theme.colorScheme.tertiary,
                   ),
                   const SizedBox(
                     width: 5,
                   ),
                   Text(
                     'Pinned Chats',
-                    style: theme.textTheme.titleSmall,
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: theme.colorScheme.tertiary),
                   ),
                 ],
               ),
@@ -46,6 +50,7 @@ class ChatNavPinned extends StatelessWidget {
             Flexible(
               child: ChatNavItem(
                   theme: theme,
+                  currentUserId: currentUserId,
                   onConversationTap: (conv) => onConversationTap(conv),
                   items: items.take(2).toList()),
             ),

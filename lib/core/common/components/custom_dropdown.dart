@@ -25,7 +25,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField2(
-      isExpanded: false,
+      isExpanded: true,
       value: widget.value,
       enableFeedback: true,
       alignment: AlignmentDirectional.centerStart,

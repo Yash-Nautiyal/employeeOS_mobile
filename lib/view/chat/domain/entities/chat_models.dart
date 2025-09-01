@@ -1,3 +1,5 @@
+import 'package:employeeos/view/chat/domain/entities/reaction_model.dart';
+
 enum MessageType {
   text,
   image,
@@ -16,16 +18,16 @@ abstract class ChatMessage {
   final DateTime createdAt;
   final MessageType type;
   final String? replyTo;
-  final Map<String, String> reactions;
+  final List<ReactionModel> reactions;
 
   ChatMessage({
     required this.id,
     required this.authorId,
     required this.createdAt,
     required this.type,
-    Map<String, String>? reactions,
+    List<ReactionModel>? reactions,
     this.replyTo,
-  }) : reactions = reactions ?? <String, String>{};
+  }) : reactions = reactions ?? <ReactionModel>[];
 
   Map<String, dynamic> toJson();
 }
@@ -62,8 +64,9 @@ class TextMessage extends ChatMessage {
         createdAt: DateTime.parse(json['createdAt'] as String),
         replyTo: json['replyTo'] as String?,
         text: json['text'] as String,
-        reactions: (json['reactions'] as Map<String, dynamic>?)
-            ?.map((key, value) => MapEntry(key, value as String)),
+        reactions: (json['reactions'] as List<dynamic>?)
+            ?.map((item) => ReactionModel.fromJson(item))
+            .toList(),
       );
 }
 
@@ -107,8 +110,9 @@ class ImageMessage extends ChatMessage {
         url: json['url'] as String,
         name: json['name'] as String,
         size: json['size'] as int,
-        reactions: (json['reactions'] as Map<String, dynamic>?)
-            ?.map((key, value) => MapEntry(key, value as String)),
+        reactions: (json['reactions'] as List<dynamic>?)
+            ?.map((item) => ReactionModel.fromJson(item))
+            .toList(),
       );
 }
 
@@ -155,8 +159,9 @@ class FileMessage extends ChatMessage {
         name: json['name'] as String,
         fileType: json['fileType'] as String,
         size: json['size'] as int,
-        reactions: (json['reactions'] as Map<String, dynamic>?)
-            ?.map((key, value) => MapEntry(key, value as String)),
+        reactions: (json['reactions'] as List<dynamic>?)
+            ?.map((item) => ReactionModel.fromJson(item))
+            .toList(),
       );
 }
 
@@ -213,120 +218,6 @@ class UnsupportedMessage extends ChatMessage {
         authorId: json['authorId'] as String,
         createdAt: DateTime.parse(json['createdAt'] as String),
       );
-}
-
-List<ChatMessage> getMockChatMessages({required String currentUserId}) {
-  final now = DateTime.now();
-  int counter = 0;
-  String rnd() => (++counter).toString();
-
-  final messages = [
-    TextMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 1, minutes: 2)),
-      text: 'Replying to image message from yesterday',
-      replyTo: '6',
-    ),
-    TextMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 1, minutes: 1)),
-      text: 'Replying to file message from yesterday',
-      replyTo: '8',
-      reactions: {
-        'user-123': '😂',
-        'user_2': '😂',
-        'user_3': '❤️',
-        'user_4': '👍',
-      },
-    ),
-    TextMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 2, minutes: 5)),
-      text: 'Hello, this is a text message from two days ago.',
-    ),
-    TextMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 2, minutes: 5)),
-      text:
-          'Hello, this is a long text message from two days ago. Hello, this is a long text message from two days ago.',
-    ),
-    TextMessage(
-        id: rnd(),
-        authorId: currentUserId,
-        createdAt: now.subtract(const Duration(days: 3, minutes: 8)),
-        text: 'Replying from three days ago',
-        replyTo: '3'),
-    TextMessage(
-      id: rnd(),
-      authorId: 'user_2',
-      createdAt: now.subtract(const Duration(days: 3, minutes: 4)),
-      replyTo: '1',
-      text: 'Replying to your text message from three days ago.',
-    ),
-    ImageMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-      url:
-          'https://plus.unsplash.com/premium_photo-1683865776032-07bf70b0add1?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'yesterday_placeholder.png',
-      size: 1024,
-    ),
-    ImageMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-      url:
-          'https://images.unsplash.com/photo-1745294279347-e1bcbcb30f8c?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'wave.png',
-      size: 1024,
-    ),
-    ImageMessage(
-      id: rnd(),
-      authorId: currentUserId,
-      createdAt: now.subtract(const Duration(days: 1, minutes: 3)),
-      url:
-          'https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'pen.png',
-      size: 1024,
-    ),
-    
-    FileMessage(
-      id: rnd(),
-      authorId: 'user_2',
-      createdAt: now.subtract(const Duration(days: 2, minutes: 2)),
-      url:
-          'https://prhsilyjzxbkufchywxt.supabase.co/storage/v1/object/public/file_attachments/907c9198-c254-49e3-b794-0d76c3e4c101/AWS%20Script%20NW.pdf',
-      name: 'document_from_two_days_ago.pdf',
-      size: 204800,
-      fileType: 'application/pdf',
-    ),
-    ImageMessage(
-      id: rnd(),
-      authorId: 'user_2',
-      createdAt: now.subtract(const Duration(days: 2, minutes: 3)),
-      url:
-          'https://plus.unsplash.com/premium_photo-1676487748067-4da1e9afa701?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      name: 'mountains.png',
-      size: 1024,
-    ),
-    ImageMessage(
-      id: rnd(),
-      authorId: 'user_2',
-      createdAt: now.subtract(const Duration(days: 2, minutes: 3)),
-      url:
-          'https://images.pexels.com/photos/31636919/pexels-photo-31636919/free-photo-of-coastal-breakwater-against-ocean-waves.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      name: 'leaf.png',
-      size: 22200,
-    ),
-  ];
-
-  messages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  return messages;
 }
 
 //-----------------------------------------------------------EXTRA MESSAGES MODELS----------------------------------------------------------- 

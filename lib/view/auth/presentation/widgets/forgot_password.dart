@@ -1,0 +1,126 @@
+import 'package:employeeos/core/common/components/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/view/auth/presentation/widgets/confirm_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+
+class ForgotPassword extends StatefulWidget {
+  final ThemeData theme;
+  const ForgotPassword({super.key, required this.theme});
+
+  @override
+  State<ForgotPassword> createState() => _ForgotPasswordState();
+}
+
+class _ForgotPasswordState extends State<ForgotPassword> {
+  final emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: widget.theme.scaffoldBackgroundColor,
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: SvgPicture.asset(
+                  'assets/icons/illustrations/ic-password.svg',
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Forgot your Password?",
+                style: widget.theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                "Please enter the email address associated with your account and we'll email you a link to reset your password.",
+                style: widget.theme.textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 25),
+              CustomTextfield(
+                controller: emailController,
+                theme: widget.theme,
+                hintText: "",
+                labelText: "Email Address",
+                onchange: (text) {
+                  setState(() {
+                    emailController.text = text;
+                  });
+                },
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Enter your email";
+                  }
+                  final emailRegex = RegExp(
+                    r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$",
+                  );
+                  if (!emailRegex.hasMatch(value)) return "Enter a valid email";
+                  return null;
+                },
+              ),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: CustomTextButton(
+                      onClick: () {
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ConfirmPage(theme: widget.theme),
+                            ),
+                          );
+                        }
+                      },
+                      backgroundColor: widget.theme.colorScheme.tertiary,
+                      child: Text(
+                        "Send Request",
+                        style: widget.theme.textTheme.labelLarge?.copyWith(
+                          color: widget.theme.scaffoldBackgroundColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.arrow_back_rounded, size: 20),
+                    const SizedBox(width: 10),
+                    Text(
+                      "Return to sign in",
+                      style: widget.theme.textTheme.titleMedium?.copyWith(
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

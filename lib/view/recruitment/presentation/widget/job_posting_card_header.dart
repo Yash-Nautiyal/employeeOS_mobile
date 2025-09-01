@@ -22,7 +22,7 @@ class JobPostingCardHeader extends StatelessWidget {
           ),
           child: Text(
             'Active',
-            style: theme.textTheme.bodyLarge?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               color: AppPallete.successMain,
               fontWeight: FontWeight.w700,
             ),

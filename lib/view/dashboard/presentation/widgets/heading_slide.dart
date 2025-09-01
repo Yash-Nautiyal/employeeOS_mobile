@@ -136,7 +136,7 @@ class _HeadingSlideState extends State<HeadingSlide> {
                       decoration: BoxDecoration(
                         color: _currentPage == index
                             ? widget.theme.primaryColor
-                            : widget.theme.colorScheme.primaryContainer,
+                            : widget.theme.colorScheme.primaryFixed,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),

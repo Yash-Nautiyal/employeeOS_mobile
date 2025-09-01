@@ -60,6 +60,7 @@ class UserProfileRole extends StatelessWidget {
               SvgPicture.asset(
                 "assets/icons/social/ic-twitter.svg",
                 width: 20,
+                color: theme.colorScheme.tertiary,
               ),
             ],
           )

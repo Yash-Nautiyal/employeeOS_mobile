@@ -20,6 +20,8 @@ class CustomTextfield extends StatelessWidget {
   final bool? alwaysFloatingLabel;
   final bool? close;
   final Function? onClose;
+  final String? Function(String?)? validator;
+
   const CustomTextfield({
     super.key,
     required this.controller,
@@ -40,6 +42,7 @@ class CustomTextfield extends StatelessWidget {
     this.alwaysFloatingLabel = false,
     this.close = false,
     this.onClose,
+    this.validator,
   });
 
   Future<void> _selectDate(BuildContext context) async {
@@ -61,7 +64,8 @@ class CustomTextfield extends StatelessWidget {
     // Check if this is a datetime field
     bool isDateTimeField = keyboardType == TextInputType.datetime;
 
-    return TextField(
+    return TextFormField(
+      validator: validator,
       keyboardType: keyboardType,
       controller: controller,
       obscureText: isPasswordVisible != null ? !(isPasswordVisible!) : false,

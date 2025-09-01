@@ -30,9 +30,21 @@ class _JobPostingViewState extends State<JobPostingView> {
           ),
           Flexible(
             child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: JobPostingCard(
-                    scrollController: scrollController, theme: theme)),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: GridView.builder(
+                controller: scrollController,
+                itemCount: 3,
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisSpacing: 20,
+                  crossAxisCount: 1,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1,
+                ),
+                itemBuilder: (context, index) => JobPostingCard(theme: theme),
+              ),
+            ),
           ),
         ],
       ),

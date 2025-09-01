@@ -105,6 +105,7 @@ class UserProfileSocialLink extends StatelessWidget {
               SvgPicture.asset(
                 "assets/icons/social/ic-twitter.svg",
                 width: 25,
+                color: theme.colorScheme.tertiary,
               ),
               const SizedBox(
                 width: 16,

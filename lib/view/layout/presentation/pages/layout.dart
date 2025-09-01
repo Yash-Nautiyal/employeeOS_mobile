@@ -25,7 +25,7 @@ class _LayoutState extends State<Layout> {
     'User': const UserDashboardView(),
     'Hirings': const HiringView(),
     'Kanban': const KanbanView(),
-    'Chat': const ChatPage(),
+    'Chat': const ChatView(),
     'File Manager': const FilemanagerView(),
     // 'Calendar': const Center(child: Text('Calendar Page')),
     // 'Mail': const Center(child: Text('Mail Page')),
@@ -171,18 +171,18 @@ class _LayoutState extends State<Layout> {
                   //     Navigator.pop(context); // Close the drawer
                   //   },
                   // ),
-                  // MenuItem(
-                  //   icon: 'assets/icons/nav/ic-mail.svg',
-                  //   title: 'Mail',
-                  //   theme: theme,
-                  //   selectedItem: _selectedItem,
-                  //   onSelected: (item) {
-                  //     setState(() {
-                  //       _selectedItem = item;
-                  //     });
-                  //     Navigator.pop(context); // Close the drawer
-                  //   },
-                  // ),
+                  MenuItem(
+                    icon: 'assets/icons/nav/ic-mail.svg',
+                    title: 'Mail',
+                    theme: theme,
+                    selectedItem: _selectedItem,
+                    onSelected: (item) {
+                      setState(() {
+                        _selectedItem = item;
+                      });
+                      Navigator.pop(context); // Close the drawer
+                    },
+                  ),
                   MenuItem(
                     icon: 'assets/icons/nav/ic-recruitment.svg',
                     title: 'Recruitment',

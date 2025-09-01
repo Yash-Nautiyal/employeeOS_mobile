@@ -1,22 +1,27 @@
+import 'package:avatar_stack/animated_avatar_stack.dart'
+    show AnimatedAvatarStack;
+import 'package:avatar_stack/positions.dart';
 import 'package:employeeos/core/common/actions/date_time_actions.dart'
     show formatRelativeTime;
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart'
     show TextMessage;
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
-    show Conversation;
+    show Conversation, ConversationType;
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 
 class ChatNavItem extends StatelessWidget {
   final ThemeData theme;
+  final String currentUserId;
   final Function onConversationTap;
   final List<Conversation> items;
   const ChatNavItem(
       {super.key,
       required this.theme,
       required this.onConversationTap,
-      required this.items});
+      required this.items,
+      required this.currentUserId});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +29,7 @@ class ChatNavItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8).copyWith(right: 15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        color: theme.cardColor,
+        color: theme.scaffoldBackgroundColor,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
@@ -53,26 +58,41 @@ class ChatNavItem extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    badges.Badge(
-                      badgeContent: const CircleAvatar(
-                        radius: 6.5,
-                        backgroundColor: Colors.white,
-                        child: CircleAvatar(
-                          radius: 5,
-                          backgroundColor: AppPallete.successMain,
-                        ),
-                      ),
-                      badgeStyle: const badges.BadgeStyle(
-                          badgeColor: Colors.transparent),
-                      position:
-                          badges.BadgePosition.bottomEnd(end: -5, bottom: 0),
-                      child: CircleAvatar(
-                        radius: 27,
-                        child: Text(
-                          conv.name[0],
-                        ),
-                      ),
-                    ),
+                    conv.type == ConversationType.group
+                        ? SizedBox(
+                            width: 60,
+                            height: 43,
+                            child: AnimatedAvatarStack(
+                              settings: RestrictedPositions(
+                                maxCoverage: 0.80,
+                              ),
+                              avatars: [
+                                for (var participant in conv.participants)
+                                  if (participant.id != currentUserId)
+                                    NetworkImage(participant.avatarUrl),
+                              ],
+                            ),
+                          )
+                        : badges.Badge(
+                            badgeContent: CircleAvatar(
+                              radius: 7,
+                              backgroundColor: theme.scaffoldBackgroundColor,
+                              child: const CircleAvatar(
+                                radius: 5,
+                                backgroundColor: AppPallete.successMain,
+                              ),
+                            ),
+                            badgeStyle: const badges.BadgeStyle(
+                                badgeColor: Colors.transparent),
+                            position: badges.BadgePosition.bottomEnd(
+                                end: -8, bottom: 0),
+                            child: CircleAvatar(
+                              radius: 27,
+                              backgroundImage: NetworkImage(conv.participants
+                                  .firstWhere((p) => p.id != currentUserId)
+                                  .avatarUrl),
+                            ),
+                          ),
                     const SizedBox(
                       width: 10,
                     ),
@@ -85,7 +105,10 @@ class ChatNavItem extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  conv.name,
+                                  conv.participants
+                                      .where((p) => p.id != currentUserId)
+                                      .map((p) => p.name)
+                                      .join(", "),
                                   style: theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: theme.colorScheme.tertiary),

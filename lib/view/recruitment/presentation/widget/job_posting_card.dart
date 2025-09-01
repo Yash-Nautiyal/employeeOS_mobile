@@ -7,10 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class JobPostingCard extends StatefulWidget {
-  final ScrollController scrollController;
   final ThemeData theme;
-  const JobPostingCard(
-      {super.key, required this.scrollController, required this.theme});
+  const JobPostingCard({super.key, required this.theme});
 
   @override
   State<JobPostingCard> createState() => _JobPostingCardState();
@@ -19,171 +17,213 @@ class JobPostingCard extends StatefulWidget {
 class _JobPostingCardState extends State<JobPostingCard>
     with SingleTickerProviderStateMixin {
   bool _showDropdown = false;
+  bool _closeDropdown = true;
+
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void toggleDropdown() {
+    if (_showDropdown) {
+      // Close animation first
+      _controller.reverse();
+      setState(() {
+        _showDropdown = false;
+      });
+      // Then hide dropdown after animation completes
+      Future.delayed(const Duration(milliseconds: 200)).then((_) {
+        setState(() {
+          _closeDropdown = true;
+        });
+      });
+    } else {
+      // First make container visible
+      setState(() {
+        _closeDropdown = false;
+        _showDropdown = false;
+      });
+
+      // Then trigger the animation
+      Future.microtask(() {
+        setState(() {
+          _showDropdown = true;
+        });
+        _controller.forward();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      controller: widget.scrollController,
-      itemCount: 3,
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        mainAxisSpacing: 20,
-        crossAxisCount: 1,
-        crossAxisSpacing: 10,
-        childAspectRatio: 1,
-      ),
-      itemBuilder: (context, index) => Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 13),
-            decoration: BoxDecoration(
-              color: widget.theme.cardColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: widget.theme.shadowColor),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.theme.shadowColor,
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                JobPostingCardHeader(
-                  theme: widget.theme,
-                  onSelect: () {
-                    setState(() {
-                      _showDropdown = !_showDropdown;
-                    });
-                  },
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  "Cloud Internship - AWS",
-                  style: widget.theme.textTheme.displaySmall
-                      ?.copyWith(fontSize: 22),
-                ),
-                Text(
-                  "Tech",
-                  style: widget.theme.textTheme.bodyMedium
-                      ?.copyWith(color: widget.theme.disabledColor),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  'Posted date: 23 Jun 2025',
-                  style: widget.theme.textTheme.titleMedium,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5.0),
-                  child: Wrap(
-                    spacing: 20,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/common/solid/ic-solar_users-group-rounded-bold.svg',
-                            color: AppPallete.successMain,
-                            width: 20,
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          Text(
-                            '1 position',
-                            style: widget.theme.textTheme.labelLarge
-                                ?.copyWith(color: AppPallete.successMain),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/common/solid/ic-file-bold.svg',
-                            color: AppPallete.infoMain,
-                            width: 20,
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          Text(
-                            '190 applications',
-                            style: widget.theme.textTheme.labelLarge
-                                ?.copyWith(color: AppPallete.infoMain),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/common/solid/ic-solar_user-id-bold.svg',
-                      color: widget.theme.disabledColor,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      'Posted by: Yash Nautiyal',
-                      style: widget.theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: widget.theme.dividerColor,
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/common/solid/ic-fluent_mail-24-filled.svg',
-                      color: widget.theme.disabledColor,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      'nautiyalyash4@gmail.com',
-                      style: widget.theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: widget.theme.dividerColor,
-                      ),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0, bottom: 13),
-                  child: CustomDivider(
-                    color: widget.theme.dividerColor,
-                  ),
-                ),
-                Expanded(
-                  child: JobPostingCardFooter(theme: widget.theme),
-                )
-              ],
-            ),
+    return Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 13),
+          decoration: BoxDecoration(
+            color: widget.theme.cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: widget.theme.shadowColor),
+            boxShadow: [
+              BoxShadow(
+                color: widget.theme.shadowColor,
+                spreadRadius: 1,
+                blurRadius: 3,
+              ),
+            ],
           ),
-          Positioned(
-            top: _showDropdown ? 10 : 30,
-            right: 30,
-            child: AnimatedSlide(
-              offset:
-                  _showDropdown ? const Offset(0.1, .2) : const Offset(0.18, 0),
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOut,
-              child: AnimatedOpacity(
-                opacity: _showDropdown ? 1 : 0,
-                duration: const Duration(
-                  milliseconds: 250,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              JobPostingCardHeader(
+                theme: widget.theme,
+                onSelect: toggleDropdown,
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Text(
+                "Cloud Internship - AWS",
+                style:
+                    widget.theme.textTheme.displaySmall?.copyWith(fontSize: 20),
+              ),
+              Text(
+                "Tech",
+                style: widget.theme.textTheme.bodyMedium
+                    ?.copyWith(color: widget.theme.disabledColor),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Posted date: 23 Jun 2025',
+                style: widget.theme.textTheme.bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                child: Wrap(
+                  spacing: 20,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/common/solid/ic-solar_users-group-rounded-bold.svg',
+                          color: AppPallete.successMain,
+                          width: 20,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          '1 position',
+                          style: widget.theme.textTheme.labelLarge
+                              ?.copyWith(color: AppPallete.successMain),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/common/solid/ic-file-bold.svg',
+                          color: AppPallete.infoMain,
+                          width: 20,
+                        ),
+                        const SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          '190 applications',
+                          style: widget.theme.textTheme.labelLarge
+                              ?.copyWith(color: AppPallete.infoMain),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
+              ),
+              Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/common/solid/ic-solar_user-id-bold.svg',
+                    color: widget.theme.disabledColor,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'Posted by: Yash Nautiyal',
+                    style: widget.theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: widget.theme.dividerColor,
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/common/solid/ic-fluent_mail-24-filled.svg',
+                    color: widget.theme.disabledColor,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'nautiyalyash4@gmail.com',
+                    style: widget.theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: widget.theme.dividerColor,
+                    ),
+                  )
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0, bottom: 13),
+                child: CustomDivider(
+                  color: widget.theme.dividerColor,
+                ),
+              ),
+              Expanded(
+                child: JobPostingCardFooter(theme: widget.theme),
+              )
+            ],
+          ),
+        ),
+        if (!_closeDropdown)
+          Positioned(
+            top: 40,
+            right: 6,
+            child: AnimatedOpacity(
+              opacity: _showDropdown ? 1 : 0,
+              duration: const Duration(
+                milliseconds: 200,
+              ),
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                alignment: Alignment.topRight,
                 child: CustomPaint(
                   painter: CustomDropdownPainter(
                     theme: widget.theme,
@@ -299,8 +339,7 @@ class _JobPostingCardState extends State<JobPostingCard>
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

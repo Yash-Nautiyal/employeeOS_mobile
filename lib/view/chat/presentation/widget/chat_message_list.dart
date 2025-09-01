@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:employeeos/core/common/actions/date_time_actions.dart'
     show formatDate, isSameDay, isSameMinute;
+import 'package:employeeos/view/chat/domain/entities/participant_model.dart';
+import 'package:employeeos/view/chat/domain/entities/reaction_model.dart'
+    show ReactionModel;
 import 'package:flutter/material.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_message_item.dart';
@@ -11,13 +14,14 @@ class ChatMessageList extends StatefulWidget {
   final String currentUserId;
   final ThemeData theme;
   final Function(ChatMessage message) onSwipeMessage;
-
+  final List<ParticipantModel> participants;
   const ChatMessageList({
     super.key,
     required this.messages,
     required this.theme,
     required this.currentUserId,
     required this.onSwipeMessage,
+    required this.participants,
   });
 
   @override
@@ -46,12 +50,17 @@ class _ChatMessageListState extends State<ChatMessageList> {
   }) {
     setState(() {
       final message = widget.messages.firstWhere((msg) => msg.id == messageId);
-      if (message.reactions[widget.currentUserId] == reaction) {
+      if (message.reactions
+              .firstWhere((r) => r.userId == widget.currentUserId,
+                  orElse: () => ReactionModel(emoji: '', userId: ''))
+              .emoji ==
+          reaction) {
         // If the same reaction is sent by the same user, clear the reaction
-        message.reactions.remove(widget.currentUserId);
+        message.reactions.removeWhere((r) => r.userId == widget.currentUserId);
       } else {
         // Otherwise, add or update the reaction
-        message.reactions[widget.currentUserId] = reaction;
+        message.reactions
+            .add(ReactionModel(emoji: reaction, userId: widget.currentUserId));
       }
     });
   }
@@ -161,6 +170,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                               bottom: 2,
                             ),
                             child: ChatMessageItem(
+                              participants: widget.participants,
                               message: batch.first,
                               isMe: isMe,
                               currentUserId: widget.currentUserId,
@@ -186,15 +196,69 @@ class _ChatMessageListState extends State<ChatMessageList> {
                         Padding(
                           padding: const EdgeInsets.only(top: 30),
                           child: Center(
-                            child: Text(
-                              formatDate(msg.createdAt),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: widget.theme.colorScheme.tertiary,
-                                    fontWeight: FontWeight.w700,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          widget.theme.dividerColor
+                                              .withAlpha(0),
+                                          widget.theme.dividerColor
+                                              .withAlpha(100),
+                                        ],
+                                      ),
+                                    ),
                                   ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: widget
+                                        .theme.colorScheme.surfaceContainer,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: widget.theme.shadowColor
+                                            .withOpacity(0.05),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    formatDate(msg.createdAt),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              widget.theme.colorScheme.tertiary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          widget.theme.dividerColor
+                                              .withAlpha(100),
+                                          widget.theme.dividerColor
+                                              .withAlpha(0),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -204,6 +268,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                           bottom: 1,
                         ),
                         child: ChatMessageItem(
+                          participants: widget.participants,
                           message: msg,
                           isMe: isMe,
                           currentUserId: widget.currentUserId,

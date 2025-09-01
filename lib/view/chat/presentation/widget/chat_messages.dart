@@ -197,7 +197,7 @@ class ChatMessages extends StatelessWidget {
             child: Text(
               m.text,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isMe ? AppPallete.grey900 : theme.colorScheme.onSurface,
+                color: isMe ? AppPallete.grey900 : theme.colorScheme.tertiary,
               ),
             ),
           ),

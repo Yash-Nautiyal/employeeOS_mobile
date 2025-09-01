@@ -35,10 +35,10 @@ class ChatNavOnline extends StatelessWidget {
                 children: [
                   Expanded(
                     child: badges.Badge(
-                      badgeContent: const CircleAvatar(
-                        radius: 8.5,
-                        backgroundColor: Colors.white,
-                        child: CircleAvatar(
+                      badgeContent: CircleAvatar(
+                        radius: 8.2,
+                        backgroundColor: theme.scaffoldBackgroundColor,
+                        child: const CircleAvatar(
                           radius: 6,
                           backgroundColor: AppPallete.successMain,
                         ),

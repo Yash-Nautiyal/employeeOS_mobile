@@ -116,6 +116,7 @@ ThemeData buildTheme({
             primary: colorscheme["Main"],
             primaryFixedDim: colorscheme["Light"],
             primaryContainer: colorscheme["Lighter"],
+            primaryFixed: colorscheme["Lighter"],
             secondary: preset != Presets.purple
                 ? AppPallete.secondaryDark
                 : AppPallete.primaryDark,
@@ -134,8 +135,9 @@ ThemeData buildTheme({
           )
         : ColorScheme.light(
             primary: colorscheme["Main"],
-            primaryFixedDim: colorscheme["Light"],
-            primaryContainer: colorscheme["Dark"],
+            primaryFixedDim: colorscheme["Dark"],
+            primaryContainer: colorscheme["Lighter"],
+            primaryFixed: colorscheme["Dark"],
             secondary: preset != Presets.purple
                 ? AppPallete.secondaryMain
                 : AppPallete.primaryMain,

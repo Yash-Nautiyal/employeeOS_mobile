@@ -14,9 +14,9 @@ class CustomDropdownPainter extends CustomPainter {
     // Container dimensions
     final containerWidth = size.width;
     final containerHeight = size.height - 12; // Account for triangle height
-    final borderRadius = 8.0;
-    final triangleHeight = 12.0;
-    final triangleWidth = 20.0;
+    const borderRadius = 8.0;
+    const triangleHeight = 12.0;
+    const triangleWidth = 20.0;
     final triangleOffset = containerWidth - 40; // Position from right edge
 
     // Start from top-left, going clockwise
@@ -74,10 +74,9 @@ class CustomDropdownPainter extends CustomPainter {
     path.close();
 
     // Draw shadow first
-    final shadowPaint =
-        Paint()
-          ..color = Colors.black.withOpacity(0.15)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+    final shadowPaint = Paint()
+      ..color = Colors.black.withOpacity(0.15)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
 
     canvas.save();
     canvas.translate(0, 2); // Shadow offset
@@ -85,31 +84,29 @@ class CustomDropdownPainter extends CustomPainter {
     canvas.restore();
 
     // Create gradient paint
-    final gradientPaint =
-        Paint()
-          ..shader = LinearGradient(
-            colors: [
-              theme.brightness == Brightness.dark
-                  ? const Color.fromARGB(255, 84, 47, 45)
-                  : const Color.fromARGB(255, 254, 237, 221),
-              theme.brightness == Brightness.dark
-                  ? Color.fromARGB(255, 18, 21, 25).withAlpha(250)
-                  : const Color.fromARGB(255, 251, 251, 251),
-              theme.brightness == Brightness.dark
-                  ? Color.fromARGB(255, 17, 20, 26).withAlpha(250)
-                  : const Color.fromARGB(255, 251, 251, 251),
-              theme.brightness == Brightness.dark
-                  ? const Color.fromARGB(255, 28, 44, 49)
-                  : const Color.fromARGB(255, 225, 255, 255),
-            ],
-            stops:
-                theme.brightness == Brightness.dark
-                    ? [0.0, .17, .87, .99]
-                    : [0.05, 0.3, .7, 0.99],
-            begin: Alignment.bottomLeft,
-            end: Alignment.topRight,
-          ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-          ..style = PaintingStyle.fill;
+    final gradientPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          theme.brightness == Brightness.dark
+              ? const Color.fromARGB(255, 84, 47, 45)
+              : const Color.fromARGB(255, 254, 237, 221),
+          theme.brightness == Brightness.dark
+              ? const Color.fromARGB(255, 27, 30, 39)
+              : const Color.fromARGB(255, 251, 251, 251),
+          theme.brightness == Brightness.dark
+              ? const Color.fromARGB(255, 27, 30, 39)
+              : const Color.fromARGB(255, 251, 251, 251),
+          theme.brightness == Brightness.dark
+              ? const Color.fromARGB(255, 33, 70, 80)
+              : const Color.fromARGB(255, 225, 255, 255),
+        ],
+        stops: theme.brightness == Brightness.dark
+            ? [0.0, .17, .834, 1]
+            : [0.05, 0.3, .7, 0.99],
+        begin: Alignment.bottomLeft,
+        end: Alignment.topRight,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
 
     // Draw the main shape with gradient
     canvas.drawPath(path, gradientPaint);
