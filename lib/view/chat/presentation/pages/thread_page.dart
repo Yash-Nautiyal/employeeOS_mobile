@@ -106,19 +106,19 @@ class _ThreadPageState extends State<ThreadPage> {
     return Container(
       color: theme.scaffoldBackgroundColor,
       child: Padding(
-        padding: const EdgeInsets.only(top: 120),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         child: Column(
           children: [
             ChatAppBar(
               theme: theme,
-             currentUserId: _currentUserId,
+              currentUserId: _currentUserId,
               subTitle: "Online",
               conversation: widget.selectedConversation,
               onBack: () => Navigator.of(context).pop(),
             ),
             Expanded(
               child: ChatMessageList(
-                participants: widget.selectedConversation.participants,
+                  participants: widget.selectedConversation.participants,
                   messages: widget.selectedConversation.messages,
                   currentUserId: _currentUserId,
                   onSwipeMessage: handleSwipeMessage,

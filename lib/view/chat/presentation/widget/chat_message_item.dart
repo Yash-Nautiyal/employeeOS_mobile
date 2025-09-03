@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
 import 'package:employeeos/view/chat/domain/entities/participant_model.dart';
@@ -75,7 +73,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
             decoration: BoxDecoration(
               color: isUserReaction
-                  ? theme.colorScheme.primaryFixedDim
+                  ? theme.primaryColor
+                      .withOpacity(theme.brightness == Brightness.dark ? 1 : .5)
                   : theme.colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(50),
             ),
@@ -273,10 +272,12 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               ),
               if (reactionPills.isNotEmpty)
                 Positioned(
-                  bottom: -23.5, // overlap by 10px
-                  left: widget.isMe ? null : 10, // left-aligned on incoming
-                  right: widget.isMe ? 10 : null, // right-aligned on outgoing
+                  bottom: -23.5,
+                  left: widget.isMe ? null : 10,
+                  right: widget.isMe ? 10 : null,
                   child: Wrap(
+                    alignment:
+                        widget.isMe ? WrapAlignment.end : WrapAlignment.start,
                     spacing: 4,
                     children: reactionPills,
                   ),

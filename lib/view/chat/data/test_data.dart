@@ -48,7 +48,6 @@ final testConversations = [
           text: 'I am fine, thanks!'),
     ],
   ),
-  
   Conversation(
     id: '18',
     type: ConversationType.group,

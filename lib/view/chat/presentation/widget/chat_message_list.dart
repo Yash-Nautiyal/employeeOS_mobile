@@ -59,6 +59,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
         message.reactions.removeWhere((r) => r.userId == widget.currentUserId);
       } else {
         // Otherwise, add or update the reaction
+        message.reactions.removeWhere((r) => r.userId == widget.currentUserId);
         message.reactions
             .add(ReactionModel(emoji: reaction, userId: widget.currentUserId));
       }

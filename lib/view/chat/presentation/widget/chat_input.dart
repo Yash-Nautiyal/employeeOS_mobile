@@ -36,6 +36,7 @@ class _ChatInputState extends State<ChatInput> {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
+        color: widget.theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),

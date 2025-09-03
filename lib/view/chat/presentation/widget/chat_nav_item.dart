@@ -26,13 +26,14 @@ class ChatNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8).copyWith(right: 15),
+      padding: const EdgeInsets.only(right: 15, left: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(35),
         color: theme.scaffoldBackgroundColor,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: const BorderRadius.horizontal(
+            left: Radius.circular(35), right: Radius.circular(30)),
         child: ListView.separated(
           separatorBuilder: (context, index) => Padding(
             padding: const EdgeInsets.only(left: 65.0),
@@ -63,6 +64,10 @@ class ChatNavItem extends StatelessWidget {
                             width: 60,
                             height: 43,
                             child: AnimatedAvatarStack(
+                              key: ValueKey(theme.brightness),
+                              borderColor: theme.brightness == Brightness.dark
+                                  ? AppPallete.grey800
+                                  : AppPallete.grey200,
                               settings: RestrictedPositions(
                                 maxCoverage: 0.80,
                               ),

@@ -111,15 +111,16 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
                       background: ChatNavOnline(theme: widget.theme)),
                 ),
                 SliverPersistentHeader(
-                  key: ValueKey(widget.theme.brightness),
                   floating: true,
                   pinned: true,
                   delegate: _SliverAppBarDelegate(
                     Container(
                       color: widget.theme.scaffoldBackgroundColor,
                       child: Container(
+                        margin: EdgeInsets.zero, // Add this
+                        key: ValueKey(widget.theme.brightness),
                         padding: const EdgeInsets.symmetric(horizontal: 6)
-                            .copyWith(top: 10),
+                            .copyWith(top: 10, bottom: 10),
                         decoration: BoxDecoration(
                           color: widget.theme.brightness == Brightness.dark
                               ? AppPallete.grey800
@@ -165,24 +166,22 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
                                     const EdgeInsets.symmetric(horizontal: 4),
                               ),
                             ),
-                            const SizedBox(
-                              height: 12,
-                            )
                           ],
                         ),
                       ),
                     ),
+                    widget.theme,
                   ),
                 ),
                 // Replace the SliverList section with:
                 SliverToBoxAdapter(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height -
-                          292, // Adjust this value based on your header heights
-                    ),
+                        minHeight: MediaQuery.of(context).size.height * .7),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      margin: EdgeInsets.zero, // Add this
+                      padding: const EdgeInsets.symmetric(horizontal: 10)
+                          .copyWith(top: 10),
                       decoration: BoxDecoration(
                         color: widget.theme.brightness == Brightness.dark
                             ? AppPallete.grey800
@@ -227,7 +226,8 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
   void _snapAppbar() {
     final scrollDistance = maxHeight - minHeight;
     if (scrollController.offset > 0 &&
-        scrollController.offset < scrollDistance + 120) {
+        scrollController.offset <
+            scrollDistance + MediaQuery.of(context).padding.top) {
       final double snapOffset = scrollController.offset / scrollDistance;
       Future.microtask(
         () => scrollController.animateTo(snapOffset,
@@ -239,12 +239,14 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final Widget _child;
-  _SliverAppBarDelegate(this._child);
+  final ThemeData theme; // Add theme parameter
+
+  _SliverAppBarDelegate(this._child, this.theme);
 
   @override
-  double get minExtent => 70;
+  double get minExtent => 68;
   @override
-  double get maxExtent => 70;
+  double get maxExtent => 68;
 
   @override
   Widget build(
@@ -253,5 +255,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(covariant _SliverAppBarDelegate oldDelegate) => false;
+  bool shouldRebuild(covariant _SliverAppBarDelegate oldDelegate) {
+    return oldDelegate.theme.brightness != theme.brightness;
+  }
 }

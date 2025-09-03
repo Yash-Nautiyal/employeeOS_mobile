@@ -110,7 +110,7 @@ class _ChatPageState extends State<ChatPage> {
     return Container(
       color: theme.scaffoldBackgroundColor,
       child: Padding(
-        padding: const EdgeInsets.only(top: 120),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
