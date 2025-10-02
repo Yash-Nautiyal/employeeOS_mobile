@@ -49,8 +49,8 @@ class UserCardsGridCard extends StatelessWidget {
                 child: ClipPath(
                   clipper: JsonPathClipper(),
                   child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.only(top: 5, bottom: 20),
+                    color: theme.colorScheme.surfaceContainer,
+                    padding: const EdgeInsets.only(top: 10, bottom: 20),
                     child: Column(
                       children: [
                         // Avatar

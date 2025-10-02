@@ -243,7 +243,7 @@ class FeaturedCard extends StatelessWidget {
                   Text(
                     'FEATURED APP',
                     style: theme.textTheme.labelLarge?.copyWith(
-                      color: theme.colorScheme.primaryFixedDim,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 12),

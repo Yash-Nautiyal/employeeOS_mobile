@@ -189,6 +189,7 @@ ThemeData buildTheme({
     //Check Box Theme
     checkboxTheme: CheckboxThemeData(
       side: const BorderSide(color: AppPallete.grey500, width: 1.5),
+      checkColor: const WidgetStatePropertyAll(AppPallete.white),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
     ),
     //-------------------------------------------------------------------------------------

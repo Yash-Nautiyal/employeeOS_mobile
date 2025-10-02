@@ -14,7 +14,7 @@ class StorageSection extends StatefulWidget {
 class _StorageSectionState extends State<StorageSection>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _animation;
+  // late final Animation<double> _animation;
   bool _isExpanded = false;
 
   @override
@@ -24,10 +24,10 @@ class _StorageSectionState extends State<StorageSection>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    );
+    // _animation = CurvedAnimation(
+    //   parent: _controller,
+    //   curve: Curves.easeInOut,
+    // );
   }
 
   @override
@@ -86,7 +86,8 @@ class _StorageSectionState extends State<StorageSection>
             children: [
               Text(
                 'Storage',
-                style: widget.theme.textTheme.titleLarge,
+                style:
+                    widget.theme.textTheme.displaySmall?.copyWith(fontSize: 20),
               ),
               if (!_isExpanded) ...[
                 const SizedBox(height: 4),
@@ -115,7 +116,7 @@ class _StorageSectionState extends State<StorageSection>
                   endAngle: 270,
                   axisLineStyle: AxisLineStyle(
                     thickness: 5,
-                    color: theme.dividerColor,
+                    color: theme.dividerColor.withAlpha(200),
                   ),
                   pointers: const <GaugePointer>[
                     RangePointer(

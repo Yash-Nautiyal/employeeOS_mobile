@@ -36,7 +36,7 @@ class _LayoutState extends State<Layout> {
     'Profile': const UserProfile(),
     'Card': const UserCards(),
   };
-  String _selectedItem = 'Chat';
+  String _selectedItem = 'File Manager';
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

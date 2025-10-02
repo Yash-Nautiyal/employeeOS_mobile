@@ -1,4 +1,5 @@
 import 'package:appflowy_board/appflowy_board.dart' show AppFlowyGroupData;
+import 'package:employeeos/core/common/components/custom_side_menu.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_group.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_side_menu.dart';
@@ -23,7 +24,8 @@ class KanbanGroupCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => showRightSideTaskDetails(context, task),
+      onTap: () => showRightSideTaskDetails(
+          context, KanbanSideMenu(task: task, group: group)),
       child: Container(
         constraints: const BoxConstraints(maxHeight: 300),
         decoration: BoxDecoration(
@@ -72,49 +74,6 @@ class KanbanGroupCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Future<void> showRightSideTaskDetails(
-      BuildContext context, KanbanGroupItem task) {
-    return showGeneralDialog(
-      context: context,
-      // Tapping outside the dialog will dismiss it
-      barrierDismissible: true,
-      barrierLabel: 'Dismiss',
-      // A semi-transparent background
-      barrierColor: Colors.black54,
-      pageBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation) {
-        // The actual widget for your side sheet
-        return Align(
-          alignment: Alignment.centerRight,
-          child: Material(
-            color: Colors.transparent,
-            // Material gives it a “surface” so it can have its own background color, elevation, etc.
-            child: SizedBox(
-              width: 350,
-              height: double.infinity,
-              child: KanbanSideMenu(
-                task: task,
-                group: group,
-              ),
-            ),
-          ),
-        );
-      },
-      // Optional: animate it in from the right side
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final offsetAnimation = Tween<Offset>(
-          begin: const Offset(1.0, 0.0), // Start just off the right edge
-          end: Offset.zero,
-        ).animate(animation);
-
-        return SlideTransition(
-          position: offsetAnimation,
-          child: child,
-        );
-      },
     );
   }
 }
