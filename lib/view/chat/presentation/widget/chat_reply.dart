@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
+import 'package:sizer/sizer.dart';
 
 class ChatReply extends StatelessWidget {
   final ChatMessage repliedMessage;
@@ -24,6 +25,7 @@ class ChatReply extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(repliedMessage.toJson());
     final screenWidth = MediaQuery.of(context).size.width;
     final isMe = repliedMessage.authorId == currentUserId;
     return Container(
@@ -34,14 +36,13 @@ class ChatReply extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: theme.brightness == Brightness.dark
-            ? theme.scaffoldBackgroundColor
-            : AppPallete.grey300,
+            ? AppPallete.grey800
+            : AppPallete.grey200,
         border: Border(
           left: BorderSide(
-            color: isMe
-                ? theme.colorScheme.primaryContainer
-                : theme.colorScheme.secondaryContainer,
-            width: 3,
+            color:
+                isMe ? theme.colorScheme.primary : theme.colorScheme.secondary,
+            width: 4,
           ),
         ),
         borderRadius: BorderRadius.circular(8),
@@ -72,9 +73,10 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
                   : repliedMessage.authorId,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w900,
-                color: theme.disabledColor,
+                color: theme.colorScheme.tertiary,
+                fontSize: 15.5.sp,
               ),
             ),
             const SizedBox(height: 5),
@@ -86,6 +88,7 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: theme.disabledColor,
+                  fontSize: 14.sp,
                 ),
               )
             else if (repliedMessage is ImageMessage)
@@ -144,13 +147,16 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
                             repliedMessage.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleSmall,
+                            style: theme.textTheme.titleSmall
+                                ?.copyWith(fontSize: 15.sp),
                           ),
                           const SizedBox(height: 4),
                           Text(
                               formatFileSize(
                                   (repliedMessage as FileMessage).size),
-                              style: theme.textTheme.bodySmall),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontSize: 14.sp,
+                              )),
                         ],
                       ),
                     ),

@@ -1,10 +1,13 @@
 import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 Future<void> showRightSideTaskDetails(BuildContext context, Widget child) {
   final screenHeight = MediaQuery.of(context).size.height;
   final theme = Theme.of(context);
-
+  final wideScreen = MediaQuery.of(context).size.width > 700;
+  final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+  final isWideScreen = !isPortrait || wideScreen;
   return showGeneralDialog(
     context: context,
     // Tapping outside the dialog will dismiss it
@@ -21,7 +24,7 @@ Future<void> showRightSideTaskDetails(BuildContext context, Widget child) {
           color: Colors.transparent,
           // Material gives it a “surface” so it can have its own background color, elevation, etc.
           child: SizedBox(
-              width: 350,
+              width: isWideScreen ? 65.w : 85.w,
               height: double.infinity,
               child: ClipRRect(
                 child: Container(
@@ -49,7 +52,6 @@ Future<void> showRightSideTaskDetails(BuildContext context, Widget child) {
                         end: const Alignment(1.2, -1),
                       ),
                     ),
-                    padding: const EdgeInsets.only(top: 50),
                     child: child),
               )),
         ),

@@ -115,7 +115,9 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
                   pinned: true,
                   delegate: _SliverAppBarDelegate(
                     Container(
-                      color: widget.theme.scaffoldBackgroundColor,
+                      color: widget.theme.brightness == Brightness.dark
+                          ? AppPallete.grey900
+                          : AppPallete.white,
                       child: Container(
                         margin: EdgeInsets.zero, // Add this
                         key: ValueKey(widget.theme.brightness),
@@ -149,7 +151,7 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
                                   text: 'Contacts',
                                 ),
                               ],
-                              tabAlignment: TabAlignment.fill,
+                              tabAlignment: TabAlignment.center,
                               labelStyle:
                                   widget.theme.textTheme.labelLarge?.copyWith(
                                 color: widget.theme.colorScheme.tertiary,
@@ -224,14 +226,21 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
   }
 
   void _snapAppbar() {
-    final scrollDistance = maxHeight - minHeight;
+    const double expandedHeight = 130.0; // SliverAppBar expandedHeight
+
+    // If scroll is in the middle of the expanded area, snap to closest position
     if (scrollController.offset > 0 &&
-        scrollController.offset <
-            scrollDistance + MediaQuery.of(context).padding.top) {
-      final double snapOffset = scrollController.offset / scrollDistance;
+        scrollController.offset < expandedHeight) {
+      // Determine whether to snap up (0) or down (expandedHeight)
+      final double snapOffset =
+          scrollController.offset < expandedHeight / 1.5 ? 0.0 : expandedHeight;
+
       Future.microtask(
-        () => scrollController.animateTo(snapOffset,
-            duration: const Duration(milliseconds: 200), curve: Curves.easeIn),
+        () => scrollController.animateTo(
+          snapOffset,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+        ),
       );
     }
   }
@@ -256,6 +265,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(covariant _SliverAppBarDelegate oldDelegate) {
+    print(oldDelegate.theme.brightness);
     return oldDelegate.theme.brightness != theme.brightness;
   }
 }

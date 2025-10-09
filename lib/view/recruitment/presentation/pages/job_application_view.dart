@@ -12,7 +12,8 @@ class JobApplicationView extends StatelessWidget {
     final theme = Theme.of(context);
     return SingleChildScrollView(
       controller: scrollController,
-      padding: const EdgeInsets.only(top: 120, bottom: 20),
+      padding:
+          EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

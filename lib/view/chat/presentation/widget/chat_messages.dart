@@ -270,34 +270,44 @@ class ChatMessages extends StatelessWidget {
           onTap: () {
             // TODO: implement file open/download
           },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: SvgPicture.asset(iconPath, width: 24, height: 24),
+          child: Align(
+            alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: isMe
+                    ? MediaQuery.of(context).size.width * 0.7
+                    : MediaQuery.of(context).size.width * 0.6,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      m.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(height: 4),
-                    Text(fileSize, style: theme.textTheme.bodySmall),
-                  ],
-                ),
+                    child: SvgPicture.asset(iconPath, width: 24, height: 24),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          m.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(fileSize, style: theme.textTheme.bodySmall),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       case MessageType.system:

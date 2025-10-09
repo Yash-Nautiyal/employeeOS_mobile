@@ -14,9 +14,15 @@ class UserDashboardView extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final theme = Theme.of(context);
 
+    final wideScreen = MediaQuery.of(context).size.width > 700;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
+    final isWideScreen = !isPortrait || wideScreen;
+
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(20.0).copyWith(top: 120),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             WelcomeHeader(screenHeight: screenHeight, theme: theme),
@@ -62,12 +68,30 @@ class UserDashboardView extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            TasksList(theme: theme, maxHeight: screenHeight * .5),
-            const SizedBox(height: 10),
-            BirthdayContainer(
-              theme: theme,
-              maxHeight: screenHeight * .5,
-            )
+            if (!isWideScreen) ...[
+              TasksList(theme: theme, maxHeight: screenHeight * .5),
+              const SizedBox(height: 10),
+              BirthdayContainer(
+                theme: theme,
+                maxHeight: screenHeight * .5,
+              )
+            ] else ...[
+              Row(
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child:
+                        TasksList(theme: theme, maxHeight: screenHeight * .9),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 7,
+                    child: BirthdayContainer(
+                        theme: theme, maxHeight: screenHeight * .9),
+                  ),
+                ],
+              )
+            ]
           ],
         ),
       ),

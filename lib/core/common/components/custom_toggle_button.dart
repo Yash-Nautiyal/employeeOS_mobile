@@ -4,7 +4,7 @@ class CustomToggleButton extends StatefulWidget {
   final List<String> values;
   final ValueChanged<int> onToggle;
   final ThemeData theme;
-  final double width;
+  final double? width;
   final double height;
   final int initialIndex;
 
@@ -13,7 +13,7 @@ class CustomToggleButton extends StatefulWidget {
     required this.values,
     required this.onToggle,
     required this.theme,
-    this.width = 60,
+    this.width,
     this.height = 40,
     this.initialIndex = 0,
   }) : assert(
@@ -71,56 +71,66 @@ class _CustomToggleButtonState extends State<CustomToggleButton>
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 7),
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 0),
       decoration: BoxDecoration(
         color: widget.theme.colorScheme.surfaceContainer
             .withAlpha(widget.theme.brightness == Brightness.light ? 200 : 120),
       ),
-      child: Stack(
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: widget.width,
-            height: widget.height,
-            margin:
-                EdgeInsets.only(left: _selectedIndex == 0 ? 0 : widget.width),
-            decoration: BoxDecoration(
-                color: widget.theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(
-                    color: widget.theme.shadowColor,
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 1),
-                  )
-                ]),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(
-              widget.values.length,
-              (index) => InkWell(
-                onTap: () => _onToggle(index),
-                child: Container(
-                  width: widget.width,
-                  height: widget.height,
-                  alignment: Alignment.center,
-                  child: Text(
-                    widget.values[index],
-                    style: widget.theme.textTheme.bodySmall?.copyWith(
-                      color: _selectedIndex == index
-                          ? widget.theme.colorScheme.tertiary
-                          : widget.theme.disabledColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+      child: widget.width != null
+          ? _buildToggleContent(widget.width!)
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                return _buildToggleContent(constraints.maxWidth);
+              },
+            ),
+    );
+  }
+
+  Widget _buildToggleContent(double width) {
+    return Stack(
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: width / widget.values.length,
+          height: widget.height,
+          margin: EdgeInsets.only(
+              left: _selectedIndex == 0 ? 0 : width / widget.values.length),
+          decoration: BoxDecoration(
+              color: widget.theme.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(6),
+              boxShadow: [
+                BoxShadow(
+                  color: widget.theme.shadowColor,
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: const Offset(0, 1),
+                )
+              ]),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(
+            widget.values.length,
+            (index) => InkWell(
+              onTap: () => _onToggle(index),
+              child: Container(
+                width: width / widget.values.length,
+                height: widget.height,
+                alignment: Alignment.center,
+                child: Text(
+                  widget.values[index],
+                  style: widget.theme.textTheme.bodySmall?.copyWith(
+                    color: _selectedIndex == index
+                        ? widget.theme.colorScheme.tertiary
+                        : widget.theme.disabledColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

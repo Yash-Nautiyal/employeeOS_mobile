@@ -50,6 +50,8 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       leading: widget.dashboardPage
           ? Builder(
               builder: (context) => IconButton(

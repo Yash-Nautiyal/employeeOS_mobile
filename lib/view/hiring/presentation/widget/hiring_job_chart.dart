@@ -2,6 +2,8 @@ import 'package:employeeos/core/common/components/custom_title_header.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/hiring/domain/entities/hiring_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class HiringJobChart extends StatefulWidget {
@@ -95,99 +97,90 @@ class _HiringJobChartState extends State<HiringJobChart>
               title: 'Positions by Job',
               subtitle: 'Distribution of open positions',
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             // Chart
-            Container(
-              padding: const EdgeInsets.all(3.5),
-              height: 350,
-              width: double.maxFinite,
-              child: SfCircularChart(
-                margin: EdgeInsets.zero,
-                tooltipBehavior: TooltipBehavior(
-                  enable: true,
-                  duration: 500,
-                  format: 'point.x: point.y positions',
-                  textStyle: widget.theme.textTheme.bodySmall,
-                  borderColor: widget.theme.colorScheme.outline,
-                  color: widget.theme.colorScheme.inverseSurface,
-                ),
-                legend: Legend(
-                  isVisible: true,
-                  overflowMode: LegendItemOverflowMode.wrap,
-                  position: LegendPosition.bottom,
-                  alignment: ChartAlignment.center,
-                  itemPadding: 8,
-                  toggleSeriesVisibility: true,
-                  textStyle: widget.theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                width: double.maxFinite,
+                child: SfCircularChart(
+                  margin: EdgeInsets.zero,
+                  tooltipBehavior: TooltipBehavior(
+                    enable: true,
+                    duration: 800,
+                    format: 'point.x: point.y positions',
+                    textStyle: widget.theme.textTheme.bodySmall,
+                    borderColor: widget.theme.colorScheme.outline,
+                    color: widget.theme.colorScheme.inverseSurface,
                   ),
-                  legendItemBuilder: (legendText, series, point, seriesIndex) {
-                    final data = _chartData[seriesIndex];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 2),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: data.color,
-                              shape: BoxShape.circle,
+                  legend: Legend(
+                    isVisible: true,
+                    overflowMode: LegendItemOverflowMode.wrap,
+                    position: LegendPosition.bottom,
+                    itemPadding: 0,
+                    alignment: ChartAlignment.center,
+                    toggleSeriesVisibility: true,
+                    textStyle: widget.theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    legendItemBuilder:
+                        (legendText, series, point, seriesIndex) {
+                      final data = _chartData[seriesIndex];
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: data.color,
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            data.jobTitle.displayName,
-                            style: widget.theme.textTheme.bodySmall?.copyWith(
-                              color: widget.theme.disabledColor,
-                              fontWeight: FontWeight.w600,
+                            const SizedBox(width: 6),
+                            Text(
+                              data.jobTitle.displayName,
+                              style: widget.theme.textTheme.bodySmall?.copyWith(
+                                color: widget.theme.disabledColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.5.sp,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                annotations: [
-                  CircularChartAnnotation(
-                    widget: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: widget.theme.colorScheme.surface,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color:
-                              widget.theme.colorScheme.outline.withOpacity(0.1),
-                          width: 1,
+                          ],
                         ),
-                      ),
-                      child: Column(
+                      );
+                    },
+                  ),
+                  annotations: [
+                    CircularChartAnnotation(
+                      widget: Column(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.groups_outlined,
-                            size: 24,
-                            color: widget.theme.primaryColor,
+                          Flexible(
+                            child: SvgPicture.asset(
+                              'assets/icons/common/solid/ic-mingcute-group-3-fill.svg',
+                              color: widget.theme.primaryColor,
+                            ),
                           ),
-                          const SizedBox(height: 4),
                           Text(
                             "Total",
                             style: widget.theme.textTheme.bodyMedium?.copyWith(
                               color: widget.theme.colorScheme.onSurface
                                   .withOpacity(0.6),
                               fontWeight: FontWeight.w500,
+                              fontSize: 15.sp,
                             ),
                           ),
                           Text(
                             "$_totalPositions",
-                            style:
-                                widget.theme.textTheme.headlineSmall?.copyWith(
+                            style: widget.theme.textTheme.titleSmall?.copyWith(
                               color: widget.theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w800,
+                              fontSize: 20.sp,
                             ),
                           ),
                           Text(
@@ -196,40 +189,41 @@ class _HiringJobChartState extends State<HiringJobChart>
                               color: widget.theme.colorScheme.onSurface
                                   .withOpacity(0.6),
                               fontWeight: FontWeight.w400,
+                              fontSize: 14.sp,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-                series: <CircularSeries>[
-                  DoughnutSeries<HiringData, String>(
-                    radius: "85%",
-                    dataSource: _chartData,
-                    xValueMapper: (HiringData data, _) =>
-                        data.jobTitle.displayName,
-                    yValueMapper: (HiringData data, _) => data.count,
-                    pointColorMapper: (HiringData data, _) => data.color,
-                    dataLabelMapper: (HiringData data, _) => '${data.count}',
-                    innerRadius: '65%',
-                    animationDuration: 700,
-                    dataLabelSettings: DataLabelSettings(
-                      isVisible: true,
-                      labelPosition: ChartDataLabelPosition.outside,
-                      connectorLineSettings: ConnectorLineSettings(
-                        type: ConnectorType.line,
-                        length: '15%',
-                        color:
-                            widget.theme.colorScheme.outline.withOpacity(0.5),
-                      ),
-                      textStyle: widget.theme.textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: widget.theme.colorScheme.onSurface,
+                  ],
+                  series: <CircularSeries>[
+                    DoughnutSeries<HiringData, String>(
+                      radius: "80%",
+                      dataSource: _chartData,
+                      xValueMapper: (HiringData data, _) =>
+                          data.jobTitle.displayName,
+                      yValueMapper: (HiringData data, _) => data.count,
+                      pointColorMapper: (HiringData data, _) => data.color,
+                      dataLabelMapper: (HiringData data, _) => '${data.count}',
+                      innerRadius: '65%',
+                      animationDuration: 700,
+                      dataLabelSettings: DataLabelSettings(
+                        isVisible: true,
+                        labelPosition: ChartDataLabelPosition.outside,
+                        connectorLineSettings: ConnectorLineSettings(
+                          type: ConnectorType.line,
+                          length: '5%',
+                          color: widget.theme.colorScheme.tertiary
+                              .withOpacity(0.5),
+                        ),
+                        textStyle: widget.theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: widget.theme.colorScheme.onSurface,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

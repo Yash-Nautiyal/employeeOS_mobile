@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class HiringPipelineMetric extends StatelessWidget {
@@ -25,58 +26,65 @@ class HiringPipelineMetric extends StatelessWidget {
     return Row(
       children: [
         if (showCircle!) ...[
-          SizedBox(
-            width: big ? 50 : 40,
-            height: big ? 50 : 40,
-            child: SfRadialGauge(
-              enableLoadingAnimation: true,
-              axes: <RadialAxis>[
-                RadialAxis(
-                  minimum: 0,
-                  maximum: 100,
-                  showLabels: false,
-                  showTicks: false,
-                  startAngle: 270,
-                  endAngle: 270,
-                  axisLineStyle: AxisLineStyle(
-                    thickness: 3,
-                    color: theme.dividerColor.withAlpha(100),
-                  ),
-                  pointers: <GaugePointer>[
-                    RangePointer(
-                      value: 86.6,
-                      width: 4,
-                      cornerStyle: CornerStyle.bothCurve,
-                      pointerOffset: -.5,
-                      color: circleColor ?? Colors.amber,
+          Expanded(
+            child: Container(
+              constraints: BoxConstraints(maxHeight: 20.h),
+              child: SfRadialGauge(
+                enableLoadingAnimation: true,
+                axes: <RadialAxis>[
+                  RadialAxis(
+                    minimum: 0,
+                    maximum: 100,
+                    showLabels: false,
+                    showTicks: false,
+                    startAngle: 270,
+                    endAngle: 270,
+                    axisLineStyle: AxisLineStyle(
+                      thickness: big ? 4 : 3,
+                      color: theme.dividerColor.withAlpha(100),
                     ),
-                  ],
-                )
-              ],
+                    pointers: <GaugePointer>[
+                      RangePointer(
+                        value: 86.6,
+                        width: big ? 5.5 : 4,
+                        cornerStyle: CornerStyle.bothCurve,
+                        pointerOffset: big ? -.8 : -.5,
+                        color: circleColor ?? Colors.amber,
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 1.w),
         ] else ...[
-          const SizedBox(width: 52), // Space for alignment when no circle
+          SizedBox(width: 3.w), // Space for alignment when no circle
         ],
         Expanded(
+          flex: 2,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(title, style: theme.textTheme.labelLarge),
-              const SizedBox(height: 2),
+              Text(title,
+                  style: theme.textTheme.labelLarge?.copyWith(fontSize: 15.sp)),
               RichText(
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 text: TextSpan(
                   children: [
                     TextSpan(
                       text: value,
-                      style: theme.textTheme.labelLarge
-                          ?.copyWith(color: theme.disabledColor),
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.disabledColor, fontSize: 15.sp),
                     ),
                     TextSpan(
                       text: subtitle != null ? ' $subtitle' : ' of 18',
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(fontWeight: FontWeight.w700),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14.sp,
+                      ),
                     ),
                   ],
                 ),

@@ -13,7 +13,7 @@ class UserCardsGridCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: theme.shadowColor),
         boxShadow: [
           BoxShadow(
@@ -30,15 +30,26 @@ class UserCardsGridCard extends StatelessWidget {
             children: [
               // Background Image
               Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        getBackgroundImage(),
+                child: Column(
+                  children: [
+                    Flexible(
+                      flex: 4,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                              getBackgroundImage(),
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
-                      fit: BoxFit.cover,
                     ),
-                  ),
+                    const Flexible(
+                      flex: 2,
+                      child: SizedBox(),
+                    )
+                  ],
                 ),
               ),
               // Content
@@ -49,19 +60,18 @@ class UserCardsGridCard extends StatelessWidget {
                 child: ClipPath(
                   clipper: JsonPathClipper(),
                   child: Container(
-                    color: theme.colorScheme.surfaceContainer,
+                    color: theme.colorScheme.surface,
                     padding: const EdgeInsets.only(top: 10, bottom: 20),
                     child: Column(
                       children: [
                         // Avatar
                         const CircleAvatar(
-                          radius: 36,
+                          radius: 30,
                           child: Icon(
                             Icons.person,
-                            size: 40,
+                            size: 20,
                           ),
                         ),
-                        const SizedBox(height: 10),
                         // Name and Title
                         Text(card.name, style: theme.textTheme.titleLarge),
 
@@ -88,6 +98,7 @@ class UserCardsGridCard extends StatelessWidget {
                               SvgPicture.asset(
                                 "assets/icons/social/ic-twitter.svg",
                                 width: 20,
+                                color: theme.colorScheme.tertiary,
                               ),
                             ],
                           ),

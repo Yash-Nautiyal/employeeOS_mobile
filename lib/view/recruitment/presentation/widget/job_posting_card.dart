@@ -5,6 +5,7 @@ import 'package:employeeos/view/recruitment/presentation/widget/job_posting_card
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting_card_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 
 class JobPostingCard extends StatefulWidget {
   final ThemeData theme;
@@ -99,26 +100,26 @@ class _JobPostingCardState extends State<JobPostingCard>
                 theme: widget.theme,
                 onSelect: toggleDropdown,
               ),
-              const SizedBox(
-                height: 5,
+              SizedBox(
+                height: 1.h,
               ),
               Text(
                 "Cloud Internship - AWS",
-                style:
-                    widget.theme.textTheme.displaySmall?.copyWith(fontSize: 20),
+                style: widget.theme.textTheme.displaySmall
+                    ?.copyWith(fontSize: 20.sp),
               ),
               Text(
                 "Tech",
                 style: widget.theme.textTheme.bodyMedium
                     ?.copyWith(color: widget.theme.disabledColor),
               ),
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: 2.h,
               ),
               Text(
                 'Posted date: 23 Jun 2025',
                 style: widget.theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                    ?.copyWith(fontWeight: FontWeight.w600, fontSize: 16.sp),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -133,8 +134,8 @@ class _JobPostingCardState extends State<JobPostingCard>
                           color: AppPallete.successMain,
                           width: 20,
                         ),
-                        const SizedBox(
-                          width: 3,
+                        SizedBox(
+                          width: 0.5.w,
                         ),
                         Text(
                           '1 position',
@@ -151,8 +152,8 @@ class _JobPostingCardState extends State<JobPostingCard>
                           color: AppPallete.infoMain,
                           width: 20,
                         ),
-                        const SizedBox(
-                          width: 3,
+                        SizedBox(
+                          width: 0.5.w,
                         ),
                         Text(
                           '190 applications',
@@ -169,6 +170,7 @@ class _JobPostingCardState extends State<JobPostingCard>
                   SvgPicture.asset(
                     'assets/icons/common/solid/ic-solar_user-id-bold.svg',
                     color: widget.theme.disabledColor,
+                    width: 22,
                   ),
                   const SizedBox(
                     width: 5,
@@ -177,6 +179,7 @@ class _JobPostingCardState extends State<JobPostingCard>
                     'Posted by: Yash Nautiyal',
                     style: widget.theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
+                      fontSize: 15.5.sp,
                       color: widget.theme.dividerColor,
                     ),
                   )
@@ -187,6 +190,7 @@ class _JobPostingCardState extends State<JobPostingCard>
                   SvgPicture.asset(
                     'assets/icons/common/solid/ic-fluent_mail-24-filled.svg',
                     color: widget.theme.disabledColor,
+                    width: 22,
                   ),
                   const SizedBox(
                     width: 5,
@@ -195,20 +199,23 @@ class _JobPostingCardState extends State<JobPostingCard>
                     'nautiyalyash4@gmail.com',
                     style: widget.theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
+                      fontSize: 15.5.sp,
                       color: widget.theme.dividerColor,
                     ),
                   )
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 20.0, bottom: 13),
+                padding: const EdgeInsets.only(top: 20.0),
                 child: CustomDivider(
                   color: widget.theme.dividerColor,
                 ),
               ),
-              Expanded(
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
                 child: JobPostingCardFooter(theme: widget.theme),
-              )
+              ),
             ],
           ),
         ),

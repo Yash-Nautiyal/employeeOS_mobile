@@ -1,5 +1,6 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class WelcomeHeader extends StatelessWidget {
   final double screenHeight;
@@ -9,11 +10,15 @@ class WelcomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final wideScreen = MediaQuery.of(context).size.width > 700;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
+    final isWideScreen = !isPortrait || wideScreen;
     return Stack(
       children: [
         Container(
-          height: screenHeight * .6,
-          constraints: const BoxConstraints(minHeight: 430),
+          height: isWideScreen ? 40.w : 60.h,
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(
               Radius.circular(20),
@@ -40,17 +45,24 @@ class WelcomeHeader extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(top: 50.0, bottom: 10),
+              padding:
+                  EdgeInsets.only(top: isWideScreen ? 13.h : 5.h, bottom: 10),
               child: Column(
                 children: [
                   Flexible(
                     child: Column(
                       children: [
                         Text(
-                          'Welcome back 👋 Yash Nautiyal',
+                          'Welcome back 👋',
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.displayLarge
-                              ?.copyWith(color: AppPallete.white),
+                          style: theme.textTheme.displayLarge?.copyWith(
+                              color: AppPallete.white, fontSize: 25.sp),
+                        ),
+                        Text(
+                          'Yash Nautiyal',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.displayLarge?.copyWith(
+                              color: AppPallete.white, fontSize: 25.sp),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30.0)
@@ -60,7 +72,7 @@ class WelcomeHeader extends StatelessWidget {
                             "If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything.",
                             style: theme.textTheme.headlineMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 15,
+                                fontSize: 15.5.sp,
                                 color: AppPallete.grey500),
                           ),
                         ),

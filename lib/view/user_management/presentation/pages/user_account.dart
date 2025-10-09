@@ -78,7 +78,7 @@ class _UserAccountState extends State<UserAccount>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(top: 120.0),
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

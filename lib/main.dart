@@ -5,6 +5,7 @@ import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sizer/sizer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,11 +14,15 @@ void main() async {
   await FastCachedImageConfig.init(
       clearCacheAfter: const Duration(days: 7), subDir: 'employeeos');
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: themeBloc),
-      ],
-      child: const MyApp(),
+    Sizer(
+      builder: (context, orientation, deviceType) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: themeBloc),
+          ],
+          child: const MyApp(),
+        );
+      },
     ),
   );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 
 class CustomTextfield extends StatelessWidget {
   final TextEditingController controller;
@@ -76,18 +77,18 @@ class CustomTextfield extends StatelessWidget {
       maxLines: maxLines,
       minLines: 1,
       style: theme.textTheme.bodyMedium?.copyWith(
-          fontSize: fontSize ?? 15, color: theme.colorScheme.tertiary),
+          fontSize: fontSize ?? 15.sp, color: theme.colorScheme.tertiary),
       decoration: InputDecoration(
           contentPadding:
-              const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+              const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
           prefixIconConstraints: BoxConstraints.loose(const Size(40, 40)),
           prefixIcon: prefix,
           helper: helper,
           labelText: labelText?.isNotEmpty == true ? labelText : null,
           hintText: hintText,
-          hintStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 15),
+          hintStyle: theme.textTheme.bodyMedium?.copyWith(fontSize: 15.sp),
           labelStyle: theme.textTheme.bodyMedium
-              ?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+              ?.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600),
           suffixIcon: _buildSuffixIcon(isDateTimeField, context),
           floatingLabelBehavior: alwaysFloatingLabel ?? false
               ? FloatingLabelBehavior.always
@@ -117,13 +118,12 @@ class CustomTextfield extends StatelessWidget {
         icon: SvgPicture.asset(
           'assets/icons/common/solid/ic-solar-calendar-mark-bold-duotone.svg',
           color: theme.disabledColor,
-          height: 20,
-          width: 20,
+          width: 19.sp,
         ),
       );
     } else if (close!) {
       return IconButton(
-        icon: Icon(Icons.close, color: theme.disabledColor, size: 18),
+        icon: Icon(Icons.close, color: theme.disabledColor, size: 18.sp),
         onPressed: () => onClose!(),
       );
     } else if (suffixIcon != null) {

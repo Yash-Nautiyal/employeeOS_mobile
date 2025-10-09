@@ -1,8 +1,10 @@
+import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
     show Conversation;
 import 'package:employeeos/view/chat/presentation/widget/chat_app_bar.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_input.dart';
+import 'package:employeeos/view/chat/presentation/widget/chat_media_preview.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_message_list.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -48,23 +50,103 @@ class _ThreadPageState extends State<ThreadPage> {
     });
   }
 
-  /// Pick an image file and insert an ImageMessage
+  /// Pick an image file and show preview
   Future<void> _handlePickImage() async {
     final result = await FilePicker.platform
         .pickFiles(type: FileType.image, allowMultiple: true);
     if (result == null) return;
 
-    final newMessages = result.files.map((file) {
-      final filePath = file.path!;
-      return ImageMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        authorId: _currentUserId,
-        createdAt: DateTime.now(),
-        url: filePath,
-        name: file.name,
-        size: file.size,
-        replyTo: replyMessage?.id,
-      );
+    final mediaItems = result.files
+        .where((file) => file.path != null)
+        .map((file) => MediaPreviewItem(
+              path: file.path!,
+              name: file.name,
+              size: file.size,
+            ))
+        .toList();
+
+    if (mediaItems.isEmpty) return;
+
+    _showMediaPreview(mediaItems);
+  }
+
+  /// Pick any file and show preview
+  Future<void> _handlePickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+      allowMultiple: true,
+    );
+    if (result == null) return;
+
+    final mediaItems = result.files
+        .where((file) => file.path != null)
+        .map((file) => MediaPreviewItem(
+              path: file.path!,
+              name: file.name,
+              size: file.size,
+            ))
+        .toList();
+
+    if (mediaItems.isEmpty) return;
+
+    _showMediaPreview(mediaItems);
+  }
+
+  /// Show media preview bottom sheet
+  void _showMediaPreview(List<MediaPreviewItem> mediaItems) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? AppPallete.black
+          : AppPallete.white,
+      isDismissible: true,
+      enableDrag: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+        minHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      builder: (context) => ChatMediaPreview(
+        mediaItems: mediaItems,
+        theme: Theme.of(context),
+        onCancel: () => Navigator.pop(context),
+        onSend: (items) {
+          Navigator.pop(context);
+          _handleMediaSend(items);
+        },
+      ),
+    );
+  }
+
+  /// Send media messages after preview confirmation
+  void _handleMediaSend(List<MediaPreviewItem> items) {
+    final newMessages = items.map((item) {
+      final mimeType = lookupMimeType(item.path) ?? 'application/octet-stream';
+      final isImage = mimeType.startsWith('image/');
+
+      if (isImage) {
+        return ImageMessage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          authorId: _currentUserId,
+          createdAt: DateTime.now(),
+          url: item.path,
+          name: item.name,
+          size: item.size,
+          replyTo: replyMessage?.id,
+        );
+      } else {
+        return FileMessage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          authorId: _currentUserId,
+          createdAt: DateTime.now(),
+          url: item.path,
+          name: item.name,
+          size: item.size,
+          fileType: mimeType,
+        );
+      }
     }).toList();
 
     setState(() {
@@ -74,60 +156,37 @@ class _ThreadPageState extends State<ThreadPage> {
     });
   }
 
-  /// Pick any file and insert a FileMessage
-  Future<void> _handlePickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.media,
-      allowMultiple: true,
-    );
-    if (result == null) return;
-
-    final newMessages = result.files.map((file) {
-      final filePath = file.path!;
-      final mimeType = lookupMimeType(filePath) ?? 'application/octet-stream';
-      return FileMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        authorId: _currentUserId,
-        createdAt: DateTime.now(),
-        url: filePath,
-        name: file.name,
-        size: file.size,
-        fileType: mimeType,
-      );
-    }).toList();
-
-    setState(
-        () => widget.selectedConversation.messages.insertAll(0, newMessages));
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
       color: theme.scaffoldBackgroundColor,
-      child: Padding(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-        child: Column(
-          children: [
-            ChatAppBar(
-              theme: theme,
-              currentUserId: _currentUserId,
-              subTitle: "Online",
-              conversation: widget.selectedConversation,
-              onBack: () => Navigator.of(context).pop(),
+      child: Column(
+        children: [
+          ChatAppBar(
+            theme: theme,
+            currentUserId: _currentUserId,
+            subTitle: "Online",
+            conversation: widget.selectedConversation,
+            onBack: () => Navigator.of(context).pop(),
+          ),
+          Expanded(
+            child: ChatMessageList(
+                participants: widget.selectedConversation.participants,
+                messages: widget.selectedConversation.messages,
+                currentUserId: _currentUserId,
+                onSwipeMessage: handleSwipeMessage,
+                theme: theme),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          AnimatedPadding(
+            duration: const Duration(milliseconds: 10),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            Expanded(
-              child: ChatMessageList(
-                  participants: widget.selectedConversation.participants,
-                  messages: widget.selectedConversation.messages,
-                  currentUserId: _currentUserId,
-                  onSwipeMessage: handleSwipeMessage,
-                  theme: theme),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            ChatInput(
+            child: ChatInput(
               theme: theme,
               onSendText: (text) => _handleTextSend(text),
               onPickImage: _handlePickImage,
@@ -136,8 +195,8 @@ class _ThreadPageState extends State<ThreadPage> {
               replyMessage: replyMessage,
               currentUserId: _currentUserId,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

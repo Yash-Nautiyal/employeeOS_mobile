@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 
 class AnalyticsContainer extends StatelessWidget {
   final ThemeData theme;
@@ -21,6 +22,11 @@ class AnalyticsContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final wideScreen = MediaQuery.of(context).size.width > 700;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
+    final isWideScreen = !isPortrait || wideScreen;
     return Container(
       padding: const EdgeInsets.all(10),
       width: MediaQuery.of(context).size.width / 2 - 30,
@@ -52,20 +58,22 @@ class AnalyticsContainer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SvgPicture.asset(width: 40, icon),
-          const SizedBox(
-            height: 20,
+          SvgPicture.asset(width: isWideScreen ? 10.h : 12.w, icon),
+          SizedBox(
+            height: 2.h,
           ),
           Text(
             title,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelLarge
-                ?.copyWith(color: titleColor, fontSize: 15, height: 1),
+                ?.copyWith(color: titleColor, fontSize: 15.sp, height: 1),
           ),
           Text(
             value,
-            style: theme.textTheme.titleLarge
-                ?.copyWith(color: valueColor, fontWeight: FontWeight.w700),
+            style: theme.textTheme.titleLarge?.copyWith(
+                color: valueColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 20.sp),
           )
         ],
       ),

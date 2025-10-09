@@ -168,8 +168,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                             }
                           : null,
                       iconColor: AppPallete.grey600,
-                      swipeSensitivity: 10,
-                      offsetDx: .2,
+                      swipeSensitivity: 5,
+                      offsetDx: .15,
                       iconSize: 24,
                       child: GestureDetector(
                         onLongPress: () {

@@ -2,6 +2,7 @@ import 'package:employeeos/core/common/components/custom_divider.dart';
 import 'package:employeeos/core/common/components/empty_content.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class TasksList extends StatefulWidget {
   final ThemeData theme;
@@ -52,14 +53,14 @@ class _TasksListState extends State<TasksList> {
               Text(
                 "Today's Tasks",
                 style: widget.theme.textTheme.titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                    ?.copyWith(fontWeight: FontWeight.bold, fontSize: 20.sp),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 15),
                 child: Text(
                   "${_tasks.length} Pending Tasks",
                   style: widget.theme.textTheme.bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.w600),
+                      ?.copyWith(fontWeight: FontWeight.w600, fontSize: 15.sp),
                 ),
               ),
               _tasks.isNotEmpty
@@ -127,6 +128,7 @@ class _TasksListState extends State<TasksList> {
                                           style: widget
                                               .theme.textTheme.bodyLarge
                                               ?.copyWith(
+                                            fontSize: 16.5.sp,
                                             decoration: task["isCompleted"]
                                                 ? TextDecoration.lineThrough
                                                 : TextDecoration.none,

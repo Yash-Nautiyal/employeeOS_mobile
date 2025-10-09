@@ -28,6 +28,7 @@ class SettingsPresetCard extends StatelessWidget {
               border: Border.all(color: theme.disabledColor.withAlpha(100)),
             ),
             child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: presets.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

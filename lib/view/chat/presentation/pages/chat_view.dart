@@ -109,31 +109,28 @@ class _ChatPageState extends State<ChatPage> {
     final theme = Theme.of(context);
     return Container(
       color: theme.scaffoldBackgroundColor,
-      child: Padding(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: ChatNav(
-                      currentUserId: widget.currentUserId,
-                      theme: theme,
-                      conversations: _conversations,
-                      onConversationTap: (conv) {
-                        Navigator.of(context)
-                            .pushNamed('/thread', arguments: conv);
-                      },
-                    ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: ChatNav(
+                    currentUserId: widget.currentUserId,
+                    theme: theme,
+                    conversations: _conversations,
+                    onConversationTap: (conv) {
+                      Navigator.of(context)
+                          .pushNamed('/thread', arguments: conv);
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

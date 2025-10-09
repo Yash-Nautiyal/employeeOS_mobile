@@ -1,3 +1,4 @@
+import 'package:appflowy_board/appflowy_board.dart';
 import 'package:employeeos/core/common/components/custom_switcher.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_group.dart';
@@ -5,10 +6,8 @@ import 'package:employeeos/view/kanban/presentation/widgets/kanban_group_card.da
 import 'package:employeeos/view/kanban/presentation/widgets/kanban_header.dart';
 import 'package:flutter/material.dart';
 
-import 'package:appflowy_board/appflowy_board.dart';
-
 class KanbanView extends StatefulWidget {
-  const KanbanView({super.key});
+  const KanbanView({Key? key}) : super(key: key);
 
   @override
   State<KanbanView> createState() => _KanbanViewState();
@@ -47,9 +46,9 @@ class _KanbanViewState extends State<KanbanView> {
       groupBodyPadding: const EdgeInsets.only(bottom: 10),
     );
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16)
-          .copyWith(top: 120.0, bottom: 20),
+      padding: const EdgeInsets.only(left: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -73,37 +72,29 @@ class _KanbanViewState extends State<KanbanView> {
                     isShriked = value;
                   });
                 },
-              )
+              ),
+              const SizedBox(width: 16),
             ],
           ),
           const SizedBox(
             height: 10,
           ),
-          Flexible(
+          Expanded(
             child: AppFlowyBoard(
                 controller: controller,
-                cardBuilder: (context, group, item) {
-                  final kanbanItem = item as KanbanGroupItem;
+                cardBuilder: (context, group, groupItem) {
                   return AppFlowyGroupCard(
-                    boxConstraints: const BoxConstraints(minHeight: 20),
-                    key: ValueKey(kanbanItem.itemId),
+                    key: ValueKey(groupItem.id),
                     decoration: const BoxDecoration(color: Colors.transparent),
-                    child: KanbanGroupCard(
-                      group: group,
-                      theme: Theme.of(context),
-                      title: kanbanItem.title,
-                      date: kanbanItem.date,
-                      task: kanbanItem,
-                    ),
+                    child: _buildCard(groupItem, group, theme),
                   );
                 },
-                scrollController: ScrollController(),
                 boardScrollController: boardController,
                 headerBuilder: (context, columnData) {
                   return KanbanHeader(
+                      theme: theme,
                       columnData: columnData,
-                      controller: controller,
-                      theme: theme);
+                      controller: controller);
                 },
                 groupConstraints:
                     const BoxConstraints(maxWidth: 300, minWidth: 250),
@@ -112,5 +103,16 @@ class _KanbanViewState extends State<KanbanView> {
         ],
       ),
     );
+  }
+
+  Widget _buildCard(AppFlowyGroupItem item, AppFlowyGroupData<dynamic> group,
+      ThemeData theme) {
+    final task = item as KanbanGroupItem;
+    return KanbanGroupCard(
+        title: task.title,
+        date: task.date,
+        theme: theme,
+        task: task,
+        group: group);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sizer/sizer.dart';
 
 class BirthdayContainer extends StatelessWidget {
   final ThemeData theme;
@@ -10,6 +11,10 @@ class BirthdayContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final wideScreen = MediaQuery.of(context).size.width > 700;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    final isWideScreen = !isPortrait || wideScreen;
     return Card(
       elevation: 10,
       shadowColor: theme.shadowColor,
@@ -43,7 +48,7 @@ class BirthdayContainer extends StatelessWidget {
                       'Upcoming Birthdays',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        fontSize: 30,
+                        fontSize: 24.sp,
                         color: AppPallete.white,
                       ),
                     ),
@@ -64,11 +69,11 @@ class BirthdayContainer extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const CircleAvatar(
-                          radius: 22,
+                        CircleAvatar(
+                          radius: isWideScreen ? 3.w : 6.w,
                         ),
-                        const SizedBox(
-                          width: 16,
+                        SizedBox(
+                          width: isWideScreen ? 1.5.w : 3.w,
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,10 +81,7 @@ class BirthdayContainer extends StatelessWidget {
                             Text(
                               'Alex Balding',
                               style: theme.textTheme.labelLarge?.copyWith(
-                                  color: AppPallete.white, fontSize: 18),
-                            ),
-                            const SizedBox(
-                              height: 3,
+                                  color: AppPallete.white, fontSize: 18.sp),
                             ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -87,13 +89,15 @@ class BirthdayContainer extends StatelessWidget {
                                 SvgPicture.asset(
                                   'assets/icons/ic-calender.svg',
                                   color: AppPallete.grey200,
+                                  width: isWideScreen ? 2.5.w : 5.w,
                                 ),
-                                const SizedBox(
-                                  width: 5,
+                                SizedBox(
+                                  width: 1.w,
                                 ),
                                 Text(
                                   '${DateTime.now().add(const Duration(days: 10)).day}/${DateTime.now().add(const Duration(days: 10)).month}/${DateTime.now().add(const Duration(days: 10)).year}',
                                   style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontSize: 15.sp,
                                       color: AppPallete.white,
                                       fontWeight: FontWeight.w600),
                                 ),

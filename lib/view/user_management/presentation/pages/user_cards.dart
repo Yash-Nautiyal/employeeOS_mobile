@@ -53,7 +53,8 @@ class _UserCardsState extends State<UserCards> {
     final theme = Theme.of(context);
     return SingleChildScrollView(
       controller: scrollController,
-      padding: const EdgeInsets.only(top: 120, bottom: 10),
+      padding:
+          EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -65,28 +66,6 @@ class _UserCardsState extends State<UserCards> {
           const SizedBox(
             height: 20,
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.end,
-          //   children: [
-          //     Text(
-          //       "ListView",
-          //       style: theme.textTheme.titleMedium
-          //           ?.copyWith(color: theme.disabledColor),
-          //     ),
-          //     Transform.scale(
-          //       scale: .7,
-          //       child: Switch(
-          //           value: isGridView,
-          //           activeTrackColor: AppPallete.successMain,
-          //           activeColor: AppPallete.white,
-          //           onChanged: (value) {
-          //             setState(() {
-          //               isGridView = value;
-          //             });
-          //           }),
-          //     ),
-          //   ],
-          // ),
           Flexible(
               child: GridView.builder(
             controller: scrollController,
@@ -94,7 +73,7 @@ class _UserCardsState extends State<UserCards> {
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: isGridView ? 2 : 1,
-              childAspectRatio: 1,
+              childAspectRatio: 1.2,
               mainAxisSpacing: 24,
               crossAxisSpacing: 10,
             ),

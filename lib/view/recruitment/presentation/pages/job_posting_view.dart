@@ -16,7 +16,8 @@ class _JobPostingViewState extends State<JobPostingView> {
     final theme = Theme.of(context);
     return SingleChildScrollView(
       controller: scrollController,
-      padding: const EdgeInsets.only(top: 120, bottom: 20),
+      padding:
+          EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -31,18 +32,15 @@ class _JobPostingViewState extends State<JobPostingView> {
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GridView.builder(
+              child: ListView.builder(
                 controller: scrollController,
                 itemCount: 3,
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisSpacing: 20,
-                  crossAxisCount: 1,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 1,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.only(bottom: 15),
+                  child: JobPostingCard(theme: theme),
                 ),
-                itemBuilder: (context, index) => JobPostingCard(theme: theme),
               ),
             ),
           ),

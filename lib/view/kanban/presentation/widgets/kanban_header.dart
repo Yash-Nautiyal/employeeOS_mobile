@@ -37,6 +37,8 @@ class KanbanHeader extends StatelessWidget {
           ),
           Flexible(
             child: TextField(
+              onTapOutside: (event) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
               decoration: const InputDecoration(
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide.none),
               ),

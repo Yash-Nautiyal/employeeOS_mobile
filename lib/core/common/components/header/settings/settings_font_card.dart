@@ -7,6 +7,7 @@ class SettingsFontCard extends StatelessWidget {
   final Map<Fonts, String> fonts;
   final Fonts currentFont;
   final Function onChange;
+
   const SettingsFontCard({
     super.key,
     required this.theme,
@@ -28,6 +29,7 @@ class SettingsFontCard extends StatelessWidget {
               border: Border.all(color: theme.disabledColor.withAlpha(100)),
             ),
             child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: fonts.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

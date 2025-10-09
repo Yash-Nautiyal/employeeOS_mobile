@@ -55,16 +55,23 @@ class _ChatInputState extends State<ChatInput> {
               padding: const EdgeInsets.only(left: 5.0, right: 5),
               child: Badge(
                 padding: const EdgeInsets.all(3),
-                offset: const Offset(0, 0),
-                backgroundColor: widget.theme.colorScheme.surface,
-                label: IconButton(
-                  onPressed: widget.onCancelReply,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: Icon(
-                    Icons.close,
-                    color: widget.theme.colorScheme.tertiary,
-                    size: 16,
+                offset: const Offset(-5, 2),
+                backgroundColor: widget.theme.scaffoldBackgroundColor,
+                label: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: widget.theme.colorScheme.surfaceContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    onPressed: widget.onCancelReply,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: Icon(
+                      Icons.close,
+                      color: widget.theme.colorScheme.tertiary,
+                      size: 16,
+                    ),
                   ),
                 ),
                 child: ChatReply(

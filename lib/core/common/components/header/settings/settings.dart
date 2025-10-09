@@ -20,11 +20,12 @@ class SettingsDialog extends StatelessWidget {
     final fonts = AppTypography.fontMap;
     final currentPreset = context.watch<ThemeBloc>().state.preset;
     final currentFont = context.watch<ThemeBloc>().state.font;
-
+    final scrollController = ScrollController();
     return SlideDialog(
       theme: theme,
       title: 'Settings',
       child: SingleChildScrollView(
+        controller: scrollController,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
