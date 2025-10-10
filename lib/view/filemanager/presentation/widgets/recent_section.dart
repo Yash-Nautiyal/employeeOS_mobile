@@ -6,6 +6,7 @@ import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.d
     show FileType, FolderFile;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 
 class RecentSection extends StatelessWidget {
   final ThemeData theme;
@@ -38,9 +39,15 @@ class RecentSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   isfolder
-                      ? SvgPicture.asset("assets/icons/file/ic-folder.svg")
+                      ? SvgPicture.asset(
+                          "assets/icons/file/ic-folder.svg",
+                          width: 26.sp,
+                          height: 26.sp,
+                        )
                       : SvgPicture.asset(
                           getFileIcon(favorites[index].fileType ?? ""),
+                          width: 26.sp,
+                          height: 26.sp,
                         ),
                   const SizedBox(
                     width: 10,
@@ -51,15 +58,18 @@ class RecentSection extends StatelessWidget {
                       children: [
                         Text(
                           filename,
-                          style: theme.textTheme.titleMedium,
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(fontSize: 16.sp),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                         filesize != null
                             ? Text(
                                 formatFileSize(filesize),
-                                style: theme.textTheme.bodySmall
-                                    ?.copyWith(fontWeight: FontWeight.bold),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.sp,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
                               )

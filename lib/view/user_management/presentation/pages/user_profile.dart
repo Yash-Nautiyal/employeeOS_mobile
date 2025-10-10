@@ -27,7 +27,7 @@ class _UserProfileState extends State<UserProfile>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SingleChildScrollView(
-      padding: const EdgeInsets.only(top: 120, bottom: 10),
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
         children: [
           CustomBreadCrumbs(

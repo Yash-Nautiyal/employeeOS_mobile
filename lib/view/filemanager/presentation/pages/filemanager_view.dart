@@ -86,6 +86,9 @@ class FilemanagerView extends StatelessWidget {
               favorites: favorites,
               theme: theme,
             ),
+            const SizedBox(
+              height: 15,
+            ),
             StorageSection(theme: theme),
             const SizedBox(
               height: 15,

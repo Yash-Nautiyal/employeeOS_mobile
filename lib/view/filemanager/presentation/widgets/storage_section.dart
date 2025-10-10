@@ -1,6 +1,7 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class StorageSection extends StatefulWidget {
@@ -70,7 +71,8 @@ class _StorageSectionState extends State<StorageSection>
             ],
           ),
         ),
-        Text(size, style: theme.textTheme.labelLarge),
+        Text(size,
+            style: theme.textTheme.labelLarge?.copyWith(fontSize: 20.sp)),
       ],
     );
   }

@@ -53,8 +53,8 @@ class _HiringViewState extends State<HiringView> {
     return SingleChildScrollView(
       controller: scrollController,
       child: Padding(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 16)
+            .copyWith(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

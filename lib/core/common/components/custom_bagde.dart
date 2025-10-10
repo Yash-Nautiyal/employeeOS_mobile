@@ -1,5 +1,6 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class CustomBagde extends StatelessWidget {
   final Widget child;
@@ -15,7 +16,7 @@ class CustomBagde extends StatelessWidget {
             label: Text(
               label!,
               style: theme.textTheme.labelLarge
-                  ?.copyWith(fontSize: 12, color: AppPallete.white),
+                  ?.copyWith(fontSize: 12.sp, color: AppPallete.white),
             ),
             offset: const Offset(-4, 0),
             backgroundColor: AppPallete.errorMain,

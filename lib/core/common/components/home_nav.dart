@@ -22,7 +22,7 @@ class HomeNav extends StatefulWidget implements PreferredSizeWidget {
   State<HomeNav> createState() => _HomeNavState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(70);
 }
 
 class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
@@ -50,7 +50,6 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       leading: widget.dashboardPage
           ? Builder(

@@ -108,6 +108,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       color: theme.scaffoldBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

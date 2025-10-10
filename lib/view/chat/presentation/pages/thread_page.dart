@@ -160,6 +160,7 @@ class _ThreadPageState extends State<ThreadPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       color: theme.scaffoldBackgroundColor,
       child: Column(
         children: [

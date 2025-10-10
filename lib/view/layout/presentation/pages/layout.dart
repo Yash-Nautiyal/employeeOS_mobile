@@ -2,20 +2,18 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:employeeos/core/common/components/home_nav.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/presentation/pages/chat_view.dart';
 import 'package:employeeos/view/dashboard/presentation/pages/user_dashboard_view.dart';
 import 'package:employeeos/view/filemanager/presentation/pages/filemanager_view.dart';
 import 'package:employeeos/view/hiring/presentation/pages/hiring_view.dart';
 import 'package:employeeos/view/kanban/presentation/pages/kanban_view.dart';
-import 'package:employeeos/view/layout/presentation/widgets/menu_item.dart';
+import 'package:employeeos/view/layout/presentation/widgets/menu_drawer.dart';
 import 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
 import 'package:employeeos/view/recruitment/presentation/pages/job_posting_view.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class Layout extends StatefulWidget {
   const Layout({super.key});
@@ -28,6 +26,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
   late AnimationController _appBarController;
   late Animation<Offset> _appBarAnimation;
   Timer? _hideTimer;
+  Orientation? _previousOrientation;
   final Map<String, Widget> _pages = {
     'User': const UserDashboardView(),
     'Hirings': const HiringView(),
@@ -43,7 +42,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     'Profile': const UserProfile(),
     'Card': const UserCards(),
   };
-  String _selectedItem = 'Chat';
+  String _selectedItem = 'File Manager';
 
   @override
   void initState() {
@@ -108,12 +107,30 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final wideScreen = MediaQuery.of(context).size.width > 700;
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
+    final currentOrientation = MediaQuery.of(context).orientation;
+    final isPortrait = currentOrientation == Orientation.portrait;
     final isLandscape = !isPortrait;
-    final isWideScreen = !isPortrait || wideScreen;
     final theme = Theme.of(context);
+
+    // Detect orientation change
+    if (_previousOrientation != currentOrientation) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (isLandscape) {
+          // Just switched to landscape - show appbar and start hide timer
+          if (!_appBarController.isCompleted) {
+            _appBarController.forward();
+          }
+          _startHideTimer();
+        } else {
+          // Switched to portrait - ensure appbar is visible and cancel timer
+          if (!_appBarController.isCompleted) {
+            _appBarController.forward();
+          }
+          _hideTimer?.cancel();
+        }
+      });
+      _previousOrientation = currentOrientation;
+    }
 
     // Ensure appbar is visible in portrait mode
     if (isPortrait && !_appBarController.isCompleted) {
@@ -132,187 +149,66 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
             )
           : null,
       drawerScrimColor: Colors.black54,
-      drawer: ClipRRect(
-        child: Container(
-          width: isWideScreen ? 40.w : 75.w,
-          decoration: BoxDecoration(
-            gradient: Theme.of(context).brightness == Brightness.dark
-                ? AppPallete.darkBackgroundGradient
-                : AppPallete.lightBackgroundGradient,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 13)
-                .copyWith(top: MediaQuery.of(context).padding.top + 10),
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                // Logo and User section
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Image.asset(
-                    'assets/logo/employeeos-logo.png',
-                    height: 50,
-                  ),
-                ),
-
-                // Services Section
-                Padding(
-                  padding: const EdgeInsets.only(top: 16, left: 16),
-                  child: Text(
-                    'OVERVIEW',
-                    style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12,
-                        color: theme.dividerColor),
-                  ),
-                ),
-
-                // Menu Items
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-user.svg',
-                  title: 'User',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-dashboard.svg',
-                  title: 'Hirings',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-
-                // User Management Section
-                Padding(
-                  padding: const EdgeInsets.only(top: 16, left: 16),
-                  child: Text(
-                    'SERVICES',
-                    style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12,
-                        color: theme.dividerColor),
-                  ),
-                ),
-
-                // User Management Menu Items
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-kanban.svg',
-                  title: 'Kanban',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-chat.svg',
-                  title: 'Chat',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-folder.svg',
-                  title: 'File Manager',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-                // MenuItem(
-                //   icon: 'assets/icons/nav/ic-calendar.svg',
-                //   title: 'Calendar',
-                //   theme: theme,
-                //   selectedItem: _selectedItem,
-                //   onSelected: (item) {
-                //     setState(() {
-                //       _selectedItem = item;
-                //     });
-                //     Navigator.pop(context); // Close the drawer
-                //   },
-                // ),
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-mail.svg',
-                  title: 'Mail',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-recruitment.svg',
-                  title: 'Recruitment',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                  submenuItems: const [
-                    'Job Posting',
-                    'Job Application',
-                    'Interview Scheduling'
-                  ],
-                ),
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-user-management.svg',
-                  title: 'User Management',
-                  theme: theme,
-                  selectedItem: _selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      _selectedItem = item;
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                  submenuItems: const ['Account', 'Profile', 'Card'],
-                ),
-              ],
-            ),
-          ),
-        ),
+      drawer: MenuDrawer(
+        selectedItem: _selectedItem,
+        onSelected: (p0) {
+          setState(() {
+            _selectedItem = p0;
+          });
+        },
       ),
       body: Stack(
         children: [
-          // Main content with gesture detection
-          GestureDetector(
-            onVerticalDragEnd: (_) => _showAppBar(),
-            behavior: HitTestBehavior.translucent,
-            child: Padding(
-              padding:
-                  EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10),
-              child: _pages[_selectedItem] ??
-                  const Center(child: Text('Page not found')),
+          // Main content with scroll detection for nested scrollables
+          NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              // Only detect scroll updates in landscape mode
+              if (!isLandscape) return false;
+
+              if (notification is ScrollUpdateNotification) {
+                // Check if this is a VERTICAL scroll (ignore horizontal PageViews, etc.)
+                final isVerticalScroll =
+                    notification.metrics.axisDirection == AxisDirection.down ||
+                        notification.metrics.axisDirection == AxisDirection.up;
+
+                // Only respond to vertical scrolling downward
+                if (isVerticalScroll &&
+                    notification.scrollDelta != null &&
+                    notification.scrollDelta! < -10) {
+                  // Threshold of -10 to avoid accidental triggers
+                  _showAppBar();
+                }
+              }
+              if (notification is OverscrollNotification) {
+                if (notification.overscroll < -10) {
+                  _showAppBar();
+                }
+              }
+              return false;
+            },
+            child: GestureDetector(
+              // Detect vertical drag down for non-scrollable areas
+              onVerticalDragUpdate: (details) {
+                if (!isLandscape) return;
+                // Only show appbar when dragging downward (threshold of 5px)
+                if (details.delta.dy > 5) {
+                  _showAppBar();
+                }
+              },
+              behavior: HitTestBehavior.translucent,
+              child: _selectedItem == 'Kanban'
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).padding.top +
+                              (isPortrait ? 70 : 10),
+                          bottom: 10),
+                      child: _pages[_selectedItem] ??
+                          const Center(child: Text('Page not found')),
+                    )
+                  : _pages[_selectedItem] ??
+                      const Center(
+                        child: Text('Page not found'),
+                      ),
             ),
           ),
 
