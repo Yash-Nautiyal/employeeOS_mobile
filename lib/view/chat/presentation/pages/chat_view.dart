@@ -3,6 +3,7 @@ import 'package:animations/animations.dart'
 import 'package:employeeos/view/chat/data/test_data.dart';
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart';
 import 'package:employeeos/view/chat/presentation/pages/thread_page.dart';
+import 'package:employeeos/view/chat/presentation/pages/chat_view_landscape.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_nav.dart';
 import 'package:flutter/material.dart';
 
@@ -47,9 +48,18 @@ class _ChatViewState extends State<ChatView> {
                   settings: settings,
                 );
               case '/thread':
-                final conv = settings.arguments as Conversation;
+                final args = settings.arguments as Map<String, dynamic>;
+                final conv = args['conversation'] as Conversation;
+                final conversations =
+                    args['conversations'] as List<Conversation>;
+                final currentUserId = args['currentUserId'] as String;
                 return _sharedAxisRoute(
-                  ThreadPage(selectedConversation: conv),
+                  ThreadPage(
+                    selectedConversation: conv,
+                    conversations: conversations,
+                    currentUserId: currentUserId,
+                    onConversationTap: (conv) {},
+                  ),
                   settings: settings,
                 );
               default:
@@ -94,7 +104,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   late List<Conversation> _conversations;
-
+  Conversation? _selectedConversation;
   @override
   void initState() {
     super.initState();
@@ -107,30 +117,52 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       color: theme.scaffoldBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: ChatNav(
+          isPortrait
+              ? Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: ChatNav(
+                          currentUserId: widget.currentUserId,
+                          theme: theme,
+                          conversations: _conversations,
+                          onConversationTap: (conv) {
+                            setState(() {
+                              _selectedConversation = conv;
+                            });
+                            Navigator.of(context)
+                                .pushNamed('/thread', arguments: {
+                              'conversation': _selectedConversation,
+                              'conversations': _conversations,
+                              'currentUserId': widget.currentUserId,
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Expanded(
+                  child: ThreadPageLandscape(
+                    selectedConversation: _selectedConversation,
                     currentUserId: widget.currentUserId,
-                    theme: theme,
                     conversations: _conversations,
                     onConversationTap: (conv) {
-                      Navigator.of(context)
-                          .pushNamed('/thread', arguments: conv);
+                      setState(() {
+                        _selectedConversation = conv;
+                      });
                     },
                   ),
                 ),
-              ],
-            ),
-          ),
         ],
       ),
     );

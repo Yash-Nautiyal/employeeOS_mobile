@@ -21,8 +21,7 @@ class FavoritesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(maxHeight: 150, minHeight: 140),
-      height: 15.h,
+      constraints: const BoxConstraints(maxHeight: 170, minHeight: 140),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

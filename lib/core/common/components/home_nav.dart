@@ -22,7 +22,7 @@ class HomeNav extends StatefulWidget implements PreferredSizeWidget {
   State<HomeNav> createState() => _HomeNavState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(70);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {

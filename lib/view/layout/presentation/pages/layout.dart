@@ -42,7 +42,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     'Profile': const UserProfile(),
     'Card': const UserCards(),
   };
-  String _selectedItem = 'File Manager';
+  String _selectedItem = 'Chat';
 
   @override
   void initState() {
@@ -165,20 +165,20 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
               // Only detect scroll updates in landscape mode
               if (!isLandscape) return false;
 
-              if (notification is ScrollUpdateNotification) {
-                // Check if this is a VERTICAL scroll (ignore horizontal PageViews, etc.)
-                final isVerticalScroll =
-                    notification.metrics.axisDirection == AxisDirection.down ||
-                        notification.metrics.axisDirection == AxisDirection.up;
+              // if (notification is ScrollUpdateNotification) {
+              //   // Check if this is a VERTICAL scroll (ignore horizontal PageViews, etc.)
+              //   final isVerticalScroll =
+              //       notification.metrics.axisDirection == AxisDirection.down ||
+              //           notification.metrics.axisDirection == AxisDirection.up;
 
-                // Only respond to vertical scrolling downward
-                if (isVerticalScroll &&
-                    notification.scrollDelta != null &&
-                    notification.scrollDelta! < -10) {
-                  // Threshold of -10 to avoid accidental triggers
-                  _showAppBar();
-                }
-              }
+              //   // Only respond to vertical scrolling downward
+              //   if (isVerticalScroll &&
+              //       notification.scrollDelta != null &&
+              //       notification.scrollDelta! < -10) {
+              //     // Threshold of -10 to avoid accidental triggers
+              //     _showAppBar();
+              //   }
+              // }
               if (notification is OverscrollNotification) {
                 if (notification.overscroll < -10) {
                   _showAppBar();
@@ -200,7 +200,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
                   ? Padding(
                       padding: EdgeInsets.only(
                           top: MediaQuery.of(context).padding.top +
-                              (isPortrait ? 70 : 10),
+                              (isPortrait ? kToolbarHeight : 10),
                           bottom: 10),
                       child: _pages[_selectedItem] ??
                           const Center(child: Text('Page not found')),

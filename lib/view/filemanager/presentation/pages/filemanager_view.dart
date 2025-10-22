@@ -6,6 +6,7 @@ import 'package:employeeos/view/filemanager/presentation/widgets/recent_section.
 import 'package:employeeos/view/filemanager/presentation/widgets/storage_section.dart';
 import 'package:employeeos/view/filemanager/presentation/widgets/file_manager_header.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class FilemanagerView extends StatelessWidget {
   const FilemanagerView({super.key});
@@ -40,7 +41,7 @@ class FilemanagerView extends StatelessWidget {
     return SingleChildScrollView(
       controller: _scrollController,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0)
+        padding: EdgeInsets.symmetric(horizontal: 2.5.w)
             .copyWith(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,

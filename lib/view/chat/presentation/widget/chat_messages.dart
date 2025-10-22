@@ -30,12 +30,16 @@ class ChatMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final theme = Theme.of(context);
     if (batch != null && batch!.length > 2) {
       // Handle batch images
       final count = batch!.length;
       final maxWidth = isMe
-          ? MediaQuery.of(context).size.width * 0.7
+          ? isLandscape
+              ? MediaQuery.of(context).size.width * 0.5
+              : MediaQuery.of(context).size.width * 0.7
           : MediaQuery.of(context).size.width * 0.6;
       // 3-image special layout
       if (count == 3) {
