@@ -173,7 +173,7 @@ ThemeData buildTheme({
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
             side: BorderSide(
               color: brightness == Brightness.dark
                   ? AppPallete.grey600
@@ -197,6 +197,8 @@ ThemeData buildTheme({
     //Icon Button Theme
     iconButtonTheme: const IconButtonThemeData(
       style: ButtonStyle(
+        minimumSize: WidgetStatePropertyAll(Size(24, 24)),
+        maximumSize: WidgetStatePropertyAll(Size(35, 35)),
         padding: WidgetStatePropertyAll(EdgeInsets.all(5)),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
@@ -220,7 +222,7 @@ ThemeData buildTheme({
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        foregroundColor: WidgetStatePropertyAll(AppPallete.grey500),
+        foregroundColor: const WidgetStatePropertyAll(AppPallete.grey500),
       ),
       dayPeriodTextColor: WidgetStateColor.resolveWith(
         (states) => states.contains(WidgetState.selected)
@@ -265,7 +267,7 @@ ThemeData buildTheme({
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        foregroundColor: WidgetStatePropertyAll(AppPallete.grey500),
+        foregroundColor: const WidgetStatePropertyAll(AppPallete.grey500),
       ),
       rangeSelectionBackgroundColor: (colorscheme["Main"] as Color).withOpacity(
         .15,
@@ -281,7 +283,7 @@ ThemeData buildTheme({
       thumbColor: WidgetStatePropertyAll(
         brightness == Brightness.dark ? AppPallete.black : AppPallete.white,
       ),
-      trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
+      trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       trackColor: WidgetStatePropertyAll(
         brightness == Brightness.dark ? AppPallete.white : AppPallete.grey400,
       ),

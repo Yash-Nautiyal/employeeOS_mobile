@@ -1,16 +1,12 @@
-import 'package:appflowy_board/appflowy_board.dart' show AppFlowyGroupData;
-import 'package:employeeos/core/common/components/custom_dropdown.dart';
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/common/components/custom_textfield.dart';
-import 'package:employeeos/core/common/components/custom_toggle_button.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/kanban/presentation/widgets/kanban_group.dart';
+import 'package:employeeos/view/kanban/index.dart'
+    show KanbanGroupItem, KanbanGroup;
+import 'package:employeeos/core/index.dart' show AppPallete, CustomDropdown, CustomTextButton, CustomTextfield, CustomToggleButton;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class KanbanSideMenu extends StatefulWidget {
   final KanbanGroupItem task;
-  final AppFlowyGroupData<dynamic> group;
+  final KanbanGroup group;
 
   const KanbanSideMenu({super.key, required this.task, required this.group});
 
@@ -28,7 +24,7 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
   @override
   void initState() {
     super.initState();
-    _group = widget.group.headerData.groupName;
+    _group = widget.group.title;
     _priority = widget.task.priority;
     _descriptionController =
         TextEditingController(text: widget.task.description);

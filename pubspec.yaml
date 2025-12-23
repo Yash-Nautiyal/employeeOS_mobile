@@ -56,7 +56,6 @@ dependencies:
   dropdown_button2: ^2.3.9
   shared_preferences: ^2.5.3
   syncfusion_flutter_charts: ^29.2.9
-  appflowy_board: ^0.1.2
   google_fonts: ^6.2.1
   flutter_native_splash: ^2.4.6
   supabase_flutter: ^2.3.4

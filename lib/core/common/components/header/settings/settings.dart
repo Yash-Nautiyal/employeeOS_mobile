@@ -16,7 +16,7 @@ class SettingsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final presets = AppPallete.primaryPresets;
+    const presets = AppPallete.primaryPresets;
     final fonts = AppTypography.fontMap;
     final currentPreset = context.watch<ThemeBloc>().state.preset;
     final currentFont = context.watch<ThemeBloc>().state.font;
