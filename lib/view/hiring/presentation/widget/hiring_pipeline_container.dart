@@ -1,7 +1,6 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/hiring/presentation/widget/hiring_pipeline_metric.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class HiringPipelineContainer extends StatelessWidget {
   final ThemeData theme;
@@ -53,9 +52,8 @@ class HiringPipelineContainer extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Application Progress',
-                    style: theme.textTheme.titleSmall?.copyWith(
+                    style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      fontSize: 16.sp,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -63,9 +61,8 @@ class HiringPipelineContainer extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Interview Progress',
-                    style: theme.textTheme.titleSmall?.copyWith(
+                    style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      fontSize: 16.sp,
                     ),
                     textAlign: TextAlign.center,
                   ),

@@ -1,7 +1,6 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_item.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class MenuDrawer extends StatefulWidget {
   final String selectedItem;
@@ -22,9 +21,10 @@ class _MenuDrawerState extends State<MenuDrawer> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final isWideScreen = !isPortrait || wideScreen;
+    final screenWidth = MediaQuery.of(context).size.width;
     return ClipRRect(
       child: Container(
-        width: isWideScreen ? 40.w : 75.w,
+        width: isWideScreen ? screenWidth * 0.4 : screenWidth * 0.75,
         decoration: BoxDecoration(
           gradient: Theme.of(context).brightness == Brightness.dark
               ? AppPallete.darkBackgroundGradient

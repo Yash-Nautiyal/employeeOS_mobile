@@ -6,7 +6,7 @@ Map<String, dynamic> kanbanData = {
     'items': [
       {
         'title': 'test task',
-        'date': 'Oct 24',
+        'date': '14-24 Oct',
         'tasks': '2/5',
         'assignedBy': 'Amanpreet',
         'assignedTo': 'Shreyas Ladhe',
@@ -14,10 +14,11 @@ Map<String, dynamic> kanbanData = {
         'priority': 'High',
         'description': 'Example task assigned to me.',
         'attachments': [],
+        'subtasks': {}
       },
       {
         'title': 'app kanban',
-        'date': 'Jul 15',
+        'date': '14-24 Oct',
         'tasks': '0/1',
         'assignedBy': 'Shreyas Ladhe',
         'assignedTo': 'Amanpreet',
@@ -25,6 +26,7 @@ Map<String, dynamic> kanbanData = {
         'priority': 'Medium',
         'description': 'Example task created by me.',
         'attachments': [],
+        'subtasks': {}
       },
     ],
   },
@@ -35,7 +37,7 @@ Map<String, dynamic> kanbanData = {
     'items': [
       {
         'title': 'new task',
-        'date': 'Jul 15',
+        'date': '14-24 Oct',
         'tasks': '1/1',
         'assignedBy': 'Shreyas Ladhe',
         'assignedTo': 'Shreyas Ladhe',
@@ -43,6 +45,7 @@ Map<String, dynamic> kanbanData = {
         'priority': 'Low',
         'description': 'Example completed task.',
         'attachments': [],
+        'subtasks': {}
       }
     ]
   },

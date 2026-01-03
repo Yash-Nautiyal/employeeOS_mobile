@@ -15,10 +15,24 @@ class CustomBreadCrumbs extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(heading, style: theme.textTheme.displaySmall),
           Row(
+            children: [
+              Flexible(
+                child: Text(heading,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.displaySmall),
+              ),
+            ],
+          ),
+          Wrap(
+            spacing: -2,
+            runSpacing: 0,
+            alignment: WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(routes[0], style: theme.textTheme.bodyMedium),
               const SizedBox(width: 15),

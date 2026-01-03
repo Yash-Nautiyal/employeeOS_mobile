@@ -21,23 +21,23 @@ ThemeData buildTheme({
       .value;
 
   final baseTextTheme = TextTheme(
-    displayLarge: AppTypography.headingLarge.copyWith(
+    displayLarge: AppTypography.displayLarge.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
-    displayMedium: AppTypography.headingMedium.copyWith(
+    displayMedium: AppTypography.displayMedium.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
-    displaySmall: AppTypography.headingSmall.copyWith(
+    displaySmall: AppTypography.displaySmall.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
-    titleLarge: AppTypography.subtitleLarge.copyWith(
+    titleLarge: AppTypography.titleLarge.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
-    titleMedium: AppTypography.subtitleMedium.copyWith(
+    titleMedium: AppTypography.titleMedium.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
@@ -249,7 +249,7 @@ ThemeData buildTheme({
     datePickerTheme: DatePickerThemeData(
       dividerColor: AppPallete.grey500,
       dayStyle: AppTypography.bodyMedium,
-      headerHeadlineStyle: AppTypography.headingMedium,
+      headerHeadlineStyle: AppTypography.displayMedium,
       yearStyle: AppTypography.bodyMedium,
       weekdayStyle: AppTypography.bodyMedium,
       confirmButtonStyle: ButtonStyle(
@@ -286,6 +286,30 @@ ThemeData buildTheme({
       trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       trackColor: WidgetStatePropertyAll(
         brightness == Brightness.dark ? AppPallete.white : AppPallete.grey400,
+      ),
+    ),
+    //-------------------------------------------------------------------------------------
+
+    //Tab Bar Theme
+    tabBarTheme: TabBarTheme(
+      labelStyle: AppTypography.button.copyWith(
+        color: brightness == Brightness.dark
+            ? AppPallete.white
+            : AppPallete.grey800,
+      ),
+      unselectedLabelColor: brightness == Brightness.dark
+          ? AppPallete.grey500
+          : AppPallete.grey600,
+      indicatorSize: TabBarIndicatorSize.label,
+      dividerColor: Colors.transparent,
+      indicator: UnderlineTabIndicator(
+        borderSide: BorderSide(
+          width: 2,
+          color: brightness == Brightness.dark
+              ? AppPallete.white
+              : AppPallete.grey800,
+        ),
+        insets: const EdgeInsets.symmetric(horizontal: 4),
       ),
     ),
   );

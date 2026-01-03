@@ -7,6 +7,7 @@ class KanbanColumnView extends StatelessWidget {
     super.key,
     required this.theme,
     required this.column,
+    required this.allColumns,
     required this.fixed,
     required this.hoverColumnId,
     required this.hoverSection,
@@ -19,12 +20,14 @@ class KanbanColumnView extends StatelessWidget {
     required this.onHover,
     required this.onHoverExit,
     required this.onAccept,
+    required this.onMoveTaskToColumn,
   });
 
   final bool fixed;
   final int? hoverIndex;
   final ThemeData theme;
   final KanbanColumn column;
+  final List<KanbanColumn> allColumns;
   final String? hoverColumnId;
   final String? draggingTaskId;
   final KanbanGroupItem? hoverTask;
@@ -41,6 +44,12 @@ class KanbanColumnView extends StatelessWidget {
   final VoidCallback onHoverExit;
   final void Function(DragPayload payload, KanbanSection section, int index)
       onAccept;
+  final void Function(
+    KanbanGroupItem task,
+    String fromColumnId,
+    KanbanSection fromSection,
+    String toColumnId,
+  ) onMoveTaskToColumn;
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +100,7 @@ class KanbanColumnView extends StatelessWidget {
                         tasks: column.createdByMe,
                         section: KanbanSection.createdByMe,
                         columnId: column.id,
+                        allColumns: allColumns,
                         hoverColumnId: hoverColumnId,
                         hoverSection: hoverSection,
                         hoverIndex: hoverIndex,
@@ -103,6 +113,7 @@ class KanbanColumnView extends StatelessWidget {
                         onHoverExit: onHoverExit,
                         onAccept: (payload, index) =>
                             onAccept(payload, KanbanSection.createdByMe, index),
+                        onMoveTaskToColumn: onMoveTaskToColumn,
                       ),
                       KanbanSectionView(
                         theme: theme,
@@ -110,6 +121,7 @@ class KanbanColumnView extends StatelessWidget {
                         tasks: column.assignedToMe,
                         section: KanbanSection.assignedToMe,
                         columnId: column.id,
+                        allColumns: allColumns,
                         hoverColumnId: hoverColumnId,
                         hoverSection: hoverSection,
                         hoverIndex: hoverIndex,
@@ -125,6 +137,7 @@ class KanbanColumnView extends StatelessWidget {
                           KanbanSection.assignedToMe,
                           index,
                         ),
+                        onMoveTaskToColumn: onMoveTaskToColumn,
                       ),
                     ],
                   );

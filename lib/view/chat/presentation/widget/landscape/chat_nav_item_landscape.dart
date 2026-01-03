@@ -5,7 +5,6 @@ import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
     show Conversation, ConversationType;
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:sizer/sizer.dart';
 
 class ChatNavItemLandscape extends StatelessWidget {
   final ThemeData theme;
@@ -33,7 +32,7 @@ class ChatNavItemLandscape extends StatelessWidget {
     return GestureDetector(
       onTap: () => onConversationTap(conv),
       child: SizedBox(
-        height: 45,
+        height: 47,
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -73,8 +72,8 @@ class ChatNavItemLandscape extends StatelessWidget {
                         ),
                         badgeStyle: const badges.BadgeStyle(
                             badgeColor: Colors.transparent),
-                        position:
-                            badges.BadgePosition.bottomEnd(end: -4.5, bottom: 0),
+                        position: badges.BadgePosition.bottomEnd(
+                            end: -4.5, bottom: 0),
                         child: CircleAvatar(
                           radius: 27,
                           backgroundImage: NetworkImage(conv.participants
@@ -110,16 +109,16 @@ class ChatNavItemLandscape extends StatelessWidget {
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
                                     color: theme.colorScheme.tertiary,
-                                    fontSize: 15.sp,
+                                    fontSize: 15,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 5),
                               Text(
                                 time,
-                                style: theme.textTheme.labelLarge?.copyWith(
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.dividerColor,
-                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
@@ -129,19 +128,19 @@ class ChatNavItemLandscape extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   snippet,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontSize: 14.5.sp,
-                                  ),
+                                  style: theme.textTheme.bodySmall,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
                               ),
                               Badge(
+                                padding: const EdgeInsets.all(2),
                                 backgroundColor: AppPallete.successMain,
                                 label: Text(
                                   '2',
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                      fontSize: 14.sp, color: AppPallete.white),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppPallete.white,
+                                      fontWeight: FontWeight.w700),
                                 ),
                               )
                             ],

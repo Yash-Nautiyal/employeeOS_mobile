@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:employeeos/core/common/components/custom_dropdown.dart';
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/common/components/custom_textfield.dart';

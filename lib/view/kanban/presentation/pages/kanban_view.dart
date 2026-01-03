@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:employeeos/core/index.dart'
-    show KanbanDimensions;
+import 'package:employeeos/core/index.dart' show KanbanDimensions;
 import 'package:employeeos/view/kanban/index.dart'
     show
         KanbanColumn,
@@ -77,6 +76,7 @@ class _KanbanViewState extends State<KanbanView> {
           priority: (item['priority'] ?? 'Low').toString(),
           description: (item['description'] ?? '').toString(),
           attachments: List<String>.from(item['attachments'] ?? const []),
+          subtasks: Map<String, bool>.from(item['subtasks'] ?? const {}),
         );
       }).toList();
 
@@ -211,6 +211,28 @@ class _KanbanViewState extends State<KanbanView> {
     });
   }
 
+  void _moveTaskToColumn(
+    KanbanGroupItem task,
+    String fromColumnId,
+    KanbanSection fromSection,
+    String toColumnId,
+  ) {
+    if (fromColumnId == toColumnId) return;
+    setState(() {
+      final fromCol = _getColumn(fromColumnId);
+      final toCol = _getColumn(toColumnId);
+
+      final fromList = _getSectionList(fromCol, fromSection);
+      final toList = _getSectionList(toCol, fromSection);
+
+      final fromIndex = fromList.indexWhere((t) => t.id == task.id);
+      if (fromIndex == -1) return;
+
+      final moved = fromList.removeAt(fromIndex);
+      toList.add(moved);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -258,6 +280,7 @@ class _KanbanViewState extends State<KanbanView> {
                         key: ValueKey(col.id),
                         theme: theme,
                         column: col,
+                        allColumns: _columns,
                         fixed: _fixedColumns,
                         hoverColumnId: _hoverColumnId,
                         hoverSection: _hoverSection,
@@ -293,6 +316,7 @@ class _KanbanViewState extends State<KanbanView> {
                           toSection: section,
                           toIndex: index,
                         ),
+                        onMoveTaskToColumn: _moveTaskToColumn,
                       );
                     },
                   ),

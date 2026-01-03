@@ -1,10 +1,7 @@
-import 'dart:ui';
-
 import 'package:employeeos/core/common/components/dialog/slide_dialog.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/home/presentation/pages/home_view.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class ProfileDialog extends StatelessWidget {
   final ThemeData theme;
@@ -13,6 +10,8 @@ class ProfileDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return SlideDialog(
       theme: theme,
       title: "Profile",
@@ -25,8 +24,8 @@ class ProfileDialog extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      width: 12.7.h,
-                      height: 12.7.h,
+                      width: 40,
+                      height: 40,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: SweepGradient(
@@ -45,19 +44,17 @@ class ProfileDialog extends StatelessWidget {
                         ),
                       ),
                     ),
-                    CircleAvatar(radius: 6.h),
+                    const CircleAvatar(radius: 30),
                   ],
                 ),
-                SizedBox(height: 1.h),
+                const SizedBox(height: 10),
                 Text('Yash Nautiyal',
-                    style:
-                        theme.textTheme.titleLarge?.copyWith(fontSize: 20.sp)),
-                SizedBox(height: .2.h),
+                    style: theme.textTheme.titleLarge?.copyWith(fontSize: 20)),
+                const SizedBox(height: 10),
                 Text(
                   'Software Engineer',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    fontSize: 16.sp,
                   ),
                 ),
               ],

@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:employeeos/core/index.dart' show KanbanDimensions;
+import 'package:employeeos/core/index.dart'
+    show KanbanDimensions, showRightSideTaskDetails;
 import 'package:employeeos/view/kanban/index.dart'
-    show KanbanGroupItem, KanbanSection, DragPayload, KanbanTaskCard;
+    show
+        DragPayload,
+        KanbanColumn,
+        KanbanGroupItem,
+        KanbanSection,
+        KanbanSideMenu,
+        KanbanTaskCard;
 
-class DraggableTask extends StatelessWidget {
-  const DraggableTask({
+class KanbanDraggableTask extends StatelessWidget {
+  const KanbanDraggableTask({
     super.key,
     required this.theme,
     required this.task,
@@ -12,6 +19,9 @@ class DraggableTask extends StatelessWidget {
     required this.fromSection,
     required this.onDragStarted,
     required this.onDragEnded,
+    required this.fromColumn,
+    required this.allColumns,
+    required this.onMoveToColumn,
   });
 
   final ThemeData theme;
@@ -20,6 +30,14 @@ class DraggableTask extends StatelessWidget {
   final KanbanSection fromSection;
   final VoidCallback onDragStarted;
   final VoidCallback onDragEnded;
+  final KanbanColumn fromColumn;
+  final List<KanbanColumn> allColumns;
+  final void Function(
+    KanbanGroupItem task,
+    String fromColumnId,
+    KanbanSection fromSection,
+    String toColumnId,
+  ) onMoveToColumn;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +91,30 @@ class DraggableTask extends StatelessWidget {
             child: KanbanTaskCard(theme: theme, task: task),
           ),
         ),
-        child: KanbanTaskCard(theme: theme, task: task),
+        child: GestureDetector(
+          onTap: () {
+            var currentColumnId = fromColumnId;
+            showRightSideTaskDetails(
+              context,
+              KanbanSideMenu(
+                task: task,
+                group: fromColumn,
+                allColumns: allColumns,
+                onMoveColumn: (toColumnId) {
+                  if (toColumnId == currentColumnId) return;
+                  onMoveToColumn(
+                    task,
+                    currentColumnId,
+                    fromSection,
+                    toColumnId,
+                  );
+                  currentColumnId = toColumnId;
+                },
+              ),
+            );
+          },
+          child: KanbanTaskCard(theme: theme, task: task),
+        ),
       ),
     );
   }

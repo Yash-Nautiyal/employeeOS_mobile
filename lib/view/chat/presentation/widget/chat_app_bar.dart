@@ -6,7 +6,6 @@ import 'package:employeeos/view/chat/domain/entities/conversation_models.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter_svg/svg.dart';
-import 'package:sizer/sizer.dart';
 
 class ChatAppBar extends StatefulWidget {
   final ThemeData theme;
@@ -40,6 +39,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
         padding: const EdgeInsets.all(10).copyWith(right: 8, left: 0),
         decoration: BoxDecoration(
@@ -68,7 +68,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
               widget.conversation!.type == ConversationType.group
                   ? Container(
                       constraints: const BoxConstraints(maxWidth: 90),
-                      width: 30.w,
+                      width: screenWidth * 0.3,
                       height: 43,
                       child: AnimatedAvatarStack(
                         settings: RestrictedPositions(),
@@ -120,16 +120,14 @@ class _ChatAppBarState extends State<ChatAppBar> {
                                   .name,
                           style: widget.theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            fontSize: 16.sp,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           widget.subTitle,
-                          style: widget.theme.textTheme.bodySmall?.copyWith(
-                              color: widget.theme.disabledColor,
-                              fontSize: 14.sp),
+                          style: widget.theme.textTheme.bodySmall
+                              ?.copyWith(color: widget.theme.disabledColor),
                         )
                       ],
                     ),

@@ -1,30 +1,35 @@
 import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
-Future<void> showRightSideTaskDetails(BuildContext context, Widget child) {
+Future<void> showRightSideTaskDetails(
+  BuildContext context,
+  Widget child, {
+  double? widthFactor,
+  double maxWidth = 400,
+}) {
   final screenHeight = MediaQuery.of(context).size.height;
   final theme = Theme.of(context);
   final wideScreen = MediaQuery.of(context).size.width > 700;
   final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
   final isWideScreen = !isPortrait || wideScreen;
+  final screenWidth = MediaQuery.of(context).size.width;
+  final dialogWidth = widthFactor != null
+      ? screenWidth * widthFactor
+      : (isWideScreen ? screenWidth * 0.65 : screenWidth * 0.85);
   return showGeneralDialog(
     context: context,
-    // Tapping outside the dialog will dismiss it
     barrierDismissible: true,
     barrierLabel: 'Dismiss',
-    // A semi-transparent background
     barrierColor: Colors.black54,
     pageBuilder: (BuildContext context, Animation<double> animation,
         Animation<double> secondaryAnimation) {
-      // The actual widget for your side sheet
       return Align(
         alignment: Alignment.centerRight,
         child: Material(
           color: Colors.transparent,
-          // Material gives it a “surface” so it can have its own background color, elevation, etc.
-          child: SizedBox(
-              width: isWideScreen ? 65.w : 85.w,
+          child: Container(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              width: dialogWidth,
               height: double.infinity,
               child: ClipRRect(
                 child: Container(

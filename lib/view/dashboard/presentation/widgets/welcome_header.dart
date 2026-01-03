@@ -1,6 +1,5 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class WelcomeHeader extends StatelessWidget {
   final double screenHeight;
@@ -15,10 +14,13 @@ class WelcomeHeader extends StatelessWidget {
         MediaQuery.of(context).orientation == Orientation.portrait;
 
     final isWideScreen = !isPortrait || wideScreen;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Stack(
       children: [
         Container(
-          height: isWideScreen ? 40.w : 60.h,
+          constraints: const BoxConstraints(maxHeight: 500),
+          height: isWideScreen ? screenWidth * 0.4 : screenHeight * 0.6,
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(
               Radius.circular(20),
@@ -45,8 +47,7 @@ class WelcomeHeader extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding:
-                  EdgeInsets.only(top: isWideScreen ? 13.h : 5.h, bottom: 10),
+              padding: EdgeInsets.only(top: isWideScreen ? 20 : 30, bottom: 10),
               child: Column(
                 children: [
                   Flexible(
@@ -55,24 +56,23 @@ class WelcomeHeader extends StatelessWidget {
                         Text(
                           'Welcome back 👋',
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.displayLarge?.copyWith(
-                              color: AppPallete.white, fontSize: 25.sp),
+                          style: theme.textTheme.displaySmall
+                              ?.copyWith(color: AppPallete.white),
                         ),
                         Text(
                           'Yash Nautiyal',
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.displayLarge?.copyWith(
-                              color: AppPallete.white, fontSize: 25.sp),
+                          style: theme.textTheme.displayMedium
+                              ?.copyWith(color: AppPallete.white),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30.0)
-                              .copyWith(top: 15),
+                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
                           child: Text(
                             textAlign: TextAlign.center,
                             "If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything.",
-                            style: theme.textTheme.headlineMedium?.copyWith(
+                            style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                fontSize: 15.5.sp,
+                                fontSize: 15,
                                 color: AppPallete.grey500),
                           ),
                         ),

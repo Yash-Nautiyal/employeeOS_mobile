@@ -9,7 +9,6 @@ import 'package:employeeos/view/chat/presentation/pages/thread_page.dart';
 import 'package:employeeos/view/chat/presentation/widget/landscape/chat_nav_appbar_landscape.dart';
 import 'package:employeeos/view/chat/presentation/widget/landscape/chat_nav_item_landscape.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class ThreadPageLandscape extends StatefulWidget {
   final Conversation? selectedConversation;
@@ -60,6 +59,7 @@ class _ThreadPageLandscapeState extends State<ThreadPageLandscape>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -80,7 +80,7 @@ class _ThreadPageLandscapeState extends State<ThreadPageLandscape>
                 borderRadius: BorderRadius.circular(50),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              width: isExpanded ? 35.w : 5.w,
+              width: isExpanded ? screenWidth * 0.35 : screenWidth * 0.05,
               child: Column(
                 children: [
                   ChatNavAppbarLandscape(
@@ -115,7 +115,7 @@ class _ThreadPageLandscapeState extends State<ThreadPageLandscape>
                       separatorBuilder: (context, index) => Padding(
                         padding: EdgeInsets.symmetric(
                                 vertical: isExpanded ? 9.0 : 7.0)
-                            .copyWith(left: 7.w),
+                            .copyWith(left: 7),
                         child: CustomDivider(
                           color: theme.dividerColor,
                         ),

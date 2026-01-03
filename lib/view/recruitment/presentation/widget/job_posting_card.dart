@@ -5,7 +5,6 @@ import 'package:employeeos/view/recruitment/presentation/widget/job_posting_card
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting_card_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sizer/sizer.dart';
 
 class JobPostingCard extends StatefulWidget {
   final ThemeData theme;
@@ -100,26 +99,26 @@ class _JobPostingCardState extends State<JobPostingCard>
                 theme: widget.theme,
                 onSelect: toggleDropdown,
               ),
-              SizedBox(
-                height: 1.h,
+              const SizedBox(
+                height: 10,
               ),
               Text(
                 "Cloud Internship - AWS",
-                style: widget.theme.textTheme.displaySmall
-                    ?.copyWith(fontSize: 20.sp),
+                style:
+                    widget.theme.textTheme.displaySmall?.copyWith(fontSize: 20),
               ),
               Text(
                 "Tech",
                 style: widget.theme.textTheme.bodyMedium
                     ?.copyWith(color: widget.theme.disabledColor),
               ),
-              SizedBox(
-                height: 2.h,
+              const SizedBox(
+                height: 20,
               ),
               Text(
                 'Posted date: 23 Jun 2025',
                 style: widget.theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w600, fontSize: 16.sp),
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -134,8 +133,8 @@ class _JobPostingCardState extends State<JobPostingCard>
                           color: AppPallete.successMain,
                           width: 20,
                         ),
-                        SizedBox(
-                          width: 0.5.w,
+                        const SizedBox(
+                          width: 5,
                         ),
                         Text(
                           '1 position',
@@ -152,8 +151,8 @@ class _JobPostingCardState extends State<JobPostingCard>
                           color: AppPallete.infoMain,
                           width: 20,
                         ),
-                        SizedBox(
-                          width: 0.5.w,
+                        const SizedBox(
+                          width: 5,
                         ),
                         Text(
                           '190 applications',
@@ -179,7 +178,6 @@ class _JobPostingCardState extends State<JobPostingCard>
                     'Posted by: Yash Nautiyal',
                     style: widget.theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      fontSize: 15.5.sp,
                       color: widget.theme.dividerColor,
                     ),
                   )
@@ -199,7 +197,6 @@ class _JobPostingCardState extends State<JobPostingCard>
                     'nautiyalyash4@gmail.com',
                     style: widget.theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      fontSize: 15.5.sp,
                       color: widget.theme.dividerColor,
                     ),
                   )

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sizer/sizer.dart';
 
 class HiringStatsCard extends StatelessWidget {
   final List<Map<String, dynamic>> data;
@@ -15,7 +14,7 @@ class HiringStatsCard extends StatelessWidget {
     final wideScreen = MediaQuery.of(context).size.width > 700;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-
+    final screenWidth = MediaQuery.of(context).size.width;
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 300,
@@ -56,7 +55,7 @@ class HiringStatsCard extends StatelessWidget {
                         item['title'],
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
+                          fontSize: 16,
                         ),
                       ),
                       Expanded(
@@ -65,7 +64,7 @@ class HiringStatsCard extends StatelessWidget {
                           style: theme.textTheme.displayMedium?.copyWith(
                             color: item['valueColor'] ??
                                 theme.colorScheme.onSurface,
-                            fontSize: 27.sp,
+                            fontSize: 27,
                           ),
                         ),
                       ),
@@ -81,7 +80,7 @@ class HiringStatsCard extends StatelessWidget {
                     child: SvgPicture.asset(
                       item['iconPath'],
                       color: item['valueColor']!.withAlpha(10),
-                      width: !isPortrait || wideScreen ? 15.w : 30.w,
+                      width: !isPortrait || wideScreen ? screenWidth * 0.15 : screenWidth * 0.3,
                     ),
                   ),
                 ),

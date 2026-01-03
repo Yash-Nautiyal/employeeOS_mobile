@@ -1,7 +1,6 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sizer/sizer.dart';
 
 class BirthdayContainer extends StatelessWidget {
   final ThemeData theme;
@@ -47,10 +46,9 @@ class BirthdayContainer extends StatelessWidget {
                     child: Text(
                       'Upcoming Birthdays',
                       style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 24.sp,
-                        color: AppPallete.white,
-                      ),
+                          fontWeight: FontWeight.w800,
+                          color: AppPallete.white,
+                          fontSize: !isWideScreen ? 25 : 35),
                     ),
                   ),
                   Flexible(
@@ -70,18 +68,16 @@ class BirthdayContainer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         CircleAvatar(
-                          radius: isWideScreen ? 3.w : 6.w,
+                          radius: isWideScreen ? 25 : 22,
                         ),
-                        SizedBox(
-                          width: isWideScreen ? 1.5.w : 3.w,
-                        ),
+                        const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Alex Balding',
-                              style: theme.textTheme.labelLarge?.copyWith(
-                                  color: AppPallete.white, fontSize: 18.sp),
+                              style: theme.textTheme.labelLarge
+                                  ?.copyWith(color: AppPallete.white),
                             ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -89,17 +85,15 @@ class BirthdayContainer extends StatelessWidget {
                                 SvgPicture.asset(
                                   'assets/icons/ic-calender.svg',
                                   color: AppPallete.grey200,
-                                  width: isWideScreen ? 2.5.w : 5.w,
+                                  width: isWideScreen ? 15 : 20,
                                 ),
-                                SizedBox(
-                                  width: 1.w,
+                                const SizedBox(
+                                  width: 5,
                                 ),
                                 Text(
                                   '${DateTime.now().add(const Duration(days: 10)).day}/${DateTime.now().add(const Duration(days: 10)).month}/${DateTime.now().add(const Duration(days: 10)).year}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                      fontSize: 15.sp,
-                                      color: AppPallete.white,
-                                      fontWeight: FontWeight.w600),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                      fontSize: 15, color: AppPallete.white),
                                 ),
                               ],
                             ),

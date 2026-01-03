@@ -6,7 +6,6 @@ import 'package:employeeos/view/hiring/presentation/widget/hiring_job_pipelines.
 import 'package:employeeos/view/hiring/presentation/widget/hiring_pipeline_container.dart';
 import 'package:employeeos/view/hiring/presentation/widget/hiring_stats_card.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class HiringView extends StatefulWidget {
   const HiringView({super.key});
@@ -143,7 +142,7 @@ class _HiringViewState extends State<HiringView> {
                         title: 'Hiring Pipeline Overview',
                         subtitle: 'Track application and interview progress',
                       ),
-                      SizedBox(height: 2.h),
+                      const SizedBox(height: 20),
                       Expanded(
                         child: HiringPipelineContainer(
                           theme: theme,
@@ -212,7 +211,7 @@ class _HiringViewState extends State<HiringView> {
                       title: 'Hiring Pipeline Overview',
                       subtitle: 'Track application and interview progress',
                     ),
-                    SizedBox(height: 2.h),
+                    const SizedBox(height: 20),
                     Expanded(
                       child: HiringPipelineContainer(
                         theme: theme,

@@ -78,14 +78,21 @@ class _HeadingSlideState extends State<HeadingSlide> {
 
   @override
   Widget build(BuildContext context) {
+    final wideScreen = MediaQuery.of(context).size.width > 700;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    final isWideScreen = !isPortrait || wideScreen;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            SizedBox(
-              height: 250,
+            Container(
+              constraints: const BoxConstraints(maxHeight: 500),
+              height: isWideScreen ? screenWidth * 0.4 : screenHeight * 0.6,
               child: PageView.builder(
                 controller: _pageController,
                 physics: const BouncingScrollPhysics(),
@@ -122,7 +129,9 @@ class _HeadingSlideState extends State<HeadingSlide> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+              padding: EdgeInsets.symmetric(
+                  horizontal: !isWideScreen ? 20 : 10,
+                  vertical: !isWideScreen ? 2 : 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -144,6 +153,7 @@ class _HeadingSlideState extends State<HeadingSlide> {
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios_rounded),
+                    iconSize: !isWideScreen ? 15 : 20,
                     onPressed: _goToPreviousPage,
                     color: _currentPage > 0
                         ? widget.theme.primaryColor
@@ -151,6 +161,7 @@ class _HeadingSlideState extends State<HeadingSlide> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios_rounded),
+                    iconSize: !isWideScreen ? 15 : 20,
                     onPressed: _goToNextPage,
                     color: _currentPage < _totalPages - 1
                         ? widget.theme.primaryColor

@@ -26,7 +26,7 @@ class _JobApplicationCardState extends State<JobApplicationCard>
         children: [
           Container(
             margin: const EdgeInsets.only(bottom: 15),
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             decoration: BoxDecoration(
               color: widget.theme.cardColor,
               borderRadius: BorderRadius.circular(12),

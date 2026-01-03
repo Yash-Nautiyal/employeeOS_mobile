@@ -6,7 +6,6 @@ import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sizer/sizer.dart';
 
 class FavoritesSection extends StatelessWidget {
   final List<FolderFile> favorites;
@@ -70,14 +69,12 @@ class FavoritesSection extends StatelessWidget {
                                 isfolder
                                     ? SvgPicture.asset(
                                         "assets/icons/file/ic-folder.svg",
-                                        width: 26.sp,
-                                        height: 26.sp,
+                                        width: 30,
                                       )
                                     : SvgPicture.asset(
                                         getFileIcon(
                                             favorites[index].fileType ?? ""),
-                                        width: 26.sp,
-                                        height: 26.sp,
+                                        width: 30,
                                       ),
                                 const SizedBox(
                                   height: 10,
@@ -85,7 +82,7 @@ class FavoritesSection extends StatelessWidget {
                                 Text(
                                   filename,
                                   style: theme.textTheme.titleMedium
-                                      ?.copyWith(fontSize: 16.sp),
+                                      ?.copyWith(fontSize: 16),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
@@ -98,7 +95,7 @@ class FavoritesSection extends StatelessWidget {
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 14.sp),
+                                                fontSize: 14),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 2,
                                       )
@@ -109,7 +106,7 @@ class FavoritesSection extends StatelessWidget {
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 14.sp),
+                                                fontSize: 14),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 2,
                                       )

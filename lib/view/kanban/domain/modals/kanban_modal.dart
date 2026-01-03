@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 enum KanbanSection { createdByMe, assignedToMe }
 
 class KanbanColumn {
@@ -18,18 +16,6 @@ class KanbanColumn {
   int get totalCount => createdByMe.length + assignedToMe.length;
 }
 
-class KanbanGroup {
-  final String id;
-  final String title;
-  final Color color;
-
-  KanbanGroup({
-    required this.id,
-    required this.title,
-    required this.color,
-  });
-}
-
 class KanbanGroupItem {
   final String itemId;
   final String title;
@@ -42,6 +28,7 @@ class KanbanGroupItem {
   final String priority;
   final String description;
   final List<String> attachments;
+  final Map<String, bool> subtasks;
 
   KanbanGroupItem({
     required this.itemId,
@@ -55,6 +42,7 @@ class KanbanGroupItem {
     required this.priority,
     required this.description,
     required this.attachments,
+    required this.subtasks,
   });
 
   String get id => itemId;
@@ -71,5 +59,3 @@ class DragPayload {
     required this.fromSection,
   });
 }
-
-

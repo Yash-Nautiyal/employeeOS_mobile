@@ -20,53 +20,81 @@ class UserDashboardView extends StatelessWidget {
 
     final isWideScreen = !isPortrait || wideScreen;
 
+    final analyticsCards = [
+      AnalyticsContainer(
+          theme: theme,
+          color: AppPallete.secondaryLighter,
+          titleColor: AppPallete.secondaryDark,
+          valueColor: AppPallete.secondaryDarker,
+          icon: 'assets/icons/glass/ic-glass-users.svg',
+          title: 'New Users',
+          value: '86.6K'),
+      AnalyticsContainer(
+          theme: theme,
+          color: AppPallete.successLighter,
+          titleColor: AppPallete.successDark,
+          valueColor: AppPallete.successDarker,
+          icon: 'assets/icons/glass/ic-glass-bag.svg',
+          title: 'Weekly Sales',
+          value: '2.6K'),
+      AnalyticsContainer(
+          theme: theme,
+          color: AppPallete.errorLighter,
+          titleColor: AppPallete.errorDark,
+          valueColor: AppPallete.errorDarker,
+          icon: 'assets/icons/glass/ic-glass-message.svg',
+          title: 'Messages',
+          value: '123'),
+      AnalyticsContainer(
+          theme: theme,
+          color: AppPallete.warningLighter,
+          titleColor: AppPallete.warningDark,
+          valueColor: AppPallete.warningDarker,
+          icon: 'assets/icons/glass/ic-glass-buy.svg',
+          title: 'Purchase Order',
+          value: '2K')
+    ];
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0)
             .copyWith(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
         child: Column(
           children: [
-            WelcomeHeader(screenHeight: screenHeight, theme: theme),
-            const SizedBox(height: 20),
-            HeadingSlide(theme: theme),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                AnalyticsContainer(
-                    theme: theme,
-                    color: AppPallete.secondaryLighter,
-                    titleColor: AppPallete.secondaryDark,
-                    valueColor: AppPallete.secondaryDarker,
-                    icon: 'assets/icons/glass/ic-glass-users.svg',
-                    title: 'New Users',
-                    value: '86.6K'),
-                AnalyticsContainer(
-                    theme: theme,
-                    color: AppPallete.successLighter,
-                    titleColor: AppPallete.successDark,
-                    valueColor: AppPallete.successDarker,
-                    icon: 'assets/icons/glass/ic-glass-bag.svg',
-                    title: 'Weekly Sales',
-                    value: '2.6K'),
-                AnalyticsContainer(
-                    theme: theme,
-                    color: AppPallete.errorLighter,
-                    titleColor: AppPallete.errorDark,
-                    valueColor: AppPallete.errorDarker,
-                    icon: 'assets/icons/glass/ic-glass-message.svg',
-                    title: 'Messages',
-                    value: '123'),
-                AnalyticsContainer(
-                    theme: theme,
-                    color: AppPallete.warningLighter,
-                    titleColor: AppPallete.warningDark,
-                    valueColor: AppPallete.warningDarker,
-                    icon: 'assets/icons/glass/ic-glass-buy.svg',
-                    title: 'Purchase Order',
-                    value: '2K')
-              ],
+            if (isWideScreen) ...[
+              Row(
+                children: [
+                  Expanded(
+                      flex: 6,
+                      child: WelcomeHeader(
+                          screenHeight: screenHeight, theme: theme)),
+                  const SizedBox(width: 10),
+                  Expanded(flex: 2, child: HeadingSlide(theme: theme)),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ] else ...[
+              WelcomeHeader(screenHeight: screenHeight, theme: theme),
+              const SizedBox(height: 20),
+              Container(
+                constraints: const BoxConstraints(maxHeight: 270),
+                height: screenHeight * .3,
+                child: HeadingSlide(theme: theme),
+              ),
+              const SizedBox(height: 20),
+            ],
+            GridView.builder(
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isWideScreen ? 4 : 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                mainAxisExtent: isWideScreen ? 140 : 130,
+              ),
+              itemCount: analyticsCards.length,
+              itemBuilder: (_, index) => analyticsCards[index],
             ),
             const SizedBox(height: 20),
             if (!isWideScreen) ...[

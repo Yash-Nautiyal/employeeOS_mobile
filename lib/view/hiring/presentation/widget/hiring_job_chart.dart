@@ -1,9 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:employeeos/core/common/components/custom_title_header.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/hiring/domain/entities/hiring_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class HiringJobChart extends StatefulWidget {
@@ -146,7 +147,6 @@ class _HiringJobChartState extends State<HiringJobChart>
                               style: widget.theme.textTheme.bodySmall?.copyWith(
                                 color: widget.theme.disabledColor,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 14.5.sp,
                               ),
                             ),
                           ],
@@ -169,27 +169,22 @@ class _HiringJobChartState extends State<HiringJobChart>
                           Text(
                             "Total",
                             style: widget.theme.textTheme.bodyMedium?.copyWith(
-                              color: widget.theme.colorScheme.onSurface
-                                  .withOpacity(0.6),
+                              color: widget.theme.disabledColor,
                               fontWeight: FontWeight.w500,
-                              fontSize: 15.sp,
                             ),
                           ),
                           Text(
                             "$_totalPositions",
-                            style: widget.theme.textTheme.titleSmall?.copyWith(
+                            style: widget.theme.textTheme.titleLarge?.copyWith(
                               color: widget.theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w800,
-                              fontSize: 20.sp,
                             ),
                           ),
                           Text(
                             "Positions",
-                            style: widget.theme.textTheme.bodySmall?.copyWith(
-                              color: widget.theme.colorScheme.onSurface
-                                  .withOpacity(0.6),
+                            style: widget.theme.textTheme.labelLarge?.copyWith(
+                              color: widget.theme.disabledColor,
                               fontWeight: FontWeight.w400,
-                              fontSize: 14.sp,
                             ),
                           ),
                         ],

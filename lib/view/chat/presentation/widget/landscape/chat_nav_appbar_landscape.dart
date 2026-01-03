@@ -2,7 +2,6 @@ import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:sizer/sizer.dart';
 
 class ChatNavAppbarLandscape extends StatelessWidget {
   final ThemeData theme;
@@ -76,9 +75,7 @@ class ChatNavAppbarLandscape extends StatelessWidget {
                                 'Yash (You) Yash (You)',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 15.sp,
-                                ),
+                                style: theme.textTheme.bodyMedium,
                               ),
                             ),
                         ],

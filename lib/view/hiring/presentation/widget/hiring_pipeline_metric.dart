@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class HiringPipelineMetric extends StatelessWidget {
@@ -23,12 +22,13 @@ class HiringPipelineMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Row(
       children: [
         if (showCircle!) ...[
           Expanded(
             child: Container(
-              constraints: BoxConstraints(maxHeight: 20.h),
+              constraints: BoxConstraints(maxHeight: screenHeight * 0.2),
               child: SfRadialGauge(
                 enableLoadingAnimation: true,
                 axes: <RadialAxis>[
@@ -57,9 +57,9 @@ class HiringPipelineMetric extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 1.w),
+          const SizedBox(width: 5),
         ] else ...[
-          SizedBox(width: 3.w), // Space for alignment when no circle
+          const SizedBox(width: 30), // Space for alignment when no circle
         ],
         Expanded(
           flex: 2,
@@ -67,8 +67,7 @@ class HiringPipelineMetric extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(title,
-                  style: theme.textTheme.labelLarge?.copyWith(fontSize: 15.sp)),
+              Text(title, style: theme.textTheme.bodySmall),
               RichText(
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -76,14 +75,14 @@ class HiringPipelineMetric extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: value,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.disabledColor, fontSize: 15.sp),
+                      style: theme.textTheme.labelLarge
+                          ?.copyWith(color: theme.disabledColor, fontSize: 13),
                     ),
                     TextSpan(
                       text: subtitle != null ? ' $subtitle' : ' of 18',
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        fontSize: 14.sp,
+                        fontSize: 11.5,
                       ),
                     ),
                   ],

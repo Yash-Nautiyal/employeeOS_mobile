@@ -10,7 +10,6 @@ import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
     show Conversation, ConversationType;
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:sizer/sizer.dart';
 
 class ChatNavItem extends StatelessWidget {
   final ThemeData theme;
@@ -115,10 +114,9 @@ class ChatNavItem extends StatelessWidget {
                                       .where((p) => p.id != currentUserId)
                                       .map((p) => p.name)
                                       .join(", "),
-                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: theme.colorScheme.tertiary,
-                                    fontSize: 16.sp,
                                   ),
                                 ),
                               ),
@@ -126,7 +124,6 @@ class ChatNavItem extends StatelessWidget {
                                 time,
                                 style: theme.textTheme.labelLarge?.copyWith(
                                   color: theme.dividerColor,
-                                  fontSize: 15.sp,
                                 ),
                               ),
                             ],
@@ -136,9 +133,7 @@ class ChatNavItem extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   snippet,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontSize: 16.sp,
-                                  ),
+                                  style: theme.textTheme.bodyMedium,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
@@ -147,8 +142,8 @@ class ChatNavItem extends StatelessWidget {
                                 backgroundColor: AppPallete.successMain,
                                 label: Text(
                                   '2',
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                      fontSize: 15.sp, color: AppPallete.white),
+                                  style: theme.textTheme.labelLarge
+                                      ?.copyWith(color: AppPallete.white),
                                 ),
                               )
                             ],

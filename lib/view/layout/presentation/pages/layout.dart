@@ -10,6 +10,7 @@ import 'package:employeeos/view/kanban/presentation/pages/kanban_view.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_drawer.dart';
 import 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
 import 'package:employeeos/view/recruitment/presentation/pages/job_posting_view.dart';
+import 'package:employeeos/view/recruitment/presentation/pages/interview_scheduling_view.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
 import 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';
@@ -37,12 +38,12 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     // 'Mail': const Center(child: Text('Mail Page')),
     'Job Posting': const JobPostingView(),
     'Job Application': const JobApplicationView(),
-    'Interview Scheduling': const Center(child: Text('Interview Scheduling')),
+    'Interview Scheduling': const InterviewSchedulingView(),
     'Account': const UserAccount(),
     'Profile': const UserProfile(),
     'Card': const UserCards(),
   };
-  String _selectedItem = 'Kanban';
+  String _selectedItem = 'Interview Scheduling';
 
   @override
   void initState() {

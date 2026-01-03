@@ -7,7 +7,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
-import 'package:sizer/sizer.dart';
 
 class ChatReply extends StatelessWidget {
   final ChatMessage repliedMessage;
@@ -25,7 +24,6 @@ class ChatReply extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(repliedMessage.toJson());
     final screenWidth = MediaQuery.of(context).size.width;
     final isMe = repliedMessage.authorId == currentUserId;
     return Container(
@@ -76,7 +74,7 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.tertiary,
-                fontSize: 15.5.sp,
+                fontSize: 16,
               ),
             ),
             const SizedBox(height: 5),
@@ -88,7 +86,7 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: theme.disabledColor,
-                  fontSize: 14.sp,
+                  fontSize: 14,
                 ),
               )
             else if (repliedMessage is ImageMessage)
@@ -148,14 +146,14 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.titleSmall
-                                ?.copyWith(fontSize: 15.sp),
+                                ?.copyWith(fontSize: 15),
                           ),
                           const SizedBox(height: 4),
                           Text(
                               formatFileSize(
                                   (repliedMessage as FileMessage).size),
                               style: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                               )),
                         ],
                       ),

@@ -41,21 +41,21 @@ class AppTypography {
   static const FontWeight extraBold = FontWeight.w800;
 
   // Headings
-  static const TextStyle headingLarge = TextStyle(
+  static const TextStyle displayLarge = TextStyle(
     fontFamily: secondaryFont,
     fontWeight: extraBold,
     fontSize: 40,
     height: 80 / 64,
   );
 
-  static const TextStyle headingMedium = TextStyle(
+  static const TextStyle displayMedium = TextStyle(
     fontFamily: secondaryFont,
     fontWeight: extraBold,
     fontSize: 32,
     height: 64 / 48,
   );
 
-  static const TextStyle headingSmall = TextStyle(
+  static const TextStyle displaySmall = TextStyle(
     fontFamily: secondaryFont,
     fontWeight: bold,
     fontSize: 24,
@@ -63,13 +63,13 @@ class AppTypography {
   );
 
   // Subtitles
-  static const TextStyle subtitleLarge = TextStyle(
+  static const TextStyle titleLarge = TextStyle(
     fontWeight: semiBold,
     fontSize: 20,
     height: 1.5,
   );
 
-  static const TextStyle subtitleMedium = TextStyle(
+  static const TextStyle titleMedium = TextStyle(
     fontWeight: semiBold,
     fontSize: 16,
     height: 1.5,

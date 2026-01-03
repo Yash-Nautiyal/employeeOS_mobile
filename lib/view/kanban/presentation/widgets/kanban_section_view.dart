@@ -5,8 +5,9 @@ import 'package:employeeos/view/kanban/index.dart'
         DragPayload,
         DropSlot,
         CardDropTarget,
-        DraggableTask,
-        GhostTaskCard;
+        KanbanDraggableTask,
+        GhostTaskCard,
+        KanbanColumn;
 import 'package:flutter/material.dart';
 import 'package:employeeos/core/index.dart';
 
@@ -18,6 +19,7 @@ class KanbanSectionView extends StatelessWidget {
     required this.tasks,
     required this.section,
     required this.columnId,
+    required this.allColumns,
     required this.hoverColumnId,
     required this.hoverSection,
     required this.hoverIndex,
@@ -29,6 +31,7 @@ class KanbanSectionView extends StatelessWidget {
     required this.onHover,
     required this.onHoverExit,
     required this.onAccept,
+    required this.onMoveTaskToColumn,
   });
 
   final ThemeData theme;
@@ -36,6 +39,7 @@ class KanbanSectionView extends StatelessWidget {
   final List<KanbanGroupItem> tasks;
   final KanbanSection section;
   final String columnId;
+  final List<KanbanColumn> allColumns;
 
   final String? hoverColumnId;
   final KanbanSection? hoverSection;
@@ -55,6 +59,12 @@ class KanbanSectionView extends StatelessWidget {
   ) onHover;
   final VoidCallback onHoverExit;
   final void Function(DragPayload payload, int index) onAccept;
+  final void Function(
+    KanbanGroupItem task,
+    String fromColumnId,
+    KanbanSection fromSection,
+    String toColumnId,
+  ) onMoveTaskToColumn;
 
   bool get _isHovered => hoverColumnId == columnId && hoverSection == section;
 
@@ -106,13 +116,21 @@ class KanbanSectionView extends StatelessWidget {
         onHover: onHover,
         onHoverExit: onHoverExit,
         onAccept: onAccept,
-        child: DraggableTask(
+        child: KanbanDraggableTask(
           theme: theme,
           task: task,
           fromColumnId: columnId,
           fromSection: section,
+          fromColumn: allColumns.firstWhere((c) => c.id == columnId,
+              orElse: () => KanbanColumn(
+                  id: columnId,
+                  title: columnId,
+                  createdByMe: const [],
+                  assignedToMe: const [])),
+          allColumns: allColumns,
           onDragStarted: () => onDragStarted(task.id),
           onDragEnded: onDragEnded,
+          onMoveToColumn: onMoveTaskToColumn,
         ),
       ));
     }

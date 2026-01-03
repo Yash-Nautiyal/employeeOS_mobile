@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 
 class SlideDialog extends StatefulWidget {
   final ThemeData theme;
@@ -64,6 +63,7 @@ class _SlideDialogState extends State<SlideDialog>
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final isWideScreen = !isPortrait || wideScreen;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Material(
       type: MaterialType.transparency,
       child: WillPopScope(
@@ -87,7 +87,7 @@ class _SlideDialogState extends State<SlideDialog>
                 position: _slideAnimation,
                 child: Container(
                   constraints: BoxConstraints(maxWidth: 400),
-                  width: isWideScreen ? 65.w : 85.w,
+                  width: isWideScreen ? screenWidth * 0.65 : screenWidth * 0.85,
                   height: MediaQuery.of(context).size.height,
                   child: ClipRRect(
                     child: BackdropFilter(

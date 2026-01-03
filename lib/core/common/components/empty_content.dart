@@ -1,7 +1,6 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sizer/sizer.dart';
 
 class EmptyContent extends StatelessWidget {
   final String icon;
@@ -24,12 +23,12 @@ class EmptyContent extends StatelessWidget {
           Text(
             title ?? '',
             style: theme.textTheme.labelLarge
-                ?.copyWith(color: AppPallete.grey500, fontSize: 16.sp),
+                ?.copyWith(color: AppPallete.grey500, fontSize: 16),
           ),
           Text(
             description ?? '',
             style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 13.sp,
+                fontSize: 14,
                 color: AppPallete.grey600,
                 fontWeight: FontWeight.w600),
           ),
