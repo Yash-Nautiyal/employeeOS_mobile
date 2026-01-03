@@ -1,12 +1,12 @@
-import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
-import 'package:employeeos/core/common/components/custom_side_menu.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/action_header.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/candidate_tabs.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/candidates_list.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/candidates_table.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/filter_panel.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/interview_rounds_tab.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/schedule_button.dart';
+import 'package:employeeos/core/index.dart'
+    show CustomBreadCrumbs, showRightSideTaskDetails;
+import 'package:employeeos/view/recruitment/index.dart'
+    show
+        ActionHeader,
+        CandidateTabs,
+        CandidatesTable,
+        InterviewFilterPanel,
+        InterviewRoundsTab;
 import 'package:flutter/material.dart';
 
 class InterviewSchedulingView extends StatefulWidget {
@@ -22,7 +22,6 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
   late TabController _roundTabController;
   late TabController _candidateTabController;
   late TextEditingController _searchController;
-  int _selectionCount = 0;
   String _searchQuery = '';
   String _selectedJob = 'All Jobs';
   String _selectedInterviewer = 'All Interviewers';
@@ -174,7 +173,7 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         setState(() {
-          _selectionCount = 0; // reset selection on tab change
+// reset selection on tab change
         });
       });
     });
@@ -211,7 +210,7 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: theme.cardColor,
                 borderRadius: BorderRadius.circular(16),
@@ -238,7 +237,6 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                     onSearchChanged: (value) {
                       setState(() {
                         _searchQuery = value.toLowerCase();
-                        _selectionCount = 0;
                       });
                     },
                   ),
@@ -253,83 +251,66 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                   const SizedBox(height: 20),
 
                   // Candidate Type Tabs and Schedule Button Row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CandidateTabs(
-                          theme: theme,
-                          controller: _candidateTabController,
-                        ),
-                      ),
-                      if (isWideScreen) ...[
-                        const SizedBox(width: 16),
-                        ScheduleButton(
-                          theme: theme,
-                          isEnabled: _selectionCount > 0,
-                          onPressed: () {
-                            // TODO: Implement Google Calendar integration
-                          },
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: theme.shadowColor),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.shadowColor,
+                          spreadRadius: 1,
+                          blurRadius: 3,
                         ),
                       ],
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Schedule Button for mobile
-                  if (!isWideScreen) ...[
-                    ScheduleButton(
-                      theme: theme,
-                      isEnabled: _selectionCount > 0,
-                      isFullWidth: true,
-                      onPressed: () {
-                        // TODO: Implement Google Calendar integration
-                      },
                     ),
-                    const SizedBox(height: 20),
-                  ],
-
-                  // Table Content - using AnimatedSwitcher instead of TabBarView
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    child: _candidateTabController.index == 0
-                        ? (isWideScreen
-                            ? CandidatesTable(
-                                key: const ValueKey('table'),
-                                screenWidth: screenWidth,
-                                candidates: _filteredCandidates(),
-                                onSelectionChanged: (count) {
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    if (!mounted) return;
-                                    setState(() => _selectionCount = count);
-                                  });
-                                },
-                              )
-                            : CandidatesList(
-                                key: const ValueKey('list'),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CandidateTabs(
                                 theme: theme,
-                                candidates: _filteredCandidates(),
-                                onSelectionChanged: (count) {
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    if (!mounted) return;
-                                    setState(() => _selectionCount = count);
-                                  });
-                                },
-                              ))
-                        : Center(
-                            key: const ValueKey('empty'),
-                            child: Padding(
-                              padding: const EdgeInsets.all(40.0),
-                              child: Text(
-                                'No scheduled interviews',
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.disabledColor,
-                                ),
+                                controller: _candidateTabController,
                               ),
                             ),
-                          ),
+                          ],
+                        ),
+
+                        // Table Content - using AnimatedSwitcher instead of TabBarView
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: _candidateTabController.index == 0
+                              ? CandidatesTable(
+                                  key: const ValueKey('table'),
+                                  screenWidth: screenWidth,
+                                  candidates: _filteredCandidates(),
+                                  onSelectionChanged: (count) {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      if (!mounted) return;
+                                    });
+                                  },
+                                )
+                              : Center(
+                                  key: const ValueKey('empty'),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(40.0),
+                                    child: Text(
+                                      'No scheduled interviews',
+                                      style:
+                                          theme.textTheme.bodyLarge?.copyWith(
+                                        color: theme.disabledColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
+
+                  // Schedule Button for mobile
                 ],
               ),
             ),
@@ -387,7 +368,6 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
             _selectedInterviewer = 'All Interviewers';
             _selectedStatus = 'All';
             _selectedRange = null;
-            _selectionCount = 0;
           });
         },
         onApply: ({
@@ -401,7 +381,6 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
             _selectedInterviewer = interviewer;
             _selectedStatus = status;
             _selectedRange = range;
-            _selectionCount = 0;
           });
         },
       ),

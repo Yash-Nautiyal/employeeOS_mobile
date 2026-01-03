@@ -1,5 +1,5 @@
 import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting_card.dart';
+import 'package:employeeos/view/recruitment/index.dart' show JobPostingCard;
 import 'package:flutter/material.dart';
 
 class JobPostingView extends StatefulWidget {

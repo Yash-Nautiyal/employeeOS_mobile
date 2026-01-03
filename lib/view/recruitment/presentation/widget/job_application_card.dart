@@ -1,5 +1,4 @@
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/core/index.dart' show AppPallete, CustomTextButton;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

@@ -1,8 +1,7 @@
-import 'package:employeeos/core/common/components/custom_divider.dart';
-import 'package:employeeos/core/common/components/custom_dropdown_painter.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting_card_footer.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting_card_header.dart';
+import 'package:employeeos/core/index.dart'
+    show AppPallete, CustomDivider, CustomDropdownPainter;
+import 'package:employeeos/view/recruitment/index.dart'
+    show JobPostingCardHeader, JobPostingCardFooter;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

@@ -21,8 +21,6 @@ class InterviewTableHeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasSel = selectedCount > 0;
-
     final theme = Theme.of(context);
     TextStyle head = theme.textTheme.labelLarge!.copyWith(
       fontWeight: FontWeight.w700,
@@ -33,9 +31,7 @@ class InterviewTableHeaderRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       height: 52,
       decoration: BoxDecoration(
-        color: hasSel ? const Color(0xFFD9FBE4) : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
       ),
       alignment: Alignment.centerLeft,
       child: Row(
@@ -65,4 +61,3 @@ class InterviewTableHeaderRow extends StatelessWidget {
     );
   }
 }
-

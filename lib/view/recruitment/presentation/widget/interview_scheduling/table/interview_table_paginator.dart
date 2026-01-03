@@ -38,7 +38,7 @@ class InterviewTablePaginator extends StatelessWidget {
               Flexible(
                 child: Text(
                   'Rows:',
-                  style: theme.textTheme.bodyMedium,
+                  style: theme.textTheme.bodySmall,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -53,7 +53,7 @@ class InterviewTablePaginator extends StatelessWidget {
                         value: e,
                         child: Text(
                           '$e',
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.tertiary,
                             fontWeight: FontWeight.w900,
                           ),
@@ -67,7 +67,7 @@ class InterviewTablePaginator extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(rangeText, style: theme.textTheme.bodyMedium),
+              Text(rangeText, style: theme.textTheme.bodySmall),
               const SizedBox(width: 5),
               InkWell(
                 onTap: onFirst,
@@ -88,7 +88,7 @@ class InterviewTablePaginator extends StatelessWidget {
                 ),
               ),
               Text('${pageIndex + 1} / $pageCount',
-                  style: theme.textTheme.bodyMedium),
+                  style: theme.textTheme.bodySmall),
               InkWell(
                 onTap: onNext,
                 child: Icon(
@@ -114,4 +114,3 @@ class InterviewTablePaginator extends StatelessWidget {
     );
   }
 }
-

@@ -1,4 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class InterviewTableDataRow extends StatefulWidget {
   const InterviewTableDataRow({
@@ -33,12 +37,8 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.dividerColor.withOpacity(0.3),
-        ),
-        color:
-            widget.selected ? theme.colorScheme.primary.withOpacity(.05) : null,
+        border: Border(
+            bottom: BorderSide(color: theme.dividerColor.withOpacity(0.3))),
       ),
       child: Row(
         children: [
@@ -88,29 +88,20 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
             width: widget.widthResume,
             child: Row(
               children: [
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.download, size: 16),
-                  label: const Text('Resume'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    side: BorderSide(color: theme.dividerColor),
+                CustomTextButton(
+                  padding: 0,
+                  onClick: () {},
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/common/solid/ic-mingcute-download-line.svg',
+                        width: 20,
+                        color: theme.colorScheme.tertiary,
+                      ),
+                      const SizedBox(width: 10),
+                      Text('Resume', style: theme.textTheme.labelLarge),
+                    ],
                   ),
-                ),
-                const Spacer(),
-                PopupMenuButton<String>(
-                  tooltip: 'More',
-                  onSelected: widget.onMenu,
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(value: 'View', child: Text('View Details')),
-                    PopupMenuItem(
-                        value: 'Schedule', child: Text('Schedule Interview')),
-                    PopupMenuItem(value: 'Reject', child: Text('Reject')),
-                  ],
-                  child: const Icon(Icons.more_vert, size: 20),
                 ),
               ],
             ),
@@ -120,4 +111,3 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
     );
   }
 }
-

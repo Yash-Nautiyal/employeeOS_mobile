@@ -177,8 +177,8 @@ ThemeData buildTheme({
             side: BorderSide(
               color: brightness == Brightness.dark
                   ? AppPallete.grey600
-                  : AppPallete.grey400,
-              width: 1.5,
+                  : AppPallete.grey300,
+              width: 1.3,
             ),
           ),
         ),

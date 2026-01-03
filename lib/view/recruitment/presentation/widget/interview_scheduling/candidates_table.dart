@@ -1,9 +1,11 @@
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/table/interview_table_data_row.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/table/interview_table_header_row.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/table/interview_table_header_selector.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/interview_scheduling/table/interview_table_paginator.dart';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
+import 'package:employeeos/view/recruitment/index.dart'
+    show
+        InterviewTableDataRow,
+        InterviewTableHeaderRow,
+        InterviewTablePaginator,
+        ScheduleButton;
 
 class CandidatesTable extends StatefulWidget {
   final double screenWidth;
@@ -40,7 +42,7 @@ class _CandidatesTableState extends State<CandidatesTable> {
   late double _wName;
   static const double _wJobTitle = 200;
   static const double _wApplicationDate = 150;
-  static const double _wResume = 220;
+  static const double _wResume = 120;
   double get _tableWidth =>
       _wName + _wJobTitle + _wApplicationDate + _wResume + 34; // + padding
 
@@ -104,58 +106,61 @@ class _CandidatesTableState extends State<CandidatesTable> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
-        // Horizontal scrollable header (stays fixed vertically)
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          controller: _hHeaderCtrl,
-          child: SizedBox(
-            height: 80,
-            width: _tableWidth,
-            child: _selected.isEmpty
-                ? InterviewTableHeaderRow(
-                    selectedCount: _selected.length,
-                    onClear: _selected.isEmpty
-                        ? null
-                        : () => setState(() => _selected.clear()),
-                    widthName: _wName,
-                    widthJobTitle: _wJobTitle,
-                    widthApplicationDate: _wApplicationDate,
-                    widthResume: _wResume,
-                    checkboxValue: _isAllSelectedOnPage
-                        ? true
-                        : (_isAnySelectedOnPage ? null : false),
-                    onCheckboxChanged: (val) {
-                      setState(() {
-                        if (val == true) {
-                          for (final f in _pageItems) {
-                            _selected.add(f['id'] ?? f['name']!);
+        Container(
+          color: theme.colorScheme.surfaceContainer,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: ScheduleButton(
+                  theme: theme,
+                  isEnabled: _selected.isNotEmpty,
+                  isFullWidth: true,
+                  onPressed: () {
+                    // TODO: Implement Google Calendar integration
+                  },
+                ),
+              ),
+              // Horizontal scrollable header (stays fixed vertically)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                controller: _hHeaderCtrl,
+                child: SizedBox(
+                    height: 80,
+                    width: _tableWidth,
+                    child: InterviewTableHeaderRow(
+                      selectedCount: _selected.length,
+                      onClear: _selected.isEmpty
+                          ? null
+                          : () => setState(() => _selected.clear()),
+                      widthName: _wName,
+                      widthJobTitle: _wJobTitle,
+                      widthApplicationDate: _wApplicationDate,
+                      widthResume: _wResume,
+                      checkboxValue: _isAllSelectedOnPage
+                          ? true
+                          : (_isAnySelectedOnPage ? null : false),
+                      onCheckboxChanged: (val) {
+                        setState(() {
+                          if (val == true) {
+                            for (final f in _pageItems) {
+                              _selected.add(f['id'] ?? f['name']!);
+                            }
+                          } else {
+                            for (final f in _pageItems) {
+                              _selected.remove(f['id'] ?? f['name']);
+                            }
                           }
-                        } else {
-                          for (final f in _pageItems) {
-                            _selected.remove(f['id'] ?? f['name']);
-                          }
-                        }
-                        _notifySelection();
-                      });
-                    },
-                  )
-                : InterviewTableHeaderSelector(
-                    selectedCount: _selected.length,
-                    onSelectAll: () => setState(() {
-                      for (final f in _pageItems) {
-                        _selected.add(f['id'] ?? f['name']!);
-                      }
-                      _notifySelection();
-                    }),
-                    onClear: _selected.isEmpty
-                        ? null
-                        : () => setState(() {
-                              _selected.clear();
-                              _notifySelection();
-                            }),
-                  ),
+                          _notifySelection();
+                        });
+                      },
+                    )),
+              ),
+            ],
           ),
         ),
 

@@ -38,8 +38,13 @@ class _CustomDropdownState extends State<CustomDropdown> {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
+      style: widget.theme.textTheme.bodyMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: widget.theme.colorScheme.tertiary,
+      ),
       dropdownStyleData: DropdownStyleData(
-        elevation: 0,
+        maxHeight: 230,
+        elevation: 8,
         useSafeArea: true,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -47,7 +52,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             colors: [
               Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 84, 47, 45)
-                  : AppPallete.errorLighter,
+                  : const Color.fromARGB(255, 253, 239, 226),
               Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 27, 31, 37)
                   : const Color.fromARGB(255, 251, 251, 251),
@@ -56,7 +61,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
                   : const Color.fromARGB(255, 251, 251, 251),
               Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 37, 59, 67)
-                  : const Color.fromARGB(255, 212, 251, 251),
+                  : const Color.fromARGB(255, 224, 255, 255),
             ],
             stops: widget.theme.brightness == Brightness.dark
                 ? [0.0, .17, .87, .99]
