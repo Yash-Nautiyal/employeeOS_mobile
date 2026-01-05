@@ -1,23 +1,31 @@
-import 'package:flutter/material.dart';
-import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:employeeos/view/recruitment/index.dart'
     show
         InterviewTableDataRow,
         InterviewTableHeaderRow,
         InterviewTablePaginator,
         ScheduleButton;
+import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 class CandidatesTable extends StatefulWidget {
   final double screenWidth;
-  final List<Map<String, String>> candidates;
+  final List<InterviewCandidate> candidates;
+  final Set<String> selectedIds;
+  final ValueChanged<Set<String>> onSelectedIdsChanged;
   final ValueChanged<int>? onSelectionChanged;
+  final ValueChanged<Set<String>>? onSchedulePressed;
   final ScrollController? verticalController;
 
   const CandidatesTable({
     super.key,
     required this.screenWidth,
     required this.candidates,
+    required this.selectedIds,
+    required this.onSelectedIdsChanged,
     this.onSelectionChanged,
+    this.onSchedulePressed,
     this.verticalController,
   });
 
@@ -26,7 +34,7 @@ class CandidatesTable extends StatefulWidget {
 }
 
 class _CandidatesTableState extends State<CandidatesTable> {
-  final Set<String> _selected = {};
+  late Set<String> _selected;
 
   // Paging
   int _pageIndex = 0;
@@ -49,6 +57,7 @@ class _CandidatesTableState extends State<CandidatesTable> {
   @override
   void initState() {
     super.initState();
+    _selected = {...widget.selectedIds};
 
     _hGroup = LinkedScrollControllerGroup();
     _hHeaderCtrl = _hGroup.addAndGet();
@@ -69,12 +78,22 @@ class _CandidatesTableState extends State<CandidatesTable> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant CandidatesTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!setEquals(oldWidget.selectedIds, widget.selectedIds)) {
+      setState(() {
+        _selected = {...widget.selectedIds};
+      });
+    }
+  }
+
   // Paging helpers
   int get _total => widget.candidates.length;
   int get _pageCount => (_total / _rowsPerPage).ceil().clamp(1, 1 << 30);
   int get _startIndex => _pageIndex * _rowsPerPage;
   int get _endIndex => (_startIndex + _rowsPerPage).clamp(0, _total);
-  List<Map<String, String>> get _pageItems =>
+  List<InterviewCandidate> get _pageItems =>
       widget.candidates.sublist(_startIndex, _endIndex);
 
   void _goFirst() => setState(() => _pageIndex = 0);
@@ -95,13 +114,14 @@ class _CandidatesTableState extends State<CandidatesTable> {
   // Selection helpers
   bool get _isAllSelectedOnPage =>
       _pageItems.isNotEmpty &&
-      _pageItems.every((f) => _selected.contains(f['id'] ?? f['name']));
+      _pageItems.every((f) => _selected.contains(f.id));
 
   bool get _isAnySelectedOnPage =>
-      _pageItems.any((f) => _selected.contains(f['id'] ?? f['name']));
+      _pageItems.any((f) => _selected.contains(f.id));
 
   void _notifySelection() {
     widget.onSelectionChanged?.call(_selected.length);
+    widget.onSelectedIdsChanged.call({..._selected});
   }
 
   @override
@@ -121,7 +141,10 @@ class _CandidatesTableState extends State<CandidatesTable> {
                   isEnabled: _selected.isNotEmpty,
                   isFullWidth: true,
                   onPressed: () {
-                    // TODO: Implement Google Calendar integration
+                    if (widget.onSchedulePressed != null &&
+                        _selected.isNotEmpty) {
+                      widget.onSchedulePressed!.call({..._selected});
+                    }
                   },
                 ),
               ),
@@ -136,7 +159,10 @@ class _CandidatesTableState extends State<CandidatesTable> {
                       selectedCount: _selected.length,
                       onClear: _selected.isEmpty
                           ? null
-                          : () => setState(() => _selected.clear()),
+                          : () => setState(() {
+                                _selected.clear();
+                                _notifySelection();
+                              }),
                       widthName: _wName,
                       widthJobTitle: _wJobTitle,
                       widthApplicationDate: _wApplicationDate,
@@ -148,11 +174,11 @@ class _CandidatesTableState extends State<CandidatesTable> {
                         setState(() {
                           if (val == true) {
                             for (final f in _pageItems) {
-                              _selected.add(f['id'] ?? f['name']!);
+                              _selected.add(f.id);
                             }
                           } else {
                             for (final f in _pageItems) {
-                              _selected.remove(f['id'] ?? f['name']);
+                              _selected.remove(f.id);
                             }
                           }
                           _notifySelection();
@@ -180,7 +206,7 @@ class _CandidatesTableState extends State<CandidatesTable> {
                   Builder(
                     builder: (context) {
                       final candidate = _pageItems[i];
-                      final id = candidate['id'] ?? candidate['name']!;
+                      final id = candidate.id;
                       final selected = _selected.contains(id);
                       return InterviewTableDataRow(
                         candidate: candidate,
@@ -200,8 +226,7 @@ class _CandidatesTableState extends State<CandidatesTable> {
                         onMenu: (action) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                                content: Text(
-                                    '$action → ${candidate['name'] ?? ''}')),
+                                content: Text('$action → ${candidate.name}')),
                           );
                         },
                       );

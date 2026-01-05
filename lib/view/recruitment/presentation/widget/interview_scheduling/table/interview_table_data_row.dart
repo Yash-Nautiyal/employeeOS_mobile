@@ -1,8 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
+import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 class InterviewTableDataRow extends StatefulWidget {
   const InterviewTableDataRow({
@@ -17,7 +19,7 @@ class InterviewTableDataRow extends StatefulWidget {
     required this.onMenu,
   });
 
-  final Map<String, String> candidate;
+  final InterviewCandidate candidate;
   final bool selected;
   final double widthName, widthJobTitle, widthApplicationDate, widthResume;
   final ValueChanged<bool?> onChanged;
@@ -28,6 +30,14 @@ class InterviewTableDataRow extends StatefulWidget {
 }
 
 class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
+  late final DateFormat _dateFormat;
+
+  @override
+  void initState() {
+    super.initState();
+    _dateFormat = DateFormat('d MMM yyyy');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -42,7 +52,6 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
       ),
       child: Row(
         children: [
-          // Applicant Name cell with checkbox
           SizedBox(
             width: widget.widthName,
             child: Row(
@@ -55,7 +64,7 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    widget.candidate['name'] ?? '',
+                    widget.candidate.name,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
@@ -64,33 +73,27 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
               ],
             ),
           ),
-
-          // Job Title
           SizedBox(
             width: widget.widthJobTitle,
             child: Text(
-              widget.candidate['jobTitle'] ?? '',
+              widget.candidate.jobTitle,
               overflow: TextOverflow.ellipsis,
             ),
           ),
-
-          // Application Date
           SizedBox(
             width: widget.widthApplicationDate,
             child: Text(
-              widget.candidate['applicationDate'] ?? '',
+              _dateFormat.format(widget.candidate.applicationDate),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-
-          // Resume & Actions
           SizedBox(
             width: widget.widthResume,
             child: Row(
               children: [
                 CustomTextButton(
                   padding: 0,
-                  onClick: () {},
+                  onClick: () => widget.onMenu('download'),
                   child: Row(
                     children: [
                       SvgPicture.asset(

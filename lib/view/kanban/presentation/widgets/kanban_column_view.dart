@@ -21,6 +21,10 @@ class KanbanColumnView extends StatelessWidget {
     required this.onHoverExit,
     required this.onAccept,
     required this.onMoveTaskToColumn,
+    required this.onAddTask,
+    required this.onDeleteColumn,
+    required this.onClearColumn,
+    required this.onRenameColumn,
   });
 
   final bool fixed;
@@ -50,6 +54,10 @@ class KanbanColumnView extends StatelessWidget {
     KanbanSection fromSection,
     String toColumnId,
   ) onMoveTaskToColumn;
+  final VoidCallback onAddTask;
+  final VoidCallback onDeleteColumn;
+  final VoidCallback onClearColumn;
+  final VoidCallback onRenameColumn;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +76,14 @@ class KanbanColumnView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             KanbanHeader(
-                theme: theme, title: column.title, count: column.totalCount),
+              theme: theme,
+              title: column.title,
+              count: column.totalCount,
+              onAddTask: onAddTask,
+              onDelete: onDeleteColumn,
+              onClear: onClearColumn,
+              onRename: onRenameColumn,
+            ),
             const SizedBox(height: 8),
             Expanded(
               child: DragTarget<DragPayload>(

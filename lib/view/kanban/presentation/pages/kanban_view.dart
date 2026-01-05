@@ -211,6 +211,181 @@ class _KanbanViewState extends State<KanbanView> {
     });
   }
 
+  Future<void> _addColumnDialog() async {
+    final controller = TextEditingController();
+    final theme = Theme.of(context);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Add column'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'Column name'),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Cancel', style: theme.textTheme.labelLarge),
+            ),
+            TextButton(
+              onPressed: () {
+                final text = controller.text.trim();
+                if (text.isNotEmpty) {
+                  Navigator.of(ctx).pop(text);
+                }
+              },
+              child: Text('Add', style: theme.textTheme.labelLarge),
+            ),
+          ],
+        );
+      },
+    );
+    if (name == null || name.isEmpty) return;
+    setState(() {
+      _columns = [
+        ..._columns,
+        KanbanColumn(
+          id: name,
+          title: name,
+          createdByMe: const [],
+          assignedToMe: const [],
+        ),
+      ];
+    });
+  }
+
+  Future<void> _renameColumn(String columnId) async {
+    final col = _getColumn(columnId);
+    final controller = TextEditingController(text: col.title);
+    final theme = Theme.of(context);
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Rename column'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'Column name'),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Cancel', style: theme.textTheme.labelLarge),
+            ),
+            TextButton(
+              onPressed: () {
+                final text = controller.text.trim();
+                if (text.isNotEmpty) {
+                  Navigator.of(ctx).pop(text);
+                }
+              },
+              child: Text('Save', style: theme.textTheme.labelLarge),
+            ),
+          ],
+        );
+      },
+    );
+    if (newName == null || newName.isEmpty) return;
+    setState(() {
+      _columns = _columns
+          .map((c) => c.id == columnId
+              ? KanbanColumn(
+                  id: newName,
+                  title: newName,
+                  createdByMe: c.createdByMe,
+                  assignedToMe: c.assignedToMe,
+                )
+              : c)
+          .toList();
+    });
+  }
+
+  void _deleteColumn(String columnId) {
+    setState(() {
+      _columns = _columns.where((c) => c.id != columnId).toList();
+    });
+  }
+
+  void _clearColumn(String columnId) {
+    setState(() {
+      _columns = _columns
+          .map((c) => c.id == columnId
+              ? KanbanColumn(
+                  id: c.id,
+                  title: c.title,
+                  createdByMe: const [],
+                  assignedToMe: const [],
+                )
+              : c)
+          .toList();
+    });
+  }
+
+  Future<void> _addTaskToColumn(String columnId) async {
+    final theme = Theme.of(context);
+    final controller = TextEditingController();
+    final title = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Add task'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'Task title'),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Cancel', style: theme.textTheme.labelLarge),
+            ),
+            TextButton(
+              onPressed: () {
+                final text = controller.text.trim();
+                if (text.isNotEmpty) {
+                  Navigator.of(ctx).pop(text);
+                }
+              },
+              child: Text('Add', style: theme.textTheme.labelLarge),
+            ),
+          ],
+        );
+      },
+    );
+    if (title == null || title.isEmpty) return;
+
+    final newTask = KanbanGroupItem(
+      itemId: const Uuid().v4(),
+      title: title,
+      date: '',
+      completedTasks: 0,
+      totalTasks: 0,
+      assignedBy: _currentUserName,
+      assignedTo: '',
+      dueDate: '',
+      priority: 'Low',
+      description: '',
+      attachments: const [],
+      subtasks: const {},
+    );
+
+    setState(() {
+      _columns = _columns
+          .map((c) => c.id == columnId
+              ? KanbanColumn(
+                  id: c.id,
+                  title: c.title,
+                  createdByMe: [...c.createdByMe, newTask],
+                  assignedToMe: c.assignedToMe,
+                )
+              : c)
+          .toList();
+    });
+  }
+
   void _moveTaskToColumn(
     KanbanGroupItem task,
     String fromColumnId,
@@ -271,10 +446,13 @@ class _KanbanViewState extends State<KanbanView> {
                     padding: const EdgeInsets.only(
                       right: KanbanDimensions.kColumnGap,
                     ),
-                    itemCount: _columns.length,
+                    itemCount: _columns.length + 1,
                     separatorBuilder: (_, __) =>
                         const SizedBox(width: KanbanDimensions.kColumnGap),
                     itemBuilder: (context, index) {
+                      if (index == _columns.length) {
+                        return _AddColumnCard(onTap: _addColumnDialog);
+                      }
                       final col = _columns[index];
                       return KanbanColumnView(
                         key: ValueKey(col.id),
@@ -317,6 +495,10 @@ class _KanbanViewState extends State<KanbanView> {
                           toIndex: index,
                         ),
                         onMoveTaskToColumn: _moveTaskToColumn,
+                        onAddTask: () => _addTaskToColumn(col.id),
+                        onDeleteColumn: () => _deleteColumn(col.id),
+                        onClearColumn: () => _clearColumn(col.id),
+                        onRenameColumn: () => _renameColumn(col.id),
                       );
                     },
                   ),
@@ -330,4 +512,37 @@ class _KanbanViewState extends State<KanbanView> {
   }
 
   void _clearHover() => setState(_clearHoverState);
+}
+
+class _AddColumnCard extends StatelessWidget {
+  const _AddColumnCard({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(KanbanDimensions.kColumnRadius),
+      child: Container(
+        width: KanbanDimensions.kColumnWidth,
+        padding: KanbanDimensions.kColumnPadding,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(KanbanDimensions.kColumnRadius),
+          border: Border.all(color: theme.dividerColor),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Text('Add column', style: theme.textTheme.titleMedium),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

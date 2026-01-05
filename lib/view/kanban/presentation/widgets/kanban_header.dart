@@ -7,11 +7,19 @@ class KanbanHeader extends StatelessWidget {
     required this.theme,
     required this.title,
     required this.count,
+    required this.onAddTask,
+    required this.onDelete,
+    required this.onClear,
+    required this.onRename,
   });
 
   final ThemeData theme;
   final String title;
   final int count;
+  final VoidCallback onAddTask;
+  final VoidCallback onDelete;
+  final VoidCallback onClear;
+  final VoidCallback onRename;
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +50,36 @@ class KanbanHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: onAddTask,
             icon: SvgPicture.asset(
               'assets/icons/common/solid/ic-solar_add-circle-bold.svg',
               color: theme.disabledColor,
             ),
           ),
-          IconButton(
-            onPressed: () {},
+          PopupMenuButton<String>(
             icon: Icon(Icons.more_horiz, color: theme.colorScheme.tertiary),
-          ),
+            onSelected: (val) {
+              switch (val) {
+                case 'edit':
+                  onRename();
+                  break;
+                case 'clear':
+                  onClear();
+                  break;
+                case 'delete':
+                  onDelete();
+                  break;
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: 'edit', child: Text('Edit name')),
+              PopupMenuItem(value: 'clear', child: Text('Clear tasks')),
+              PopupMenuItem(
+                value: 'delete',
+                child: Text('Delete column'),
+              ),
+            ],
+          )
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/view/recruitment/domain/entities/interview_enums.dart';
 import 'package:flutter/material.dart';
 
 class InterviewRoundsTab extends StatelessWidget {
@@ -30,13 +31,9 @@ class InterviewRoundsTab extends StatelessWidget {
         controller: controller,
         isScrollable: true,
         tabAlignment: TabAlignment.start,
-        tabs: const [
-          Tab(text: 'Telephone Round'),
-          Tab(text: 'Technical Round'),
-          Tab(text: 'Onboarding'),
-          Tab(text: 'Selected'),
-          Tab(text: 'Rejected'),
-        ],
+        tabs: InterviewRound.values
+            .map((round) => Tab(text: round.label))
+            .toList(),
       ),
     );
   }

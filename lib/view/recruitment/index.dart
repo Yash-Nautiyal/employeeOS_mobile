@@ -8,6 +8,7 @@ export 'presentation/widget/interview_scheduling/table/interview_table_data_row.
 export 'presentation/widget/interview_scheduling/table/interview_table_header_row.dart';
 export 'presentation/widget/interview_scheduling/table/interview_table_header_selector.dart';
 export 'presentation/widget/interview_scheduling/table/interview_table_paginator.dart';
+export 'presentation/bloc/interview_scheduling/interview_scheduling_bloc.dart';
 
 export 'presentation/widget/job_application_card.dart';
 export 'presentation/widget/job_posting_card.dart';

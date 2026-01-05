@@ -43,6 +43,15 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
   late String _status;
   DateTimeRange? _range;
 
+  void _apply() {
+    widget.onApply(
+      job: _job,
+      interviewer: _interviewer,
+      status: _status,
+      range: _range,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +71,7 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
     );
     if (picked != null) {
       setState(() => _range = picked);
+      _apply();
     }
   }
 
@@ -126,7 +136,10 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
                   theme: theme,
                   value: _job,
                   items: widget.jobOptions,
-                  onChanged: (v) => setState(() => _job = v ?? _job),
+                  onChanged: (v) {
+                    setState(() => _job = v ?? _job);
+                    _apply();
+                  },
                 ),
                 const SizedBox(height: 20),
                 _buildLabel(theme, 'Interviewer'),
@@ -134,8 +147,10 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
                   theme: theme,
                   value: _interviewer,
                   items: widget.interviewerOptions,
-                  onChanged: (v) =>
-                      setState(() => _interviewer = v ?? _interviewer),
+                  onChanged: (v) {
+                    setState(() => _interviewer = v ?? _interviewer);
+                    _apply();
+                  },
                 ),
                 const SizedBox(height: 20),
                 _buildLabel(theme, 'Status'),
@@ -143,7 +158,10 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
                   theme: theme,
                   value: _status,
                   items: widget.statusOptions,
-                  onChanged: (v) => setState(() => _status = v ?? _status),
+                  onChanged: (v) {
+                    setState(() => _status = v ?? _status);
+                    _apply();
+                  },
                 ),
                 const SizedBox(height: 20),
                 _buildLabel(theme, 'Interview Date'),
