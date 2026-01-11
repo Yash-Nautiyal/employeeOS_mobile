@@ -69,6 +69,8 @@ ThemeData buildTheme({
     useMaterial3: true,
     brightness: brightness,
     primaryColor: colorscheme["Main"],
+    primaryColorDark: colorscheme["Darker"],
+    primaryColorLight: colorscheme["Lighter"],
     scaffoldBackgroundColor:
         brightness == Brightness.dark ? AppPallete.grey900 : AppPallete.white,
     dividerColor:

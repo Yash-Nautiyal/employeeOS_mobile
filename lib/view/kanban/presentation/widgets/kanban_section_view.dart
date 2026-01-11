@@ -2,6 +2,7 @@ import 'package:employeeos/view/kanban/index.dart'
     show
         KanbanSection,
         KanbanGroupItem,
+        KanbanAssignee,
         DragPayload,
         DropSlot,
         CardDropTarget,
@@ -32,6 +33,8 @@ class KanbanSectionView extends StatelessWidget {
     required this.onHoverExit,
     required this.onAccept,
     required this.onMoveTaskToColumn,
+    required this.onPriorityChanged,
+    required this.onAssigneesChanged,
   });
 
   final ThemeData theme;
@@ -65,6 +68,18 @@ class KanbanSectionView extends StatelessWidget {
     KanbanSection fromSection,
     String toColumnId,
   ) onMoveTaskToColumn;
+  final void Function(
+    KanbanSection section,
+    String columnId,
+    String taskId,
+    String priority,
+  ) onPriorityChanged;
+  final void Function(
+    KanbanSection section,
+    String columnId,
+    String taskId,
+    List<KanbanAssignee> assignees,
+  ) onAssigneesChanged;
 
   bool get _isHovered => hoverColumnId == columnId && hoverSection == section;
 
@@ -131,6 +146,18 @@ class KanbanSectionView extends StatelessWidget {
           onDragStarted: () => onDragStarted(task.id),
           onDragEnded: onDragEnded,
           onMoveToColumn: onMoveTaskToColumn,
+          onPriorityChanged: (priority) => onPriorityChanged(
+            section,
+            columnId,
+            task.id,
+            priority,
+          ),
+          onAssigneesChanged: (assignees) => onAssigneesChanged(
+            section,
+            columnId,
+            task.id,
+            assignees,
+          ),
         ),
       ));
     }

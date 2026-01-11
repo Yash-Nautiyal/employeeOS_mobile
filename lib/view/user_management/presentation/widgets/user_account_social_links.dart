@@ -49,12 +49,9 @@ class UserAccountSocialLinks extends StatelessWidget {
                   onchange: () {},
                   hintText: 'https://facebook.com/username',
                   labelText: 'Facebook',
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(left: 5.0),
-                    child: SvgPicture.asset(
-                      'assets/icons/social/ic-facebbook.svg',
-                      width: 30,
-                    ),
+                  prefix: SvgPicture.asset(
+                    'assets/icons/social/ic-facebbook.svg',
+                    width: 30,
                   ),
                   alwaysFloatingLabel: true,
                 ),
@@ -68,12 +65,9 @@ class UserAccountSocialLinks extends StatelessWidget {
                   onchange: () {},
                   hintText: 'https://instagram.com/username',
                   labelText: 'Instagram',
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 5),
-                    child: SvgPicture.asset(
-                      'assets/icons/social/ic-instagram.svg',
-                      width: 30,
-                    ),
+                  prefix: SvgPicture.asset(
+                    'assets/icons/social/ic-instagram.svg',
+                    width: 30,
                   ),
                   alwaysFloatingLabel: true,
                 ),
@@ -87,12 +81,9 @@ class UserAccountSocialLinks extends StatelessWidget {
                   onchange: () {},
                   hintText: 'https://linkedin.com.in/username',
                   labelText: 'Linkedin',
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 5),
-                    child: SvgPicture.asset(
-                      'assets/icons/social/ic-linkedin.svg',
-                      width: 30,
-                    ),
+                  prefix: SvgPicture.asset(
+                    'assets/icons/social/ic-linkedin.svg',
+                    width: 30,
                   ),
                   alwaysFloatingLabel: true,
                 ),
@@ -106,13 +97,10 @@ class UserAccountSocialLinks extends StatelessWidget {
                   onchange: () {},
                   hintText: 'https://twitter.com/username',
                   labelText: 'Twitter',
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 5),
-                    child: SvgPicture.asset(
-                      'assets/icons/social/ic-twitter.svg',
-                      width: 30,
-                      color: theme.colorScheme.tertiary,
-                    ),
+                  prefix: SvgPicture.asset(
+                    'assets/icons/social/ic-twitter.svg',
+                    width: 30,
+                    color: theme.colorScheme.tertiary,
                   ),
                   alwaysFloatingLabel: true,
                 ),

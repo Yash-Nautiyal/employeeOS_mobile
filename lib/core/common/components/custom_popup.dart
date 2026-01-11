@@ -19,7 +19,7 @@ class CustomPopup extends StatelessWidget {
     this.contentPadding,
     this.constraints,
     this.barrierColor = Colors.black26,
-    this.animationDuration = const Duration(milliseconds: 400),
+    this.animationDuration = const Duration(milliseconds: 200),
     this.showArrow = true,
     this.contentDecoration,
     this.anchorKey,

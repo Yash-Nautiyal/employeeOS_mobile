@@ -1,7 +1,8 @@
 import 'package:employeeos/core/index.dart'
     show CustomDropdown, CustomToggleButton;
 import 'package:employeeos/view/kanban/index.dart'
-    show KanbanColumn, KanbanGroupItem;
+    show KanbanColumn, KanbanGroupItem, KanbanAssignee, kSampleAssignees;
+import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/contact_dialog.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/overview_side_menu.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/subtasks_side_menu.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +12,17 @@ class KanbanSideMenu extends StatefulWidget {
   final KanbanColumn group;
   final List<KanbanColumn> allColumns;
   final void Function(String toColumnId) onMoveColumn;
+  final void Function(String priority) onPriorityChanged;
+  final void Function(List<KanbanAssignee> assignees) onAssigneesChanged;
 
   const KanbanSideMenu(
       {super.key,
       required this.task,
       required this.group,
       required this.allColumns,
-      required this.onMoveColumn});
+      required this.onMoveColumn,
+      required this.onPriorityChanged,
+      required this.onAssigneesChanged});
 
   @override
   _KanbanSideMenuState createState() => _KanbanSideMenuState();
@@ -30,6 +35,7 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
   late List<String> _columnIds;
   late Map<String, String> _columnLabels;
   late Map<String, bool> _subtasks;
+  late List<KanbanAssignee> _assignees;
 
   bool showOverView = true;
 
@@ -45,6 +51,7 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
       for (final c in widget.allColumns) c.id: c.title,
     };
     _subtasks = Map<String, bool>.from(widget.task.subtasks);
+    _assignees = widget.task.assignees.map((a) => a.copyWith()).toList();
   }
 
   @override
@@ -122,6 +129,7 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                       setState(() {
                         _priority = value;
                       });
+                      widget.onPriorityChanged(value);
                     },
                     onDescriptionChange: (value) {
                       setState(() {
@@ -130,6 +138,8 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                     },
                     onAttachmentChange: (value) {},
                     currentPriority: _priority,
+                    assignees: _assignees,
+                    onAddAssignees: _openAssigneePicker,
                   )
                 : SubtasksSideMenu(
                     initialSubtasks: _subtasks,
@@ -142,6 +152,64 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _openAssigneePicker() async {
+    final controller = TextEditingController();
+    final theme = Theme.of(context);
+    final selected = _assignees.map((a) => a.email).toSet();
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            final query = controller.text.toLowerCase();
+            final filtered = kSampleAssignees.where((a) {
+              return a.name.toLowerCase().contains(query) ||
+                  a.email.toLowerCase().contains(query);
+            }).toList();
+
+            void updateAssignees() {
+              final chosen = kSampleAssignees
+                  .where((u) => selected.contains(u.email))
+                  .map((u) => u.copyWith())
+                  .toList();
+              setState(() {
+                _assignees = chosen;
+              });
+              widget.onAssigneesChanged(chosen);
+            }
+
+            return ContactDialog(
+              theme: theme,
+              ctx: ctx,
+              selected: selected,
+              filtered: filtered,
+              kSampleAssignees: kSampleAssignees,
+              controller: controller,
+              onSearch: () => setDialogState(() {}),
+              onAssign: (user) {
+                setDialogState(() {
+                  selected.add(user.email);
+                });
+                updateAssignees();
+              },
+              onTap: (isSelected, user) {
+                setDialogState(() {
+                  if (isSelected) {
+                    selected.remove(user.email);
+                  } else {
+                    selected.add(user.email);
+                  }
+                });
+                updateAssignees();
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

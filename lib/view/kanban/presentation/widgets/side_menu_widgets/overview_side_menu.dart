@@ -1,7 +1,8 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:employeeos/core/index.dart'
     show AppPallete, CustomTextButton, CustomTextfield;
-import 'package:employeeos/view/kanban/index.dart' show KanbanGroupItem;
+import 'package:employeeos/view/kanban/index.dart'
+    show KanbanGroupItem, KanbanAssignee;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -13,6 +14,8 @@ class OverviewSideMenu extends StatelessWidget {
   final Function(String) onDescriptionChange;
   final Function(String) onAttachmentChange;
   final String currentPriority;
+  final List<KanbanAssignee> assignees;
+  final VoidCallback onAddAssignees;
   const OverviewSideMenu({
     super.key,
     required this.task,
@@ -22,6 +25,8 @@ class OverviewSideMenu extends StatelessWidget {
     required this.onDescriptionChange,
     required this.onAttachmentChange,
     required this.currentPriority,
+    required this.assignees,
+    required this.onAddAssignees,
   });
 
   @override
@@ -45,13 +50,20 @@ class OverviewSideMenu extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            const CircleAvatar(
+            CircleAvatar(
               radius: 14,
+              // backgroundImage: NetworkImage(task.assignedBy ?? ''),
+              child: Text(
+                task.assignedBy.characters.take(2).toString().toUpperCase(),
+                style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700, color: AppPallete.black),
+              ),
             ),
             const SizedBox(width: 5),
             Text(
               task.assignedBy,
               style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
                 color: theme.colorScheme.tertiary,
               ),
             ),
@@ -59,6 +71,7 @@ class OverviewSideMenu extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Assigned To: ',
@@ -67,18 +80,63 @@ class OverviewSideMenu extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            const CircleAvatar(
-              radius: 14,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              task.assignedTo,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.tertiary,
+            Flexible(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.start,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  ...assignees.map(
+                    (assignee) => Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 14,
+                          backgroundImage: assignee.avatarUrl != null &&
+                                  assignee.avatarUrl!.isNotEmpty
+                              ? NetworkImage(assignee.avatarUrl!)
+                              : null,
+                          child: assignee.avatarUrl == null ||
+                                  assignee.avatarUrl!.isEmpty
+                              ? Text(assignee.initials,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppPallete.black))
+                              : null,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          assignee.name,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.tertiary),
+                        )
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceDim.withAlpha(100),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child:
+                          Icon(Icons.add, color: theme.dividerColor, size: 18),
+                    ),
+                    onPressed: onAddAssignees,
+                    tooltip: 'Assign users',
+                  ),
+                ],
               ),
             ),
           ],
         ),
+
         const SizedBox(height: 10),
         Row(
           children: [
@@ -90,8 +148,9 @@ class OverviewSideMenu extends StatelessWidget {
             const SizedBox(width: 30),
             Text(
               task.dueDate,
-              style: theme.textTheme.labelLarge
-                  ?.copyWith(color: theme.colorScheme.tertiary, fontSize: 14),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.tertiary,
+                  fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -141,7 +200,9 @@ class OverviewSideMenu extends StatelessWidget {
                         const SizedBox(width: 5),
                         Text(
                           level,
-                          style: theme.textTheme.labelLarge?.copyWith(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.tertiary),
                         ),
                       ],
                     ),

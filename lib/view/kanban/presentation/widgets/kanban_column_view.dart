@@ -25,6 +25,8 @@ class KanbanColumnView extends StatelessWidget {
     required this.onDeleteColumn,
     required this.onClearColumn,
     required this.onRenameColumn,
+    required this.onPriorityChanged,
+    required this.onAssigneesChanged,
   });
 
   final bool fixed;
@@ -58,6 +60,18 @@ class KanbanColumnView extends StatelessWidget {
   final VoidCallback onDeleteColumn;
   final VoidCallback onClearColumn;
   final VoidCallback onRenameColumn;
+  final void Function(
+    KanbanSection section,
+    String columnId,
+    String taskId,
+    String priority,
+  ) onPriorityChanged;
+  final void Function(
+    KanbanSection section,
+    String columnId,
+    String taskId,
+    List<KanbanAssignee> assignees,
+  ) onAssigneesChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +143,8 @@ class KanbanColumnView extends StatelessWidget {
                         onAccept: (payload, index) =>
                             onAccept(payload, KanbanSection.createdByMe, index),
                         onMoveTaskToColumn: onMoveTaskToColumn,
+                        onPriorityChanged: onPriorityChanged,
+                        onAssigneesChanged: onAssigneesChanged,
                       ),
                       KanbanSectionView(
                         theme: theme,
@@ -153,6 +169,8 @@ class KanbanColumnView extends StatelessWidget {
                           index,
                         ),
                         onMoveTaskToColumn: onMoveTaskToColumn,
+                        onPriorityChanged: onPriorityChanged,
+                        onAssigneesChanged: onAssigneesChanged,
                       ),
                     ],
                   );

@@ -6,6 +6,7 @@ import 'package:employeeos/view/kanban/index.dart'
         DragPayload,
         KanbanColumn,
         KanbanGroupItem,
+        KanbanAssignee,
         KanbanSection,
         KanbanSideMenu,
         KanbanTaskCard;
@@ -22,6 +23,8 @@ class KanbanDraggableTask extends StatelessWidget {
     required this.fromColumn,
     required this.allColumns,
     required this.onMoveToColumn,
+    required this.onPriorityChanged,
+    required this.onAssigneesChanged,
   });
 
   final ThemeData theme;
@@ -38,6 +41,8 @@ class KanbanDraggableTask extends StatelessWidget {
     KanbanSection fromSection,
     String toColumnId,
   ) onMoveToColumn;
+  final void Function(String priority) onPriorityChanged;
+  final void Function(List<KanbanAssignee> assignees) onAssigneesChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +115,8 @@ class KanbanDraggableTask extends StatelessWidget {
                   );
                   currentColumnId = toColumnId;
                 },
+                onPriorityChanged: onPriorityChanged,
+                onAssigneesChanged: onAssigneesChanged,
               ),
             );
           },

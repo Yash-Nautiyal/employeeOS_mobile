@@ -43,7 +43,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     'Profile': const UserProfile(),
     'Card': const UserCards(),
   };
-  String _selectedItem = 'Interview Scheduling';
+  String _selectedItem = 'Kanban';
 
   @override
   void initState() {

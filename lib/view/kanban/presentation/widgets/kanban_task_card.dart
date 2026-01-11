@@ -74,7 +74,74 @@ class KanbanTaskCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                const CircleAvatar(radius: 15),
+                if (task.assignees.isNotEmpty)
+                  SizedBox(
+                    width: 100,
+                    height: 32,
+                    child: Stack(
+                      children: [
+                        ...task.assignees.take(3).toList().asMap().entries.map(
+                          (entry) {
+                            final index = entry.key;
+                            final assignee = entry.value;
+                            return Positioned(
+                              right: index * 20.0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: theme.scaffoldBackgroundColor,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 14,
+                                  backgroundImage: assignee.avatarUrl != null &&
+                                          assignee.avatarUrl!.isNotEmpty
+                                      ? NetworkImage(assignee.avatarUrl!)
+                                      : null,
+                                  child: assignee.avatarUrl == null ||
+                                          assignee.avatarUrl!.isEmpty
+                                      ? Text(
+                                          assignee.initials,
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppPallete.black),
+                                        )
+                                      : null,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        if (task.assignees.length > 3)
+                          Positioned(
+                            right: 3 * 20.0,
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: theme.primaryColor.withOpacity(0.6),
+                                border: Border.all(
+                                  color: theme.scaffoldBackgroundColor,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Text(
+                                '+${task.assignees.length - 3}',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: theme.primaryColorLight,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ],

@@ -1,5 +1,4 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropdown extends StatefulWidget {

@@ -1,6 +1,5 @@
 import 'package:employeeos/core/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class ActionHeader extends StatelessWidget {
   final ThemeData theme;
@@ -30,14 +29,7 @@ class ActionHeader extends StatelessWidget {
             theme: theme,
             onchange: onSearchChanged,
             hintText: 'Search applicant name...',
-            prefix: Padding(
-              padding: const EdgeInsets.only(left: 10, right: 3),
-              child: SvgPicture.asset(
-                'assets/icons/common/solid/ic-eva_search-fill.svg',
-                color: theme.disabledColor,
-                width: 20,
-              ),
-            ),
+            isSearchField: true,
           ),
         ),
         const SizedBox(width: 12),

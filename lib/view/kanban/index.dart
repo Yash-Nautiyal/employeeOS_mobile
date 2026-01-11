@@ -14,3 +14,9 @@ export 'presentation/widgets/side_menu_widgets/subtasks_side_menu.dart';
 export 'presentation/widgets/drop_down_widgets/card_drop_target.dart';
 
 export 'data/test_data.dart';
+export 'data/test_users.dart';
+export 'data/kanban_repository_impl.dart';
+export 'domain/repositories/kanban_repository.dart';
+export 'presentation/bloc/kanban_bloc.dart';
+export 'presentation/bloc/kanban_event.dart';
+export 'presentation/bloc/kanban_state.dart';

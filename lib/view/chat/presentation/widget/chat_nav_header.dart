@@ -37,71 +37,75 @@ class ChatNavHeader extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(
             height: 10,
           ),
-          Row(
-            children: [
-              badges.Badge(
-                badgeContent: CircleAvatar(
-                  radius: 6.7,
-                  backgroundColor: theme.scaffoldBackgroundColor,
+          Flexible(
+            child: Row(
+              children: [
+                badges.Badge(
+                  badgeContent: CircleAvatar(
+                    radius: 6.7,
+                    backgroundColor: theme.scaffoldBackgroundColor,
+                    child: const CircleAvatar(
+                      radius: 5,
+                      backgroundColor: AppPallete.successMain,
+                    ),
+                  ),
+                  badgeStyle:
+                      const badges.BadgeStyle(badgeColor: Colors.transparent),
+                  position: badges.BadgePosition.bottomEnd(end: -7, bottom: -2),
                   child: const CircleAvatar(
-                    radius: 5,
-                    backgroundColor: AppPallete.successMain,
+                    radius: 23,
                   ),
                 ),
-                badgeStyle:
-                    const badges.BadgeStyle(badgeColor: Colors.transparent),
-                position: badges.BadgePosition.bottomEnd(end: -7, bottom: -2),
-                child: const CircleAvatar(
-                  radius: 23,
-                ),
-              ),
-              const Spacer(),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(
-                      sizeFactor: animation,
-                      axis: Axis.horizontal,
-                      child: child,
-                    ),
-                  );
-                },
-                child: isSearchExpanded
-                    ? Container(
-                        key: const ValueKey('search-field'),
-                        height: 55, // <-- Increase height to fit floating label
-                        alignment: Alignment.center,
-                        child: _buildSearchField(),
-                      )
-                    : IconButton(
-                        style: ButtonStyle(
-                          padding: const WidgetStatePropertyAll(EdgeInsets.all(12)),
-                          shape: const WidgetStatePropertyAll(CircleBorder()),
-                          backgroundColor: WidgetStatePropertyAll(
-                            theme.brightness == Brightness.dark
-                                ? AppPallete.grey500.withAlpha(70)
-                                : const Color.fromARGB(119, 238, 236, 234),
+                const SizedBox(width: 10),
+                const Spacer(),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SizeTransition(
+                        sizeFactor: animation,
+                        axis: Axis.horizontal,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: isSearchExpanded
+                      ? Container(
+                          key: const ValueKey('search-field'),
+                          height:
+                              55, // <-- Increase height to fit floating label
+                          alignment: Alignment.center,
+                          child: _buildSearchField(),
+                        )
+                      : GestureDetector(
+                          onTap: toggleSearch.call,
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: theme.brightness == Brightness.dark
+                                  ? AppPallete.grey500.withAlpha(70)
+                                  : const Color.fromARGB(119, 238, 236, 234),
+                              shape: BoxShape.circle,
+                            ),
+                            key: const ValueKey('search-icon'),
+                            child: SvgPicture.asset(
+                              'assets/icons/ic-eva_search-fill.svg',
+                              color: theme.disabledColor,
+                            ),
                           ),
                         ),
-                        key: const ValueKey('search-icon'),
-                        onPressed: toggleSearch.call,
-                        icon: SvgPicture.asset(
-                          'assets/icons/ic-eva_search-fill.svg',
-                          color: theme.disabledColor,
-                          width: 21,
-                        ),
-                      ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: SvgPicture.asset(
-                  "assets/icons/common/solid/ic-solar_user-plus-bold.svg",
-                  color: theme.disabledColor,
                 ),
-              ),
-            ],
+                IconButton(
+                  onPressed: () {},
+                  icon: SvgPicture.asset(
+                    "assets/icons/common/solid/ic-solar_user-plus-bold.svg",
+                    color: theme.disabledColor,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -111,19 +115,13 @@ class ChatNavHeader extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildSearchField() {
     return Container(
       key: const ValueKey('search-field'),
-      constraints: const BoxConstraints(maxWidth: 250),
+      constraints: const BoxConstraints(maxWidth: 210),
       child: CustomTextfield(
         controller: controller,
         keyboardType: TextInputType.text,
         theme: theme,
         fontSize: 17,
-        prefix: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 4),
-          child: SvgPicture.asset(
-            'assets/icons/common/solid/ic-eva_search-fill.svg',
-            color: theme.disabledColor,
-          ),
-        ),
+        isSearchField: true,
         onchange: (text) => controller.text = text,
         hintText: "Search Conversation",
         close: true,

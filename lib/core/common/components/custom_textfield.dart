@@ -16,6 +16,7 @@ class CustomTextfield extends StatelessWidget {
   final DateTime? lastDate;
   final double? fontSize;
   final Widget? helper;
+  final bool? isSearchField;
   final Widget? prefix;
   final bool? alwaysFloatingLabel;
   final bool? close;
@@ -41,9 +42,11 @@ class CustomTextfield extends StatelessWidget {
     this.prefix,
     this.alwaysFloatingLabel = false,
     this.close = false,
+    this.isSearchField = false,
     this.onClose,
     this.validator,
-  });
+  }) : assert(close == null || close == false || onClose != null,
+            'onClose is required when close is true');
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -81,7 +84,7 @@ class CustomTextfield extends StatelessWidget {
           contentPadding:
               const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
           prefixIconConstraints: BoxConstraints.loose(const Size(40, 40)),
-          prefixIcon: prefix,
+          prefixIcon: _buildPrefixIcon(isSearchField ?? false),
           helper: helper,
           labelText: labelText?.isNotEmpty == true ? labelText : null,
           hintText: hintText,
@@ -92,6 +95,18 @@ class CustomTextfield extends StatelessWidget {
           floatingLabelBehavior: alwaysFloatingLabel ?? false
               ? FloatingLabelBehavior.always
               : null),
+    );
+  }
+
+  Widget _buildPrefixIcon(bool isSearchField) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15, right: 4),
+      child: isSearchField && prefix == null
+          ? SvgPicture.asset(
+              'assets/icons/common/solid/ic-eva_search-fill.svg',
+              color: theme.disabledColor,
+            )
+          : prefix,
     );
   }
 
@@ -120,10 +135,10 @@ class CustomTextfield extends StatelessWidget {
           width: 20,
         ),
       );
-    } else if (close!) {
+    } else if (close == true) {
       return IconButton(
         icon: Icon(Icons.close, color: theme.disabledColor, size: 15),
-        onPressed: () => onClose!(),
+        onPressed: () => onClose?.call(),
       );
     } else if (suffixIcon != null) {
       // Custom suffix icon
