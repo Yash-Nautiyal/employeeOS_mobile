@@ -1,4 +1,4 @@
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart';
+import 'package:employeeos/view/filemanager/domain/entities/files_models.dart';
 
 List<FolderFile> mockFiles() {
   return [
@@ -16,145 +16,160 @@ List<FolderFile> mockFiles() {
           id: '1',
           name: 'Yash',
           email: 'yash.nautiyal@f13.tech',
-          avatarUrl: 'https://avatar.iran.liara.run/public/23',
+          avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Eliza',
         ),
-        SharedUser(
-            id: '1',
-            name: 'Yash',
-            email: 'yash.nautiyal@f13.tech',
-            avatarUrl: 'https://avatar.iran.liara.run/public/6'),
-        SharedUser(
-            id: '1',
-            name: 'Yash',
-            email: 'yash.nautiyal@f13.tech',
-            avatarUrl: 'https://avatar.iran.liara.run/public/48'),
-        SharedUser(
-            id: '1',
-            name: 'Yash',
-            email: 'yash.nautiyal@f13.tech',
-            avatarUrl: 'https://avatar.iran.liara.run/public/45'),
-        SharedUser(
-            id: '1',
-            name: 'Yash',
-            email: 'yash.nautiyal@f13.tech',
-            avatarUrl: 'https://avatar.iran.liara.run/public/19'),
       ],
     ),
 
     // add more files with different dates for testing date range filtering
-    FolderFile(
-      id: '1',
-      name: 'project_documentation.pdf',
-      path: '/documents/project_documentation.pdf',
-      size: (1.2 * 1024 * 1024).round(),
-      fileType: 'pdf',
-      type: FileType.file,
-      createdAt: DateTime.now().subtract(const Duration(days: 5)), // 5 days ago
-      isFavorite: false,
+    // FolderFile(
+    //   id: '1',
+    //   name: 'project_documentation.pdf',
+    //   path: '/documents/project_documentation.pdf',
+    //   size: (1.2 * 1024 * 1024).round(),
+    //   fileType: 'pdf',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now().subtract(const Duration(days: 5)), // 5 days ago
+    //   isFavorite: false,
+    // ),
+    // FolderFile(
+    //   id: '2',
+    //   name: 'meeting_notes.docx',
+    //   path: '/documents/meeting_notes.docx',
+    //   size: (256 * 1024).round(),
+    //   fileType: 'word',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now().subtract(const Duration(days: 3)), // 3 days ago
+    //   isFavorite: true,
+    // ),
+    // FolderFile(
+    //   id: '3',
+    //   name: 'budget_spreadsheet.xlsx',
+    //   path: '/documents/budget_spreadsheet.xlsx',
+    //   size: (512 * 1024).round(),
+    //   fileType: 'excel',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now().subtract(const Duration(days: 1)), // 1 day ago
+    //   isFavorite: false,
+    // ),
+    // FolderFile(
+    //   id: '4',
+    //   name: 'presentation.pptx',
+    //   path: '/documents/presentation.pptx',
+    //   size: (3.5 * 1024 * 1024).round(),
+    //   fileType: 'powerpoint',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now(), // Today
+    //   isFavorite: true,
+    // ),
+    // FolderFile(
+    //   id: '5',
+    //   name: 'design_mockups.psd',
+    //   path: '/documents/design_mockups.psd',
+    //   size: (8.2 * 1024 * 1024).round(),
+    //   fileType: 'photoshop',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now().subtract(const Duration(days: 7)), // 7 days ago
+    //   isFavorite: false,
+    // ),
+    // FolderFile(
+    //   id: '6',
+    //   name: 'logo_assets.ai',
+    //   path: '/documents/logo_assets.ai',
+    //   size: (2.1 * 1024 * 1024).round(),
+    //   fileType: 'illustrator',
+    //   type: FileType.file,
+    //   createdAt:
+    //       DateTime.now().subtract(const Duration(days: 10)), // 10 days ago
+    //   isFavorite: true,
+    // ),
+    // FolderFile(
+    //   id: '7',
+    //   name: 'team_photo.jpg',
+    //   path: '/documents/team_photo.jpg',
+    //   size: (1.8 * 1024 * 1024).round(),
+    //   fileType: 'image',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now().subtract(const Duration(days: 2)), // 2 days ago
+    //   isFavorite: false,
+    // ),
+    // FolderFile(
+    //   id: '8',
+    //   name: 'audio_recording.mp3',
+    //   path: '/documents/audio_recording.mp3',
+    //   size: (4.5 * 1024 * 1024).round(),
+    //   fileType: 'audio',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now().subtract(const Duration(days: 4)), // 4 days ago
+    //   isFavorite: true,
+    // ),
+    // FolderFile(
+    //   id: '9',
+    //   name: 'video_demo.mp4',
+    //   path: '/documents/video_demo.mp4',
+    //   size: (25.8 * 1024 * 1024).round(),
+    //   fileType: 'video',
+    //   type: FileType.file,
+    //   createdAt: DateTime.now().subtract(const Duration(days: 6)), // 6 days ago
+    //   isFavorite: false,
+    // ),
+    // FolderFile(
+    //   id: '10',
+    //   name: 'archive_folder',
+    //   path: '/documents/archive_folder',
+    //   type: FileType.folder,
+    //   createdAt:
+    //       DateTime.now().subtract(const Duration(days: 15)), // 15 days ago
+    //   isFavorite: false,
+    //   fileCount: 12,
+    // ),
+    // // Add more files with various dates for comprehensive testing
+    // for (int i = 11; i < 30; i++)
+    //   FolderFile(
+    //     id: '$i',
+    //     name: "file_$i.txt",
+    //     path: '/documents/file_$i.txt',
+    //     size: (1024 * (i % 5 + 1)).round(),
+    //     fileType: 'txt',
+    //     type: FileType.file,
+    //     createdAt: DateTime.now()
+    //         .subtract(Duration(days: i % 20)), // Spread across 20 days
+    //     isFavorite: i % 3 == 0,
+    //   ),
+  ];
+}
+
+List<SharedUser> mockShareUsers() {
+  return [
+    SharedUser(
+      id: 'u1',
+      name: 'Diya Mangla',
+      email: 'diya.mangla@f13.tech',
+      avatarUrl: 'https://i.pravatar.cc/150?img=32',
     ),
-    FolderFile(
-      id: '2',
-      name: 'meeting_notes.docx',
-      path: '/documents/meeting_notes.docx',
-      size: (256 * 1024).round(),
-      fileType: 'word',
-      type: FileType.file,
-      createdAt: DateTime.now().subtract(const Duration(days: 3)), // 3 days ago
-      isFavorite: true,
+    SharedUser(
+      id: 'u2',
+      name: 'Tushar Bhatia',
+      email: 'tushar.bhatia@f13.tech',
+      avatarUrl: 'https://i.pravatar.cc/150?img=12',
     ),
-    FolderFile(
-      id: '3',
-      name: 'budget_spreadsheet.xlsx',
-      path: '/documents/budget_spreadsheet.xlsx',
-      size: (512 * 1024).round(),
-      fileType: 'excel',
-      type: FileType.file,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)), // 1 day ago
-      isFavorite: false,
+    SharedUser(
+      id: 'u3',
+      name: 'Jasveen Kaur',
+      email: 'jasveen.kaur@f13.tech',
+      avatarUrl: 'https://i.pravatar.cc/150?img=47',
     ),
-    FolderFile(
-      id: '4',
-      name: 'presentation.pptx',
-      path: '/documents/presentation.pptx',
-      size: (3.5 * 1024 * 1024).round(),
-      fileType: 'powerpoint',
-      type: FileType.file,
-      createdAt: DateTime.now(), // Today
-      isFavorite: true,
+    SharedUser(
+      id: 'u4',
+      name: 'Arunima Dahal',
+      email: 'arunima.dahal@f13.tech',
+      avatarUrl: 'https://i.pravatar.cc/150?img=5',
     ),
-    FolderFile(
-      id: '5',
-      name: 'design_mockups.psd',
-      path: '/documents/design_mockups.psd',
-      size: (8.2 * 1024 * 1024).round(),
-      fileType: 'photoshop',
-      type: FileType.file,
-      createdAt: DateTime.now().subtract(const Duration(days: 7)), // 7 days ago
-      isFavorite: false,
+    SharedUser(
+      id: 'u5',
+      name: 'Abhigyan Sadhanidar',
+      email: 'abhigyan.sadhanidar@f13.tech',
+      avatarUrl: 'https://i.pravatar.cc/150?img=18',
     ),
-    FolderFile(
-      id: '6',
-      name: 'logo_assets.ai',
-      path: '/documents/logo_assets.ai',
-      size: (2.1 * 1024 * 1024).round(),
-      fileType: 'illustrator',
-      type: FileType.file,
-      createdAt:
-          DateTime.now().subtract(const Duration(days: 10)), // 10 days ago
-      isFavorite: true,
-    ),
-    FolderFile(
-      id: '7',
-      name: 'team_photo.jpg',
-      path: '/documents/team_photo.jpg',
-      size: (1.8 * 1024 * 1024).round(),
-      fileType: 'image',
-      type: FileType.file,
-      createdAt: DateTime.now().subtract(const Duration(days: 2)), // 2 days ago
-      isFavorite: false,
-    ),
-    FolderFile(
-      id: '8',
-      name: 'audio_recording.mp3',
-      path: '/documents/audio_recording.mp3',
-      size: (4.5 * 1024 * 1024).round(),
-      fileType: 'audio',
-      type: FileType.file,
-      createdAt: DateTime.now().subtract(const Duration(days: 4)), // 4 days ago
-      isFavorite: true,
-    ),
-    FolderFile(
-      id: '9',
-      name: 'video_demo.mp4',
-      path: '/documents/video_demo.mp4',
-      size: (25.8 * 1024 * 1024).round(),
-      fileType: 'video',
-      type: FileType.file,
-      createdAt: DateTime.now().subtract(const Duration(days: 6)), // 6 days ago
-      isFavorite: false,
-    ),
-    FolderFile(
-      id: '10',
-      name: 'archive_folder',
-      path: '/documents/archive_folder',
-      type: FileType.folder,
-      createdAt:
-          DateTime.now().subtract(const Duration(days: 15)), // 15 days ago
-      isFavorite: false,
-      fileCount: 12,
-    ),
-    // Add more files with various dates for comprehensive testing
-    for (int i = 11; i < 30; i++)
-      FolderFile(
-        id: '$i',
-        name: "file_$i.txt",
-        path: '/documents/file_$i.txt',
-        size: (1024 * (i % 5 + 1)).round(),
-        fileType: 'txt',
-        type: FileType.file,
-        createdAt: DateTime.now()
-            .subtract(Duration(days: i % 20)), // Spread across 20 days
-        isFavorite: i % 3 == 0,
-      ),
   ];
 }

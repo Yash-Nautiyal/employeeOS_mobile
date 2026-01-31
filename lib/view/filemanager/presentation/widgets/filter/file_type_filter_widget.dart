@@ -1,15 +1,15 @@
-import 'package:employeeos/core/common/actions/file_actions.dart'
-    show getFileIcon;
-import 'package:employeeos/core/common/components/custom_divider.dart';
-import 'package:employeeos/core/common/components/custom_popup.dart';
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/filemanager/domain/entities/filter_models.dart';
-import 'package:employeeos/view/filemanager/domain/repositories/filter_repository.dart';
-import 'package:employeeos/view/filemanager/presentation/controllers/filter_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_popup/flutter_popup.dart' show CustomPopupState;
 import 'package:flutter_svg/svg.dart';
+
+import '../../../../../core/index.dart'
+    show AppPallete, CustomDivider, CustomPopup, CustomTextButton, getFileIcon;
+import '../../../index.dart'
+    show
+        FileFilterService,
+        FileManagerFilterController,
+        FileTypeFilter,
+        FilterControllerProvider;
 
 /// UI component for file type filtering
 /// This component is now purely UI-focused and uses the controller for state management
@@ -33,7 +33,7 @@ class FilterFileTypeWidget extends StatelessWidget {
       anchorKey: anchorKey,
       constraints: const BoxConstraints(
         minWidth: 240,
-        maxWidth: 360,
+        maxWidth: 380,
         maxHeight: 300,
       ),
       contentPadding: EdgeInsets.zero,

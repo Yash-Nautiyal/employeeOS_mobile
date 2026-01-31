@@ -7,6 +7,8 @@ class CustomDropdown extends StatefulWidget {
   final Function onChange;
   final String label;
   final List<DropdownMenuItem> items;
+  final DropdownButtonBuilder? selectedItemBuilder;
+  final bool isSearchable;
   const CustomDropdown({
     super.key,
     this.value,
@@ -14,6 +16,8 @@ class CustomDropdown extends StatefulWidget {
     required this.onChange,
     required this.label,
     required this.items,
+    this.selectedItemBuilder,
+    this.isSearchable = false,
   });
 
   @override
@@ -21,6 +25,14 @@ class CustomDropdown extends StatefulWidget {
 }
 
 class _CustomDropdownState extends State<CustomDropdown> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField2(
@@ -71,6 +83,46 @@ class _CustomDropdownState extends State<CustomDropdown> {
         ),
       ),
       items: widget.items,
+      selectedItemBuilder: widget.selectedItemBuilder,
+      dropdownSearchData: widget.isSearchable
+          ? DropdownSearchData(
+              searchController: _searchController,
+              searchInnerWidgetHeight: 50,
+              searchInnerWidget: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: 'Search...',
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                  ),
+                ),
+              ),
+              // match against item.value (toString) and simple Text children if present
+              searchMatchFn: (dropDownItem, searchValue) {
+                final query = searchValue.toLowerCase();
+                // check value string
+                if (dropDownItem.value != null &&
+                    dropDownItem.value
+                        .toString()
+                        .toLowerCase()
+                        .contains(query)) {
+                  return true;
+                }
+                // check if child is Text widget
+                final item = dropDownItem.value;
+                // fallback to widget's toString
+                if (item.toString().toLowerCase().contains(query)) return true;
+                return false;
+              },
+            )
+          : null,
       onChanged: (value) {
         if (value != null) widget.onChange(value);
       },

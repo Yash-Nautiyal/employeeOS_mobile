@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class FilemanagerHeader extends StatelessWidget {
-  const FilemanagerHeader({super.key});
+  final VoidCallback? onUploadTap;
+
+  const FilemanagerHeader({super.key, this.onUploadTap});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class FilemanagerHeader extends StatelessWidget {
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(theme.colorScheme.tertiary),
           ),
-          onPressed: () {},
+          onPressed: onUploadTap,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

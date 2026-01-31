@@ -249,6 +249,10 @@ ThemeData buildTheme({
 
     //DatePicker Theme
     datePickerTheme: DatePickerThemeData(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      
       dividerColor: AppPallete.grey500,
       dayStyle: AppTypography.bodyMedium,
       headerHeadlineStyle: AppTypography.displayMedium,

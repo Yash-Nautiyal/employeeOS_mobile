@@ -1,12 +1,17 @@
-import 'package:employeeos/view/filemanager/domain/entities/filter_models.dart';
-import 'package:employeeos/view/filemanager/presentation/controllers/filter_controller.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/filter/date_range_filter_widget.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/filter/file_type_filter_widget.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/filter/filter_status_widget.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/filter/search_filter_widget.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/filter/view_toggle_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_popup/flutter_popup.dart' show CustomPopupState;
+
+import '../../index.dart'
+    show
+        FileManagerFilterController,
+        FileManagerFilterState,
+        FileTypeFilter,
+        FilterControllerProvider,
+        FilterDateRangeWidget,
+        FilterFileTypeWidget,
+        FilterSearchWidget,
+        FilterStatusWidget,
+        ViewType;
 
 /// Simple filter section widget that orchestrates all filter components
 /// No state persistence - starts fresh every time
@@ -107,8 +112,8 @@ class _FileManagerFilterSectionState extends State<FileManagerFilterSection> {
           ],
         ),
         // View toggle and filter status
-        FilterViewToggleWidget(theme: theme),
-        const SizedBox(height: 12),
+        // FilterViewToggleWidget(theme: theme),
+        // const SizedBox(height: 12),
         if (FilterControllerProvider.of(context).hasActiveFilters)
           Align(
             alignment: Alignment.centerLeft,

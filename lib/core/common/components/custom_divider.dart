@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
 class CustomDivider extends StatelessWidget {
-  const CustomDivider({super.key, this.height = 1, this.color = Colors.black});
+  const CustomDivider(
+      {super.key,
+      this.height = 1,
+      this.color = Colors.black,
+      this.dashWidth = 3.0});
   final double height;
   final Color color;
+  final double dashWidth;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final boxWidth = constraints.constrainWidth();
-        const dashWidth = 3.0;
         final dashHeight = height;
         final dashCount = (boxWidth / (2 * dashWidth)).floor();
         return Flex(

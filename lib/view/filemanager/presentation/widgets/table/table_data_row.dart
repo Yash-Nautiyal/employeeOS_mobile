@@ -1,13 +1,22 @@
-import 'package:avatar_stack/animated_avatar_stack.dart';
-import 'package:avatar_stack/positions.dart' show RestrictedPositions;
-import 'package:employeeos/core/common/actions/date_time_actions.dart'
-    show fmtDate, fmtTime;
-import 'package:employeeos/core/common/actions/file_actions.dart'
-    show formatFileSize, getFileIcon;
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/table/table_row_shared_avatar.dart';
+// ignore_for_file: deprecated_member_use
+import 'package:employeeos/core/index.dart'
+    show
+        AvatarStackItem,
+        CustomAvatarStack,
+        CustomDivider,
+        PopupPreferredPosition,
+        ResponsivePopupContainer,
+        ResponsivePopupController,
+        ResponsivePopupItem,
+        fmtDate,
+        fmtTime,
+        formatFileSize,
+        getFileIcon;
 import 'package:flutter/material.dart';
+import 'package:flutter_popup/flutter_popup.dart' show CustomPopupState;
 import 'package:flutter_svg/svg.dart';
+
+import '../../../index.dart' show FolderFile;
 
 class TableDataRow extends StatefulWidget {
   const TableDataRow({
@@ -42,6 +51,18 @@ class TableDataRow extends StatefulWidget {
 }
 
 class _TableDataRowState extends State<TableDataRow> {
+  final anchorKey = GlobalKey<CustomPopupState>();
+  final GlobalKey _popupAnchorKey = GlobalKey();
+  final LayerLink _layerLink = LayerLink();
+  final ResponsivePopupController _popupController =
+      ResponsivePopupController();
+
+  @override
+  void dispose() {
+    _popupController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -137,32 +158,20 @@ class _TableDataRowState extends State<TableDataRow> {
             child: widget.file.sharedWith == null ||
                     widget.file.sharedWith!.isEmpty
                 ? const Text('-')
-                : SharedUsersTooltip(
-                    users:
-                        widget.file.sharedWith!, // each: avatarUrl, name, email
-                    stackHeight: 40,
-                    avatarSize: 20,
-                    child: SizedBox(
-                      width: double.maxFinite,
-                      child: AnimatedAvatarStack(
-                        infoWidgetBuilder: (surplus, context) => CircleAvatar(
-                          radius: 20,
-                          child: Text(
-                            '+$surplus',
-                            style: theme.textTheme.labelLarge
-                                ?.copyWith(color: Colors.black),
-                          ),
-                        ),
-                        key: ValueKey(theme.brightness),
-                        borderColor: null,
-                        settings: RestrictedPositions(
-                          maxCoverage: 0.5,
-                        ),
-                        avatars: [
-                          for (var user in widget.file.sharedWith!)
-                            NetworkImage(user.avatarUrl),
-                        ],
-                      ),
+                : Align(
+                    alignment: Alignment.centerLeft,
+                    child: CustomAvatarStack(
+                      items: widget.file.sharedWith!
+                          .map(
+                            (user) => AvatarStackItem(
+                              name: user.name,
+                              imageUrl: user.avatarUrl,
+                            ),
+                          )
+                          .toList(),
+                      size: 36,
+                      overlap: 23,
+                      maxVisible: 3,
                     ),
                   ),
           ),
@@ -185,16 +194,82 @@ class _TableDataRowState extends State<TableDataRow> {
                           : theme.disabledColor,
                     ),
                   ),
-                  PopupMenuButton<String>(
-                    tooltip: 'More',
-                    onSelected: widget.onMenu,
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(value: 'Open', child: Text('Open')),
-                      PopupMenuItem(value: 'Rename', child: Text('Rename')),
-                      PopupMenuItem(value: 'Move', child: Text('Move')),
-                      PopupMenuItem(value: 'Delete', child: Text('Delete')),
-                    ],
-                    child: const Icon(Icons.more_vert, size: 20),
+                  CompositedTransformTarget(
+                    key: _popupAnchorKey,
+                    link: _layerLink,
+                    child: IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () {
+                        _popupController.show(
+                          context: context,
+                          link: _layerLink,
+                          anchorKey: _popupAnchorKey,
+                          preferredPosition: PopupPreferredPosition.left,
+                          manualOffset: const Offset(60, 10),
+                          // arrowOffsetOverride: 0.5,
+                          childBuilder: (placement) => ResponsivePopupContainer(
+                            width: 130,
+                            arrowSide: placement.arrowSide,
+                            arrowOffset: 0.15,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                            horizontal: 5.0)
+                                        .copyWith(bottom: 10),
+                                    child: ResponsivePopupItem(
+                                      title: 'Copy Link',
+                                      svgIcon:
+                                          'assets/icons/common/solid/ic-solar-link-bold.svg',
+                                      onTap: () {
+                                        _popupController.hide();
+                                      },
+                                      color: theme.colorScheme.tertiary,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                            horizontal: 5.0)
+                                        .copyWith(bottom: 10),
+                                    child: ResponsivePopupItem(
+                                      title: 'Share',
+                                      svgIcon:
+                                          'assets/icons/common/solid/ic-solar_share-bold.svg',
+                                      color: theme.colorScheme.tertiary,
+                                      onTap: () {
+                                        _popupController.hide();
+                                      },
+                                    ),
+                                  ),
+                                  CustomDivider(
+                                    color: theme.dividerColor.withAlpha(100),
+                                    dashWidth: 2.3,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5.0),
+                                    child: ResponsivePopupItem(
+                                      title: 'Delete',
+                                      svgIcon:
+                                          'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+                                      color: Colors.red,
+                                      onTap: () {
+                                        _popupController.hide();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

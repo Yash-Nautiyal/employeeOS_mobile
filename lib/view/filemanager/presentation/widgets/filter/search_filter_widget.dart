@@ -36,20 +36,23 @@ class _FilterSearchWidgetState extends State<FilterSearchWidget> {
     final filterController = FilterControllerProvider.of(context);
     final isActive = filterController.filterState.searchFilter.isActive;
 
-    return CustomTextfield(
-      controller: _searchController,
-      hintText: 'Search files...',
-      theme: widget.theme,
-      keyboardType: TextInputType.text,
-      onchange: (value) {
-        filterController.updateSearchFilter(value);
-      },
-      isSearchField: true,
-      close: isActive,
-      onClose: () {
-        _searchController.clear();
-        filterController.clearSearchFilter();
-      },
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 400),
+      child: CustomTextfield(
+        controller: _searchController,
+        hintText: 'Search files...',
+        theme: widget.theme,
+        keyboardType: TextInputType.text,
+        onchange: (value) {
+          filterController.updateSearchFilter(value);
+        },
+        isSearchField: true,
+        close: isActive,
+        onClose: () {
+          _searchController.clear();
+          filterController.clearSearchFilter();
+        },
+      ),
     );
   }
 }

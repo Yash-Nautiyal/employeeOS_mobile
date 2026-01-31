@@ -6,6 +6,8 @@ import 'package:employeeos/view/filemanager/presentation/controllers/filter_cont
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../index.dart' show DateSelectorButton, QuickDateOptions;
+
 /// UI component for date range filtering
 /// This component is now purely UI-focused and uses the controller for state management
 class FilterDateRangeWidget extends StatelessWidget {
@@ -111,80 +113,91 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Select Date Range', style: widget.theme.textTheme.titleLarge),
+          Text(
+            'Select Date Range',
+            style: widget.theme.textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w800),
+          ),
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: SvgPicture.asset(
               'assets/icons/common/solid/ic-mingcute_close-line.svg',
-              color: widget.theme.colorScheme.error,
+              color: widget.theme.colorScheme.tertiary,
             ),
           ),
         ],
       ),
-      content: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Date Selection Buttons
-            Row(
+      content: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: _DateSelectorButton(
-                    label: 'Start Date',
-                    date: _tempStartDate ?? _localSelectedDateRange?.start,
-                    theme: widget.theme,
-                    onTap: () => _selectStartDate(context),
-                  ),
+                // Date Selection Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: DateSelectorButton(
+                        label: 'Start Date',
+                        date: _tempStartDate ?? _localSelectedDateRange?.start,
+                        theme: widget.theme,
+                        onTap: () => _selectStartDate(context),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DateSelectorButton(
+                        label: 'End Date',
+                        date: _tempEndDate ?? _localSelectedDateRange?.end,
+                        theme: widget.theme,
+                        onTap: () => _selectEndDate(context),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _DateSelectorButton(
-                    label: 'End Date',
-                    date: _tempEndDate ?? _localSelectedDateRange?.end,
-                    theme: widget.theme,
-                    onTap: () => _selectEndDate(context),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Quick date range options
-            _QuickDateOptions(
-              theme: widget.theme,
-              selectedRange: _localSelectedDateRange,
-              tempStartDate: _tempStartDate,
-              tempEndDate: _tempEndDate,
-              onRangeSelected: (range) {
-                setState(() {
-                  _localSelectedDateRange = range;
-                  _tempStartDate = range.start;
-                  _tempEndDate = range.end;
-                });
-              },
-            ),
-            // Selected date range display
-            if (_localSelectedDateRange != null ||
-                (_tempStartDate != null && _tempEndDate != null))
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: _SelectedRangeDisplay(
+                const SizedBox(height: 16),
+                // Quick date range options
+                QuickDateOptions(
                   theme: widget.theme,
-                  range: _localSelectedDateRange,
+                  selectedRange: _localSelectedDateRange,
                   tempStartDate: _tempStartDate,
                   tempEndDate: _tempEndDate,
+                  onRangeSelected: (range) {
+                    setState(() {
+                      _localSelectedDateRange = range;
+                      _tempStartDate = range.start;
+                      _tempEndDate = range.end;
+                    });
+                  },
                 ),
-              ),
-          ],
+                // Selected date range display
+                // if (_localSelectedDateRange != null ||
+                //     (_tempStartDate != null && _tempEndDate != null))
+                //   Padding(
+                //     padding: const EdgeInsets.only(top: 16),
+                //     child: SelectedRangeDisplay(
+                //       theme: widget.theme,
+                //       range: _localSelectedDateRange,
+                //       tempStartDate: _tempStartDate,
+                //       tempEndDate: _tempEndDate,
+                //     ),
+                //   ),
+              ],
+            ),
+          ),
         ),
       ),
       actions: [
         CustomTextButton(
+          padding: 0,
           child: Text('Clear', style: widget.theme.textTheme.labelLarge),
           onClick: () {
             widget.controller.clearDateRangeFilter();
@@ -192,6 +205,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
           },
         ),
         CustomTextButton(
+          padding: 0,
           onClick: () {
             DateTimeRange? rangeToApply;
 
@@ -227,14 +241,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
-        return Theme(
-          data: widget.theme.copyWith(
-            colorScheme: widget.theme.colorScheme.copyWith(
-              primary: widget.theme.colorScheme.primary,
-            ),
-          ),
-          child: child!,
-        );
+        return child!;
       },
     );
 
@@ -274,227 +281,5 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
         _tempEndDate = date;
       });
     }
-  }
-}
-
-/// Date selector button widget
-class _DateSelectorButton extends StatelessWidget {
-  final String label;
-  final DateTime? date;
-  final ThemeData theme;
-  final VoidCallback onTap;
-
-  const _DateSelectorButton({
-    required this.label,
-    required this.date,
-    required this.theme,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
-      controller: TextEditingController(
-        text: date != null ? formatDate(date!) : '',
-      ),
-      readOnly: true,
-      onTap: onTap,
-      style: theme.textTheme.bodyMedium?.copyWith(
-        color: date != null
-            ? theme.colorScheme.primary
-            : theme.colorScheme.tertiary,
-        fontWeight: date != null ? FontWeight.w800 : FontWeight.normal,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: theme.textTheme.bodyMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-}
-
-/// Quick date options widget
-class _QuickDateOptions extends StatelessWidget {
-  final ThemeData theme;
-  final DateTimeRange? selectedRange;
-  final DateTime? tempStartDate;
-  final DateTime? tempEndDate;
-  final Function(DateTimeRange) onRangeSelected;
-
-  const _QuickDateOptions({
-    required this.theme,
-    required this.selectedRange,
-    required this.tempStartDate,
-    required this.tempEndDate,
-    required this.onRangeSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    final quickOptions = [
-      ('Today', DateTimeRange(start: today, end: today)),
-      (
-        'Yesterday',
-        DateTimeRange(
-          start: today.subtract(const Duration(days: 1)),
-          end: today.subtract(const Duration(days: 1)),
-        )
-      ),
-      (
-        'Last 7 days',
-        DateTimeRange(
-          start: today.subtract(const Duration(days: 6)),
-          end: today,
-        )
-      ),
-      (
-        'Last 30 days',
-        DateTimeRange(
-          start: today.subtract(const Duration(days: 29)),
-          end: today,
-        )
-      ),
-      (
-        'This month',
-        DateTimeRange(
-          start: DateTime(now.year, now.month, 1),
-          end: today,
-        )
-      ),
-      (
-        'Last month',
-        DateTimeRange(
-          start: DateTime(now.year, now.month - 1, 1),
-          end: DateTime(now.year, now.month, 0),
-        )
-      ),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Options',
-          style: theme.textTheme.labelLarge,
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: quickOptions.map((option) {
-            final isSelected = _isRangeEqual(selectedRange, option.$2) ||
-                _isRangeEqual(
-                  tempStartDate != null && tempEndDate != null
-                      ? DateTimeRange(start: tempStartDate!, end: tempEndDate!)
-                      : null,
-                  option.$2,
-                );
-
-            return InkWell(
-              onTap: () => onRangeSelected(option.$2),
-              borderRadius: BorderRadius.circular(6),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? theme.colorScheme.primary.withAlpha(35)
-                      : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.dividerColor,
-                  ),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  option.$1,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.tertiary,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  bool _isRangeEqual(DateTimeRange? range1, DateTimeRange range2) {
-    if (range1 == null) return false;
-    return range1.start.year == range2.start.year &&
-        range1.start.month == range2.start.month &&
-        range1.start.day == range2.start.day &&
-        range1.end.year == range2.end.year &&
-        range1.end.month == range2.end.month &&
-        range1.end.day == range2.end.day;
-  }
-}
-
-/// Selected range display widget
-class _SelectedRangeDisplay extends StatelessWidget {
-  final ThemeData theme;
-  final DateTimeRange? range;
-  final DateTime? tempStartDate;
-  final DateTime? tempEndDate;
-
-  const _SelectedRangeDisplay({
-    required this.theme,
-    required this.range,
-    required this.tempStartDate,
-    required this.tempEndDate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          SvgPicture.asset(
-            'assets/icons/ic-calender.svg',
-            color: theme.colorScheme.primary,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              _getDisplayText(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getDisplayText() {
-    if (tempStartDate != null && tempEndDate != null) {
-      return formatDateRange(
-          DateTimeRange(start: tempStartDate!, end: tempEndDate!));
-    }
-    if (range != null) {
-      return formatDateRange(range!);
-    }
-    return '';
   }
 }

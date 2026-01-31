@@ -5,7 +5,9 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class StorageSection extends StatefulWidget {
   final ThemeData theme;
-  const StorageSection({super.key, required this.theme});
+  final bool? keepExpanded;
+  const StorageSection(
+      {super.key, required this.theme, this.keepExpanded = false});
 
   @override
   State<StorageSection> createState() => _StorageSectionState();
@@ -20,6 +22,7 @@ class _StorageSectionState extends State<StorageSection>
   @override
   void initState() {
     super.initState();
+    _isExpanded = widget.keepExpanded ?? false;
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -47,8 +50,7 @@ class _StorageSectionState extends State<StorageSection>
       children: [
         SvgPicture.asset(
           icon,
-          width: 36,
-          height: 36,
+          width: 33,
         ),
         const SizedBox(width: 15),
         Expanded(
@@ -57,14 +59,14 @@ class _StorageSectionState extends State<StorageSection>
             children: [
               Text(
                 title,
-                style: theme.textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
                 fileCount,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -86,8 +88,10 @@ class _StorageSectionState extends State<StorageSection>
             children: [
               Text(
                 'Storage',
-                style:
-                    widget.theme.textTheme.displaySmall?.copyWith(fontSize: 20),
+                style: widget.theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.tertiary,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               if (!_isExpanded) ...[
                 const SizedBox(height: 4),
@@ -149,13 +153,23 @@ class _StorageSectionState extends State<StorageSection>
           child: Column(
             children: [
               AnimatedContainer(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(20),
-                height: _isExpanded ? 500 : 100,
+                height: _isExpanded ? 450 : 100,
                 decoration: BoxDecoration(
                   color: widget.theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.theme.brightness == Brightness.dark
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.grey.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: SingleChildScrollView(
                   physics: const NeverScrollableScrollPhysics(),
@@ -165,7 +179,7 @@ class _StorageSectionState extends State<StorageSection>
                       _buildStorageHeader(widget.theme),
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
-                        height: _isExpanded ? 200 : 0,
+                        height: _isExpanded ? 170 : 0,
                         child: AnimatedOpacity(
                           duration: _isExpanded
                               ? const Duration(milliseconds: 400)
@@ -204,25 +218,18 @@ class _StorageSectionState extends State<StorageSection>
                                 ],
                                 annotations: <GaugeAnnotation>[
                                   GaugeAnnotation(
+                                    positionFactor: 0,
                                     verticalAlignment: GaugeAlignment.center,
                                     horizontalAlignment: GaugeAlignment.center,
                                     widget: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text(
-                                          '86.6%',
-                                          style: widget
-                                              .theme.textTheme.displaySmall
-                                              ?.copyWith(),
-                                        ),
-                                        Text(
-                                          'Used of 24GB / 50 GB',
-                                          style: widget
-                                              .theme.textTheme.bodyMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        Text('86.6%',
+                                            style: widget
+                                                .theme.textTheme.displaySmall),
+                                        Text('Used of 24GB / 50 GB',
+                                            style: widget
+                                                .theme.textTheme.bodySmall),
                                       ],
                                     ),
                                     angle: 90,
@@ -233,6 +240,7 @@ class _StorageSectionState extends State<StorageSection>
                           ),
                         ),
                       ),
+                      const SizedBox(height: 10),
                       // Storage items with staggered animations
                       AnimatedSlide(
                         duration: const Duration(milliseconds: 300),
@@ -286,36 +294,37 @@ class _StorageSectionState extends State<StorageSection>
             ],
           ),
         ),
-        Positioned(
-          bottom: _isExpanded ? -8 : -10,
-          left: 0,
-          right: 0,
-          child: Hero(
-            tag: 'storageButton',
-            child: IconButton(
-              onPressed: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                  if (_isExpanded) {
-                    _controller.forward();
-                  } else {
-                    _controller.reverse();
-                  }
-                });
-              },
-              icon: AnimatedRotation(
-                duration: const Duration(milliseconds: 300),
-                turns: _isExpanded ? 0.5 : 0,
-                child: SvgPicture.asset(
-                  'assets/icons/arrow/chevrons-down-alt-svgrepo-com.svg',
-                  width: 24,
-                  height: 24,
-                  color: widget.theme.colorScheme.secondary,
+        if (widget.keepExpanded != null && !widget.keepExpanded!)
+          Positioned(
+            bottom: _isExpanded ? -8 : -10,
+            left: 0,
+            right: 0,
+            child: Hero(
+              tag: 'storageButton',
+              child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                    if (_isExpanded) {
+                      _controller.forward();
+                    } else {
+                      _controller.reverse();
+                    }
+                  });
+                },
+                icon: AnimatedRotation(
+                  duration: const Duration(milliseconds: 300),
+                  turns: _isExpanded ? 0.5 : 0,
+                  child: SvgPicture.asset(
+                    'assets/icons/arrow/chevrons-down-alt-svgrepo-com.svg',
+                    width: 24,
+                    height: 24,
+                    color: widget.theme.colorScheme.secondary,
+                  ),
                 ),
               ),
             ),
-          ),
-        )
+          )
       ],
     );
   }

@@ -20,18 +20,20 @@ class EmptyContent extends StatelessWidget {
           SvgPicture.asset(
             icon,
           ),
-          Text(
-            title ?? '',
-            style: theme.textTheme.labelLarge
-                ?.copyWith(color: AppPallete.grey500, fontSize: 16),
-          ),
-          Text(
-            description ?? '',
-            style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 14,
-                color: AppPallete.grey600,
-                fontWeight: FontWeight.w600),
-          ),
+          title != null
+              ? Text(
+                  title!,
+                  style: theme.textTheme.labelLarge
+                      ?.copyWith(color: AppPallete.grey500),
+                )
+              : const SizedBox.shrink(),
+          description != null
+              ? Text(
+                  description!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppPallete.grey600, fontWeight: FontWeight.w600),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
     );

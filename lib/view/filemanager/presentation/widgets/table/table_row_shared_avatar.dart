@@ -1,5 +1,4 @@
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart'
-    show SharedUser;
+import '../../../index.dart' show SharedUser;
 import 'package:flutter/material.dart';
 import 'package:super_tooltip/super_tooltip.dart';
 

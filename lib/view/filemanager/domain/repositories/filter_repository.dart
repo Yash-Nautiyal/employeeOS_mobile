@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart';
+import 'package:employeeos/view/filemanager/domain/entities/files_models.dart';
 import 'package:employeeos/view/filemanager/domain/entities/filter_models.dart';
 
 /// Service class for handling file filtering logic

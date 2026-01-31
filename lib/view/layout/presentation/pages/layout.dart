@@ -2,18 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:employeeos/core/common/components/home_nav.dart';
-import 'package:employeeos/view/chat/presentation/pages/chat_view.dart';
-import 'package:employeeos/view/dashboard/presentation/pages/user_dashboard_view.dart';
-import 'package:employeeos/view/filemanager/presentation/pages/filemanager_view.dart';
-import 'package:employeeos/view/hiring/presentation/pages/hiring_view.dart';
-import 'package:employeeos/view/kanban/presentation/pages/kanban_view.dart';
+import 'package:employeeos/view/index.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_drawer.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_posting_view.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/interview_scheduling_view.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';
 import 'package:flutter/material.dart';
 
 class Layout extends StatefulWidget {
@@ -43,7 +33,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     'Profile': const UserProfile(),
     'Card': const UserCards(),
   };
-  String _selectedItem = 'Kanban';
+  String _selectedItem = 'File Manager';
 
   @override
   void initState() {

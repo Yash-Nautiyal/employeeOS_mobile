@@ -1,114 +1,283 @@
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart'
-    show FileType, FolderFile;
-import 'package:employeeos/view/filemanager/presentation/widgets/favorites_section.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/file_manager_table.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/recent_section.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/storage_section.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/file_manager_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:employeeos/view/filemanager/presentation/bloc/filemanager_bloc.dart';
+import '../../index.dart'
+    show
+        AddShareParticipantUsecase,
+        DeleteFileUsecase,
+        FavoritesSection,
+        FetchFilesUsecase,
+        FileTableScreen,
+        FilemanagerHeader,
+        FilemanagerLocalDatasource,
+        FilemanagerRepositoryImpl,
+        RecentSection,
+        RemoveShareParticipantUsecase,
+        StorageSection,
+        ToggleFavoritesUsecase,
+        UpdateSharePermissionUsecase,
+        UpdateTagsUsecase,
+        UploadFilesDialog,
+        UploadFilesUsecase;
 
-class FilemanagerView extends StatelessWidget {
+class FilemanagerView extends StatefulWidget {
   const FilemanagerView({super.key});
 
   @override
+  State<FilemanagerView> createState() => _FilemanagerViewState();
+}
+
+class _FilemanagerViewState extends State<FilemanagerView> {
+  final _scrollController = ScrollController();
+
+  late FilemanagerBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    const repository = FilemanagerRepositoryImpl(FilemanagerLocalDatasource());
+    _bloc = FilemanagerBloc(
+      fetchFileUsecase: const FetchFilesUsecase(repository),
+      toggleFavoritesUsecase: const ToggleFavoritesUsecase(repository),
+      uploadFilesUsecase: const UploadFilesUsecase(repository),
+      deleteFileUsecase: const DeleteFileUsecase(repository),
+      updateTagsUsecase: const UpdateTagsUsecase(repository),
+      addShareParticipantUsecase: const AddShareParticipantUsecase(repository),
+      updateSharePermissionUsecase:
+          const UpdateSharePermissionUsecase(repository),
+      removeShareParticipantUsecase:
+          const RemoveShareParticipantUsecase(repository),
+    );
+
+    _bloc.add(FilemanagerLoadingEvent());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+
+    _bloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final _scrollController = ScrollController();
     final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
     // final screenWidth = MediaQuery.of(context).size.width;
-    final List<FolderFile> favorites = [
-      FolderFile(
-        id: '1',
-        name: 'DesignsDesignsDesignsDesignsDesigns',
-        path: '/documents/designs',
-        type: FileType.folder,
-        createdAt: DateTime.now(),
-        isFavorite: true,
-        fileCount: 2,
-      ),
-      FolderFile(
-        id: '2',
-        name: 'Specs.pdf',
-        path: '/documents/specs.pdf',
-        type: FileType.file,
-        createdAt: DateTime.now(),
-        size: 204800,
-        fileType: 'application/pdf',
-        isFavorite: true,
-      ),
-    ];
-    return SingleChildScrollView(
-      controller: _scrollController,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16)
-            .copyWith(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const FilemanagerHeader(),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                Text(
-                  " Favorites",
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.tertiary,
-                    fontWeight: FontWeight.w700,
+
+    final wideScreen = MediaQuery.of(context).size.width > 700;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    final isWideScreen = !isPortrait || wideScreen;
+
+    return BlocProvider.value(
+      value: _bloc,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10, bottom: 20),
+          child: BlocConsumer<FilemanagerBloc, FilemanagerState>(
+            listenWhen: (previous, current) =>
+                current is FilemanagerActionState,
+            buildWhen: (previous, current) =>
+                current is! FilemanagerActionState,
+            listener: (context, state) {},
+            builder: (context, state) {
+              if (state is FilemanagerLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is FilemanagerError) {
+                return Center(
+                  child: Text(
+                    'Error: ${state.message}',
+                    style: theme.textTheme.bodyLarge
+                        ?.copyWith(color: theme.colorScheme.error),
                   ),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {},
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text("View all", style: theme.textTheme.labelLarge),
-                      const SizedBox(
-                        width: 5,
+                );
+              } else if (state is FilemanagerLoaded) {
+                final files = state.files;
+                final favorites =
+                    files.where((file) => file.isFavorite).toList();
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isWideScreen ? 32 : 16.0),
+                      child: FilemanagerHeader(
+                        onUploadTap: () => showDialog<void>(
+                          context: context,
+                          builder: (ctx) => BlocProvider.value(
+                            value: _bloc,
+                            child: const UploadFilesDialog(),
+                          ),
+                        ),
                       ),
-                      const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 13,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isWideScreen ? 32 : 16.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Favorites",
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.tertiary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text("View all",
+                                    style: theme.textTheme.labelLarge),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 13,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: isWideScreen ? 32 : 16.0),
+                      child: FavoritesSection(
+                        screenHeight: screenHeight,
+                        favorites: favorites,
+                        theme: theme,
+                        onFavoriteToggle: (fileId) =>
+                            _bloc.add(ToggleFavoriteEvent(fileId)),
+                      ),
+                    ),
+                    if (!isWideScreen) ...[
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      StorageSection(theme: theme),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          "Recent Files",
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.tertiary,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: RecentSection(
+                          theme: theme,
+                          files: files,
+                          onFavoriteToggle: (fileId) => _bloc.add(
+                            ToggleFavoriteEvent(fileId),
+                          ),
+                        ),
                       ),
                     ],
-                  ),
+                    isWideScreen
+                        ? Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0)
+                                    .copyWith(right: isWideScreen ? 32 : 16),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: StorageSection(
+                                    theme: theme,
+                                    keepExpanded: true,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  flex: 4,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Recent Files",
+                                        style:
+                                            theme.textTheme.bodyLarge?.copyWith(
+                                          color: theme.colorScheme.tertiary,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      RecentSection(
+                                        theme: theme,
+                                        files: files,
+                                        onFavoriteToggle: (fileId) => _bloc.add(
+                                          ToggleFavoriteEvent(fileId),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isWideScreen ? 32 : 16.0),
+                      child: FileTableScreen(
+                        files: [...files],
+                        verticalScrollController: _scrollController,
+                        screenWidth: MediaQuery.of(context).size.width,
+                        onFavoriteToggle: (fileId) =>
+                            _bloc.add(ToggleFavoriteEvent(fileId)),
+                      ),
+                    )
+                  ],
+                );
+              }
+              return Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 50),
+                child: Text(
+                  'No Data Available',
+                  style: theme.textTheme.bodyLarge
+                      ?.copyWith(color: theme.colorScheme.tertiary),
                 ),
-              ],
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            FavoritesSection(
-              screenHeight: screenHeight,
-              favorites: favorites,
-              theme: theme,
-            ),
-            StorageSection(theme: theme),
-            const SizedBox(
-              height: 15,
-            ),
-            Text(
-              " Recent Files",
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.tertiary,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            RecentSection(theme: theme, favorites: favorites),
-            const SizedBox(
-              height: 15,
-            ),
-            FileTableScreen(
-              verticalScrollController: _scrollController,
-              screenWidth: MediaQuery.of(context).size.width,
-            )
-          ],
+              );
+            },
+          ),
         ),
       ),
     );

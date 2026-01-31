@@ -1,8 +1,10 @@
+import 'package:equatable/equatable.dart';
+
 enum FileType { file, folder }
 
 enum UserPermission { view, edit }
 
-class FolderFile {
+class FolderFile extends Equatable {
   final String id;
   final String name;
   final String path;
@@ -13,8 +15,9 @@ class FolderFile {
   final int? fileCount;
   final List<SharedUser>? sharedWith;
   final String? fileType; // Only for files
+  final List<String>? tags;
 
-  FolderFile({
+  const FolderFile({
     required this.id,
     required this.name,
     required this.path,
@@ -25,9 +28,25 @@ class FolderFile {
     this.size,
     this.sharedWith,
     this.fileType,
+    this.tags,
   });
 
   bool get isFolder => type == FileType.folder;
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        path,
+        type,
+        createdAt,
+        isFavorite,
+        size,
+        fileCount,
+        sharedWith,
+        fileType,
+        tags,
+      ];
 }
 
 class StorageInfo {
@@ -57,5 +76,18 @@ class SharedUser {
     required this.email,
     this.permission = UserPermission.view,
     required this.avatarUrl,
+  });
+}
+
+/// Represents a file picked for upload (e.g. from file_picker). Used by upload use case.
+class PickedFile {
+  final String name;
+  final int size;
+  final String fileType;
+
+  const PickedFile({
+    required this.name,
+    required this.size,
+    this.fileType = '',
   });
 }

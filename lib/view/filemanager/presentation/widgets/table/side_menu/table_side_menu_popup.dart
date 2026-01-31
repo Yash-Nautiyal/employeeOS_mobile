@@ -3,7 +3,7 @@ import 'package:employeeos/core/common/components/custom_divider.dart';
 import 'package:employeeos/core/common/components/custom_popup.dart'
     show CustomPopup;
 import 'package:employeeos/core/common/components/custom_popup_menu_item.dart';
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart'
+import 'package:employeeos/view/filemanager/domain/entities/files_models.dart'
     show SharedUser, UserPermission;
 import 'package:flutter/material.dart';
 

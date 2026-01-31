@@ -1,32 +1,51 @@
-import 'package:employeeos/core/common/components/custom_side_menu.dart';
-import 'package:employeeos/view/filemanager/data/test_data.dart';
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart';
-import 'package:employeeos/view/filemanager/domain/entities/filter_models.dart';
-import 'package:employeeos/view/filemanager/domain/repositories/filter_repository.dart';
-import 'package:employeeos/view/filemanager/presentation/controllers/filter_controller.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/file_manager_filter_section.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/table/table_data_row.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/table/table_header_row.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/table/table_header_selector.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/table/table_paginator.dart';
-import 'package:employeeos/view/filemanager/presentation/widgets/table/table_side_menu.dart';
+import 'package:employeeos/core/index.dart'
+    show EmptyContent, showRightSideTaskDetails;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
+
+import '../../index.dart'
+    show
+        FilemanagerBloc,
+        FileFilterService,
+        FileManagerFilterController,
+        FileManagerFilterSection,
+        FileManagerSideMenu,
+        FilterControllerProvider,
+        FolderFile,
+        TableDataRow,
+        TableHeaderRow,
+        TableHeaderSelector,
+        TablePaginator,
+        ViewType;
 
 class FileTableScreen extends StatefulWidget {
   final double screenWidth;
+  final List<FolderFile> files;
   final ScrollController verticalScrollController;
+  final Function(String) onFavoriteToggle;
   const FileTableScreen(
       {super.key,
       required this.screenWidth,
-      required this.verticalScrollController});
+      required this.verticalScrollController,
+      required this.files,
+      required this.onFavoriteToggle});
 
   @override
   State<FileTableScreen> createState() => _FileTableScreenState();
 }
 
 class _FileTableScreenState extends State<FileTableScreen> {
-  late List<FolderFile> _all;
+  @override
+  void didUpdateWidget(covariant FileTableScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.files != widget.files) {
+      _filtered = List.from(widget.files);
+      // Optionally re-apply filters if needed
+      _applyFilters();
+    }
+  }
+
   late List<FolderFile> _filtered;
   final Set<String> _selected = {};
 
@@ -62,8 +81,7 @@ class _FileTableScreenState extends State<FileTableScreen> {
   @override
   void initState() {
     super.initState();
-    _all = mockFiles();
-    _filtered = List.from(_all);
+    _filtered = List.from(widget.files);
 
     // Initialize filter controller
     _filterController = FileManagerFilterController();
@@ -97,7 +115,7 @@ class _FileTableScreenState extends State<FileTableScreen> {
 
     setState(() {
       // Use the new FileFilterService to apply all filters
-      _filtered = FileFilterService.applyFilters(_all, filterState);
+      _filtered = FileFilterService.applyFilters(widget.files, filterState);
 
       // Reset to first page when filters change
       _pageIndex = 0;
@@ -143,6 +161,7 @@ class _FileTableScreenState extends State<FileTableScreen> {
     return FilterControllerProvider(
       controller: _filterController,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
           // ---------- Filter Section ----------
@@ -216,50 +235,61 @@ class _FileTableScreenState extends State<FileTableScreen> {
               const SizedBox(height: 8),
 
               // ---------- Rows: vertically scrollable, horizontally linked to header ----------
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                controller: _hBodyCtrl,
-                child: SizedBox(
-                  width: _tableWidth,
-                  child: ListView.builder(
-                    controller: widget.verticalScrollController,
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    itemCount: _pageItems.length,
-                    itemBuilder: (context, i) {
-                      final f = _pageItems[i];
-                      final selected = _selected.contains(f.id);
-                      return GestureDetector(
-                        onTap: () => showRightSideTaskDetails(
-                            context, FileManagerSideMenu(file: f)),
-                        child: TableDataRow(
-                          file: f,
-                          selected: selected,
-                          widthName: _wName,
-                          widthSize: _wSize,
-                          widthType: _wType,
-                          widthModified: _wModified,
-                          widthShared: _wShared,
-                          widthActions: _wActions,
-                          onChanged: (v) => setState(() {
-                            if (v == true) {
-                              _selected.add(f.id);
-                            } else {
-                              _selected.remove(f.id);
-                            }
-                          }),
-                          onStar: () => setState(() => {}),
-                          onMenu: (action) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('$action → ${f.name}')),
+              _pageItems.isEmpty
+                  ? const EmptyContent(
+                      icon: 'assets/icons/empty/ic-content.svg',
+                      title: "No Files Found",
+                    )
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      controller: _hBodyCtrl,
+                      child: SizedBox(
+                        width: _tableWidth,
+                        child: ListView.builder(
+                          controller: widget.verticalScrollController,
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          itemCount: _pageItems.length,
+                          itemBuilder: (context, i) {
+                            final f = _pageItems[i];
+                            final selected = _selected.contains(f.id);
+                            return GestureDetector(
+                              key: ValueKey('${f.id}_$i'),
+                              onTap: () => showRightSideTaskDetails(
+                                  context,
+                                  BlocProvider.value(
+                                    value: context.read<FilemanagerBloc>(),
+                                    child: FileManagerSideMenu(file: f),
+                                  )),
+                              child: TableDataRow(
+                                file: f,
+                                selected: selected,
+                                widthName: _wName,
+                                widthSize: _wSize,
+                                widthType: _wType,
+                                widthModified: _wModified,
+                                widthShared: _wShared,
+                                widthActions: _wActions,
+                                onChanged: (v) => setState(() {
+                                  if (v == true) {
+                                    _selected.add(f.id);
+                                  } else {
+                                    _selected.remove(f.id);
+                                  }
+                                }),
+                                onStar: () => widget.onFavoriteToggle(f.id),
+                                onMenu: (action) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text('$action → ${f.name}')),
+                                  );
+                                },
+                              ),
                             );
                           },
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ),
+                      ),
+                    ),
 
               // ---------- External Paginator (fixed, does not scroll with rows) ----------
               TablePaginator(

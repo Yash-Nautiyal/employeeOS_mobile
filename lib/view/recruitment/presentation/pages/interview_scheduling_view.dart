@@ -33,11 +33,11 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
   @override
   void initState() {
     super.initState();
-    final repository = InterviewSchedulingRepositoryImpl(
-      const InterviewSchedulingLocalDataSource(),
+    const repository = InterviewSchedulingRepositoryImpl(
+      InterviewSchedulingLocalDataSource(),
     );
     _bloc = InterviewSchedulingBloc(
-      getInterviewCandidatesUseCase: GetInterviewCandidatesUseCase(repository),
+      getInterviewCandidatesUseCase: const GetInterviewCandidatesUseCase(repository),
     );
 
     _roundTabController = TabController(

@@ -1,4 +1,4 @@
-import 'package:employeeos/view/filemanager/domain/entities/filemanager_models.dart'
+import 'package:employeeos/view/filemanager/domain/entities/files_models.dart'
     show UserPermission;
 
 String getFileIcon(String fileType) {
