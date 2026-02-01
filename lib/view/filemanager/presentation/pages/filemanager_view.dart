@@ -9,7 +9,7 @@ import '../../index.dart'
         FetchFilesUsecase,
         FileTableScreen,
         FilemanagerHeader,
-        FilemanagerLocalDatasource,
+        FilemanagerRemoteDatasource,
         FilemanagerRepositoryImpl,
         RecentSection,
         RemoveShareParticipantUsecase,
@@ -35,18 +35,16 @@ class _FilemanagerViewState extends State<FilemanagerView> {
   @override
   void initState() {
     super.initState();
-    const repository = FilemanagerRepositoryImpl(FilemanagerLocalDatasource());
+    final repository = FilemanagerRepositoryImpl(FilemanagerRemoteDatasource());
     _bloc = FilemanagerBloc(
-      fetchFileUsecase: const FetchFilesUsecase(repository),
-      toggleFavoritesUsecase: const ToggleFavoritesUsecase(repository),
-      uploadFilesUsecase: const UploadFilesUsecase(repository),
-      deleteFileUsecase: const DeleteFileUsecase(repository),
-      updateTagsUsecase: const UpdateTagsUsecase(repository),
-      addShareParticipantUsecase: const AddShareParticipantUsecase(repository),
-      updateSharePermissionUsecase:
-          const UpdateSharePermissionUsecase(repository),
-      removeShareParticipantUsecase:
-          const RemoveShareParticipantUsecase(repository),
+      fetchFileUsecase: FetchFilesUsecase(repository),
+      toggleFavoritesUsecase: ToggleFavoritesUsecase(repository),
+      uploadFilesUsecase: UploadFilesUsecase(repository),
+      deleteFileUsecase: DeleteFileUsecase(repository),
+      updateTagsUsecase: UpdateTagsUsecase(repository),
+      addShareParticipantUsecase: AddShareParticipantUsecase(repository),
+      updateSharePermissionUsecase: UpdateSharePermissionUsecase(repository),
+      removeShareParticipantUsecase: RemoveShareParticipantUsecase(repository),
     );
 
     _bloc.add(FilemanagerLoadingEvent());

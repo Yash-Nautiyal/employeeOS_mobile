@@ -80,14 +80,19 @@ class SharedUser {
 }
 
 /// Represents a file picked for upload (e.g. from file_picker). Used by upload use case.
+/// [path] is set when picking from device so the datasource can read bytes for upload.
 class PickedFile {
   final String name;
   final int size;
   final String fileType;
 
+  /// Local file path for reading bytes (e.g. from file_picker). Null when bytes not available.
+  final String? path;
+
   const PickedFile({
     required this.name,
     required this.size,
     this.fileType = '',
+    this.path,
   });
 }

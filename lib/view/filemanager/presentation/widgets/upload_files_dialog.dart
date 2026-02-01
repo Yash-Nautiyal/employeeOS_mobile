@@ -52,6 +52,7 @@ class _UploadFilesDialogState extends State<UploadFilesDialog> {
             name: f.name,
             size: f.size,
             fileType: _extension(f.name),
+            path: f.path,
           ),
         )
         .toList();

@@ -1,7 +1,9 @@
 import 'package:employeeos/core/common/components/dialog/slide_dialog.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/view/auth/presentation/bloc/auth_bloc.dart';
 import 'package:employeeos/view/home/presentation/pages/home_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileDialog extends StatelessWidget {
   final ThemeData theme;
@@ -61,10 +63,14 @@ class ProfileDialog extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeView()),
-            ),
+            onPressed: () {
+              context.read<AuthBloc>().add(AuthSignOutRequested());
+              Navigator.of(context).pop(); // close profile dialog
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HomeView()),
+                (route) => false,
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppPallete.errorLight.withOpacity(0.8),
               foregroundColor: AppPallete.errorLight,

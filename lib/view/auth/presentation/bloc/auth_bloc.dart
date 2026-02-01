@@ -8,9 +8,9 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  late final StreamSubscription _authSubscription;
-
-  AuthBloc() : super(AuthInitial()) {
+  AuthBloc()
+      : _client = Supabase.instance.client,
+        super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<AuthLoggedIn>(_onAuthLoggedIn);
     on<AuthLoggedOut>(_onAuthLoggedOut);
@@ -19,26 +19,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignOutRequested>(_onSignOutRequested);
     on<AuthResetPasswordRequested>(_onResetPasswordRequested);
 
-    // Listen to Supabase auth changes and add events accordingly
-    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((
-      event,
-    ) {
-      final session = Supabase.instance.client.auth.currentSession;
+    _authSubscription = _client.auth.onAuthStateChange.listen((event) {
+      final session = _client.auth.currentSession;
       if (session != null) {
         add(AuthLoggedIn());
       } else {
         add(AuthLoggedOut());
       }
     });
-    // Immediately check auth state at startup
     add(AuthCheckRequested());
   }
+
+  final SupabaseClient _client;
+  late final StreamSubscription _authSubscription;
 
   void _onAuthCheckRequested(
     AuthCheckRequested event,
     Emitter<AuthState> emit,
   ) {
-    final session = Supabase.instance.client.auth.currentSession;
+    final session = _client.auth.currentSession;
     if (session != null) {
       emit(Authenticated(session.user));
     } else {
@@ -47,7 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onAuthLoggedIn(AuthLoggedIn event, Emitter<AuthState> emit) {
-    final session = Supabase.instance.client.auth.currentSession;
+    final session = _client.auth.currentSession;
     if (session != null) {
       emit(Authenticated(session.user));
     } else {
@@ -71,7 +70,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final response = await Supabase.instance.client.auth.signInWithPassword(
+      final response = await _client.auth.signInWithPassword(
         email: event.email,
         password: event.password,
       );
@@ -97,7 +96,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final response = await Supabase.instance.client.auth.signUp(
+      final response = await _client.auth.signUp(
         email: event.email,
         password: event.password,
         data: {
@@ -127,18 +126,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    await Supabase.instance.client.auth.signOut();
+    await _client.auth.signOut();
     // The listener above will emit the logout state
     emit(Unauthenticated());
   }
 
-  FutureOr<void> _onResetPasswordRequested(
+  Future<void> _onResetPasswordRequested(
     AuthResetPasswordRequested event,
     Emitter<AuthState> emit,
-  ) {
+  ) async {
     emit(AuthLoading());
-    try {} catch (e) {
-      emit(AuthError('Reset password failed: ${e.toString()}'));
+    try {
+      await _client.auth.resetPasswordForEmail(event.email);
+      emit(AuthSuccessState(
+          'If an account exists for ${event.email}, a reset link has been sent.'));
+      emit(Unauthenticated());
+    } catch (e) {
+      final errorMessage = (e is AuthException) ? e.message : e.toString();
+      emit(AuthError('Reset password failed: $errorMessage'));
       emit(Unauthenticated());
     }
   }

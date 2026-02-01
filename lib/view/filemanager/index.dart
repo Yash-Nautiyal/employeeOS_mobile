@@ -2,6 +2,7 @@
 export 'data/test_data.dart';
 
 export 'data/datasources/filemanager_local_datasource.dart';
+export 'data/datasources/filemanager_remote_datasource.dart';
 export 'data/repositories/filemanager_repository_impl.dart';
 export 'data/models/filemanager_files_model.dart';
 

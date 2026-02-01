@@ -1,6 +1,6 @@
 import '../../index.dart'
     show
-        FilemanagerLocalDatasource,
+        FilemanagerRemoteDatasource,
         FilemanagerRepository,
         FolderFile,
         PickedFile,
@@ -8,48 +8,52 @@ import '../../index.dart'
         UserPermission;
 
 class FilemanagerRepositoryImpl implements FilemanagerRepository {
-  final FilemanagerLocalDatasource localDatasource;
+  final FilemanagerRemoteDatasource remoteDatasource;
 
-  const FilemanagerRepositoryImpl(this.localDatasource);
+  const FilemanagerRepositoryImpl(this.remoteDatasource);
 
   @override
   Future<List<FolderFile>> fetchFiles() async {
-    return localDatasource.fetchFoldersFiles();
+    return remoteDatasource.fetchFoldersFiles();
   }
 
   @override
   Future<FolderFile> toggleFavoriteFile(String fileId) {
-    return localDatasource.toggleFavoriteFile(fileId);
+    return remoteDatasource.toggleFavoriteFile(fileId);
   }
 
   @override
   Future<List<FolderFile>> uploadFiles(List<PickedFile> files) async {
     if (files.isEmpty) return [];
-    final models = await localDatasource.uploadFiles(
+    return remoteDatasource.uploadFiles(
       files
-          .map((f) => (name: f.name, size: f.size, fileType: f.fileType))
+          .map((f) => (
+                name: f.name,
+                size: f.size,
+                fileType: f.fileType,
+                path: f.path,
+              ))
           .toList(),
     );
-    return models;
   }
 
   @override
-  Future<void> deleteFile(String fileId) => localDatasource.deleteFile(fileId);
+  Future<void> deleteFile(String fileId) => remoteDatasource.deleteFile(fileId);
 
   @override
   Future<FolderFile> updateTags(String fileId, List<String> tags) =>
-      localDatasource.updateTags(fileId, tags);
+      remoteDatasource.updateTags(fileId, tags);
 
   @override
   Future<FolderFile> addShareParticipant(String fileId, SharedUser user) =>
-      localDatasource.addShareParticipant(fileId, user);
+      remoteDatasource.addShareParticipant(fileId, user);
 
   @override
   Future<FolderFile> updateSharePermission(
           String fileId, String userId, UserPermission permission) =>
-      localDatasource.updateSharePermission(fileId, userId, permission);
+      remoteDatasource.updateSharePermission(fileId, userId, permission);
 
   @override
   Future<FolderFile> removeShareParticipant(String fileId, String userId) =>
-      localDatasource.removeShareParticipant(fileId, userId);
+      remoteDatasource.removeShareParticipant(fileId, userId);
 }
