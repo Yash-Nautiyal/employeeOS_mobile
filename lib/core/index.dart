@@ -18,6 +18,7 @@ export 'common/components/custom_toast.dart';
 export 'common/components/custom_side_menu.dart';
 export 'common/components/custom_avatar_stack.dart';
 
+export 'common/components/dialog/action_confirm_dialog.dart';
 export 'common/components/dialog/slide_dialog.dart';
 
 export 'common/components/header/notification.dart';
@@ -35,3 +36,5 @@ export 'theme/app_pallete.dart';
 
 export 'common/actions/date_time_actions.dart';
 export 'common/actions/file_actions.dart';
+
+export 'user/user_info_index.dart';

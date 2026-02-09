@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:toastification/toastification.dart';
 
-import '../../../../core/index.dart'
+import '../../../../../core/index.dart'
     show
-        AppPallete,
         CustomDivider,
         PopupPreferredPosition,
         ResponsivePopupContainer,
@@ -12,13 +13,14 @@ import '../../../../core/index.dart'
         ResponsivePopupItem,
         formatFileSize,
         getFileIcon,
+        showCustomToast,
         showRightSideTaskDetails;
-import '../../index.dart'
-    show FilemanagerBloc, FileManagerSideMenu, FileType, FolderFile;
+import '../../../index.dart'
+    show FileEntity, FileItem, FilemanagerBloc, FileManagerSideMenu, FileRole;
 
 class RecentSection extends StatefulWidget {
   final ThemeData theme;
-  final List<FolderFile> files;
+  final List<FileEntity> files;
   final Function(String) onFavoriteToggle;
   const RecentSection(
       {super.key,
@@ -44,7 +46,11 @@ class _RecentSectionState extends State<RecentSection> {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: widget.files.length > 5 ? 5 : widget.files.length,
         separatorBuilder: (context, index) {
-          return CustomDivider(color: widget.theme.dividerColor, height: 1);
+          return CustomDivider(
+            color: widget.theme.dividerColor.withValues(alpha: .5),
+            dashWidth: 2.5,
+            height: 1,
+          );
         },
         itemBuilder: (context, index) {
           return _RecentSectionRow(
@@ -61,7 +67,7 @@ class _RecentSectionState extends State<RecentSection> {
 /// One row in the recent list; has its own popup key so GlobalKey is not shared.
 class _RecentSectionRow extends StatefulWidget {
   final ThemeData theme;
-  final FolderFile file;
+  final FileEntity file;
   final Function(String) onFavoriteToggle;
 
   const _RecentSectionRow({
@@ -90,17 +96,15 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
   Widget build(BuildContext context) {
     final filename = widget.file.name;
     final filesize = widget.file.size;
-    final filecounts = widget.file.fileCount;
-    final isfolder = widget.file.type == FileType.folder;
-    final isfavorite = widget.file.isFavorite;
 
     return GestureDetector(
       onTap: () => showRightSideTaskDetails(
-          context,
-          BlocProvider.value(
-            value: context.read<FilemanagerBloc>(),
-            child: FileManagerSideMenu(file: widget.file),
-          )),
+        context,
+        BlocProvider.value(
+          value: context.read<FilemanagerBloc>(),
+          child: FileManagerSideMenu(item: FileItem(widget.file)),
+        ),
+      ),
       child: Container(
         padding: const EdgeInsets.all(20).copyWith(right: 5),
         child: Row(
@@ -108,15 +112,10 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            isfolder
-                ? SvgPicture.asset(
-                    "assets/icons/file/ic-folder.svg",
-                    width: 30,
-                  )
-                : SvgPicture.asset(
-                    getFileIcon(widget.file.fileType ?? ""),
-                    width: 30,
-                  ),
+            SvgPicture.asset(
+              getFileIcon(widget.file.fileType ?? ""),
+              width: 30,
+            ),
             const SizedBox(width: 15),
             Expanded(
               child: Column(
@@ -128,50 +127,21 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  filesize != null
-                      ? Text(
-                          formatFileSize(filesize),
-                          style: widget.theme.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        )
-                      : const SizedBox.shrink(),
-                  filecounts != null
-                      ? Text(
-                          'Files: ${filecounts.toString()}',
-                          style: widget.theme.textTheme.bodySmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        )
-                      : const SizedBox.shrink(),
+                  if (filesize != null)
+                    Text(
+                      formatFileSize(filesize),
+                      style: widget.theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                 ],
               ),
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                InkWell(
-                  onTap: () => widget.onFavoriteToggle(widget.file.id),
-                  splashFactory: InkRipple.splashFactory,
-                  customBorder: const CircleBorder(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: SvgPicture.asset(
-                      isfavorite
-                          ? "assets/icons/common/solid/ic-eva_star-fill.svg"
-                          : "assets/icons/common/solid/ic-eva_star-outline.svg",
-                      colorFilter: ColorFilter.mode(
-                        isfavorite
-                            ? AppPallete.warningMain
-                            : widget.theme.disabledColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                ),
                 CompositedTransformTarget(
                   key: _popupAnchorKey,
                   link: _layerLink,
@@ -187,7 +157,8 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                         childBuilder: (placement) => ResponsivePopupContainer(
                           width: 130,
                           arrowSide: placement.arrowSide,
-                          arrowOffset: 0.15,
+                          arrowOffset:
+                              widget.file.role == FileRole.owner ? 0.15 : 0.4,
                           child: Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 5.0),
@@ -203,6 +174,17 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                                     svgIcon:
                                         'assets/icons/common/solid/ic-solar-link-bold.svg',
                                     onTap: () {
+                                      final link = widget.file.path;
+                                      if (link.isNotEmpty) {
+                                        Clipboard.setData(
+                                            ClipboardData(text: link));
+                                      } else {
+                                        showCustomToast(
+                                          context: context,
+                                          type: ToastificationType.error,
+                                          title: 'No link available',
+                                        );
+                                      }
                                       _popupController.hide();
                                     },
                                     color: widget.theme.colorScheme.tertiary,
@@ -211,7 +193,11 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                           horizontal: 5.0)
-                                      .copyWith(bottom: 10),
+                                      .copyWith(
+                                          bottom:
+                                              widget.file.role == FileRole.owner
+                                                  ? 10
+                                                  : 0),
                                   child: ResponsivePopupItem(
                                     title: 'Share',
                                     svgIcon:
@@ -222,25 +208,27 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                                     },
                                   ),
                                 ),
-                                CustomDivider(
-                                  color:
-                                      widget.theme.dividerColor.withAlpha(100),
-                                  dashWidth: 2.3,
-                                ),
-                                const SizedBox(height: 12),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 5.0),
-                                  child: ResponsivePopupItem(
-                                    title: 'Delete',
-                                    svgIcon:
-                                        'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
-                                    color: Colors.red,
-                                    onTap: () {
-                                      _popupController.hide();
-                                    },
+                                if (widget.file.role == FileRole.owner) ...[
+                                  CustomDivider(
+                                    color: widget.theme.dividerColor
+                                        .withAlpha(100),
+                                    dashWidth: 2.3,
                                   ),
-                                ),
+                                  const SizedBox(height: 12),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5.0),
+                                    child: ResponsivePopupItem(
+                                      title: 'Delete',
+                                      svgIcon:
+                                          'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+                                      color: Colors.red,
+                                      onTap: () {
+                                        _popupController.hide();
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

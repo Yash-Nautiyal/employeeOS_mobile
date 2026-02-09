@@ -14,16 +14,26 @@ final class FilemanagerInitial extends FilemanagerState {}
 final class FilemanagerLoading extends FilemanagerState {}
 
 final class FilemanagerLoaded extends FilemanagerState {
-  final List<FolderFile> files; // Example property
+  final List<FilemanagerItem> items;
+  final List<SharedUser>? availableUsers;
+  final List<String>? recentFileIds;
 
-  const FilemanagerLoaded(this.files);
+  const FilemanagerLoaded(this.items,
+      {this.availableUsers, this.recentFileIds});
 
   @override
-  List<Object> get props => [files];
+  List<Object> get props =>
+      [items, availableUsers ?? <SharedUser>[], recentFileIds ?? <String>[]];
 
-  FilemanagerLoaded copyWith({List<FolderFile>? files}) {
+  FilemanagerLoaded copyWith({
+    List<FilemanagerItem>? items,
+    List<SharedUser>? availableUsers,
+    List<String>? recentFileIds,
+  }) {
     return FilemanagerLoaded(
-      files ?? this.files,
+      items ?? this.items,
+      availableUsers: availableUsers ?? this.availableUsers,
+      recentFileIds: recentFileIds ?? this.recentFileIds,
     );
   }
 }

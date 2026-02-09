@@ -24,8 +24,21 @@ class PopupPlacement {
 
 class ResponsivePopupController {
   OverlayEntry? _entry;
+  void Function()? _exitAnimationCallback;
 
   bool get isShowing => _entry != null;
+
+  /// Called by the overlay to remove the entry (e.g. after exit animation).
+  void removeEntry() {
+    _entry?.remove();
+    _entry = null;
+    _exitAnimationCallback = null;
+  }
+
+  /// Registers a callback to run when [hide] is called (e.g. play exit animation then [removeEntry]).
+  void registerExit(void Function() animateOut) {
+    _exitAnimationCallback = animateOut;
+  }
 
   static const double _popupWidth = 180;
   static const double _popupHeight = 100;
@@ -53,6 +66,7 @@ class ResponsivePopupController {
     final usePlacement = anchorKey != null && childBuilder != null;
     Offset finalOffset = offset;
     Widget finalChild;
+    PopupArrowSide arrowSide = PopupArrowSide.bottom;
 
     if (usePlacement) {
       final key = anchorKey;
@@ -65,18 +79,21 @@ class ResponsivePopupController {
       );
       if (placement != null) {
         finalOffset = placement.offset;
+        arrowSide = placement.arrowSide;
         finalChild = childBuilder(placement);
       } else {
+        arrowSide = _arrowSideForPosition(preferredPosition);
         finalChild = childBuilder(PopupPlacement(
           offset: offset + (manualOffset ?? Offset.zero),
-          arrowSide: _arrowSideForPosition(preferredPosition),
+          arrowSide: arrowSide,
           arrowOffset: arrowOffsetOverride ?? 0.5,
         ));
       }
     } else if (childBuilder != null) {
+      arrowSide = _arrowSideForPosition(preferredPosition);
       final placement = PopupPlacement(
         offset: offset + (manualOffset ?? Offset.zero),
-        arrowSide: _arrowSideForPosition(preferredPosition),
+        arrowSide: arrowSide,
         arrowOffset: arrowOffsetOverride ?? 0.5,
       );
       finalChild = childBuilder(placement);
@@ -85,21 +102,12 @@ class ResponsivePopupController {
     }
 
     _entry = OverlayEntry(
-      builder: (_) => Positioned.fill(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: hide,
-          child: Stack(
-            children: [
-              CompositedTransformFollower(
-                link: link,
-                offset: finalOffset,
-                showWhenUnlinked: false,
-                child: finalChild,
-              ),
-            ],
-          ),
-        ),
+      builder: (_) => _AnimatedPopupOverlay(
+        controller: this,
+        link: link,
+        offset: finalOffset,
+        arrowSide: arrowSide,
+        child: finalChild,
       ),
     );
 
@@ -307,11 +315,125 @@ class ResponsivePopupController {
   }
 
   void hide() {
-    _entry?.remove();
-    _entry = null;
+    if (_exitAnimationCallback != null) {
+      _exitAnimationCallback!();
+      _exitAnimationCallback = null;
+    } else {
+      removeEntry();
+    }
   }
 
   void dispose() {
     hide();
+  }
+}
+
+/// Overlay that runs slide-from-arrow + fade in on show and slide-toward-arrow + fade out when closed.
+class _AnimatedPopupOverlay extends StatefulWidget {
+  const _AnimatedPopupOverlay({
+    required this.controller,
+    required this.link,
+    required this.offset,
+    required this.arrowSide,
+    required this.child,
+  });
+
+  final ResponsivePopupController controller;
+  final LayerLink link;
+  final Offset offset;
+  final PopupArrowSide arrowSide;
+  final Widget child;
+
+  @override
+  State<_AnimatedPopupOverlay> createState() => _AnimatedPopupOverlayState();
+}
+
+class _AnimatedPopupOverlayState extends State<_AnimatedPopupOverlay>
+    with SingleTickerProviderStateMixin {
+  static const Duration _duration = Duration(milliseconds: 200);
+  static const double _slideDistance = 14;
+  late final AnimationController _controller;
+  late final Animation<Offset> _slide;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: _duration,
+    );
+    final curve = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    _slide = Tween<Offset>(
+      begin: _slideBeginForArrowSide(widget.arrowSide),
+      end: Offset.zero,
+    ).animate(curve);
+    _opacity = Tween<double>(begin: 0.0, end: 1.0).animate(curve);
+    widget.controller.registerExit(_animateOut);
+    _controller.forward();
+  }
+
+  /// From the arrow (anchor) toward the side the popup opens. e.g. opens on left → right-to-left.
+  static Offset _slideBeginForArrowSide(PopupArrowSide side) {
+    switch (side) {
+      case PopupArrowSide.bottom:
+        return const Offset(0, _slideDistance);
+      case PopupArrowSide.top:
+        return const Offset(0, -_slideDistance);
+      case PopupArrowSide.left:
+        return const Offset(-_slideDistance, 0);
+      case PopupArrowSide.right:
+        return const Offset(_slideDistance, 0);
+    }
+  }
+
+  void _animateOut() {
+    if (!_controller.isAnimating && _controller.value > 0) {
+      _controller.reverse().then((_) {
+        if (mounted) widget.controller.removeEntry();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _animateOut,
+        child: Stack(
+          children: [
+            CompositedTransformFollower(
+              link: widget.link,
+              offset: widget.offset,
+              showWhenUnlinked: false,
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _opacity.value,
+                    child: Transform.translate(
+                      offset: _slide.value,
+                      child: child,
+                    ),
+                  );
+                },
+                child: widget.child,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

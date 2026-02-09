@@ -4,10 +4,12 @@ class AvatarStackItem {
   const AvatarStackItem({
     required this.name,
     this.imageUrl,
+    this.isCurrentUser = false,
   });
 
   final String name;
   final String? imageUrl;
+  final bool isCurrentUser;
 }
 
 class CustomAvatarStack extends StatelessWidget {
@@ -47,6 +49,7 @@ class CustomAvatarStack extends StatelessWidget {
                 item: entry.value,
                 size: size,
                 theme: theme,
+                isCurrentUser: entry.value.isCurrentUser,
               ),
             ),
           if (hasOverflow)
@@ -69,11 +72,13 @@ class _AvatarCircle extends StatelessWidget {
     required this.item,
     required this.size,
     required this.theme,
+    required this.isCurrentUser,
   });
 
   final AvatarStackItem item;
   final double size;
   final ThemeData theme;
+  final bool isCurrentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -81,31 +86,68 @@ class _AvatarCircle extends StatelessWidget {
     final hasUrl = (item.imageUrl ?? '').isNotEmpty;
     final initialsAvatar = _buildInitialsAvatar(theme, initials, size);
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.scaffoldBackgroundColor,
-          width: 2,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isCurrentUser
+                  ? theme.primaryColor
+                  : theme.scaffoldBackgroundColor,
+              width: isCurrentUser ? 2.5 : 1.5,
+            ),
+          ),
+          child: ClipOval(
+            child: hasUrl
+                ? Image.network(
+                    item.imageUrl!,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return initialsAvatar;
+                    },
+                    errorBuilder: (context, error, stackTrace) =>
+                        initialsAvatar,
+                  )
+                : initialsAvatar,
+          ),
         ),
-      ),
-      child: ClipOval(
-        child: hasUrl
-            ? Image.network(
-                item.imageUrl!,
-                width: size,
-                height: size,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return initialsAvatar;
-                },
-                errorBuilder: (context, error, stackTrace) => initialsAvatar,
-              )
-            : initialsAvatar,
-      ),
+        if (isCurrentUser)
+          Positioned(
+            top: -7,
+            right: 0,
+            left: 0,
+            child: Container(
+              width: size * 0.41,
+              height: size * 0.41,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: theme.primaryColor,
+                border: Border.all(
+                  color: theme.scaffoldBackgroundColor,
+                  width: 1,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  'Y',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 7.2,
+                    color: theme.scaffoldBackgroundColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -129,7 +171,7 @@ class _SurplusCircle extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: theme.primaryColor.withOpacity(0.6),
+        color: theme.primaryColor.withOpacity(0.8),
         border: Border.all(
           color: theme.scaffoldBackgroundColor,
           width: 2,
@@ -137,7 +179,7 @@ class _SurplusCircle extends StatelessWidget {
       ),
       child: Text(
         '+$count',
-        style: theme.textTheme.labelSmall?.copyWith(
+        style: theme.textTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.w700,
           color: theme.primaryColorLight,
         ),

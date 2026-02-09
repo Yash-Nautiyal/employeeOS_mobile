@@ -7,8 +7,8 @@ import 'package:employeeos/view/filemanager/domain/entities/files_models.dart'
     show SharedUser, UserPermission;
 import 'package:flutter/material.dart';
 
-class TableSideMenuPopup extends StatelessWidget {
-  const TableSideMenuPopup(
+class SideMenuPopup extends StatefulWidget {
+  const SideMenuPopup(
       {super.key,
       required this.theme,
       required this.user,
@@ -20,11 +20,40 @@ class TableSideMenuPopup extends StatelessWidget {
   final Function(SharedUser) handleRemoveUser;
 
   @override
+  State<SideMenuPopup> createState() => _SideMenuPopupState();
+}
+
+class _SideMenuPopupState extends State<SideMenuPopup> {
+  /// Local permission used to update UI immediately on tap before bloc emits.
+  UserPermission? _localPermission;
+
+  UserPermission get _effectivePermission =>
+      _localPermission ?? widget.user.permission ?? UserPermission.view;
+
+  @override
+  void didUpdateWidget(SideMenuPopup oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.user.permission != oldWidget.user.permission) {
+      _localPermission = null;
+    }
+  }
+
+  void _onPermissionTap(BuildContext context, UserPermission permission) {
+    setState(() => _localPermission = permission);
+    widget.handlePermissionChange(widget.user, permission);
+    if (mounted && context.mounted) Navigator.of(context).pop();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = widget.theme;
+    final user = widget.user;
+    final effective = _effectivePermission;
+
     return CustomPopup(
       content: Container(
         constraints: const BoxConstraints(
-          maxWidth: 160,
+          maxWidth: 140,
           minWidth: 100,
         ),
         child: Column(
@@ -32,22 +61,22 @@ class TableSideMenuPopup extends StatelessWidget {
           children: [
             PermissionMenuItem(
               text: 'Can view',
-              onTap: () => handlePermissionChange(user, UserPermission.view),
+              onTap: () => _onPermissionTap(context, UserPermission.view),
               svgIcon: 'assets/icons/common/solid/ic-solar_eye-bold.svg',
-              isSelected: user.permission == UserPermission.view,
+              isSelected: effective == UserPermission.view,
             ),
             PermissionMenuItem(
               text: 'Can edit',
-              onTap: () => handlePermissionChange(user, UserPermission.edit),
+              onTap: () => _onPermissionTap(context, UserPermission.edit),
               svgIcon: 'assets/icons/common/solid/ic-solar_pen-bold.svg',
-              isSelected: user.permission == UserPermission.edit,
+              isSelected: effective == UserPermission.edit,
             ),
             CustomDivider(
               color: theme.dividerColor,
             ),
             DestructiveMenuItem(
               text: 'Remove',
-              onTap: () => handleRemoveUser(user),
+              onTap: () => widget.handleRemoveUser(user),
             ),
           ],
         ),
@@ -56,7 +85,7 @@ class TableSideMenuPopup extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Can ${formatUserPermission(user.permission ?? UserPermission.view).toLowerCase()}',
+            'Can ${formatUserPermission(effective).toLowerCase()}',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
               color: theme.colorScheme.tertiary,

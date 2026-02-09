@@ -85,3 +85,98 @@ final class RemoveShareParticipantEvent extends FilemanagerEvent {
   @override
   List<Object> get props => [fileId, userId];
 }
+
+final class FetchAvailableUsersEvent extends FilemanagerEvent {}
+
+final class CreateFolderEvent extends FilemanagerEvent {
+  final String folderName;
+  final List<String>? fileIds;
+
+  const CreateFolderEvent(this.folderName, {this.fileIds});
+
+  @override
+  List<Object> get props => [folderName, fileIds ?? <String>[]];
+}
+
+final class DeleteFolderEvent extends FilemanagerEvent {
+  final String folderId;
+
+  const DeleteFolderEvent(this.folderId);
+
+  @override
+  List<Object> get props => [folderId];
+}
+
+/// Delete multiple files (owner only) and folders. Emits success/error when done.
+final class DeleteSelectedEvent extends FilemanagerEvent {
+  final List<String> fileIds;
+  final List<String> folderIds;
+
+  const DeleteSelectedEvent({
+    required this.fileIds,
+    required this.folderIds,
+  });
+
+  @override
+  List<Object> get props => [fileIds, folderIds];
+}
+
+final class ToggleFolderFavoriteEvent extends FilemanagerEvent {
+  final String folderId;
+  final bool currentlyFavorited;
+
+  const ToggleFolderFavoriteEvent(this.folderId, this.currentlyFavorited);
+
+  @override
+  List<Object> get props => [folderId, currentlyFavorited];
+}
+
+final class MoveFileToFolderEvent extends FilemanagerEvent {
+  final String fileId;
+  final String folderId;
+
+  const MoveFileToFolderEvent(this.fileId, this.folderId);
+
+  @override
+  List<Object> get props => [fileId, folderId];
+}
+
+final class MoveFileToRootEvent extends FilemanagerEvent {
+  final String fileId;
+
+  const MoveFileToRootEvent(this.fileId);
+
+  @override
+  List<Object> get props => [fileId];
+}
+
+final class LogFileActivityEvent extends FilemanagerEvent {
+  final String fileId;
+
+  const LogFileActivityEvent(this.fileId);
+
+  @override
+  List<Object> get props => [fileId];
+}
+
+final class AddTagEvent extends FilemanagerEvent {
+  final String fileId;
+  final String tagName;
+  final bool isPersonal;
+
+  const AddTagEvent(this.fileId, this.tagName, {this.isPersonal = false});
+
+  @override
+  List<Object> get props => [fileId, tagName, isPersonal];
+}
+
+final class DeleteTagEvent extends FilemanagerEvent {
+  final String fileId;
+  final String tagName;
+  final bool isPersonal;
+
+  const DeleteTagEvent(this.fileId, this.tagName, {this.isPersonal = false});
+
+  @override
+  List<Object> get props => [fileId, tagName, isPersonal];
+}

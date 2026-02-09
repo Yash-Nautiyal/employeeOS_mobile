@@ -1,16 +1,16 @@
 import 'package:employeeos/core/index.dart' show AppPallete;
 import 'package:flutter/material.dart';
 
-import '../../../../index.dart'
-    show SharedUser, TableSideMenuPopup, UserPermission;
+import '../../../index.dart' show SharedUser, SideMenuPopup, UserPermission;
 
-class TableSideMenuShareSection extends StatelessWidget {
-  const TableSideMenuShareSection(
-      {super.key,
-      required this.theme,
-      required this.title,
-      required this.child,
-      this.onAdd});
+class SideMenuShareSection extends StatelessWidget {
+  const SideMenuShareSection({
+    super.key,
+    required this.theme,
+    required this.title,
+    required this.child,
+    this.onAdd,
+  });
 
   final ThemeData theme;
   final String title;
@@ -74,16 +74,23 @@ class SharePropertyRow extends StatelessWidget {
     required this.user,
     required this.handlePermissionChange,
     required this.handleRemoveUser,
+    this.canChangePermission = true,
   });
+
   final ThemeData theme;
   final SharedUser user;
   final Function(SharedUser, UserPermission) handlePermissionChange;
   final Function(SharedUser) handleRemoveUser;
-  
+
+  /// When false (e.g. editor viewing own row), only show permission text, no dropdown/remove.
+  final bool canChangePermission;
+
   @override
   Widget build(BuildContext context) {
     final hasUrl = user.avatarUrl.isNotEmpty;
     final initials = _initialsFromName(user.name);
+    final permissionText =
+        user.permission == UserPermission.edit ? 'Can edit' : 'Can view';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -102,30 +109,41 @@ class SharePropertyRow extends StatelessWidget {
                   )
                 : null,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   user.name,
-                  style: theme.textTheme.titleMedium
+                  style: theme.textTheme.bodyMedium
                       ?.copyWith(color: theme.colorScheme.tertiary),
                 ),
-                Text(
-                  user.email,
-                  style: theme.textTheme.bodySmall,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                if (user.email.isNotEmpty)
+                  Text(
+                    user.email,
+                    style: theme.textTheme.bodySmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          TableSideMenuPopup(
+          if (canChangePermission)
+            SideMenuPopup(
               theme: theme,
               user: user,
               handlePermissionChange: handlePermissionChange,
-              handleRemoveUser: handleRemoveUser),
+              handleRemoveUser: handleRemoveUser,
+            )
+          else
+            Text(
+              permissionText,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.tertiary,
+              ),
+            ),
         ],
       ),
     );

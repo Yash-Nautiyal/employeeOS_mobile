@@ -1,24 +1,9 @@
+import 'package:employeeos/core/index.dart' show showCustomToast;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:employeeos/view/filemanager/presentation/bloc/filemanager_bloc.dart';
-import '../../index.dart'
-    show
-        AddShareParticipantUsecase,
-        DeleteFileUsecase,
-        FavoritesSection,
-        FetchFilesUsecase,
-        FileTableScreen,
-        FilemanagerHeader,
-        FilemanagerRemoteDatasource,
-        FilemanagerRepositoryImpl,
-        RecentSection,
-        RemoveShareParticipantUsecase,
-        StorageSection,
-        ToggleFavoritesUsecase,
-        UpdateSharePermissionUsecase,
-        UpdateTagsUsecase,
-        UploadFilesDialog,
-        UploadFilesUsecase;
+import 'package:toastification/toastification.dart';
+
+import '../../index.dart';
 
 class FilemanagerView extends StatefulWidget {
   const FilemanagerView({super.key});
@@ -29,24 +14,14 @@ class FilemanagerView extends StatefulWidget {
 
 class _FilemanagerViewState extends State<FilemanagerView> {
   final _scrollController = ScrollController();
+  bool _showingAllFavorites = false;
 
   late FilemanagerBloc _bloc;
 
   @override
   void initState() {
     super.initState();
-    final repository = FilemanagerRepositoryImpl(FilemanagerRemoteDatasource());
-    _bloc = FilemanagerBloc(
-      fetchFileUsecase: FetchFilesUsecase(repository),
-      toggleFavoritesUsecase: ToggleFavoritesUsecase(repository),
-      uploadFilesUsecase: UploadFilesUsecase(repository),
-      deleteFileUsecase: DeleteFileUsecase(repository),
-      updateTagsUsecase: UpdateTagsUsecase(repository),
-      addShareParticipantUsecase: AddShareParticipantUsecase(repository),
-      updateSharePermissionUsecase: UpdateSharePermissionUsecase(repository),
-      removeShareParticipantUsecase: RemoveShareParticipantUsecase(repository),
-    );
-
+    _bloc = FilemanagerInjection.createBloc();
     _bloc.add(FilemanagerLoadingEvent());
   }
 
@@ -58,12 +33,35 @@ class _FilemanagerViewState extends State<FilemanagerView> {
     super.dispose();
   }
 
+  /// Runs upload via bloc and completes when the upload finishes (success or error).
+  Future<void> _handleUpload(List<PickedFile> picked) async {
+    if (picked.isEmpty) return;
+    _bloc.add(UploadFilesEvent(picked));
+    await _bloc.stream
+        .where(
+            (s) => s is FilemanagerLoaded || s is FilemanagerErrorActionState)
+        .first;
+  }
+
+  void _openUploadDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => BlocProvider.value(
+        value: _bloc,
+        child: UploadFilesDialog(
+          onUpload: (picked) async {
+            await _handleUpload(picked);
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
-    // final screenWidth = MediaQuery.of(context).size.width;
-
     final wideScreen = MediaQuery.of(context).size.width > 700;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
@@ -81,7 +79,22 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                 current is FilemanagerActionState,
             buildWhen: (previous, current) =>
                 current is! FilemanagerActionState,
-            listener: (context, state) {},
+            listener: (context, state) {
+              if (state is FilemanagerErrorActionState) {
+                showCustomToast(
+                  context: context,
+                  type: ToastificationType.error,
+                  title: 'Error',
+                  description: state.message,
+                );
+              } else if (state is FilemanagerSuccessActionState) {
+                showCustomToast(
+                  context: context,
+                  type: ToastificationType.success,
+                  title: state.message,
+                );
+              }
+            },
             builder: (context, state) {
               if (state is FilemanagerLoading) {
                 return const Center(
@@ -96,9 +109,42 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                   ),
                 );
               } else if (state is FilemanagerLoaded) {
-                final files = state.files;
-                final favorites =
-                    files.where((file) => file.isFavorite).toList();
+                final items = state.items;
+                final favorites = items
+                    .whereType<FileItem>()
+                    .map((i) => i.file)
+                    .where((f) => f.isFavorite)
+                    .toList();
+                final allFiles =
+                    items.whereType<FileItem>().map((i) => i.file).toList();
+                final recentIds = state.recentFileIds ?? [];
+                final recentFiles = recentIds.isEmpty
+                    ? allFiles
+                    : recentIds
+                            .map((id) => allFiles
+                                .cast<FileEntity?>()
+                                .firstWhere((f) => f?.id == id,
+                                    orElse: () => null))
+                            .whereType<FileEntity>()
+                            .toList() +
+                        allFiles
+                            .where((f) => !recentIds.contains(f.id))
+                            .toList();
+                final horizontalPadding =
+                    EdgeInsets.symmetric(horizontal: isWideScreen ? 32 : 16.0);
+
+                if (_showingAllFavorites) {
+                  return AllFavoritesSection(
+                    favorites: favorites,
+                    theme: theme,
+                    horizontalPadding: horizontalPadding,
+                    onBack: () => setState(() => _showingAllFavorites = false),
+                    onFavoriteToggle: (fileId) =>
+                        _bloc.add(ToggleFavoriteEvent(fileId)),
+                    bloc: _bloc,
+                  );
+                }
+
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,13 +153,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                       padding: EdgeInsets.symmetric(
                           horizontal: isWideScreen ? 32 : 16.0),
                       child: FilemanagerHeader(
-                        onUploadTap: () => showDialog<void>(
-                          context: context,
-                          builder: (ctx) => BlocProvider.value(
-                            value: _bloc,
-                            child: const UploadFilesDialog(),
-                          ),
-                        ),
+                        onUploadTap: () => _openUploadDialog(context),
                       ),
                     ),
                     const SizedBox(
@@ -133,7 +173,8 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                           ),
                           const Spacer(),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () =>
+                                setState(() => _showingAllFavorites = true),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -190,7 +231,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: RecentSection(
                           theme: theme,
-                          files: files,
+                          files: recentFiles,
                           onFavoriteToggle: (fileId) => _bloc.add(
                             ToggleFavoriteEvent(fileId),
                           ),
@@ -236,7 +277,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                                       ),
                                       RecentSection(
                                         theme: theme,
-                                        files: files,
+                                        files: recentFiles,
                                         onFavoriteToggle: (fileId) => _bloc.add(
                                           ToggleFavoriteEvent(fileId),
                                         ),
@@ -255,7 +296,8 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                       padding: EdgeInsets.symmetric(
                           horizontal: isWideScreen ? 32 : 16.0),
                       child: FileTableScreen(
-                        files: [...files],
+                        bloc: _bloc,
+                        items: items,
                         verticalScrollController: _scrollController,
                         screenWidth: MediaQuery.of(context).size.width,
                         onFavoriteToggle: (fileId) =>

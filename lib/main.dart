@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
 import 'package:employeeos/view/auth/presentation/bloc/auth_bloc.dart';
-import 'package:employeeos/view/auth/presentation/pages/auth_view.dart';
 import 'package:employeeos/view/home/presentation/pages/home_view.dart';
 import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';

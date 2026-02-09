@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_popup/flutter_popup.dart' show CustomPopupState;
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../../core/index.dart'
+import '../../../../../../core/index.dart'
     show AppPallete, CustomDivider, CustomPopup, CustomTextButton, getFileIcon;
-import '../../../index.dart'
+import '../../../../index.dart'
     show
         FileFilterService,
         FileManagerFilterController,

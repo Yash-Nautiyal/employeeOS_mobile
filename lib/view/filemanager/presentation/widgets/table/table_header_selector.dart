@@ -7,11 +7,38 @@ class TableHeaderSelector extends StatelessWidget {
     required this.selectedCount,
     required this.onClear,
     required this.onSelectAll,
+    required this.hasFolderSelected,
+    required this.selectedFileIds,
+    required this.onAddToFolder,
+    this.onShare,
+    this.onDelete,
   });
 
   final int selectedCount;
   final VoidCallback? onClear;
   final VoidCallback? onSelectAll;
+
+  /// When true, the add-to-folder and share buttons are disabled (folders are personal, not shareable).
+  final bool hasFolderSelected;
+
+  /// File IDs only (no folder IDs). Used when creating a folder and moving these files into it.
+  final List<String> selectedFileIds;
+
+  /// Called when user taps the add-folder icon. Only enabled when no folder is selected and at least one file is selected.
+  final VoidCallback? onAddToFolder;
+
+  /// Called when user taps the share icon. Disabled when a folder is selected (folders cannot be shared).
+  final VoidCallback? onShare;
+
+  /// Called when user taps the delete (trash) icon. Only enabled when there is selection.
+  final VoidCallback? onDelete;
+
+  bool get _canAddToFolder =>
+      !hasFolderSelected && selectedFileIds.isNotEmpty && onAddToFolder != null;
+
+  /// Share is only for files; folders are personal and cannot be shared.
+  bool get _canShare =>
+      !hasFolderSelected && selectedFileIds.isNotEmpty && onShare != null;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +54,7 @@ class TableHeaderSelector extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           Checkbox(
@@ -51,19 +78,44 @@ class TableHeaderSelector extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          SvgPicture.asset(
-            'assets/icons/common/solid/ic-solar-add-folder-bold.svg',
-            color: theme.primaryColor,
+          InkWell(
+            onTap: _canAddToFolder ? onAddToFolder : null,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SvgPicture.asset(
+                'assets/icons/common/solid/ic-solar-add-folder-bold.svg',
+                color: _canAddToFolder
+                    ? theme.primaryColor
+                    : theme.primaryColor.withAlpha(50),
+              ),
+            ),
           ),
-          const SizedBox(width: 10),
-          SvgPicture.asset(
-            'assets/icons/common/solid/ic-solar_share-bold.svg',
-            color: theme.primaryColor,
+          InkWell(
+            onTap: _canShare ? onShare : null,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SvgPicture.asset(
+                'assets/icons/common/solid/ic-solar_share-bold.svg',
+                color: _canShare
+                    ? theme.primaryColor
+                    : theme.primaryColor.withAlpha(50),
+              ),
+            ),
           ),
-          const SizedBox(width: 10),
-          SvgPicture.asset(
-            'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
-            color: theme.primaryColor,
+          InkWell(
+            onTap: hasSel && onDelete != null ? onDelete : null,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SvgPicture.asset(
+                'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+                color: hasSel && onDelete != null
+                    ? theme.primaryColor
+                    : theme.disabledColor.withValues(alpha: 0.5),
+              ),
+            ),
           ),
         ],
       ),

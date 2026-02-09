@@ -1,11 +1,11 @@
-import '../../index.dart' show FilemanagerRepository, FolderFile, PickedFile;
+import '../../index.dart' show FileEntity, FilemanagerRepository, PickedFile;
 
 class UploadFilesUsecase {
   final FilemanagerRepository repository;
 
   const UploadFilesUsecase(this.repository);
 
-  Future<List<FolderFile>> call(List<PickedFile> files) {
-    return repository.uploadFiles(files);
+  Future<List<FileEntity>> call(List<PickedFile> files, {String? folderId}) {
+    return repository.uploadFiles(files, folderId: folderId);
   }
 }

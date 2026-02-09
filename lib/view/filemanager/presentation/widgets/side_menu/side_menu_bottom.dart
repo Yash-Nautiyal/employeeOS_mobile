@@ -4,10 +4,10 @@ import 'package:employeeos/core/index.dart' show AppPallete, CustomTextButton;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class TableSideMenuBottom extends StatelessWidget {
+class SideMenuBottom extends StatelessWidget {
   final ThemeData theme;
   final VoidCallback onDelete;
-  const TableSideMenuBottom(
+  const SideMenuBottom(
       {super.key, required this.theme, required this.onDelete});
 
   @override

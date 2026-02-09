@@ -1,8 +1,8 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
-class TableSideMenuSections extends StatelessWidget {
-  const TableSideMenuSections(
+class SideMenuSections extends StatelessWidget {
+  const SideMenuSections(
       {super.key,
       required this.onToggle,
       required this.title,

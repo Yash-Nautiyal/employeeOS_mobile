@@ -1,10 +1,10 @@
-import '../../index.dart' show FilemanagerRepository, FolderFile;
+import '../../index.dart' show FileEntity, FilemanagerRepository;
 
 class UpdateTagsUsecase {
   final FilemanagerRepository repository;
 
   const UpdateTagsUsecase(this.repository);
 
-  Future<FolderFile> call(String fileId, List<String> tags) =>
+  Future<FileEntity> call(String fileId, List<String> tags) =>
       repository.updateTags(fileId, tags);
 }

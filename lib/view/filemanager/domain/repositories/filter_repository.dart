@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:employeeos/view/filemanager/domain/entities/files_models.dart';
+import 'package:employeeos/view/filemanager/domain/entities/files_models.dart'
+    show FileItem, FilemanagerItem;
 import 'package:employeeos/view/filemanager/domain/entities/filter_models.dart';
 
-/// Service class for handling file filtering logic
-/// This separates the business logic from UI components
+/// Service class for handling file/folder filtering logic.
 class FileFilterService {
-  /// Check if a file matches the search query
-  static bool matchesSearchQuery(FolderFile file, String query) {
+  static bool matchesSearchQuery(FilemanagerItem item, String query) {
     if (query.isEmpty) return true;
-    return file.name.toLowerCase().contains(query.toLowerCase());
+    return item.name.toLowerCase().contains(query.toLowerCase());
   }
 
-  /// Check if a file matches the date range filter
-  static bool matchesDateRange(FolderFile file, DateTimeRange? dateRange) {
+  static bool matchesDateRange(FilemanagerItem item, DateTimeRange? dateRange) {
     if (dateRange == null) return true;
-
     final fileDay = DateTime(
-      file.createdAt.year,
-      file.createdAt.month,
-      file.createdAt.day,
+      item.createdAt.year,
+      item.createdAt.month,
+      item.createdAt.day,
     );
     final startDay = DateTime(
       dateRange.start.year,
@@ -30,37 +27,27 @@ class FileFilterService {
       dateRange.end.month,
       dateRange.end.day,
     );
-
     return (fileDay.isAtSameMomentAs(startDay) || fileDay.isAfter(startDay)) &&
         (fileDay.isAtSameMomentAs(endDay) || fileDay.isBefore(endDay));
   }
 
-  /// Check if a file matches any of the selected file type filters
   static bool matchesFileTypeFilters(
-      FolderFile file, Set<FileTypeFilter> filters) {
-    if (filters.isEmpty) return true; // No restriction = all files
-
+      FilemanagerItem item, Set<FileTypeFilter> filters) {
+    if (filters.isEmpty) return true;
     for (final filter in filters) {
-      if (matchesFileTypeFilter(file, filter)) return true;
+      if (matchesFileTypeFilter(item, filter)) return true;
     }
     return false;
   }
 
-  /// Check if a file matches a specific file type filter
-  static bool matchesFileTypeFilter(FolderFile file, FileTypeFilter filter) {
+  static bool matchesFileTypeFilter(
+      FilemanagerItem item, FileTypeFilter filter) {
     if (filter == FileTypeFilter.all) return true;
-
-    // Handle folder filter
-    if (filter == FileTypeFilter.folder) {
-      return file.isFolder;
-    }
-
-    // For files, check the file type
-    if (file.isFolder) return false;
-    if (file.fileType == null) return false;
-
-    final lowerFileType = file.fileType!.toLowerCase();
-
+    if (filter == FileTypeFilter.folder) return item.isFolder;
+    if (item.isFolder) return false;
+    final fileType = item is FileItem ? item.file.fileType : null;
+    if (fileType == null) return false;
+    final lowerFileType = fileType.toLowerCase();
     switch (filter) {
       case FileTypeFilter.all:
         return true;
@@ -91,31 +78,24 @@ class FileFilterService {
     }
   }
 
-  /// Apply all filters to a list of files
-  static List<FolderFile> applyFilters(
-    List<FolderFile> files,
+  static List<FilemanagerItem> applyFilters(
+    List<FilemanagerItem> items,
     FileManagerFilterState filterState,
   ) {
-    return files.where((file) {
-      // Apply search filter
+    return items.where((item) {
       if (filterState.searchFilter.isActive &&
-          !matchesSearchQuery(file, filterState.searchFilter.query)) {
+          !matchesSearchQuery(item, filterState.searchFilter.query)) {
         return false;
       }
-
-      // Apply date range filter
       if (filterState.dateRangeFilter.isActive &&
-          !matchesDateRange(file, filterState.dateRangeFilter.dateRange)) {
+          !matchesDateRange(item, filterState.dateRangeFilter.dateRange)) {
         return false;
       }
-
-      // Apply file type filter
       if (filterState.fileTypeFilter.isActive &&
           !matchesFileTypeFilters(
-              file, filterState.fileTypeFilter.selectedTypes)) {
+              item, filterState.fileTypeFilter.selectedTypes)) {
         return false;
       }
-
       return true;
     }).toList();
   }

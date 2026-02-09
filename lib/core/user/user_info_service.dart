@@ -1,0 +1,78 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'user_info_entity.dart';
+
+/// Common service to fetch user info from [public.user_info].
+/// Use anywhere in the project when you need user profile data (name, avatar, email, etc.).
+class UserInfoService {
+  UserInfoService() : _client = Supabase.instance.client;
+
+  final SupabaseClient _client;
+
+  static const String _table = 'user_info';
+
+  /// Fetches all users from user_info, ordered by full_name.
+  Future<List<UserInfoEntity>> fetchAllUsers() async {
+    final res = await _client
+        .from(_table)
+        .select(
+            'id, email, full_name, avatar_url, phone_number, date_of_birth, role, email_verified, phone_verified, created_at, last_activity, status')
+        .order('full_name');
+    return _mapRows(res);
+  }
+
+  /// Fetches a single user by id. Returns null if not found.
+  Future<UserInfoEntity?> fetchUserById(String id) async {
+    if (id.isEmpty) return null;
+    final res = await _client
+        .from(_table)
+        .select(
+            'id, email, full_name, avatar_url, phone_number, date_of_birth, role, email_verified, phone_verified, created_at, last_activity, status')
+        .eq('id', id)
+        .maybeSingle();
+    if (res == null) return null;
+    return _rowToEntity(res);
+  }
+
+  /// Fetches multiple users by ids. Returns only found users; missing ids are skipped.
+  Future<List<UserInfoEntity>> fetchUsersByIds(List<String> ids) async {
+    if (ids.isEmpty) return [];
+    final uniqueIds = ids.toSet().where((id) => id.isNotEmpty).toList();
+    if (uniqueIds.isEmpty) return [];
+    final res = await _client
+        .from(_table)
+        .select(
+            'id, email, full_name, avatar_url, phone_number, date_of_birth, role, email_verified, phone_verified, created_at, last_activity, status')
+        .inFilter('id', uniqueIds);
+    return _mapRows(res);
+  }
+
+  List<UserInfoEntity> _mapRows(dynamic res) {
+    final list = res is List ? res : (res != null ? [res] : <dynamic>[]);
+    return list.map((e) => _rowToEntity(e as Map<String, dynamic>)).toList();
+  }
+
+  UserInfoEntity _rowToEntity(Map<String, dynamic> row) {
+    return UserInfoEntity(
+      id: row['id'] as String,
+      email: row['email'] as String? ?? '',
+      fullName: row['full_name'] as String? ?? '',
+      avatarUrl: row['avatar_url'] as String?,
+      phoneNumber: row['phone_number'] as String?,
+      dateOfBirth: _parseDate(row['date_of_birth']),
+      role: row['role'] as String?,
+      emailVerified: row['email_verified'] as bool? ?? false,
+      phoneVerified: row['phone_verified'] as bool? ?? false,
+      createdAt: _parseDate(row['created_at']),
+      lastActivity: _parseDate(row['last_activity']),
+      status: row['status'] as String?,
+    );
+  }
+
+  DateTime? _parseDate(dynamic v) {
+    if (v == null) return null;
+    if (v is DateTime) return v;
+    if (v is String) return DateTime.tryParse(v);
+    return null;
+  }
+}

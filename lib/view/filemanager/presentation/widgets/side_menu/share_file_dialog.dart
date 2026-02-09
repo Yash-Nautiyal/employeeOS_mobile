@@ -14,6 +14,10 @@ class ShareFileDialog extends StatelessWidget {
   final Function(SharedUser) setSelectedUser;
   final Function(UserPermission) setSelectedPermission;
   final Function() onShare;
+
+  /// Title shown at top of dialog. Defaults to 'Share File'.
+  final String title;
+
   const ShareFileDialog(
       {super.key,
       required this.context,
@@ -23,7 +27,8 @@ class ShareFileDialog extends StatelessWidget {
       required this.available,
       required this.setSelectedUser,
       required this.setSelectedPermission,
-      required this.onShare});
+      required this.onShare,
+      this.title = 'Share File'});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +43,7 @@ class ShareFileDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Share File',
+              title,
               style: theme.textTheme.titleLarge
                   ?.copyWith(fontWeight: FontWeight.w800),
             ),
@@ -77,7 +82,19 @@ class ShareFileDialog extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 14,
-                            backgroundImage: NetworkImage(user.avatarUrl),
+                            backgroundImage: user.avatarUrl.isNotEmpty
+                                ? NetworkImage(user.avatarUrl)
+                                : null,
+                            child: user.avatarUrl.isEmpty
+                                ? Text(
+                                    user.name.isNotEmpty
+                                        ? user.name
+                                            .substring(0, 1)
+                                            .toUpperCase()
+                                        : '?',
+                                    style: theme.textTheme.labelLarge,
+                                  )
+                                : null,
                           ),
                           const SizedBox(width: 10),
                           Expanded(

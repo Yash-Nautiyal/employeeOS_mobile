@@ -1,12 +1,12 @@
 import '../../index.dart'
-    show FilemanagerRepository, FolderFile, UserPermission;
+    show FileEntity, FilemanagerRepository, UserPermission;
 
 class UpdateSharePermissionUsecase {
   final FilemanagerRepository repository;
 
   const UpdateSharePermissionUsecase(this.repository);
 
-  Future<FolderFile> call(
+  Future<FileEntity> call(
           String fileId, String userId, UserPermission permission) =>
       repository.updateSharePermission(fileId, userId, permission);
 }

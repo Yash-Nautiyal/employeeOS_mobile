@@ -6,7 +6,7 @@ import 'package:employeeos/view/filemanager/presentation/controllers/filter_cont
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../index.dart' show DateSelectorButton, QuickDateOptions;
+import '../../../../index.dart' show DateSelectorButton, QuickDateOptions;
 
 /// UI component for date range filtering
 /// This component is now purely UI-focused and uses the controller for state management
