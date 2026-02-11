@@ -19,6 +19,9 @@ ThemeData buildTheme({
   final colorscheme = AppPallete.primaryPresets.entries
       .firstWhere((entry) => entry.key == preset)
       .value;
+  final secondaryScheme = AppPallete.secondaryPresets.entries
+      .firstWhere((entry) => entry.key == preset)
+      .value;
 
   final baseTextTheme = TextTheme(
     displayLarge: AppTypography.displayLarge.copyWith(
@@ -119,15 +122,9 @@ ThemeData buildTheme({
             primaryFixedDim: colorscheme["Light"],
             primaryContainer: colorscheme["Lighter"],
             primaryFixed: colorscheme["Lighter"],
-            secondary: preset != Presets.purple
-                ? AppPallete.secondaryDark
-                : AppPallete.primaryDark,
-            secondaryFixedDim: preset != Presets.purple
-                ? AppPallete.secondaryDarker
-                : AppPallete.primaryDarker,
-            secondaryContainer: preset != Presets.purple
-                ? AppPallete.secondaryLighter
-                : AppPallete.primaryLighter,
+            secondary: secondaryScheme["Dark"],
+            secondaryFixedDim: secondaryScheme["Darker"],
+            secondaryContainer: secondaryScheme["Lighter"],
             error: AppPallete.errorMain,
             errorContainer: AppPallete.errorMain,
             surface: AppPallete.grey800,
@@ -140,15 +137,9 @@ ThemeData buildTheme({
             primaryFixedDim: colorscheme["Dark"],
             primaryContainer: colorscheme["Lighter"],
             primaryFixed: colorscheme["Dark"],
-            secondary: preset != Presets.purple
-                ? AppPallete.secondaryMain
-                : AppPallete.primaryMain,
-            secondaryFixedDim: preset != Presets.purple
-                ? AppPallete.secondaryLight
-                : AppPallete.primaryLight,
-            secondaryContainer: preset != Presets.purple
-                ? AppPallete.secondaryDark
-                : AppPallete.primaryDark,
+            secondary: secondaryScheme["Main"],
+            secondaryFixedDim: secondaryScheme["Light"],
+            secondaryContainer: secondaryScheme["Dark"],
             error: AppPallete.errorMain,
             errorContainer: AppPallete.errorLight,
             surface: AppPallete.grey200,
@@ -252,7 +243,6 @@ ThemeData buildTheme({
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      
       dividerColor: AppPallete.grey500,
       dayStyle: AppTypography.bodyMedium,
       headerHeadlineStyle: AppTypography.displayMedium,

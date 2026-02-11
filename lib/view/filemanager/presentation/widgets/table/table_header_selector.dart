@@ -10,8 +10,13 @@ class TableHeaderSelector extends StatelessWidget {
     required this.hasFolderSelected,
     required this.selectedFileIds,
     required this.onAddToFolder,
+    required this.hasViewerFilesSelected,
+    required this.hasAllOwnerFilesSelected,
+    required this.onErrorToast,
     this.onShare,
     this.onDelete,
+    this.isInsideFolder = false,
+    this.onMoveToRoot,
   });
 
   final int selectedCount;
@@ -20,6 +25,15 @@ class TableHeaderSelector extends StatelessWidget {
 
   /// When true, the add-to-folder and share buttons are disabled (folders are personal, not shareable).
   final bool hasFolderSelected;
+
+  /// When true, the share buttons is disabled (viewer files are not shareable).
+  final bool hasViewerFilesSelected;
+
+  /// When false, user cannot delete files (some files are not owner files).
+  final bool hasAllOwnerFilesSelected;
+
+  /// Called when an error occurs.
+  final Function({String title, String description}) onErrorToast;
 
   /// File IDs only (no folder IDs). Used when creating a folder and moving these files into it.
   final List<String> selectedFileIds;
@@ -33,18 +47,36 @@ class TableHeaderSelector extends StatelessWidget {
   /// Called when user taps the delete (trash) icon. Only enabled when there is selection.
   final VoidCallback? onDelete;
 
-  bool get _canAddToFolder =>
-      !hasFolderSelected && selectedFileIds.isNotEmpty && onAddToFolder != null;
+  /// When true, we're viewing files inside a folder; the first action button shows "Move to root" instead of "Add to folder".
+  final bool isInsideFolder;
 
-  /// Share is only for files; folders are personal and cannot be shared.
+  /// Called when user taps the move-to-root icon. Only relevant when [isInsideFolder] is true and files are selected.
+  final VoidCallback? onMoveToRoot;
+
+  bool get _canAddToFolder =>
+      !hasFolderSelected &&
+      !isInsideFolder &&
+      selectedFileIds.isNotEmpty &&
+      onAddToFolder != null;
+
+  /// Move to root: enabled when viewing a folder and at least one file is selected.
+  bool get _canMoveToRoot =>
+      isInsideFolder && selectedFileIds.isNotEmpty && onMoveToRoot != null;
+
+  /// Share is only for files and not viewer files; folders are personal and cannot be shared.
   bool get _canShare =>
-      !hasFolderSelected && selectedFileIds.isNotEmpty && onShare != null;
+      !hasFolderSelected &&
+      !hasViewerFilesSelected &&
+      selectedFileIds.isNotEmpty &&
+      onShare != null;
+
+  /// Delete: only enabled when all files are owner files.
+  bool get _canDelete => hasAllOwnerFilesSelected && onDelete != null;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasSel = selectedCount > 0;
-
     return Container(
       height: 52,
       decoration: BoxDecoration(
@@ -79,20 +111,38 @@ class TableHeaderSelector extends StatelessWidget {
           ),
           const Spacer(),
           InkWell(
-            onTap: _canAddToFolder ? onAddToFolder : null,
+            onTap: _canMoveToRoot
+                ? onMoveToRoot
+                : (_canAddToFolder ? onAddToFolder : null),
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SvgPicture.asset(
-                'assets/icons/common/solid/ic-solar-add-folder-bold.svg',
-                color: _canAddToFolder
+                _canMoveToRoot
+                    ? 'assets/icons/common/solid/ic-lets-icons-out.svg'
+                    : 'assets/icons/common/solid/ic-solar-add-folder-bold.svg',
+                color: (_canMoveToRoot || _canAddToFolder)
                     ? theme.primaryColor
                     : theme.primaryColor.withAlpha(50),
               ),
             ),
           ),
           InkWell(
-            onTap: _canShare ? onShare : null,
+            onTap: () {
+              if (_canShare) {
+                onShare?.call();
+              } else if (hasFolderSelected) {
+                onErrorToast(
+                  title: 'Failed to share',
+                  description: 'Your selection contains a folder.',
+                );
+              } else if (hasViewerFilesSelected) {
+                onErrorToast(
+                  title: 'Failed to share',
+                  description: 'Your selection contains viewer files.',
+                );
+              }
+            },
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -105,15 +155,24 @@ class TableHeaderSelector extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: hasSel && onDelete != null ? onDelete : null,
+            onTap: () {
+              if (_canDelete) {
+                onDelete?.call();
+              } else if (!hasAllOwnerFilesSelected) {
+                onErrorToast(
+                  title: 'Failed to delete',
+                  description: 'Your selection contains shared file(s).',
+                );
+              }
+            },
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SvgPicture.asset(
                 'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
-                color: hasSel && onDelete != null
+                color: _canDelete
                     ? theme.primaryColor
-                    : theme.disabledColor.withValues(alpha: 0.5),
+                    : theme.primaryColor.withAlpha(50),
               ),
             ),
           ),

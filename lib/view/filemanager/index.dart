@@ -82,7 +82,7 @@ export 'presentation/widgets/sections/all_favorites_section.dart';
 export 'presentation/widgets/file_manager_table.dart';
 export 'presentation/widgets/sections/file_manager_filter_section.dart';
 export 'presentation/widgets/file_manager_header.dart';
-export 'presentation/widgets/upload_files_dialog.dart';
+export 'presentation/widgets/dialogs/upload_files_dialog.dart';
 export 'presentation/widgets/favorite_star_button.dart';
 export 'presentation/widgets/sections/favorites_section.dart';
 export 'presentation/widgets/sections/recent_section.dart';

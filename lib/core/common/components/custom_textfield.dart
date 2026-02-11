@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -22,6 +24,8 @@ class CustomTextfield extends StatelessWidget {
   final bool? close;
   final Function? onClose;
   final String? Function(String?)? validator;
+  final Function? onSubmitted;
+  final Function? onTapOutside;
 
   const CustomTextfield({
     super.key,
@@ -45,6 +49,8 @@ class CustomTextfield extends StatelessWidget {
     this.isSearchField = false,
     this.onClose,
     this.validator,
+    this.onSubmitted,
+    this.onTapOutside,
   }) : assert(close == null || close == false || onClose != null,
             'onClose is required when close is true');
 
@@ -68,11 +74,13 @@ class CustomTextfield extends StatelessWidget {
     bool isDateTimeField = keyboardType == TextInputType.datetime;
 
     return TextFormField(
+      onFieldSubmitted: (value) => onSubmitted?.call(value),
       validator: validator,
       keyboardType: keyboardType,
       controller: controller,
       obscureText: isPasswordVisible != null ? !(isPasswordVisible!) : false,
-      onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
+      onTapOutside: (event) =>
+          onTapOutside ?? FocusManager.instance.primaryFocus?.unfocus(),
       onChanged: (value) => onchange(value),
       onTap: isDateTimeField ? () => _selectDate(context) : null,
       readOnly: isDateTimeField,

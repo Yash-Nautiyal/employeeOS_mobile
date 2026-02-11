@@ -131,14 +131,15 @@ final class ToggleFolderFavoriteEvent extends FilemanagerEvent {
   List<Object> get props => [folderId, currentlyFavorited];
 }
 
+/// Move one or more files into a folder. Single or batch; emits success when done.
 final class MoveFileToFolderEvent extends FilemanagerEvent {
-  final String fileId;
+  final List<String> fileIds;
   final String folderId;
 
-  const MoveFileToFolderEvent(this.fileId, this.folderId);
+  const MoveFileToFolderEvent(this.fileIds, this.folderId);
 
   @override
-  List<Object> get props => [fileId, folderId];
+  List<Object> get props => [fileIds, folderId];
 }
 
 final class MoveFileToRootEvent extends FilemanagerEvent {

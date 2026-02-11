@@ -4,8 +4,8 @@ import '../custom_textbutton.dart';
 
 /// Reusable alert dialog with a title, content, and two actions (cancel + primary).
 /// Use for confirmations (e.g. delete) or simple forms (e.g. new folder).
-class ActionConfirmDialog extends StatelessWidget {
-  const ActionConfirmDialog({
+class CustomAlertDialog extends StatelessWidget {
+  const CustomAlertDialog({
     super.key,
     required this.title,
     required this.content,
@@ -36,10 +36,15 @@ class ActionConfirmDialog extends StatelessWidget {
         : (primaryColor ?? theme.colorScheme.tertiary);
 
     return AlertDialog(
+      titlePadding: const EdgeInsets.symmetric(
+        horizontal: 18,
+      ).copyWith(top: 20),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       title: Text(
         title,
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w700,
+        style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w800,
         ),
       ),
       content: content,

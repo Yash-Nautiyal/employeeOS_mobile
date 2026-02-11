@@ -20,16 +20,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 
+import 'package:employeeos/view/filemanager/presentation/widgets/dialogs/delete_confirm_dialog.dart';
 import '../../../index.dart'
     show
+        FavoriteStarButton,
         FileItem,
         FileRole,
         FilemanagerBloc,
         FilemanagerItem,
-        FavoriteStarButton,
         MoveFileToRootEvent,
+        ShareFileDialogRunner,
         SharedUser,
-        ShareFileDialogRunner;
+        UserPermission;
 
 class TableDataRow extends StatefulWidget {
   const TableDataRow({
@@ -210,9 +212,6 @@ class _TableDataRowState extends State<TableDataRow> {
               if (sharedWith == null || sharedWith.isEmpty) {
                 return const Text('-');
               }
-              print(
-                  'sharedWith: ${sharedWith.map((user) => user.id).toList()}');
-              print('currentUserId: $_currentUserId');
               return Align(
                 alignment: Alignment.centerLeft,
                 child: CustomAvatarStack(
@@ -222,6 +221,9 @@ class _TableDataRowState extends State<TableDataRow> {
                           name: user.name,
                           imageUrl: user.avatarUrl,
                           isCurrentUser: user.id == _currentUserId,
+                          headerInitials: user.permission == UserPermission.view
+                              ? 'V'
+                              : 'E',
                         ),
                       )
                       .toList(),
@@ -245,9 +247,7 @@ class _TableDataRowState extends State<TableDataRow> {
                       padding:
                           EdgeInsets.only(right: widget.item.isFolder ? 34 : 0),
                       child: FavoriteStarButton(
-                        isFavorite: widget.item.isFile
-                            ? (widget.item as FileItem).file.isFavorite
-                            : (widget.item as dynamic).folder.isFavorite,
+                        isFavorite: (widget.item as FileItem).file.isFavorite,
                         onTap: widget.onStar,
                         size: 22,
                         activeColor: Colors.amber,
@@ -269,8 +269,14 @@ class _TableDataRowState extends State<TableDataRow> {
                             manualOffset: Offset(
                                 60,
                                 (widget.item as FileItem).file.folderId != null
-                                    ? -40
-                                    : 10),
+                                    ? (widget.item as FileItem).file.role ==
+                                            FileRole.owner
+                                        ? -40
+                                        : -10
+                                    : (widget.item as FileItem).file.role ==
+                                            FileRole.viewer
+                                        ? 25
+                                        : 10),
                             // arrowOffsetOverride: 0.5,
                             childBuilder: (placement) =>
                                 ResponsivePopupContainer(
@@ -289,13 +295,13 @@ class _TableDataRowState extends State<TableDataRow> {
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                              horizontal: 5.0)
-                                          .copyWith(bottom: 10),
+                                          horizontal: 5.0),
                                       child: ResponsivePopupItem(
                                         title: 'Copy Link',
                                         svgIcon:
                                             'assets/icons/common/solid/ic-solar-link-bold.svg',
                                         onTap: () {
+                                          _popupController.hide();
                                           final link = (widget.item as FileItem)
                                               .file
                                               .path;
@@ -309,38 +315,47 @@ class _TableDataRowState extends State<TableDataRow> {
                                               title: 'No link available',
                                             );
                                           }
-                                          _popupController.hide();
                                         },
                                         color: theme.colorScheme.tertiary,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                              horizontal: 5.0)
-                                          .copyWith(bottom: 10),
-                                      child: ResponsivePopupItem(
-                                        title: 'Share',
-                                        svgIcon:
-                                            'assets/icons/common/solid/ic-solar_share-bold.svg',
-                                        color: theme.colorScheme.tertiary,
-                                        onTap: () {
-                                          _popupController.hide();
-                                          final fileItem =
-                                              widget.item as FileItem;
-                                          final bloc =
-                                              context.read<FilemanagerBloc>();
-                                          final sharedUsers =
-                                              fileItem.file.sharedWith ??
-                                                  const <SharedUser>[];
-                                          ShareFileDialogRunner.show(
-                                            context,
-                                            bloc: bloc,
-                                            sharedUsers: sharedUsers,
-                                            fileId: fileItem.file.id,
-                                          );
-                                        },
+                                    if ((widget.item as FileItem).file.role !=
+                                        FileRole.viewer)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                                horizontal: 5.0)
+                                            .copyWith(
+                                                bottom:
+                                                    (widget.item as FileItem)
+                                                                .file
+                                                                .role ==
+                                                            FileRole.editor
+                                                        ? 0
+                                                        : 10,
+                                                top: 10),
+                                        child: ResponsivePopupItem(
+                                          title: 'Share',
+                                          svgIcon:
+                                              'assets/icons/common/solid/ic-solar_share-bold.svg',
+                                          color: theme.colorScheme.tertiary,
+                                          onTap: () {
+                                            _popupController.hide();
+                                            final fileItem =
+                                                widget.item as FileItem;
+                                            final bloc =
+                                                context.read<FilemanagerBloc>();
+                                            final sharedUsers =
+                                                fileItem.file.sharedWith ??
+                                                    const <SharedUser>[];
+                                            ShareFileDialogRunner.show(
+                                              context,
+                                              bloc: bloc,
+                                              sharedUsers: sharedUsers,
+                                              fileId: fileItem.file.id,
+                                            );
+                                          },
+                                        ),
                                       ),
-                                    ),
                                     if ((widget.item as FileItem)
                                             .file
                                             .folderId !=
@@ -392,6 +407,25 @@ class _TableDataRowState extends State<TableDataRow> {
                                           color: Colors.red,
                                           onTap: () {
                                             _popupController.hide();
+                                            final fileItem =
+                                                widget.item as FileItem;
+                                            final bloc =
+                                                context.read<FilemanagerBloc>();
+                                            showDialog<void>(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (ctx) => BlocProvider<
+                                                  FilemanagerBloc>.value(
+                                                value: bloc,
+                                                child: DeleteConfirmDialog(
+                                                  fileCount: 1,
+                                                  folderCount: 0,
+                                                  filesInsideFoldersCount: 0,
+                                                  fileIds: [fileItem.file.id],
+                                                  folderIds: const [],
+                                                ),
+                                              ),
+                                            );
                                           },
                                         ),
                                       ),

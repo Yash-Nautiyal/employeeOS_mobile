@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 
 import 'package:employeeos/core/theme/app_pallete.dart';
@@ -86,7 +88,7 @@ class _SlideDialogState extends State<SlideDialog>
               child: SlideTransition(
                 position: _slideAnimation,
                 child: Container(
-                  constraints: BoxConstraints(maxWidth: 400),
+                  constraints: const BoxConstraints(maxWidth: 400),
                   width: isWideScreen ? screenWidth * 0.65 : screenWidth * 0.85,
                   height: MediaQuery.of(context).size.height,
                   child: ClipRRect(

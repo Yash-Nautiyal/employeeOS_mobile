@@ -36,6 +36,40 @@ class FilemanagerRemoteDatasource {
     }
   }
 
+  /// Ensures the current user is either the owner of the file
+  /// or has editor access via file_sharing (access_type = 'edit').
+  Future<void> _requireOwnerOrEditor(String fileId) async {
+    _requireUser();
+    final userId = _userId!;
+
+    // First, check ownership on files table.
+    final fileRow = await _client
+        .from('files')
+        .select('user_id')
+        .eq('id', fileId)
+        .maybeSingle();
+    if (fileRow == null) {
+      throw Exception('File not found');
+    }
+    if (fileRow['user_id'] == userId) {
+      // Owner is always allowed.
+      return;
+    }
+
+    // Not owner: must be an editor in file_sharing.
+    final shareRow = await _client
+        .from('file_sharing')
+        .select('access_type')
+        .eq('file_id', fileId)
+        .eq('shared_with', userId)
+        .maybeSingle();
+
+    final accessType = (shareRow?['access_type'] as String?)?.toLowerCase();
+    if (accessType != 'edit') {
+      throw Exception('You must be an owner or editor to manage sharing');
+    }
+  }
+
   Future<List<FilemanagerItem>> fetchFoldersFiles() async {
     _requireUser();
     final userId = _userId!;
@@ -466,16 +500,8 @@ class FilemanagerRemoteDatasource {
   }
 
   Future<FileEntity> addShareParticipant(String fileId, SharedUser user) async {
-    _requireUser();
+    await _requireOwnerOrEditor(fileId);
     final userId = _userId!;
-    final fileRow = await _client
-        .from('files')
-        .select('user_id')
-        .eq('id', fileId)
-        .maybeSingle();
-    if (fileRow == null || fileRow['user_id'] != userId) {
-      throw Exception('You do not own this file');
-    }
     await _client.from('file_sharing').upsert(
       {
         'file_id': fileId,
@@ -494,7 +520,7 @@ class FilemanagerRemoteDatasource {
 
   Future<FileEntity> updateSharePermission(
       String fileId, String sharedWithUserId, UserPermission permission) async {
-    _requireUser();
+    await _requireOwnerOrEditor(fileId);
     await _client
         .from('file_sharing')
         .update({
@@ -511,7 +537,7 @@ class FilemanagerRemoteDatasource {
 
   Future<FileEntity> removeShareParticipant(
       String fileId, String userId) async {
-    _requireUser();
+    await _requireOwnerOrEditor(fileId);
     await _client
         .from('file_sharing')
         .delete()

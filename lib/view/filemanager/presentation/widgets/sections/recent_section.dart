@@ -15,8 +15,16 @@ import '../../../../../core/index.dart'
         getFileIcon,
         showCustomToast,
         showRightSideTaskDetails;
+import 'package:employeeos/view/filemanager/presentation/widgets/dialogs/delete_confirm_dialog.dart';
 import '../../../index.dart'
-    show FileEntity, FileItem, FilemanagerBloc, FileManagerSideMenu, FileRole;
+    show
+        FileEntity,
+        FileItem,
+        FileManagerSideMenu,
+        FileRole,
+        FilemanagerBloc,
+        ShareFileDialogRunner,
+        SharedUser;
 
 class RecentSection extends StatefulWidget {
   final ThemeData theme;
@@ -153,7 +161,13 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                         link: _layerLink,
                         anchorKey: _popupAnchorKey,
                         preferredPosition: PopupPreferredPosition.left,
-                        manualOffset: const Offset(60, 10),
+                        manualOffset: Offset(
+                            60,
+                            widget.file.role == FileRole.owner
+                                ? 10
+                                : widget.file.role == FileRole.viewer
+                                    ? 25
+                                    : 10),
                         childBuilder: (placement) => ResponsivePopupContainer(
                           width: 130,
                           arrowSide: placement.arrowSide,
@@ -167,13 +181,13 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                          horizontal: 5.0)
-                                      .copyWith(bottom: 10),
+                                      horizontal: 5.0),
                                   child: ResponsivePopupItem(
                                     title: 'Copy Link',
                                     svgIcon:
                                         'assets/icons/common/solid/ic-solar-link-bold.svg',
                                     onTap: () {
+                                      _popupController.hide();
                                       final link = widget.file.path;
                                       if (link.isNotEmpty) {
                                         Clipboard.setData(
@@ -185,29 +199,37 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                                           title: 'No link available',
                                         );
                                       }
-                                      _popupController.hide();
                                     },
                                     color: widget.theme.colorScheme.tertiary,
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                          horizontal: 5.0)
-                                      .copyWith(
-                                          bottom:
-                                              widget.file.role == FileRole.owner
-                                                  ? 10
-                                                  : 0),
-                                  child: ResponsivePopupItem(
-                                    title: 'Share',
-                                    svgIcon:
-                                        'assets/icons/common/solid/ic-solar_share-bold.svg',
-                                    color: widget.theme.colorScheme.tertiary,
-                                    onTap: () {
-                                      _popupController.hide();
-                                    },
+                                if (widget.file.role != FileRole.viewer)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                            horizontal: 5.0)
+                                        .copyWith(
+                                            bottom: widget.file.role ==
+                                                    FileRole.owner
+                                                ? 10
+                                                : 0,
+                                            top: 10),
+                                    child: ResponsivePopupItem(
+                                      title: 'Share',
+                                      svgIcon:
+                                          'assets/icons/common/solid/ic-solar_share-bold.svg',
+                                      color: widget.theme.colorScheme.tertiary,
+                                      onTap: () {
+                                        _popupController.hide();
+                                        ShareFileDialogRunner.show(
+                                          context,
+                                          bloc: context.read<FilemanagerBloc>(),
+                                          sharedUsers: widget.file.sharedWith ??
+                                              const <SharedUser>[],
+                                          fileId: widget.file.id,
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
                                 if (widget.file.role == FileRole.owner) ...[
                                   CustomDivider(
                                     color: widget.theme.dividerColor
@@ -225,6 +247,23 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                                       color: Colors.red,
                                       onTap: () {
                                         _popupController.hide();
+                                        final bloc =
+                                            context.read<FilemanagerBloc>();
+                                        showDialog<void>(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (ctx) => BlocProvider<
+                                              FilemanagerBloc>.value(
+                                            value: bloc,
+                                            child: DeleteConfirmDialog(
+                                              fileCount: 1,
+                                              folderCount: 0,
+                                              filesInsideFoldersCount: 0,
+                                              fileIds: [widget.file.id],
+                                              folderIds: const [],
+                                            ),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ),

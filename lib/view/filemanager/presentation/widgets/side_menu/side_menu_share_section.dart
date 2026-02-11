@@ -1,5 +1,5 @@
-import 'package:employeeos/core/index.dart' show AppPallete;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../index.dart' show SharedUser, SideMenuPopup, UserPermission;
 
@@ -37,21 +37,12 @@ class SideMenuShareSection extends StatelessWidget {
                 const Spacer(),
                 if (onAdd != null) ...[
                   GestureDetector(
-                    onTap: onAdd,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        color: AppPallete.successMain,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
+                      onTap: onAdd,
+                      child: SvgPicture.asset(
+                        'assets/icons/common/solid/ic-solar_add-circle-bold.svg',
+                        width: 30,
+                        color: theme.colorScheme.primary,
+                      )),
                 ],
               ],
             ),

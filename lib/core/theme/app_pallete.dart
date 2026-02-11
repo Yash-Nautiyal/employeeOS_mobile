@@ -122,6 +122,15 @@ class AppPallete {
     Presets.darkBlue: darkBlue,
   };
 
+  static const Map<Presets, dynamic> secondaryPresets = {
+    Presets.blue: green,
+    Presets.green: blue,
+    Presets.orange: purple,
+    Presets.purple: green,
+    Presets.red: orange,
+    Presets.darkBlue: red,
+  };
+
   static LinearGradient lightBackgroundGradient = const LinearGradient(
     colors: [
       AppPallete.errorLighter,

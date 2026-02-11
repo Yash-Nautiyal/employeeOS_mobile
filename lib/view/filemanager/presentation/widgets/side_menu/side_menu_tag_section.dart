@@ -1,5 +1,7 @@
+import 'package:employeeos/core/index.dart' show CustomTextfield;
 import 'package:employeeos/view/filemanager/index.dart' show FileRole, FileTag;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class SideMenuTagSection extends StatefulWidget {
   const SideMenuTagSection({
@@ -52,19 +54,19 @@ class _SideMenuTagSectionState extends State<SideMenuTagSection> {
           children: widget.tags.map((tag) {
             final canRemove = _canRemoveTag(tag);
             final isPersonal = tag.isPersonal;
-            print('tag: $tag' 'isPersonal: $isPersonal');
+
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5)
-                  .copyWith(right: 5),
+                  .copyWith(right: canRemove ? 5 : 10),
               decoration: BoxDecoration(
                 color: isPersonal
                     ? widget.theme.colorScheme.primary.withValues(alpha: 0.15)
-                    : null,
+                    : widget.theme.disabledColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: isPersonal
-                      ? widget.theme.colorScheme.primary
-                      : widget.theme.disabledColor,
+                      ? widget.theme.colorScheme.primary.withValues(alpha: 0.2)
+                      : widget.theme.disabledColor.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -80,10 +82,17 @@ class _SideMenuTagSectionState extends State<SideMenuTagSection> {
                   ),
                   if (canRemove) ...[
                     const SizedBox(width: 5),
-                    IconButton(
-                      onPressed: () =>
+                    InkWell(
+                      onTap: () =>
                           widget.onRemoveTag(tag.tagName, tag.isPersonal),
-                      icon: const Icon(Icons.close, size: 16),
+                      child: SvgPicture.asset(
+                          'assets/icons/common/solid/ic-solar_close-circle-bold.svg',
+                          width: 20,
+                          height: 20,
+                          color: isPersonal
+                              ? widget.theme.colorScheme.primary
+                              : widget.theme.disabledColor
+                                  .withValues(alpha: 0.4)),
                     ),
                   ]
                 ],
@@ -95,29 +104,22 @@ class _SideMenuTagSectionState extends State<SideMenuTagSection> {
         Row(
           children: [
             Expanded(
-              child: TextField(
+              child: CustomTextfield(
                 controller: _addController,
-                decoration: InputDecoration(
-                  hintText: '#Add a tag',
-                  hintStyle: widget.theme.textTheme.bodySmall?.copyWith(
-                    color: widget.theme.disabledColor,
-                  ),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                keyboardType: TextInputType.text,
+                theme: widget.theme,
+                onchange: (value) {},
+                hintText: '#Add a tag',
                 onSubmitted: (value) => _submitTag(value),
               ),
             ),
             const SizedBox(width: 8),
-            IconButton(
-              onPressed: () => _submitTag(_addController.text),
-              icon: const Icon(Icons.add_circle_outline),
+            InkWell(
+              onTap: () => _submitTag(_addController.text),
+              child: SvgPicture.asset(
+                  width: 28,
+                  'assets/icons/common/solid/ic-solar_add-circle-bold.svg',
+                  color: widget.theme.colorScheme.primary),
             ),
           ],
         ),

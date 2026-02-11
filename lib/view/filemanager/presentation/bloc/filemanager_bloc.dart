@@ -424,15 +424,22 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     if (state is! FilemanagerLoaded) return;
     final currentState = state as FilemanagerLoaded;
     final previousItems = currentState.items;
-    final optimisticItems = currentState.items.map((item) {
-      if (item is FileItem && item.file.id == event.fileId) {
+    final fileIdsSet = event.fileIds.toSet();
+    final optimisticItems = currentState.items.map<FilemanagerItem>((item) {
+      if (item is FileItem && fileIdsSet.contains(item.file.id)) {
         return FileItem(item.file.copyWith(folderId: event.folderId));
       }
       return item;
     }).toList();
-    emit(currentState.copyWith(items: optimisticItems));
     try {
-      await moveFileToFolderUsecase.call(event.fileId, event.folderId);
+      for (final fileId in event.fileIds) {
+        await moveFileToFolderUsecase.call(fileId, event.folderId);
+      }
+      final message = event.fileIds.length == 1
+          ? 'File added to folder'
+          : 'Files added to folder';
+      emit(FilemanagerSuccessActionState(message));
+      emit(currentState.copyWith(items: optimisticItems));
     } catch (e) {
       print(e);
       emit(FilemanagerErrorActionState(e.toString()));
@@ -452,8 +459,10 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       return item;
     }).toList();
     emit(currentState.copyWith(items: optimisticItems));
+    print('Moving file $event.fileId to root');
     try {
       await moveFileToRootUsecase.call(event.fileId);
+      print('File $event.fileId moved to root');
     } catch (e) {
       print(e);
       emit(FilemanagerErrorActionState(e.toString()));

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 
 class AvatarStackItem {
@@ -5,11 +7,13 @@ class AvatarStackItem {
     required this.name,
     this.imageUrl,
     this.isCurrentUser = false,
+    this.headerInitials = 'Y',
   });
 
   final String name;
   final String? imageUrl;
   final bool isCurrentUser;
+  final String headerInitials;
 }
 
 class CustomAvatarStack extends StatelessWidget {
@@ -79,7 +83,6 @@ class _AvatarCircle extends StatelessWidget {
   final double size;
   final ThemeData theme;
   final bool isCurrentUser;
-
   @override
   Widget build(BuildContext context) {
     final initials = _initialsFromName(item.name);
@@ -96,7 +99,9 @@ class _AvatarCircle extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(
               color: isCurrentUser
-                  ? theme.primaryColor
+                  ? item.headerInitials == 'V'
+                      ? theme.colorScheme.secondary
+                      : theme.primaryColor
                   : theme.scaffoldBackgroundColor,
               width: isCurrentUser ? 2.5 : 1.5,
             ),
@@ -129,7 +134,9 @@ class _AvatarCircle extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.primaryColor,
+                color: item.headerInitials == 'V'
+                    ? theme.colorScheme.secondary
+                    : theme.primaryColor,
                 border: Border.all(
                   color: theme.scaffoldBackgroundColor,
                   width: 1,
@@ -137,12 +144,11 @@ class _AvatarCircle extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'Y',
+                  item.headerInitials,
                   style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 7.2,
-                    color: theme.scaffoldBackgroundColor,
-                  ),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 7.5,
+                      color: Colors.white),
                 ),
               ),
             ),

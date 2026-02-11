@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

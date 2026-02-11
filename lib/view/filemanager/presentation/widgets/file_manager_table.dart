@@ -1,25 +1,18 @@
 import 'package:employeeos/core/index.dart'
-    show
-        ActionConfirmDialog,
-        EmptyContent,
-        showRightSideTaskDetails,
-        showCustomToast;
+    show EmptyContent, showRightSideTaskDetails, showCustomToast;
+import 'package:employeeos/view/filemanager/presentation/widgets/dialogs/add_to_folder_dialog.dart';
+import 'package:employeeos/view/filemanager/presentation/widgets/dialogs/delete_confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
-
 import 'package:toastification/toastification.dart';
 
 import '../../index.dart'
     show
-        CreateFolderEvent,
-        DeleteSelectedEvent,
         FileItem,
         FileRole,
-        FilemanagerActionState,
         FilemanagerBloc,
-        FilemanagerState,
         FileFilterService,
         FileManagerFilterController,
         FileManagerFilterSection,
@@ -28,6 +21,7 @@ import '../../index.dart'
         FilemanagerItem,
         FolderEntity,
         FolderItem,
+        MoveFileToRootEvent,
         ShareFileDialogRunner,
         SharedUser,
         TableDataRow,
@@ -56,7 +50,6 @@ class FileTableScreen extends StatefulWidget {
 
 class _FileTableScreenState extends State<FileTableScreen>
     with SingleTickerProviderStateMixin {
-      
   FolderEntity? _currentFolder;
 
   /// Keys to look up folder icon position in rows (for fly-to-header animation).
@@ -354,6 +347,28 @@ class _FileTableScreenState extends State<FileTableScreen>
 
   bool get _hasFolderSelected => _selectedItems.any((i) => i.isFolder);
 
+  bool get _hasViewerFilesSelected => _selectedItems
+      .whereType<FileItem>()
+      .any((f) => f.file.role == FileRole.viewer);
+
+  bool get _hasAllOwnerFilesSelected {
+    // Files selected directly.
+    final selectedFiles = _selectedItems.whereType<FileItem>();
+
+    // Files inside any selected folders.
+    final selectedFolderIds =
+        _selectedItems.whereType<FolderItem>().map((f) => f.folder.id).toSet();
+    final filesInSelectedFolders = widget.items.whereType<FileItem>().where(
+        (f) =>
+            f.file.folderId != null &&
+            selectedFolderIds.contains(f.file.folderId!));
+
+    // All selected files (direct + inside selected folders) must be owner files.
+    return selectedFiles
+        .followedBy(filesInSelectedFolders)
+        .every((f) => f.file.role == FileRole.owner);
+  }
+
   List<String> get _selectedFileIds =>
       _selectedItems.whereType<FileItem>().map((f) => f.file.id).toList();
 
@@ -381,49 +396,36 @@ class _FileTableScreenState extends State<FileTableScreen>
     final fileIds = _selectedFileIds;
     if (fileIds.isEmpty) return;
     final bloc = context.read<FilemanagerBloc>();
-    final controller = TextEditingController();
+    final folders = widget.items.whereType<FolderItem>().toList();
     showDialog<void>(
       context: context,
-      builder: (ctx) => ActionConfirmDialog(
-        title: 'New folder',
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Folder name',
-            hintText: 'Enter folder name',
-          ),
-          onSubmitted: (name) {
-            final n = name.trim();
-            if (n.isEmpty) return;
-            bloc.add(CreateFolderEvent(n, fileIds: fileIds));
-            setState(() => _selected.clear());
-            if (ctx.mounted) Navigator.of(ctx).pop();
-          },
+      builder: (ctx) => BlocProvider.value(
+        value: bloc,
+        child: AddToFolderDialog(
+          fileIds: fileIds,
+          folders: folders,
         ),
-        primaryLabel: 'Create',
-        primaryOnTap: () {
-          final name = controller.text.trim();
-          if (name.isEmpty) {
-            showCustomToast(
-              context: ctx,
-              type: ToastificationType.error,
-              title: 'Enter a folder name',
-            );
-            return;
-          }
-          bloc.add(CreateFolderEvent(name, fileIds: fileIds));
-          setState(() => _selected.clear());
-          if (ctx.mounted) Navigator.of(ctx).pop();
-        },
       ),
-    );
+    ).then((_) {
+      if (mounted) setState(() => _selected.clear());
+    });
+  }
+
+  void _onMoveToRootTap() {
+    final fileIds = _selectedFileIds;
+    if (fileIds.isEmpty || _currentFolder == null) return;
+    final bloc = context.read<FilemanagerBloc>();
+    for (final id in fileIds) {
+      bloc.add(MoveFileToRootEvent(id));
+    }
+    if (mounted) setState(() => _selected.clear());
   }
 
   void _onShareTap() {
     // Share is only for files; disabled when folder selected (TableHeaderSelector).
     final fileItems = _selectedItems.whereType<FileItem>().toList();
     if (fileItems.isEmpty || !context.mounted) return;
+
     if (fileItems.length == 1) {
       showRightSideTaskDetails(
         context,
@@ -449,26 +451,16 @@ class _FileTableScreenState extends State<FileTableScreen>
     );
   }
 
+  void _errorToast(String title, String description) {
+    showCustomToast(
+      context: context,
+      type: ToastificationType.error,
+      title: title,
+      description: description,
+    );
+  }
+
   void _onDeleteTap() {
-    // Rule: cannot delete shared files (e.g. in personal folders)
-    final deletableItems = _selectedItems
-        .whereType<FileItem>()
-        .where((f) => f.file.role == FileRole.owner)
-        .toList();
-    final hasSharedFile = deletableItems.any((f) {
-      final sw = f.file.sharedWith;
-      return sw != null && sw.isNotEmpty;
-    });
-    if (hasSharedFile) {
-      showCustomToast(
-        context: context,
-        type: ToastificationType.error,
-        title: 'Cannot delete',
-        description:
-            'Your selection contains shared file(s). Shared files cannot be deleted.',
-      );
-      return;
-    }
     final fileIds = _deletableFileIds;
     final folderIds = _selectedFolderIds;
     final fileCount = fileIds.length;
@@ -480,7 +472,7 @@ class _FileTableScreenState extends State<FileTableScreen>
       barrierDismissible: false,
       builder: (ctx) => BlocProvider.value(
         value: bloc,
-        child: _DeleteConfirmDialog(
+        child: DeleteConfirmDialog(
           fileCount: fileCount,
           folderCount: folderCount,
           filesInsideFoldersCount: _filesInsideSelectedFoldersCount,
@@ -576,11 +568,19 @@ class _FileTableScreenState extends State<FileTableScreen>
                           onClear: _selected.isEmpty
                               ? null
                               : () => setState(() => _selected.clear()),
+                          hasViewerFilesSelected: _hasViewerFilesSelected,
+                          hasAllOwnerFilesSelected: _hasAllOwnerFilesSelected,
                           hasFolderSelected: _hasFolderSelected,
                           selectedFileIds: _selectedFileIds,
                           onAddToFolder: _onAddToFolderTap,
                           onShare: _onShareTap,
                           onDelete: _onDeleteTap,
+                          isInsideFolder: _currentFolder != null,
+                          onMoveToRoot: _onMoveToRootTap,
+                          onErrorToast: (
+                                  {String? title, String? description}) =>
+                              _errorToast(title ?? 'Failed to delete',
+                                  description ?? ''),
                         ),
                 ),
               ),
@@ -796,98 +796,6 @@ class _FlyingFolderIcon extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-/// Dialog that confirms bulk delete and stays open until delete completes, errors, or user cancels.
-class _DeleteConfirmDialog extends StatefulWidget {
-  const _DeleteConfirmDialog({
-    required this.fileCount,
-    required this.folderCount,
-    required this.filesInsideFoldersCount,
-    required this.fileIds,
-    required this.folderIds,
-  });
-
-  final int fileCount;
-  final int folderCount;
-  final int filesInsideFoldersCount;
-  final List<String> fileIds;
-  final List<String> folderIds;
-
-  @override
-  State<_DeleteConfirmDialog> createState() => _DeleteConfirmDialogState();
-}
-
-class _DeleteConfirmDialogState extends State<_DeleteConfirmDialog> {
-  bool _loading = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return BlocListener<FilemanagerBloc, FilemanagerState>(
-      listenWhen: (previous, current) => current is FilemanagerActionState,
-      listener: (context, state) {
-        if (context.mounted) Navigator.of(context).pop();
-      },
-      child: ActionConfirmDialog(
-        title: 'Delete selected?',
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'You are about to delete:',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            if (widget.fileCount > 0)
-              Text(
-                '• ${widget.fileCount} file(s)',
-                style: theme.textTheme.bodyMedium,
-              ),
-            if (widget.folderCount > 0) ...[
-              Text(
-                '• ${widget.folderCount} folder(s)',
-                style: theme.textTheme.bodyMedium,
-              ),
-              if (widget.filesInsideFoldersCount > 0)
-                Text(
-                  '  (containing ${widget.filesInsideFoldersCount} file(s))',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-            ],
-            const SizedBox(height: 16),
-            Text(
-              'This action cannot be undone.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.error,
-              ),
-            ),
-          ],
-        ),
-        cancelLabel: 'Cancel',
-        primaryLabel: 'Delete',
-        primaryColor: theme.colorScheme.error,
-        loading: _loading,
-        onCancel: () {
-          if (!_loading) Navigator.of(context).pop();
-        },
-        primaryOnTap: () {
-          setState(() => _loading = true);
-          context.read<FilemanagerBloc>().add(
-                DeleteSelectedEvent(
-                  fileIds: widget.fileIds,
-                  folderIds: widget.folderIds,
-                ),
-              );
-        },
-      ),
     );
   }
 }

@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../index.dart' show PickedFile;
+import '../../../index.dart' show PickedFile;
 
 class UploadFilesDialog extends StatefulWidget {
   final Future<void> Function(List<PickedFile>) onUpload;

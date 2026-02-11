@@ -18,7 +18,8 @@ export 'common/components/custom_toast.dart';
 export 'common/components/custom_side_menu.dart';
 export 'common/components/custom_avatar_stack.dart';
 
-export 'common/components/dialog/action_confirm_dialog.dart';
+export 'common/components/dialog/custom_alert_dialog.dart';
+export 'common/components/dialog/custom_dialog.dart';
 export 'common/components/dialog/slide_dialog.dart';
 
 export 'common/components/header/notification.dart';

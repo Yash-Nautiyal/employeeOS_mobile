@@ -107,26 +107,26 @@ Each file object in `folders[].files` and `root_files` is expected to include:
 
 **Main methods (return types)**
 
-| Method                                                   | Return type                     | Notes                                                                                                          |
-| -------------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `fetchFoldersFiles()`                                    | `Future<List<FilemanagerItem>>` | RPC `get_user_files(p_user_id)`; parses `folders` + `root_files`; then `_enrichWithUserInfo(list)`.            |
-| `getRecentFileIds()`                                     | `Future<List<String>>`          | From `file_activity` (user_id, order activity_at DESC, limit 5).                                               |
-| `logFileActivity(fileId)`                                | `Future<void>`                  | RPC `log_file_activity(p_user_id, p_file_id)`.                                                                 |
-| `uploadFiles(files, {folderId})`                         | `Future<List<FileEntity>>`      | Storage upload + `files` insert + optional `user_file_folders`; returns entities.                              |
-| `deleteFile(fileId)`                                     | `Future<void>`                  | Owner-only: checks `files.user_id == currentUser`; deletes storage then file row.                              |
-| `moveFileToFolder(fileId, folderId)`                     | `Future<void>`                  | Upsert `user_file_folders`.                                                                                    |
-| `moveFileToRoot(fileId)`                                 | `Future<void>`                  | Delete `user_file_folders` for current user + file.                                                            |
-| `createFolder(folderName, {fileIds})`                    | `Future<FolderEntity>`          | Insert folder; optionally upsert `user_file_folders` for fileIds.                                              |
-| `deleteFolder(folderId)`                                 | `Future<void>`                  | Delete folder where user owns it.                                                                              |
-| `toggleFavorite(entityId, isFolder, currentlyFavorited)` | `Future<void>`                  | Insert/delete in `file_favorites` (file_id or folder_id).                                                      |
-| `toggleFavoriteFile(fileId, currentlyFavorited)`         | `Future<void>`                  | Delegates to `toggleFavorite(..., false, ...)`.                                                                |
-| `addTag(fileId, tagName, {isPersonal})`                  | `Future<void>`                  | Insert into `file_tags` (file_id, user_id, tag_name, is_personal).                                             |
-| `deleteTag(fileId, tagName, {isPersonal})`               | `Future<void>`                  | Delete from `file_tags`; if isPersonal, also eq user_id.                                                       |
-| `updateTags(fileId, tags)`                               | `Future<FileEntity>`            | Legacy; re-fetches and returns file (no direct tag replace in DB).                                             |
-| `addShareParticipant(fileId, user)`                      | `Future<FileEntity>`            | Owner check; upsert `file_sharing`; re-fetches and returns updated file.                                       |
-| `updateSharePermission(fileId, userId, permission)`      | `Future<FileEntity>`            | Update `file_sharing.access_type`; re-fetches file.                                                            |
-| `removeShareParticipant(fileId, userId)`                 | `Future<FileEntity>`            | Delete row in `file_sharing`; re-fetches file.                                                                 |
-| `fetchUsers()`                                           | `Future<List<SharedUser>>`      | Via `UserInfoService.fetchAllUsers()`; excludes current user; maps to SharedUser (id, name, email, avatarUrl). |
+| Method                                                   | Return type                     | Notes                                                                                                                               |
+| -------------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `fetchFoldersFiles()`                                    | `Future<List<FilemanagerItem>>` | RPC `get_user_files(p_user_id)`; parses `folders` + `root_files`; then `_enrichWithUserInfo(list)`.                                 |
+| `getRecentFileIds()`                                     | `Future<List<String>>`          | From `file_activity` (user_id, order activity_at DESC, limit 5).                                                                    |
+| `logFileActivity(fileId)`                                | `Future<void>`                  | RPC `log_file_activity(p_user_id, p_file_id)`.                                                                                      |
+| `uploadFiles(files, {folderId})`                         | `Future<List<FileEntity>>`      | Storage upload + `files` insert + optional `user_file_folders`; returns entities.                                                   |
+| `deleteFile(fileId)`                                     | `Future<void>`                  | Owner-only: checks `files.user_id == currentUser`; deletes storage then file row.                                                   |
+| `moveFileToFolder(fileId, folderId)`                     | `Future<void>`                  | Upsert `user_file_folders`.                                                                                                         |
+| `moveFileToRoot(fileId)`                                 | `Future<void>`                  | Delete `user_file_folders` for current user + file.                                                                                 |
+| `createFolder(folderName, {fileIds})`                    | `Future<FolderEntity>`          | Insert folder; optionally upsert `user_file_folders` for fileIds.                                                                   |
+| `deleteFolder(folderId)`                                 | `Future<void>`                  | Delete folder where user owns it.                                                                                                   |
+| `toggleFavorite(entityId, isFolder, currentlyFavorited)` | `Future<void>`                  | Insert/delete in `file_favorites` (file_id or folder_id).                                                                           |
+| `toggleFavoriteFile(fileId, currentlyFavorited)`         | `Future<void>`                  | Delegates to `toggleFavorite(..., false, ...)`.                                                                                     |
+| `addTag(fileId, tagName, {isPersonal})`                  | `Future<void>`                  | Insert into `file_tags` (file_id, user_id, tag_name, is_personal).                                                                  |
+| `deleteTag(fileId, tagName, {isPersonal})`               | `Future<void>`                  | Delete from `file_tags`; if isPersonal, also eq user_id.                                                                            |
+| `updateTags(fileId, tags)`                               | `Future<FileEntity>`            | Legacy; re-fetches and returns file (no direct tag replace in DB).                                                                  |
+| `addShareParticipant(fileId, user)`                      | `Future<FileEntity>`            | Requires current user to be owner or editor; upsert `file_sharing` (shared_by = current user); re-fetches and returns updated file. |
+| `updateSharePermission(fileId, userId, permission)`      | `Future<FileEntity>`            | Requires current user to be owner or editor; update `file_sharing.access_type`; re-fetches file.                                    |
+| `removeShareParticipant(fileId, userId)`                 | `Future<FileEntity>`            | Requires current user to be owner or editor; delete row in `file_sharing`; re-fetches file.                                         |
+| `fetchUsers()`                                           | `Future<List<SharedUser>>`      | Via `UserInfoService.fetchAllUsers()`; excludes current user; maps to SharedUser (id, name, email, avatarUrl).                      |
 
 **Parsing**
 
@@ -335,6 +335,59 @@ Each file object in `folders[].files` and `root_files` is expected to include:
 | Table             | `presentation/widgets/file_manager_table.dart`                                                          | \_effectiveFiltered getter (reactive list); add-folder dialog; delete confirm dialog       |
 | Table row         | `presentation/widgets/table/table_widgets/table_data_row.dart`                                          | Popup: Remove from folder (when in folder), Delete only for owner                          |
 | Recent            | `presentation/widgets/sections/recent_section.dart`                                                     | Popup: Delete only for owner                                                               |
+
+---
+
+## 15. Role-Based Share / Delete / Folder Rules
+
+### 15.1 Per-file permissions (Owner / Editor / Viewer)
+
+- **Owner**
+  - **Share:** Can share any file they own (row menu, side menu, bulk share via table header).
+  - **Delete:** Can delete files they own (single delete and bulk delete). Whether the file is shared with others does not restrict the owner.
+- **Editor**
+  - **Share:** Can share files where `file.role == FileRole.editor`.
+  - **Delete:** Cannot delete those files. UI hides or disables delete actions:
+    - Table row popup shows **Delete** only when `file.role == FileRole.owner`.
+    - Side menu delete button is shown only for owner files.
+    - Bulk delete (table header trash) only includes owner files in `fileIds`.
+- **Viewer**
+  - **Share:** Cannot share files. UI hides the **Share** row action and disables bulk share when any selected file has `role == FileRole.viewer`.
+  - **Delete:** Cannot delete files. Viewer never sees per-file delete actions, and viewer files are never added to `fileIds` for bulk delete.
+
+### 15.2 Bulk actions in table header
+
+- **Share (multi-select)**
+  - Enabled only when:
+    - No folders are selected (`hasFolderSelected == false`), and
+    - No selected files are viewer files (`hasViewerFilesSelected == false`), and
+    - At least one file is selected.
+  - Implementation: `TableHeaderSelector._canShare` + `FileTableScreen._hasViewerFilesSelected`.
+- **Delete (multi-select)**
+  - Only files where `file.role == FileRole.owner` are considered deletable and are passed to the bloc:
+    - `FileTableScreen._deletableFileIds` filters `FileItem` selection by `file.role == FileRole.owner`.
+  - The delete icon in `TableHeaderSelector` is enabled when:
+    - All selected files (if any) are owner files (`hasAllOwnerFilesSelected == true`).
+    - Folders may be selected in any combination; folders themselves are always deletable from the UI’s perspective.
+  - Bloc event: `DeleteSelectedEvent(fileIds, folderIds)` deletes:
+    - Only owner files (from `fileIds`).
+    - The user’s own folders (from `folderIds`), with backend enforcing folder ownership.
+
+### 15.3 Folders (personal containers)
+
+- Folders are **personal** and are never shared:
+  - Add-to-folder and share buttons are disabled when a folder is selected (`hasFolderSelected == true`).
+  - Sharing is always file-based.
+- Users can:
+  - Add **any accessible file** (owner/editor/viewer) into their personal folders.
+  - Remove files from a folder (row popup **Remove** → `MoveFileToRootEvent`).
+  - Delete their folders even when folders contain files the user only has editor/viewer access to.
+- When deleting:
+  - Bulk delete passes only owner files in `fileIds`.
+  - Backend `deleteFolder(folderId)` enforces:
+    - Folder ownership.
+    - Owner files may be deleted per DB rules.
+    - Files the user only has shared access to are handled according to backend triggers (e.g., removing only this user’s folder placement), so viewers/editors never directly delete shared files.
 
 ---
 
