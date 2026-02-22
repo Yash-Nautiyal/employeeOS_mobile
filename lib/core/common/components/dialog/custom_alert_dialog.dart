@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../custom_textbutton.dart';
+
+enum CustomAlertDialogStyle { normal, danger }
 
 /// Reusable alert dialog with a title, content, and two actions (cancel + primary).
 /// Use for confirmations (e.g. delete) or simple forms (e.g. new folder).
@@ -16,6 +19,8 @@ class CustomAlertDialog extends StatelessWidget {
     this.loading = false,
     this.onCancel,
     this.barrierDismissible = true,
+    this.style = CustomAlertDialogStyle.normal,
+    this.icon,
   });
 
   final String title;
@@ -27,6 +32,8 @@ class CustomAlertDialog extends StatelessWidget {
   final bool loading;
   final VoidCallback? onCancel;
   final bool barrierDismissible;
+  final CustomAlertDialogStyle style;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +41,21 @@ class CustomAlertDialog extends StatelessWidget {
     final effectivePrimaryColor = loading
         ? theme.disabledColor.withValues(alpha: 0.3)
         : (primaryColor ?? theme.colorScheme.tertiary);
+    final effectiveIcon = icon ??
+        (style == CustomAlertDialogStyle.danger
+            ? SvgPicture.asset(
+                'assets/icons/common/solid/ic-alert.svg',
+                color: theme.colorScheme.error,
+                width: 55,
+              )
+            : null);
 
     return AlertDialog(
+      icon: effectiveIcon,
+      iconPadding: const EdgeInsets.only(bottom: 0, top: 18),
       titlePadding: const EdgeInsets.symmetric(
         horizontal: 18,
-      ).copyWith(top: 20),
+      ).copyWith(top: icon != null ? 20 : 0),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
       actionsPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       title: Text(

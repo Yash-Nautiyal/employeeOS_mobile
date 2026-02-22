@@ -55,6 +55,19 @@ final class KanbanTaskAdded extends KanbanEvent {
   List<Object?> get props => [columnId, taskName];
 }
 
+final class KanbanTaskDeleted extends KanbanEvent {
+  final String columnId;
+  final KanbanSection section;
+  final String taskId;
+  const KanbanTaskDeleted({
+    required this.columnId,
+    required this.section,
+    required this.taskId,
+  });
+  @override
+  List<Object?> get props => [columnId, section, taskId];
+}
+
 final class KanbanTaskMoved extends KanbanEvent {
   final DragPayload payload;
   final String toColumnId;

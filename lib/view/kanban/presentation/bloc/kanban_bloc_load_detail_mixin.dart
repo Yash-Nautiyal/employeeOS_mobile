@@ -3,13 +3,18 @@ part of 'kanban_bloc.dart';
 extension KanbanLoadDetailHandlers on KanbanBloc {
   Future<void> _onLoad(
       KanbanLoadRequested event, Emitter<KanbanState> emit) async {
+    final previousLoaded = state is KanbanLoaded ? state as KanbanLoaded : null;
     emit(KanbanLoading());
     try {
       final columns = await _loadBoardUseCase();
       emit(KanbanLoaded(columns));
     } catch (e) {
       emit(KanbanErrorActionState(e.toString()));
-      emit(KanbanError(e.toString()));
+      if (previousLoaded != null) {
+        emit(previousLoaded);
+      } else {
+        emit(KanbanError(e.toString()));
+      }
     }
   }
 

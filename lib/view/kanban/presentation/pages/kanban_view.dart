@@ -1,7 +1,12 @@
 import 'dart:async';
 
 import 'package:employeeos/core/index.dart'
-    show EmptyContent, KanbanDimensions, showCustomToast;
+    show
+        CustomAlertDialog,
+        CustomAlertDialogStyle,
+        EmptyContent,
+        KanbanDimensions,
+        showCustomToast;
 import 'package:employeeos/view/kanban/data/index.dart'
     show KanbanRepositoryImpl;
 import 'package:employeeos/view/kanban/presentation/index.dart'
@@ -112,7 +117,7 @@ class _KanbanViewState extends State<KanbanView> {
     final width = box.size.width;
 
     // Wider edge zone + speed ramps up as you get closer to the edge.
-    const edge = 140.0;
+    const edge = 120.0;
     const maxStep = 44.0; // px per tick (~2750px/s at 60fps)
 
     final maxScroll = _boardScrollController.position.maxScrollExtent;
@@ -227,8 +232,23 @@ class _KanbanViewState extends State<KanbanView> {
     _bloc.add(KanbanColumnRenamed(column.id, newName));
   }
 
-  void _deleteColumn(KanbanColumn column) {
+  Future<void> _deleteColumn(KanbanColumn column) async {
     if (column.isArchive) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => CustomAlertDialog(
+        style: CustomAlertDialogStyle.danger,
+        title: 'Delete column?',
+        content: Text(
+          'This will permanently delete "${column.title}" and all tasks in it.',
+        ),
+        cancelLabel: 'Cancel',
+        primaryLabel: 'Delete',
+        onCancel: () => Navigator.of(ctx).pop(false),
+        primaryOnTap: () => Navigator.of(ctx).pop(true),
+      ),
+    );
+    if (confirm != true) return;
     _bloc.add(KanbanColumnDeleted(column.id));
   }
 
@@ -435,7 +455,9 @@ class _KanbanViewState extends State<KanbanView> {
                                   ),
                                   onMoveTaskToColumn: _moveTaskToColumn,
                                   onAddTask: () => _addTaskToColumn(col.id),
-                                  onDeleteColumn: () => _deleteColumn(col),
+                                  onDeleteColumn: () {
+                                    _deleteColumn(col);
+                                  },
                                   onClearColumn: () => _clearColumn(col.id),
                                   onRenameColumn: () => _renameColumn(col),
                                   onPriorityChanged:

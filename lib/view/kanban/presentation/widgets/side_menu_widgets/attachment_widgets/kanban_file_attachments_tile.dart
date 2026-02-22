@@ -3,7 +3,8 @@ import 'dart:ui';
 import 'package:employeeos/core/index.dart'
     show CustomExpansionTile, getFileIcon;
 import 'package:employeeos/view/kanban/domain/index.dart' show KanbanAttachment;
-import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/attachment_widgets/action_button.dart';
+import 'package:employeeos/view/kanban/presentation/index.dart'
+    show ActionButton, AttachmentOwnerAvatar;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

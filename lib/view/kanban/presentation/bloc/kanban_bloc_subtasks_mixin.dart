@@ -74,6 +74,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
       }
     } catch (e) {
       emit(KanbanErrorActionState(e.toString()));
+      emit(current);
     }
   }
 
@@ -114,6 +115,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
       }
     } catch (e) {
       emit(KanbanErrorActionState(e.toString()));
+      emit(current);
     }
   }
 
@@ -146,6 +148,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
       }
     } catch (e) {
       emit(KanbanErrorActionState(e.toString()));
+      emit(current);
     }
   }
 }

@@ -23,6 +23,7 @@ extension KanbanTaskHandlers on KanbanBloc {
             createdByMe: created,
             assignedToMe: c.assignedToMe);
       }).toList();
+      emit(KanbanSuccessActionState('Task added successfully'));
       emit(current.copyWith(columns: newColumns, isActionLoading: false));
     } catch (e) {
       emit(KanbanErrorActionState(e.toString()));
@@ -103,6 +104,45 @@ extension KanbanTaskHandlers on KanbanBloc {
       );
       emit(KanbanErrorActionState(e.toString()));
       emit(latest.copyWith(columns: rollbackColumns));
+    }
+  }
+
+  Future<void> _onDeleteTask(
+      KanbanTaskDeleted event, Emitter<KanbanState> emit) async {
+    if (state is! KanbanLoaded) return;
+    final current = _loaded;
+    emit(current.copyWith(isActionLoading: true));
+    try {
+      final res = await _deleteTaskUseCase(event.taskId);
+      final success = res['success'] as bool? ?? false;
+      if (!success) {
+        final msg = res['error'] as String? ?? 'Failed to delete task';
+        emit(KanbanErrorActionState(msg));
+        emit(current.copyWith(isActionLoading: false));
+        return;
+      }
+      final newColumns = current.columns.map((c) {
+        if (c.id != event.columnId) return c;
+        final createdByMe = event.section == KanbanSection.createdByMe
+            ? c.createdByMe.where((t) => t.id != event.taskId).toList()
+            : c.createdByMe;
+        final assignedToMe = event.section == KanbanSection.assignedToMe
+            ? c.assignedToMe.where((t) => t.id != event.taskId).toList()
+            : c.assignedToMe;
+        return KanbanColumn(
+          id: c.id,
+          title: c.title,
+          position: c.position,
+          createdByMe: createdByMe,
+          assignedToMe: assignedToMe,
+        );
+      }).toList();
+      _getTaskDetailUseCase.clear(event.taskId);
+      emit(KanbanSuccessActionState('Task deleted successfully'));
+      emit(current.copyWith(columns: newColumns, isActionLoading: false));
+    } catch (e) {
+      emit(KanbanErrorActionState(e.toString()));
+      emit(current.copyWith(isActionLoading: false));
     }
   }
 
@@ -235,6 +275,7 @@ extension KanbanTaskHandlers on KanbanBloc {
       emit(next);
     } catch (e) {
       emit(KanbanErrorActionState(e.toString()));
+      emit(current);
     }
   }
 

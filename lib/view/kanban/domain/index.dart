@@ -11,6 +11,7 @@ export 'usecases/rename_column_usecase.dart';
 export 'usecases/delete_column_usecase.dart';
 export 'usecases/clear_column_usecase.dart';
 export 'usecases/create_task_usecase.dart';
+export 'usecases/delete_task_usecase.dart';
 export 'usecases/update_task_priority_usecase.dart';
 export 'usecases/update_task_description_usecase.dart';
 export 'usecases/update_task_due_date_usecase.dart';
@@ -21,3 +22,5 @@ export 'usecases/sync_task_assignees_usecase.dart';
 export 'usecases/toggle_subtask_usecase.dart';
 export 'usecases/rename_subtask_usecase.dart';
 export 'usecases/delete_subtask_usecase.dart';
+
+export 'repositories/kanban_repository.dart';

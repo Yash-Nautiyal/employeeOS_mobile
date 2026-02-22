@@ -1,9 +1,15 @@
 import 'package:employeeos/core/index.dart'
-    show CustomDropdown, CustomToggleButton, showCustomToast;
+    show
+        CustomAlertDialog,
+        CustomAlertDialogStyle,
+        CustomDropdown,
+        CustomToggleButton,
+        showCustomToast;
 import 'package:employeeos/view/kanban/domain/modals/kanban_modal.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/overview_side_menu.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/subtasks_side_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 
@@ -19,6 +25,11 @@ class KanbanSideMenu extends StatefulWidget {
       String taskId, List<KanbanUploadFile> files) onAttachmentUpload;
   final Future<void> Function(String taskId, String attachmentId)
       onAttachmentDelete;
+  final Future<void> Function(
+    String columnId,
+    KanbanSection section,
+    String taskId,
+  ) onDeleteTask;
   final void Function(List<KanbanAssignee> assignees) onAssigneesChanged;
   final void Function(String name) onSubtaskAdded;
   final void Function(String subtaskId, bool completed) onSubtaskToggled;
@@ -46,6 +57,7 @@ class KanbanSideMenu extends StatefulWidget {
     required this.onDueDateChanged,
     required this.onAttachmentUpload,
     required this.onAttachmentDelete,
+    required this.onDeleteTask,
     required this.onAssigneesChanged,
     required this.onSubtaskAdded,
     required this.onSubtaskToggled,
@@ -133,6 +145,46 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
     return 'U';
   }
 
+  bool _isTaskCreatedByCurrentUser() {
+    return widget.group.createdByMe.any((t) => t.id == widget.task.id);
+  }
+
+  Future<void> _confirmDeleteTask() async {
+    final isCreatedByMe = _isTaskCreatedByCurrentUser();
+    if (!isCreatedByMe) {
+      showCustomToast(
+        context: context,
+        type: ToastificationType.error,
+        title: 'Only task creator can delete this task',
+      );
+      return;
+    }
+    final section =
+        isCreatedByMe ? KanbanSection.createdByMe : KanbanSection.assignedToMe;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => CustomAlertDialog(
+        style: CustomAlertDialogStyle.danger,
+        title: 'Delete task?',
+        content: Text(
+          'This will permanently delete "${widget.task.title}" and its details.',
+        ),
+        cancelLabel: 'Cancel',
+        primaryLabel: 'Delete',
+        onCancel: () => Navigator.of(ctx).pop(false),
+        primaryOnTap: () => Navigator.of(ctx).pop(true),
+      ),
+    );
+    if (confirm != true) return;
+    await widget.onDeleteTask(
+      widget.task.columnId,
+      section,
+      widget.task.id,
+    );
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
   @override
   void didUpdateWidget(covariant KanbanSideMenu oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -158,6 +210,7 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    final canDeleteTask = _isTaskCreatedByCurrentUser();
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,6 +243,22 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                   ),
                 ),
                 const Spacer(),
+                IconButton(
+                  onPressed: _confirmDeleteTask,
+                  icon: SvgPicture.asset(
+                    'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+                    colorFilter: ColorFilter.mode(
+                      canDeleteTask
+                          ? theme.colorScheme.error
+                          : theme.disabledColor,
+                      BlendMode.srcIn,
+                    ),
+                    width: 20,
+                  ),
+                  tooltip: canDeleteTask
+                      ? 'Delete task'
+                      : 'Only task creator can delete',
+                ),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.of(context).pop(),

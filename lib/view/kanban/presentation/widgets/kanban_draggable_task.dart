@@ -219,6 +219,13 @@ class KanbanDraggableTask extends StatelessWidget {
                         attachmentId: attachmentId,
                       );
                     },
+                    onDeleteTask: (columnId, section, taskId) async {
+                      bloc.add(KanbanTaskDeleted(
+                        columnId: columnId,
+                        section: section,
+                        taskId: taskId,
+                      ));
+                    },
                   );
                 },
               ),

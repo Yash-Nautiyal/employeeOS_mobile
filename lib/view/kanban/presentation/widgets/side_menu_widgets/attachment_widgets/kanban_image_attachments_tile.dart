@@ -1,4 +1,4 @@
-import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/attachment_widgets/action_button.dart';
+import 'package:employeeos/view/kanban/presentation/index.dart' show ActionButton, AttachmentOwnerAvatar;
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:employeeos/core/index.dart'

@@ -13,6 +13,7 @@ export 'widgets/drop_down_widgets/card_drop_target.dart';
 export 'widgets/side_menu_widgets/attachment_widgets/kanban_image_attachments_tile.dart';
 export 'widgets/side_menu_widgets/attachment_widgets/kanban_file_attachments_tile.dart';
 export 'widgets/side_menu_widgets/contact_dialog.dart';
+export 'widgets/side_menu_widgets/attachment_widgets/action_button.dart';
 
 export 'bloc/kanban_bloc.dart';
 export 'bloc/task_detail_cubit.dart';

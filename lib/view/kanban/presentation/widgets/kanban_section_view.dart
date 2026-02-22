@@ -185,8 +185,9 @@ class KanbanSectionView extends StatelessWidget {
     // already contain the dragged task).
     if (ghost != null && !tasks.any((t) => t.id == ghost.id)) {
       final idx = hoverIndex!.clamp(0, renderTasks.length);
-      // We insert AFTER the drop slot that represents this index.
-      final slotWidgetIndex = 0 + (idx == 0 ? 1 : (idx * 2) + 1);
+      // children layout is: [topDropSlot, task0, task1, ..., bottomDropSlot]
+      // so the ghost position for a given index is always (index + 1).
+      final slotWidgetIndex = (idx + 1).clamp(0, children.length);
       children.insert(
         slotWidgetIndex,
         Padding(

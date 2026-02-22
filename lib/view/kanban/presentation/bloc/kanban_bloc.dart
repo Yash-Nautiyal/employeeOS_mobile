@@ -1,25 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:employeeos/view/kanban/domain/modals/kanban_modal.dart';
-import 'package:employeeos/view/kanban/domain/repositories/kanban_repository.dart';
-import 'package:employeeos/view/kanban/domain/services/kanban_state_helper.dart';
-import 'package:employeeos/view/kanban/domain/usecases/add_subtask_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/clear_column_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/create_column_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/create_task_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/delete_subtask_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/delete_column_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/fetch_assignee_users_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/get_task_detail_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/load_board_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/move_task_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/rename_column_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/rename_subtask_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/sync_task_assignees_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/toggle_subtask_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/update_task_description_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/update_task_due_date_usecase.dart';
-import 'package:employeeos/view/kanban/domain/usecases/update_task_priority_usecase.dart';
+import 'package:employeeos/view/kanban/domain/index.dart';
 
 part 'kanban_event.dart';
 part 'kanban_state.dart';
@@ -41,6 +22,7 @@ class KanbanBloc extends Bloc<KanbanEvent, KanbanState> {
     DeleteColumnUseCase? deleteColumnUseCase,
     ClearColumnUseCase? clearColumnUseCase,
     CreateTaskUseCase? createTaskUseCase,
+    DeleteTaskUseCase? deleteTaskUseCase,
     UpdateTaskPriorityUseCase? updateTaskPriorityUseCase,
     UpdateTaskDescriptionUseCase? updateTaskDescriptionUseCase,
     UpdateTaskDueDateUseCase? updateTaskDueDateUseCase,
@@ -63,6 +45,7 @@ class KanbanBloc extends Bloc<KanbanEvent, KanbanState> {
         _clearColumnUseCase =
             clearColumnUseCase ?? ClearColumnUseCase(repository),
         _createTaskUseCase = createTaskUseCase ?? CreateTaskUseCase(repository),
+        _deleteTaskUseCase = deleteTaskUseCase ?? DeleteTaskUseCase(repository),
         _updateTaskPriorityUseCase =
             updateTaskPriorityUseCase ?? UpdateTaskPriorityUseCase(repository),
         _updateTaskDescriptionUseCase = updateTaskDescriptionUseCase ??
@@ -87,6 +70,7 @@ class KanbanBloc extends Bloc<KanbanEvent, KanbanState> {
     on<KanbanColumnDeleted>(_onDeleteColumn);
     on<KanbanColumnCleared>(_onClearColumn);
     on<KanbanTaskAdded>(_onAddTask);
+    on<KanbanTaskDeleted>(_onDeleteTask);
     on<KanbanTaskMoved>(_onMoveTask);
     on<KanbanTaskMovedToColumn>(_onMoveTaskToColumn);
     on<KanbanTaskPriorityChanged>(_onChangePriority);
@@ -108,6 +92,7 @@ class KanbanBloc extends Bloc<KanbanEvent, KanbanState> {
   final DeleteColumnUseCase _deleteColumnUseCase;
   final ClearColumnUseCase _clearColumnUseCase;
   final CreateTaskUseCase _createTaskUseCase;
+  final DeleteTaskUseCase _deleteTaskUseCase;
   final UpdateTaskPriorityUseCase _updateTaskPriorityUseCase;
   final UpdateTaskDescriptionUseCase _updateTaskDescriptionUseCase;
   final UpdateTaskDueDateUseCase _updateTaskDueDateUseCase;

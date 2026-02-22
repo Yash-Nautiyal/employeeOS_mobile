@@ -23,7 +23,7 @@ class CustomPopupMenuItem extends StatelessWidget {
     this.isDestructive = false,
     this.iconSize = 20,
     this.textStyle,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
     this.margin = const EdgeInsets.all(2),
     this.borderRadius = 8.0,
   });
@@ -143,6 +143,7 @@ class PermissionMenuItem extends CustomPopupMenuItem {
     required super.onTap,
     required super.svgIcon,
     required super.isSelected,
+    super.padding,
   });
 }
 

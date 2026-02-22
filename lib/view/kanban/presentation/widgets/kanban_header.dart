@@ -61,7 +61,7 @@ class KanbanHeader extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             content: Container(
               constraints: const BoxConstraints(
-                maxWidth: 150,
+                maxWidth: 140,
                 minWidth: 100,
               ),
               child: Column(
@@ -72,6 +72,8 @@ class KanbanHeader extends StatelessWidget {
                     onTap: () => onRename(),
                     svgIcon: 'assets/icons/common/solid/ic-solar_pen-bold.svg',
                     isSelected: false,
+                    padding: const EdgeInsets.symmetric(horizontal: 10)
+                        .copyWith(top: 10),
                   ),
                   PermissionMenuItem(
                     text: 'Clear tasks',
