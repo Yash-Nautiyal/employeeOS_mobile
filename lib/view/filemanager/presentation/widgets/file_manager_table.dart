@@ -438,9 +438,14 @@ class _FileTableScreenState extends State<FileTableScreen>
     }
     // Multiple files: open share dialog "Share these N files with" and share all with selected user.
     final existingSharedUsers = <String, SharedUser>{};
+    final ownerIdsToExclude = <String>{};
     for (final item in fileItems) {
       for (final u in item.file.sharedWith ?? []) {
         existingSharedUsers[u.id] = u;
+      }
+      final ownerId = item.file.ownerId;
+      if (ownerId != null && ownerId.isNotEmpty) {
+        ownerIdsToExclude.add(ownerId);
       }
     }
     ShareFileDialogRunner.showMultiple(
@@ -448,6 +453,7 @@ class _FileTableScreenState extends State<FileTableScreen>
       bloc: widget.bloc,
       fileIds: _selectedFileIds,
       existingSharedUsers: existingSharedUsers.values.toList(),
+      ownerIdsToExclude: ownerIdsToExclude.toList(),
     );
   }
 

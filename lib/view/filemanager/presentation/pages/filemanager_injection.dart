@@ -1,5 +1,7 @@
 import 'package:employeeos/core/index.dart' show UserInfoService;
-import '../../index.dart';
+import '../../domain/index.dart';
+import '../../data/index.dart';
+import '../index.dart' show FilemanagerBloc;
 
 /// Central place to build [FilemanagerBloc] and its dependencies.
 /// Use this from the filemanager view (or route) so the UI stays free of wiring.
@@ -22,7 +24,7 @@ class FilemanagerInjection {
       moveFileToFolderUsecase: MoveFileToFolderUsecase(repository),
       moveFileToRootUsecase: MoveFileToRootUsecase(repository),
       logFileActivityUsecase: LogFileActivityUsecase(repository),
-      updateTagsUsecase: UpdateTagsUsecase(repository),
+      // updateTagsUsecase: UpdateTagsUsecase(repository),
       addTagUsecase: AddTagUsecase(repository),
       deleteTagUsecase: DeleteTagUsecase(repository),
       addShareParticipantUsecase: AddShareParticipantUsecase(repository),

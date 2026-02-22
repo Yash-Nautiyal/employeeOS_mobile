@@ -205,7 +205,8 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
                           fileRole: fileRole,
                           sharedUsers: sharedUsers,
                           currentUserId: currentUserId,
-                          onAdd: () => _openShareDialog(bloc, sharedUsers),
+                          onAdd: () => _openShareDialog(
+                              bloc, sharedUsers, file?.ownerId),
                           onPermissionChange: (u, p) => bloc
                               .add(UpdateSharePermissionEvent(itemId, u.id, p)),
                           onRemoveUser: (u) => bloc
@@ -313,12 +314,14 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
     return folder != null;
   }
 
-  void _openShareDialog(FilemanagerBloc bloc, List<SharedUser> sharedUsers) {
+  void _openShareDialog(FilemanagerBloc bloc, List<SharedUser> sharedUsers,
+      [String? ownerId]) {
     ShareFileDialogRunner.show(
       context,
       bloc: bloc,
       sharedUsers: sharedUsers,
       fileId: widget.item.id,
+      ownerId: ownerId,
     );
   }
 }

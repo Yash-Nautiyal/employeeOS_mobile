@@ -1,12 +1,14 @@
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/index.dart' show CustomTextfield;
-import 'package:employeeos/view/kanban/index.dart' show KanbanAssignee;
+import 'package:employeeos/view/kanban/domain/index.dart' show KanbanAssignee;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class ContactDialog extends StatelessWidget {
   final ThemeData theme;
   final BuildContext ctx;
+
+  /// Selected user ids (for showing checkmark / assigned state).
   final Set<String> selected;
   final List<KanbanAssignee> kSampleAssignees;
   final List<KanbanAssignee> filtered;
@@ -81,7 +83,7 @@ class ContactDialog extends StatelessWidget {
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final user = filtered[index];
-                  final isSelected = selected.contains(user.email);
+                  final isSelected = selected.contains(user.userId);
                   return ListTile(
                     horizontalTitleGap: 10,
                     contentPadding:

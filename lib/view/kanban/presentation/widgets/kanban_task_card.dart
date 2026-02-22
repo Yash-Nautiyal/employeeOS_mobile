@@ -1,7 +1,7 @@
+import 'package:employeeos/view/kanban/domain/index.dart' show KanbanGroupItem;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:employeeos/core/index.dart' show AppPallete, KanbanDimensions;
-import 'package:employeeos/view/kanban/index.dart' show KanbanGroupItem;
 
 class KanbanTaskCard extends StatelessWidget {
   const KanbanTaskCard({super.key, required this.theme, required this.task});
@@ -42,6 +42,7 @@ class KanbanTaskCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   task.title,
@@ -50,7 +51,6 @@ class KanbanTaskCard extends StatelessWidget {
                   style: theme.textTheme.titleSmall
                       ?.copyWith(fontWeight: FontWeight.w700),
                 ),
-                const SizedBox(width: 10),
                 SvgPicture.asset(
                   iconPath,
                   width: 20,
@@ -60,6 +60,17 @@ class KanbanTaskCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
+            if (task.attachments.isNotEmpty) ...[
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: 50),
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    final attachment = task.attachments[index];
+                    return Image.network(attachment.fileUrl);
+                  },
+                ),
+              )
+            ],
             Row(
               children: [
                 SvgPicture.asset(
@@ -68,7 +79,7 @@ class KanbanTaskCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  (task.dueDate.isNotEmpty ? task.dueDate : task.date),
+                  task.displayDate,
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),

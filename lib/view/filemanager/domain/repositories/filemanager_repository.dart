@@ -1,4 +1,4 @@
-import 'package:employeeos/view/filemanager/domain/entities/files_models.dart';
+import '../entities/files_models.dart';
 
 abstract class FilemanagerRepository {
   Future<List<FilemanagerItem>> fetchFiles();
@@ -25,7 +25,7 @@ abstract class FilemanagerRepository {
 
   Future<void> deleteFolder(String folderId);
 
-  Future<FileEntity> updateTags(String fileId, List<String> tags);
+  // Future<FileEntity> updateTags(String fileId, List<String> tags);
 
   Future<void> addTag(String fileId, String tagName,
       {required bool isPersonal});
@@ -33,12 +33,12 @@ abstract class FilemanagerRepository {
   Future<void> deleteTag(String fileId, String tagName,
       {required bool isPersonal});
 
-  Future<FileEntity> addShareParticipant(String fileId, SharedUser user);
+  Future<void> addShareParticipant(String fileId, SharedUser user);
 
-  Future<FileEntity> updateSharePermission(
+  Future<void> updateSharePermission(
       String fileId, String userId, UserPermission permission);
 
-  Future<FileEntity> removeShareParticipant(String fileId, String userId);
+  Future<void> removeShareParticipant(String fileId, String userId);
 
   Future<List<SharedUser>> fetchUsers();
 }

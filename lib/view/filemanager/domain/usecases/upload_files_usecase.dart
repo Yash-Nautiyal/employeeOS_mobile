@@ -1,4 +1,4 @@
-import '../../index.dart' show FileEntity, FilemanagerRepository, PickedFile;
+import '../index.dart' show FileEntity, FilemanagerRepository, PickedFile;
 
 class UploadFilesUsecase {
   final FilemanagerRepository repository;

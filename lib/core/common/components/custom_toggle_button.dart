@@ -96,7 +96,9 @@ class _CustomToggleButtonState extends State<CustomToggleButton>
           margin: EdgeInsets.only(
               left: _selectedIndex == 0 ? 0 : width / widget.values.length),
           decoration: BoxDecoration(
-              color: widget.theme.scaffoldBackgroundColor,
+              color: widget.theme.brightness == Brightness.dark
+                  ? const Color.fromARGB(255, 20, 19, 19)
+                  : Colors.white,
               borderRadius: BorderRadius.circular(6),
               boxShadow: [
                 BoxShadow(

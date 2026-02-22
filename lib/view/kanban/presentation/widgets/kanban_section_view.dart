@@ -1,20 +1,20 @@
-import 'package:employeeos/view/kanban/index.dart'
+import 'package:employeeos/view/kanban/domain/index.dart'
     show
-        KanbanSection,
-        KanbanGroupItem,
-        KanbanAssignee,
         DragPayload,
-        DropSlot,
-        CardDropTarget,
-        KanbanDraggableTask,
-        GhostTaskCard,
-        KanbanColumn;
+        KanbanAssignee,
+        KanbanColumn,
+        KanbanGroupItem,
+        KanbanSection;
+import 'package:employeeos/view/kanban/presentation/index.dart'
+    show DropSlot, CardDropTarget, KanbanDraggableTask, GhostTaskCard;
+import 'package:employeeos/view/kanban/presentation/bloc/kanban_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:employeeos/core/index.dart';
 
 class KanbanSectionView extends StatelessWidget {
   const KanbanSectionView({
     super.key,
+    required this.bloc,
     required this.theme,
     required this.title,
     required this.tasks,
@@ -37,6 +37,7 @@ class KanbanSectionView extends StatelessWidget {
     required this.onAssigneesChanged,
   });
 
+  final KanbanBloc bloc;
   final ThemeData theme;
   final String title;
   final List<KanbanGroupItem> tasks;
@@ -132,6 +133,7 @@ class KanbanSectionView extends StatelessWidget {
         onHoverExit: onHoverExit,
         onAccept: onAccept,
         child: KanbanDraggableTask(
+          bloc: bloc,
           theme: theme,
           task: task,
           fromColumnId: columnId,
@@ -140,6 +142,7 @@ class KanbanSectionView extends StatelessWidget {
               orElse: () => KanbanColumn(
                   id: columnId,
                   title: columnId,
+                  position: 0,
                   createdByMe: const [],
                   assignedToMe: const [])),
           allColumns: allColumns,

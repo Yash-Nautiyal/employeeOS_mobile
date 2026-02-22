@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:toastification/toastification.dart';
 
-import '../../index.dart';
+import 'package:employeeos/view/filemanager/domain/index.dart'
+    show FileEntity, FileItem, PickedFile;
+import 'package:employeeos/view/filemanager/presentation/index.dart';
+import 'package:employeeos/view/filemanager/index.dart'
+    show FilemanagerInjection;
 
 class FilemanagerView extends StatefulWidget {
   const FilemanagerView({super.key});

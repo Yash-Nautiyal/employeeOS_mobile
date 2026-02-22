@@ -4,14 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../../core/theme/app_pallete.dart' show AppPallete;
-import '../../../index.dart'
-    show
-        FavoriteStarButton,
-        FileEntity,
-        FileItem,
-        FileManagerSideMenu,
-        FilemanagerBloc;
+import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
+
+import '../../../domain/index.dart' show FileEntity, FileItem;
+import '../../index.dart'
+    show FavoriteStarButton, FileManagerSideMenu, FilemanagerBloc;
 
 class AllFavoritesSection extends StatelessWidget {
   const AllFavoritesSection({
@@ -34,8 +31,6 @@ class AllFavoritesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
           padding: horizontalPadding,
@@ -85,7 +80,6 @@ class AllFavoritesSection extends StatelessWidget {
               crossAxisCount: _crossAxisCount(context),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 1.1,
             ),
             itemCount: favorites.length,
             itemBuilder: (context, index) {
@@ -110,8 +104,8 @@ class AllFavoritesSection extends StatelessWidget {
 
   int _crossAxisCount(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    if (width > 900) return 4;
-    if (width > 600) return 3;
+    if (width > 900) return 5;
+    if (width > 600) return 4;
     if (width > 400) return 2;
     return 2;
   }
@@ -138,6 +132,11 @@ class _FavoriteCard extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
+            constraints: const BoxConstraints(
+              maxHeight: 150,
+              maxWidth: 180,
+            ),
+            width: double.infinity,
             decoration: BoxDecoration(
               border: Border.all(
                 color: theme.brightness == Brightness.dark
@@ -148,6 +147,7 @@ class _FavoriteCard extends StatelessWidget {
             ),
             padding: const EdgeInsets.all(16),
             child: Column(
+              mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

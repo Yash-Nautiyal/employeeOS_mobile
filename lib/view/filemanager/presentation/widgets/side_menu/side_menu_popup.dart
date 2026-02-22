@@ -75,9 +75,11 @@ class _SideMenuPopupState extends State<SideMenuPopup> {
               color: theme.dividerColor,
             ),
             DestructiveMenuItem(
-              text: 'Remove',
-              onTap: () => widget.handleRemoveUser(user),
-            ),
+                text: 'Remove',
+                onTap: () {
+                  widget.handleRemoveUser(user);
+                  if (mounted && context.mounted) Navigator.of(context).pop();
+                }),
           ],
         ),
       ),

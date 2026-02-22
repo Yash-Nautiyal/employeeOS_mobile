@@ -1,4 +1,4 @@
-import '../../index.dart' show FilemanagerRepository;
+import '../index.dart' show FilemanagerRepository;
 
 class DeleteFolderUsecase {
   final FilemanagerRepository repository;

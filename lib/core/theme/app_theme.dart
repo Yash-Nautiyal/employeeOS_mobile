@@ -131,6 +131,7 @@ ThemeData buildTheme({
             tertiary: AppPallete.white,
             surfaceContainer: AppPallete.containerColor,
             surfaceDim: AppPallete.grey700,
+            surfaceContainerHigh: AppPallete.grey900,
           )
         : ColorScheme.light(
             primary: colorscheme["Main"],
@@ -146,6 +147,7 @@ ThemeData buildTheme({
             tertiary: AppPallete.grey900,
             surfaceContainer: AppPallete.grey300,
             surfaceDim: AppPallete.grey300,
+            surfaceContainerHigh: AppPallete.grey300,
           ),
 
     //-------------------------------------------------------------------------------------

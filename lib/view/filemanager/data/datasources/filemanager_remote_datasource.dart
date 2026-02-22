@@ -4,17 +4,7 @@ import 'dart:typed_data';
 import 'package:employeeos/core/index.dart' show UserInfoService;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../domain/entities/files_models.dart'
-    show
-        FileEntity,
-        FileItem,
-        FilemanagerItem,
-        FileRole,
-        FileTag,
-        FolderEntity,
-        FolderItem,
-        SharedUser,
-        UserPermission;
+import '../../domain/entities/files_models.dart';
 import '../models/filemanager_file_model.dart';
 import '../models/filemanager_folder_model.dart';
 
@@ -499,7 +489,7 @@ class FilemanagerRemoteDatasource {
     }
   }
 
-  Future<FileEntity> addShareParticipant(String fileId, SharedUser user) async {
+  Future<void> addShareParticipant(String fileId, SharedUser user) async {
     await _requireOwnerOrEditor(fileId);
     final userId = _userId!;
     await _client.from('file_sharing').upsert(
@@ -511,14 +501,11 @@ class FilemanagerRemoteDatasource {
       },
       onConflict: 'file_id,shared_with',
     );
-    final list = await fetchFoldersFiles();
-    for (final e in list) {
-      if (e is FileItem && e.file.id == fileId) return e.file;
-    }
+
     throw Exception('File not found after share');
   }
 
-  Future<FileEntity> updateSharePermission(
+  Future<void> updateSharePermission(
       String fileId, String sharedWithUserId, UserPermission permission) async {
     await _requireOwnerOrEditor(fileId);
     await _client
@@ -528,25 +515,18 @@ class FilemanagerRemoteDatasource {
         })
         .eq('file_id', fileId)
         .eq('shared_with', sharedWithUserId);
-    final list = await fetchFoldersFiles();
-    for (final e in list) {
-      if (e is FileItem && e.file.id == fileId) return e.file;
-    }
+
     throw Exception('File not found after update permission');
   }
 
-  Future<FileEntity> removeShareParticipant(
-      String fileId, String userId) async {
+  Future<void> removeShareParticipant(String fileId, String userId) async {
     await _requireOwnerOrEditor(fileId);
     await _client
         .from('file_sharing')
         .delete()
         .eq('file_id', fileId)
         .eq('shared_with', userId);
-    final list = await fetchFoldersFiles();
-    for (final e in list) {
-      if (e is FileItem && e.file.id == fileId) return e.file;
-    }
+
     throw Exception('File not found after remove share');
   }
 
@@ -649,14 +629,14 @@ class FilemanagerRemoteDatasource {
   }
 
   /// Replace/sync tags: not in guide; kept for backward compatibility. Re-fetches file after changes.
-  Future<FileEntity> updateTags(String fileId, List<String> tags) async {
-    _requireUser();
-    final list = await fetchFoldersFiles();
-    for (final e in list) {
-      if (e is FileItem && e.file.id == fileId) return e.file;
-    }
-    throw Exception('File not found');
-  }
+  // Future<FileEntity> updateTags(String fileId, List<String> tags) async {
+  //   _requireUser();
+  //   final list = await fetchFoldersFiles();
+  //   for (final e in list) {
+  //     if (e is FileItem && e.file.id == fileId) return e.file;
+  //   }
+  //   throw Exception('File not found');
+  // }
 
   /// Fetches all users from user_info (via common [UserInfoService]) for share dropdown. Excludes current user.
   Future<List<SharedUser>> fetchUsers() async {

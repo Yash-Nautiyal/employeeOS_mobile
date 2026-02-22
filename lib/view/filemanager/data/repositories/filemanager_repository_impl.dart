@@ -1,13 +1,13 @@
-import '../../index.dart'
+import '../../domain/index.dart'
     show
-        FilemanagerRemoteDatasource,
-        FilemanagerRepository,
         FileEntity,
         FilemanagerItem,
+        FilemanagerRepository,
         FolderEntity,
         PickedFile,
         SharedUser,
         UserPermission;
+import '../../index.dart' show FilemanagerRemoteDatasource;
 
 class FilemanagerRepositoryImpl implements FilemanagerRepository {
   final FilemanagerRemoteDatasource remoteDatasource;
@@ -74,9 +74,9 @@ class FilemanagerRepositoryImpl implements FilemanagerRepository {
   Future<void> deleteFolder(String folderId) =>
       remoteDatasource.deleteFolder(folderId);
 
-  @override
-  Future<FileEntity> updateTags(String fileId, List<String> tags) =>
-      remoteDatasource.updateTags(fileId, tags);
+  // @override
+  // Future<FileEntity> updateTags(String fileId, List<String> tags) =>
+  //     remoteDatasource.updateTags(fileId, tags);
 
   @override
   Future<void> addTag(String fileId, String tagName,
@@ -89,16 +89,16 @@ class FilemanagerRepositoryImpl implements FilemanagerRepository {
       remoteDatasource.deleteTag(fileId, tagName, isPersonal: isPersonal);
 
   @override
-  Future<FileEntity> addShareParticipant(String fileId, SharedUser user) =>
+  Future<void> addShareParticipant(String fileId, SharedUser user) =>
       remoteDatasource.addShareParticipant(fileId, user);
 
   @override
-  Future<FileEntity> updateSharePermission(
+  Future<void> updateSharePermission(
           String fileId, String userId, UserPermission permission) =>
       remoteDatasource.updateSharePermission(fileId, userId, permission);
 
   @override
-  Future<FileEntity> removeShareParticipant(String fileId, String userId) =>
+  Future<void> removeShareParticipant(String fileId, String userId) =>
       remoteDatasource.removeShareParticipant(fileId, userId);
 
   @override

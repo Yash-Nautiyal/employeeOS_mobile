@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:employeeos/view/filemanager/domain/entities/files_models.dart'
-    show FileItem, FilemanagerItem;
-import 'package:employeeos/view/filemanager/domain/entities/filter_models.dart';
+import '../index.dart'
+    show FileItem, FileManagerFilterState, FileTypeFilter, FilemanagerItem;
 
 /// Service class for handling file/folder filtering logic.
 class FileFilterService {

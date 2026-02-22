@@ -1,4 +1,4 @@
-import '../../index.dart' show FilemanagerRepository, FilemanagerItem;
+import '../index.dart' show FilemanagerRepository, FilemanagerItem;
 
 class FetchFilesUsecase {
   final FilemanagerRepository repository;

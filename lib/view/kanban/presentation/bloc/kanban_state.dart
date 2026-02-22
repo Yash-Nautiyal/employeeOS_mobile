@@ -1,32 +1,79 @@
-import 'package:equatable/equatable.dart';
-import 'package:employeeos/view/kanban/domain/modals/kanban_modal.dart';
+part of 'kanban_bloc.dart';
 
-class KanbanState extends Equatable {
-  final bool isLoading;
-  final List<KanbanColumn> columns;
-  final String? error;
-
-  const KanbanState({
-    required this.isLoading,
-    required this.columns,
-    this.error,
-  });
-
-  factory KanbanState.initial() =>
-      const KanbanState(isLoading: true, columns: [], error: null);
-
-  KanbanState copyWith({
-    bool? isLoading,
-    List<KanbanColumn>? columns,
-    String? error,
-  }) {
-    return KanbanState(
-      isLoading: isLoading ?? this.isLoading,
-      columns: columns ?? this.columns,
-      error: error,
-    );
-  }
+sealed class KanbanState extends Equatable {
+  const KanbanState();
 
   @override
-  List<Object?> get props => [isLoading, columns, error];
+  List<Object?> get props => [];
+}
+
+/// Action-only states for one-off UI feedback (toasts). Do not use for build.
+sealed class KanbanActionState extends KanbanState {}
+
+final class KanbanInitial extends KanbanState {}
+
+final class KanbanLoading extends KanbanState {}
+
+final class KanbanLoaded extends KanbanState {
+  final List<KanbanColumn> columns;
+  final bool isActionLoading;
+  final List<KanbanAssignee>? usersForAssignees;
+  final bool isLoadingUsersForAssignees;
+
+  const KanbanLoaded(
+    this.columns, {
+    this.isActionLoading = false,
+    this.usersForAssignees,
+    this.isLoadingUsersForAssignees = false,
+  });
+
+  @override
+  List<Object?> get props => [
+        columns,
+        isActionLoading,
+        usersForAssignees,
+        isLoadingUsersForAssignees,
+      ];
+
+  KanbanLoaded copyWith({
+    List<KanbanColumn>? columns,
+    bool? isActionLoading,
+    List<KanbanAssignee>? usersForAssignees,
+    bool? isLoadingUsersForAssignees,
+  }) {
+    return KanbanLoaded(
+      columns ?? this.columns,
+      isActionLoading: isActionLoading ?? this.isActionLoading,
+      usersForAssignees: usersForAssignees ?? this.usersForAssignees,
+      isLoadingUsersForAssignees:
+          isLoadingUsersForAssignees ?? this.isLoadingUsersForAssignees,
+    );
+  }
+}
+
+final class KanbanError extends KanbanState {
+  final String message;
+
+  const KanbanError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+final class KanbanErrorActionState extends KanbanActionState {
+  final String message;
+
+  KanbanErrorActionState(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+final class KanbanSuccessActionState extends KanbanActionState {
+  final String message;
+
+  KanbanSuccessActionState(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

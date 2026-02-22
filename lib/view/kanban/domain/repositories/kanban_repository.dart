@@ -1,48 +1,70 @@
 import 'package:employeeos/view/kanban/domain/modals/kanban_modal.dart';
 
-/// Abstraction for Kanban data source.
-///
-/// For now we keep it simple and synchronous with in-memory data so the backend
-/// team can later plug in async/database calls behind the same interface.
+/// Repository for Kanban board and tasks.
+/// All methods are async and may throw on failure.
 abstract class KanbanRepository {
-  List<KanbanColumn> loadBoard();
+  /// Load full board for current user. Throws on error.
+  Future<List<KanbanColumn>> loadBoard();
 
-  List<KanbanColumn> addColumn(String title);
-  List<KanbanColumn> renameColumn(String columnId, String newTitle);
-  List<KanbanColumn> clearColumn(String columnId);
-  List<KanbanColumn> deleteColumn(String columnId);
+  /// Create column. Returns new column id and position.
+  Future<Map<String, dynamic>> createColumn(String name);
 
-  List<KanbanColumn> addTask({
-    required String columnId,
-    required KanbanGroupItem task,
-    required KanbanSection section,
-  });
+  Future<void> renameColumn(String columnId, String newTitle);
 
-  List<KanbanColumn> updatePriority({
-    required String columnId,
-    required KanbanSection section,
+  /// Clear tasks created by current user in column. Returns deleted count.
+  Future<int> clearColumn(String columnId);
+
+  Future<void> deleteColumn(String columnId);
+
+  /// Reorder columns. positions: list of { id, position }.
+  Future<void> reorderColumns(List<Map<String, dynamic>> positions);
+
+  /// Create task with name only. Returns created task row (id, name, created_at).
+  Future<Map<String, dynamic>> createTask(String columnId, String name);
+
+  /// Full task detail. Throws if not found.
+  Future<KanbanGroupItem> getTaskDetail(String taskId);
+
+  /// Upload one or many attachments and create DB records.
+  Future<List<KanbanAttachment>> uploadAttachments({
     required String taskId,
-    required String priority,
+    required List<KanbanUploadFile> files,
   });
 
-  List<KanbanColumn> updateAssignees({
-    required String columnId,
-    required KanbanSection section,
+  /// Delete a task attachment. Only uploader is allowed.
+  Future<void> deleteAttachment(String attachmentId);
+
+  /// Update task fields. Only include keys that changed.
+  Future<void> updateTask(String taskId, Map<String, dynamic> updates);
+
+  /// Move task to column. Returns { success: bool, error?: string }.
+  Future<Map<String, dynamic>> moveTaskToColumn({
     required String taskId,
-    required List<KanbanAssignee> assignees,
+    required String targetColumnId,
   });
 
-  List<KanbanColumn> moveTask({
-    required DragPayload payload,
-    required String toColumnId,
-    required KanbanSection toSection,
-    required int toIndex,
-  });
+  /// Mark task complete (moves to Archive). Returns { success, error? }.
+  Future<Map<String, dynamic>> markTaskComplete(String taskId);
 
-  List<KanbanColumn> moveTaskToColumn({
-    required KanbanGroupItem task,
-    required String fromColumnId,
-    required KanbanSection fromSection,
-    required String toColumnId,
-  });
+  /// Delete task. Returns { success, error? }. Only creator can delete.
+  Future<Map<String, dynamic>> deleteTask(String taskId);
+
+  Future<void> addAssignee(String taskId, String userId);
+
+  Future<void> removeAssignee(String taskId, String userId);
+
+  /// Add subtask. Returns { id, name, completed }.
+  Future<Map<String, dynamic>> addSubtask(String taskId, String name);
+
+  Future<void> updateSubtaskCompleted(String subtaskId, bool completed);
+
+  Future<void> updateSubtaskName(String subtaskId, String name);
+
+  Future<void> deleteSubtask(String subtaskId);
+
+  /// Current user as assignee (for new tasks). Null if not logged in.
+  Future<KanbanAssignee?> getCurrentUserAssignee();
+
+  /// All users for assignee picker (uses core UserInfoService).
+  Future<List<KanbanAssignee>> fetchUsersForAssignees();
 }

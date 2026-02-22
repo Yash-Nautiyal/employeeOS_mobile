@@ -1,10 +1,17 @@
 import 'dart:async';
 
-import 'package:employeeos/core/index.dart' show KanbanDimensions;
-import 'package:employeeos/view/kanban/index.dart';
+import 'package:employeeos/core/index.dart'
+    show EmptyContent, KanbanDimensions, showCustomToast;
+import 'package:employeeos/view/kanban/data/index.dart'
+    show KanbanRepositoryImpl;
+import 'package:employeeos/view/kanban/presentation/index.dart'
+    show KanbanColumnView, TaskDetailCubit;
+
+import 'package:employeeos/view/kanban/presentation/bloc/kanban_bloc.dart';
+import 'package:employeeos/view/kanban/domain/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
+import 'package:toastification/toastification.dart';
 
 class KanbanView extends StatefulWidget {
   const KanbanView({super.key});
@@ -14,9 +21,12 @@ class KanbanView extends StatefulWidget {
 }
 
 class _KanbanViewState extends State<KanbanView> {
-  static const String _currentUserName = 'Shreyas Ladhe';
-
+  late final KanbanRepositoryImpl _repository;
+  late final GetTaskDetailUseCase _taskDetailUseCase;
+  late final UploadTaskAttachmentsUseCase _uploadTaskAttachmentsUseCase;
+  late final DeleteTaskAttachmentUseCase _deleteTaskAttachmentUseCase;
   late final KanbanBloc _bloc;
+  late final TaskDetailCubit _taskDetailCubit;
   bool _fixedColumns = false;
 
   final GlobalKey _boardKey = GlobalKey();
@@ -35,14 +45,26 @@ class _KanbanViewState extends State<KanbanView> {
   @override
   void initState() {
     super.initState();
-    _bloc = KanbanBloc(repository: InMemoryKanbanRepository())
-      ..add(const KanbanLoadRequested());
+    _repository = KanbanRepositoryImpl();
+    _taskDetailUseCase = GetTaskDetailUseCase(_repository);
+    _uploadTaskAttachmentsUseCase = UploadTaskAttachmentsUseCase(_repository);
+    _deleteTaskAttachmentUseCase = DeleteTaskAttachmentUseCase(_repository);
+    _bloc = KanbanBloc(
+      repository: _repository,
+      getTaskDetailUseCase: _taskDetailUseCase,
+    )..add(const KanbanLoadRequested());
+    _taskDetailCubit = TaskDetailCubit(
+      getTaskDetailUseCase: _taskDetailUseCase,
+      uploadTaskAttachmentsUseCase: _uploadTaskAttachmentsUseCase,
+      deleteTaskAttachmentUseCase: _deleteTaskAttachmentUseCase,
+    );
   }
 
   @override
   void dispose() {
     _autoScrollTimer?.cancel();
     _boardScrollController.dispose();
+    _taskDetailCubit.close();
     _bloc.close();
     super.dispose();
   }
@@ -170,6 +192,7 @@ class _KanbanViewState extends State<KanbanView> {
   }
 
   Future<void> _renameColumn(KanbanColumn column) async {
+    if (column.isArchive) return;
     final controller = TextEditingController(text: column.title);
     final theme = Theme.of(context);
     final newName = await showDialog<String>(
@@ -204,8 +227,9 @@ class _KanbanViewState extends State<KanbanView> {
     _bloc.add(KanbanColumnRenamed(column.id, newName));
   }
 
-  void _deleteColumn(String columnId) {
-    _bloc.add(KanbanColumnDeleted(columnId));
+  void _deleteColumn(KanbanColumn column) {
+    if (column.isArchive) return;
+    _bloc.add(KanbanColumnDeleted(column.id));
   }
 
   void _clearColumn(String columnId) {
@@ -245,29 +269,9 @@ class _KanbanViewState extends State<KanbanView> {
     );
     if (title == null || title.isEmpty) return;
 
-    final newTask = KanbanGroupItem(
-      itemId: const Uuid().v4(),
-      title: title,
-      date: '',
-      completedTasks: 0,
-      totalTasks: 0,
-      assignedBy: _currentUserName,
-      assignees: [
-        const KanbanAssignee(
-          name: _currentUserName,
-          email: '$_currentUserName@example.com',
-        )
-      ],
-      dueDate: '',
-      priority: 'Low',
-      description: '',
-      attachments: const [],
-      subtasks: const {},
-    );
     _bloc.add(KanbanTaskAdded(
       columnId: columnId,
-      section: KanbanSection.createdByMe,
-      task: newTask,
+      taskName: title,
     ));
   }
 
@@ -289,8 +293,11 @@ class _KanbanViewState extends State<KanbanView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocProvider.value(
-      value: _bloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _bloc),
+        BlocProvider.value(value: _taskDetailCubit),
+      ],
       child: Padding(
         padding: const EdgeInsets.only(left: 16, bottom: 16),
         child: Column(
@@ -313,26 +320,39 @@ class _KanbanViewState extends State<KanbanView> {
               ],
             ),
             Expanded(
-              child: BlocBuilder<KanbanBloc, KanbanState>(
+              child: BlocConsumer<KanbanBloc, KanbanState>(
                 bloc: _bloc,
+                listenWhen: (previous, current) => current is KanbanActionState,
+                buildWhen: (previous, current) => current is! KanbanActionState,
+                listener: (context, state) {
+                  if (state is KanbanErrorActionState) {
+                    showCustomToast(
+                      context: context,
+                      type: ToastificationType.error,
+                      title: 'Error',
+                      description: state.message,
+                    );
+                  } else if (state is KanbanSuccessActionState) {
+                    showCustomToast(
+                      context: context,
+                      type: ToastificationType.success,
+                      title: state.message,
+                    );
+                  }
+                },
                 builder: (context, state) {
-                  if (state.isLoading) {
+                  if (state is KanbanLoading) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  if (state.error != null) {
+                  if (state is KanbanError) {
                     return Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'Failed to load board',
-                            style: theme.textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            state.error!,
-                            style: theme.textTheme.bodySmall,
-                          ),
+                          EmptyContent(
+                              icon: 'assets/icons/empty/ic-folder-empty.svg',
+                              title: 'Failed to load board',
+                              description: state.message),
                           const SizedBox(height: 12),
                           TextButton(
                             onPressed: () =>
@@ -342,6 +362,9 @@ class _KanbanViewState extends State<KanbanView> {
                         ],
                       ),
                     );
+                  }
+                  if (state is! KanbanLoaded) {
+                    return const SizedBox.shrink();
                   }
                   final columns = state.columns;
                   return Container(
@@ -366,66 +389,88 @@ class _KanbanViewState extends State<KanbanView> {
                               return _AddColumnCard(onTap: _addColumnDialog);
                             }
                             final col = columns[index];
-                            return KanbanColumnView(
-                              key: ValueKey(col.id),
-                              theme: theme,
-                              column: col,
-                              allColumns: columns,
-                              fixed: _fixedColumns,
-                              hoverColumnId: _hoverColumnId,
-                              hoverSection: _hoverSection,
-                              hoverIndex: _hoverIndex,
-                              hoverTask: _hoverTask,
-                              draggingTaskId: _draggingTaskId,
-                              onDragMove: _maybeAutoScroll,
-                              onDragStarted: (taskId) => setState(() {
-                                _draggingTaskId = taskId;
-                                _lastDragGlobalOffset = null;
-                                _autoScrollTimer ??= Timer.periodic(
-                                  const Duration(milliseconds: 16),
-                                  (_) => _autoScrollTick(),
-                                );
-                              }),
-                              onDragEnded: () => setState(() {
-                                _draggingTaskId = null;
-                                _clearHoverState();
-                                _stopAutoScroll();
-                              }),
-                              onHover: (columnId, section, index, task) {
-                                setState(() {
-                                  _hoverColumnId = columnId;
-                                  _hoverSection = section;
-                                  _hoverIndex = index;
-                                  _hoverTask = task;
-                                });
-                              },
-                              onHoverExit: _clearHover,
-                              onAccept: (payload, section, index) => _moveTask(
-                                payload: payload,
-                                toColumnId: col.id,
-                                toSection: section,
-                                toIndex: index,
-                              ),
-                              onMoveTaskToColumn: _moveTaskToColumn,
-                              onAddTask: () => _addTaskToColumn(col.id),
-                              onDeleteColumn: () => _deleteColumn(col.id),
-                              onClearColumn: () => _clearColumn(col.id),
-                              onRenameColumn: () => _renameColumn(col),
-                              onPriorityChanged:
-                                  (section, columnId, taskId, priority) =>
-                                      _bloc.add(KanbanTaskPriorityChanged(
-                                          columnId: columnId,
-                                          section: section,
-                                          taskId: taskId,
-                                          priority: priority)),
-                              onAssigneesChanged:
-                                  (section, columnId, taskId, assignees) =>
-                                      _bloc.add(KanbanTaskAssigneesUpdated(
-                                columnId: columnId,
-                                section: section,
-                                taskId: taskId,
-                                assignees: assignees,
-                              )),
+                            return Stack(
+                              children: [
+                                KanbanColumnView(
+                                  key: ValueKey(col.id),
+                                  bloc: _bloc,
+                                  theme: theme,
+                                  column: col,
+                                  allColumns: columns,
+                                  fixed: _fixedColumns,
+                                  hoverColumnId: _hoverColumnId,
+                                  hoverSection: _hoverSection,
+                                  hoverIndex: _hoverIndex,
+                                  hoverTask: _hoverTask,
+                                  draggingTaskId: _draggingTaskId,
+                                  onDragMove: _maybeAutoScroll,
+                                  onDragStarted: (taskId) => setState(() {
+                                    _draggingTaskId = taskId;
+                                    _lastDragGlobalOffset = null;
+                                    _autoScrollTimer ??= Timer.periodic(
+                                      const Duration(milliseconds: 16),
+                                      (_) => _autoScrollTick(),
+                                    );
+                                  }),
+                                  onDragEnded: () => setState(() {
+                                    _draggingTaskId = null;
+                                    _clearHoverState();
+                                    _stopAutoScroll();
+                                  }),
+                                  onHover: (columnId, section, index, task) {
+                                    setState(() {
+                                      _hoverColumnId = columnId;
+                                      _hoverSection = section;
+                                      _hoverIndex = index;
+                                      _hoverTask = task;
+                                    });
+                                  },
+                                  onHoverExit: _clearHover,
+                                  onAccept: (payload, section, index) =>
+                                      _moveTask(
+                                    payload: payload,
+                                    toColumnId: col.id,
+                                    toSection: section,
+                                    toIndex: index,
+                                  ),
+                                  onMoveTaskToColumn: _moveTaskToColumn,
+                                  onAddTask: () => _addTaskToColumn(col.id),
+                                  onDeleteColumn: () => _deleteColumn(col),
+                                  onClearColumn: () => _clearColumn(col.id),
+                                  onRenameColumn: () => _renameColumn(col),
+                                  onPriorityChanged:
+                                      (section, columnId, taskId, priority) =>
+                                          _bloc.add(KanbanTaskPriorityChanged(
+                                              columnId: columnId,
+                                              section: section,
+                                              taskId: taskId,
+                                              priority: priority)),
+                                  onAssigneesChanged:
+                                      (section, columnId, taskId, assignees) =>
+                                          _bloc.add(KanbanTaskAssigneesUpdated(
+                                    columnId: columnId,
+                                    section: section,
+                                    taskId: taskId,
+                                    assignees: assignees,
+                                  )),
+                                ),
+                                if (state.isActionLoading)
+                                  Positioned.fill(
+                                    child: IgnorePointer(
+                                      child: Container(
+                                        color: Colors.black12,
+                                        child: const Center(
+                                          child: SizedBox(
+                                            width: 32,
+                                            height: 32,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             );
                           },
                         ),

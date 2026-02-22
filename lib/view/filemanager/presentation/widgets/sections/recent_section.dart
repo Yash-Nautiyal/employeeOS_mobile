@@ -226,6 +226,7 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                                           sharedUsers: widget.file.sharedWith ??
                                               const <SharedUser>[],
                                           fileId: widget.file.id,
+                                          ownerId: widget.file.ownerId,
                                         );
                                       },
                                     ),

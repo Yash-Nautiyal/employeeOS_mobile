@@ -32,6 +32,7 @@ class ShareFileDialogRunner extends StatefulWidget {
     required this.bloc,
     required this.sharedUsers,
     required this.fileIds,
+    this.ownerIdsToExclude = const [],
   });
 
   final FilemanagerBloc bloc;
@@ -40,18 +41,23 @@ class ShareFileDialogRunner extends StatefulWidget {
   /// File IDs to share with the selected user. One for single-file, multiple for bulk.
   final List<String> fileIds;
 
+  /// User IDs to exclude from the list (e.g. file owner — cannot share with owner).
+  final List<String> ownerIdsToExclude;
+
   /// Shows the share dialog for a single file.
   static Future<void> show(
     BuildContext context, {
     required FilemanagerBloc bloc,
     required List<SharedUser> sharedUsers,
     required String fileId,
+    String? ownerId,
   }) async {
     await showMultiple(
       context,
       bloc: bloc,
       fileIds: [fileId],
       existingSharedUsers: sharedUsers,
+      ownerIdsToExclude: ownerId != null ? [ownerId] : null,
     );
   }
 
@@ -62,6 +68,7 @@ class ShareFileDialogRunner extends StatefulWidget {
     required FilemanagerBloc bloc,
     required List<String> fileIds,
     List<SharedUser> existingSharedUsers = const [],
+    List<String>? ownerIdsToExclude,
   }) async {
     if (fileIds.isEmpty) return;
     bloc.add(FetchAvailableUsersEvent());
@@ -74,6 +81,7 @@ class ShareFileDialogRunner extends StatefulWidget {
             bloc: bloc,
             sharedUsers: existingSharedUsers,
             fileIds: fileIds,
+            ownerIdsToExclude: ownerIdsToExclude ?? const [],
           ),
         );
       },
@@ -102,12 +110,17 @@ class _ShareFileDialogRunnerState extends State<ShareFileDialogRunner> {
   static List<SharedUser> _availableUsersForShare(
     FilemanagerState state,
     List<SharedUser> sharedUsers,
+    List<String> ownerIdsToExclude,
   ) {
     final list = <SharedUser>[];
     if (state is FilemanagerLoaded && state.availableUsers != null) {
       list.addAll(state.availableUsers!);
     }
-    return list.where((u) => !sharedUsers.any((s) => s.id == u.id)).toList();
+    final excludeIds = {...ownerIdsToExclude};
+    return list
+        .where((u) =>
+            !sharedUsers.any((s) => s.id == u.id) && !excludeIds.contains(u.id))
+        .toList();
   }
 
   @override
@@ -118,7 +131,11 @@ class _ShareFileDialogRunnerState extends State<ShareFileDialogRunner> {
           current is FilemanagerLoaded ||
           current is FilemanagerErrorActionState,
       builder: (context, state) {
-        final available = _availableUsersForShare(state, widget.sharedUsers);
+        final available = _availableUsersForShare(
+          state,
+          widget.sharedUsers,
+          widget.ownerIdsToExclude,
+        );
         final isLoading =
             state is FilemanagerLoaded && state.availableUsers == null;
 

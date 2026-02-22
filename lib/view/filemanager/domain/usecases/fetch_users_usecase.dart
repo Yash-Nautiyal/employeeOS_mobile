@@ -1,4 +1,4 @@
-import '../../index.dart' show FilemanagerRepository, SharedUser;
+import '../index.dart' show FilemanagerRepository, SharedUser;
 
 class FetchUsersUsecase {
   final FilemanagerRepository repository;

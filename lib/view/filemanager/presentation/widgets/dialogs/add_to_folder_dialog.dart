@@ -1,10 +1,11 @@
 import 'package:employeeos/core/index.dart'
-    show CustomDialog, CustomDropdown, CustomTextButton, CustomTextfield;
+    show CustomDialog, CustomDropdown, CustomTextButton;
 import 'package:employeeos/view/filemanager/domain/entities/files_models.dart';
 import 'package:employeeos/view/filemanager/presentation/bloc/filemanager_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:keyboard_sticky/keyboard_sticky.dart';
 
 enum AddToFolderMode { createNew, addToExisting }
 
@@ -125,14 +126,78 @@ class _AddToFolderDialogState extends State<AddToFolderDialog> {
 
   Widget _buildFormField(ThemeData theme) {
     if (_isCreateMode) {
-      return CustomTextfield(
+      return KeyboardSticky.both(
         controller: _nameController,
-        theme: theme,
-        hintText: 'e.g. Project files',
-        labelText: 'Folder name',
-        keyboardType: TextInputType.text,
-        onTapOutside: () => null,
-        onchange: (_) => setState(() {}),
+        useMaterial: true,
+        builder: (context, controller, field) =>
+            field ?? const SizedBox.shrink(),
+        fieldBuilder: (context, controller, focusNode) => TextField(
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: TextInputType.text,
+          onChanged: (_) => setState(() {}),
+          onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontSize: 14,
+            color: theme.colorScheme.tertiary,
+          ),
+          decoration: InputDecoration(
+            hintText: 'e.g. Project files',
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: theme.dividerColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide:
+                  BorderSide(color: theme.dividerColor.withValues(alpha: 0.5)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: theme.primaryColor, width: 1.5),
+            ),
+          ),
+        ),
+        floatingBuilder: (context, controller, field) => Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            boxShadow: [
+              BoxShadow(
+                color: theme.shadowColor.withValues(alpha: 0.08),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: field ?? const SizedBox.shrink(),
+        ),
+        floatingFieldBuilder: (context, controller, focusNode) => TextField(
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: TextInputType.text,
+          onChanged: (_) => setState(() {}),
+          onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontSize: 14,
+            color: theme.colorScheme.tertiary,
+          ),
+          decoration: InputDecoration(
+            hintText: 'e.g. Project files',
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            filled: true,
+            fillColor: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.5),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
       );
     }
 
@@ -289,28 +354,24 @@ class _AddToFolderDialogState extends State<AddToFolderDialog> {
         ),
         const SizedBox(height: 12),
         // Scrollable body (takes remaining space in landscape)
-        Flexible(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Choose an option',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildOptionCards(theme,
-                    isWideScreen: isWideScreen,
-                    hasExistingFolders: hasExistingFolders),
-                const SizedBox(height: 16),
-                _buildFormField(theme),
-              ],
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Choose an option',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
-          ),
+            const SizedBox(height: 12),
+            _buildOptionCards(theme,
+                isWideScreen: isWideScreen,
+                hasExistingFolders: hasExistingFolders),
+            const SizedBox(height: 16),
+            _buildFormField(theme),
+          ],
         ),
         const SizedBox(height: 12),
         // Fixed actions

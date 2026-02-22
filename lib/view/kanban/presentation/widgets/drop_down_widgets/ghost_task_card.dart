@@ -1,6 +1,6 @@
+import 'package:employeeos/view/kanban/domain/index.dart' show KanbanGroupItem;
 import 'package:flutter/material.dart';
-import 'package:employeeos/view/kanban/index.dart'
-    show KanbanGroupItem, KanbanTaskCard;
+import 'package:employeeos/view/kanban/presentation/index.dart' show KanbanTaskCard;
 
 class GhostTaskCard extends StatelessWidget {
   const GhostTaskCard({super.key, required this.theme, required this.task});

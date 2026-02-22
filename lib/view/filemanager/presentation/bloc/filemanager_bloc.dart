@@ -3,33 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../index.dart'
-    show
-        AddShareParticipantUsecase,
-        AddTagUsecase,
-        CreateFolderUsecase,
-        DeleteFileUsecase,
-        DeleteFolderUsecase,
-        DeleteTagUsecase,
-        FetchFilesUsecase,
-        FetchUsersUsecase,
-        FileItem,
-        FileTag,
-        FilemanagerItem,
-        FolderItem,
-        GetRecentFileIdsUsecase,
-        LogFileActivityUsecase,
-        MoveFileToFolderUsecase,
-        MoveFileToRootUsecase,
-        PickedFile,
-        RemoveShareParticipantUsecase,
-        SharedUser,
-        ToggleFavoritesUsecase,
-        ToggleFolderFavoriteUsecase,
-        UpdateSharePermissionUsecase,
-        UpdateTagsUsecase,
-        UploadFilesUsecase,
-        UserPermission;
+import '../../domain/index.dart';
 
 part 'filemanager_event.dart';
 part 'filemanager_state.dart';
@@ -47,7 +21,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
   final MoveFileToFolderUsecase moveFileToFolderUsecase;
   final MoveFileToRootUsecase moveFileToRootUsecase;
   final LogFileActivityUsecase logFileActivityUsecase;
-  final UpdateTagsUsecase updateTagsUsecase;
+  // final UpdateTagsUsecase updateTagsUsecase;
   final AddTagUsecase addTagUsecase;
   final DeleteTagUsecase deleteTagUsecase;
   final AddShareParticipantUsecase addShareParticipantUsecase;
@@ -67,7 +41,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     required this.moveFileToFolderUsecase,
     required this.moveFileToRootUsecase,
     required this.logFileActivityUsecase,
-    required this.updateTagsUsecase,
+    // required this.updateTagsUsecase,
     required this.addTagUsecase,
     required this.deleteTagUsecase,
     required this.addShareParticipantUsecase,
@@ -86,7 +60,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     on<MoveFileToFolderEvent>(_moveFileToFolderEvent);
     on<MoveFileToRootEvent>(_moveFileToRootEvent);
     on<LogFileActivityEvent>(_logFileActivityEvent);
-    on<UpdateTagsEvent>(_updateTagsEvent);
+    // on<UpdateTagsEvent>(_updateTagsEvent);
     on<AddTagEvent>(_addTagEvent);
     on<DeleteTagEvent>(_deleteTagEvent);
     on<AddShareParticipantEvent>(_addShareParticipantEvent);
@@ -102,7 +76,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       final users = await fetchUsersUsecase.call();
       emit(currentState.copyWith(availableUsers: users));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(availableUsers: []));
     }
@@ -119,7 +92,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       } catch (_) {}
       emit(FilemanagerLoaded(items, recentFileIds: recentIds));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(FilemanagerError(e.toString()));
     }
@@ -148,7 +120,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await toggleFavoritesUsecase.call(event.fileId, wasFavorite);
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -167,7 +138,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
         items: [...currentState.items, ...newItems],
       ));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -186,35 +156,33 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
             .toList(),
       ));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
   }
 
-  FutureOr<void> _updateTagsEvent(
-      UpdateTagsEvent event, Emitter<FilemanagerState> emit) async {
-    if (state is! FilemanagerLoaded) return;
-    final currentState = state as FilemanagerLoaded;
-    final previousItems = currentState.items;
-    try {
-      await updateTagsUsecase.call(event.fileId, event.tags);
-      final newTags = event.tags
-          .map((s) => FileTag(tagName: s, isPersonal: false))
-          .toList();
-      final newItems = currentState.items.map((item) {
-        if (item is FileItem && item.file.id == event.fileId) {
-          return FileItem(item.file.copyWith(tags: newTags));
-        }
-        return item;
-      }).toList();
-      emit(currentState.copyWith(items: newItems));
-    } catch (e) {
-      print(e);
-      emit(FilemanagerErrorActionState(e.toString()));
-      emit(currentState.copyWith(items: previousItems));
-    }
-  }
+  // FutureOr<void> _updateTagsEvent(
+  //     UpdateTagsEvent event, Emitter<FilemanagerState> emit) async {
+  //   if (state is! FilemanagerLoaded) return;
+  //   final currentState = state as FilemanagerLoaded;
+  //   final previousItems = currentState.items;
+  //   try {
+  //     await updateTagsUsecase.call(event.fileId, event.tags);
+  //     final newTags = event.tags
+  //         .map((s) => FileTag(tagName: s, isPersonal: false))
+  //         .toList();
+  //     final newItems = currentState.items.map((item) {
+  //       if (item is FileItem && item.file.id == event.fileId) {
+  //         return FileItem(item.file.copyWith(tags: newTags));
+  //       }
+  //       return item;
+  //     }).toList();
+  //     emit(currentState.copyWith(items: newItems));
+  //   } catch (e) {
+  //     emit(FilemanagerErrorActionState(e.toString()));
+  //     emit(currentState.copyWith(items: previousItems));
+  //   }
+  // }
 
   FutureOr<void> _addShareParticipantEvent(
       AddShareParticipantEvent event, Emitter<FilemanagerState> emit) async {
@@ -234,7 +202,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await addShareParticipantUsecase.call(event.fileId, event.user);
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -263,7 +230,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       await updateSharePermissionUsecase.call(
           event.fileId, event.userId, event.permission);
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -287,7 +253,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await removeShareParticipantUsecase.call(event.fileId, event.userId);
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -310,7 +275,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       await toggleFolderFavoriteUsecase.call(
           event.folderId, event.currentlyFavorited);
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -328,7 +292,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
           .toList();
       emit(currentState.copyWith(items: newItems));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -385,7 +348,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       emit(FilemanagerSuccessActionState(message));
       emit(currentState.copyWith(items: newItems));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -413,7 +375,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
         items: [...updatedItems, newItem],
       ));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -441,7 +402,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       emit(FilemanagerSuccessActionState(message));
       emit(currentState.copyWith(items: optimisticItems));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -459,12 +419,9 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       return item;
     }).toList();
     emit(currentState.copyWith(items: optimisticItems));
-    print('Moving file $event.fileId to root');
     try {
       await moveFileToRootUsecase.call(event.fileId);
-      print('File $event.fileId moved to root');
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -475,7 +432,6 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await logFileActivityUsecase.call(event.fileId);
     } catch (e) {
-      print(e);
       if (state is FilemanagerLoaded) {
         emit(FilemanagerErrorActionState(e.toString()));
       }
@@ -496,15 +452,15 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
         if (item is FileItem && item.file.id == event.fileId) {
           final tags = item.file.tags ?? [];
           if (tags.any((t) =>
-              t.tagName == event.tagName && t.isPersonal == event.isPersonal))
+              t.tagName == event.tagName && t.isPersonal == event.isPersonal)) {
             return item;
+          }
           return FileItem(item.file.copyWith(tags: [...tags, newTag]));
         }
         return item;
       }).toList();
       emit(currentState.copyWith(items: newItems));
     } catch (e) {
-      print(e);
       emit(FilemanagerErrorActionState(e.toString()));
       emit(currentState.copyWith(items: previousItems));
     }

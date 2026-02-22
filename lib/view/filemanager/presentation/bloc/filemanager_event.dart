@@ -45,15 +45,15 @@ final class UploadFilesEvent extends FilemanagerEvent {
   List<Object> get props => [pickedFiles];
 }
 
-final class UpdateTagsEvent extends FilemanagerEvent {
-  final String fileId;
-  final List<String> tags;
+// final class UpdateTagsEvent extends FilemanagerEvent {
+//   final String fileId;
+//   final List<String> tags;
 
-  const UpdateTagsEvent(this.fileId, this.tags);
+//   const UpdateTagsEvent(this.fileId, this.tags);
 
-  @override
-  List<Object> get props => [fileId, tags];
-}
+//   @override
+//   List<Object> get props => [fileId, tags];
+// }
 
 final class AddShareParticipantEvent extends FilemanagerEvent {
   final String fileId;

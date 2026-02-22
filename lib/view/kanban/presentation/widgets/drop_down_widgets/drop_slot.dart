@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:employeeos/view/kanban/index.dart'
-    show KanbanSection, KanbanGroupItem, DragPayload;
+import 'package:employeeos/view/kanban/domain/index.dart'
+    show DragPayload, KanbanGroupItem, KanbanSection;
 
 class DropSlot extends StatelessWidget {
   const DropSlot({

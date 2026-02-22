@@ -38,13 +38,13 @@ Future<void> showRightSideTaskDetails(
                       gradient: LinearGradient(
                         colors: [
                           theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 56, 32, 31)
+                              ? const Color.fromARGB(255, 62, 36, 35)
                               : AppPallete.errorLighter,
                           theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 27, 31, 37)
+                              ? const Color.fromARGB(255, 14, 16, 19)
                               : const Color.fromARGB(255, 251, 251, 251),
                           theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 24, 27, 32)
+                              ? const Color.fromARGB(255, 16, 18, 22)
                               : const Color.fromARGB(255, 251, 251, 251),
                           theme.brightness == Brightness.dark
                               ? const Color.fromARGB(255, 38, 55, 66)

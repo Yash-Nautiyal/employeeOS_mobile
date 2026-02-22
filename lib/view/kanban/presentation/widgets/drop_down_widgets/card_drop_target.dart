@@ -1,6 +1,6 @@
-import 'package:employeeos/view/kanban/index.dart'
-    show KanbanSection, KanbanGroupItem, DragPayload;
 import 'package:flutter/material.dart';
+
+import '../../../domain/index.dart' show DragPayload, KanbanGroupItem, KanbanSection;
 
 class CardDropTarget extends StatelessWidget {
   const CardDropTarget({super.key, 

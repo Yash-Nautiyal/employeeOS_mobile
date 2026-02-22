@@ -1,10 +1,12 @@
+import 'package:employeeos/view/kanban/domain/index.dart';
 import 'package:flutter/material.dart';
 import 'package:employeeos/core/index.dart';
-import 'package:employeeos/view/kanban/index.dart';
+import 'package:employeeos/view/kanban/presentation/index.dart';
 
 class KanbanColumnView extends StatelessWidget {
   const KanbanColumnView({
     super.key,
+    required this.bloc,
     required this.theme,
     required this.column,
     required this.allColumns,
@@ -29,6 +31,7 @@ class KanbanColumnView extends StatelessWidget {
     required this.onAssigneesChanged,
   });
 
+  final KanbanBloc bloc;
   final bool fixed;
   final int? hoverIndex;
   final ThemeData theme;
@@ -124,6 +127,7 @@ class KanbanColumnView extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     children: [
                       KanbanSectionView(
+                        bloc: bloc,
                         theme: theme,
                         title: 'Created by me',
                         tasks: column.createdByMe,
@@ -147,6 +151,7 @@ class KanbanColumnView extends StatelessWidget {
                         onAssigneesChanged: onAssigneesChanged,
                       ),
                       KanbanSectionView(
+                        bloc: bloc,
                         theme: theme,
                         title: 'Assigned to me',
                         tasks: column.assignedToMe,

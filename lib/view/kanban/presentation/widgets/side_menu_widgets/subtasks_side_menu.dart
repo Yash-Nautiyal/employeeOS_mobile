@@ -1,16 +1,25 @@
 import 'package:employeeos/core/index.dart'
     show CustomTextButton, CustomTextfield;
+import 'package:employeeos/view/kanban/domain/modals/kanban_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SubtasksSideMenu extends StatefulWidget {
-  final Map<String, bool> initialSubtasks;
-  final ValueChanged<Map<String, bool>>? onChanged;
+  final String taskId;
+  final List<KanbanSubtask> initialSubtasks;
+  final void Function(String name) onSubtaskAdded;
+  final void Function(String subtaskId, bool completed) onSubtaskToggled;
+  final void Function(String subtaskId, String name) onSubtaskRenamed;
+  final void Function(String subtaskId) onSubtaskDeleted;
 
   const SubtasksSideMenu({
     super.key,
+    required this.taskId,
     required this.initialSubtasks,
-    this.onChanged,
+    required this.onSubtaskAdded,
+    required this.onSubtaskToggled,
+    required this.onSubtaskRenamed,
+    required this.onSubtaskDeleted,
   });
 
   @override
@@ -18,12 +27,11 @@ class SubtasksSideMenu extends StatefulWidget {
 }
 
 class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
-  late Map<String, bool> _subtasks;
+  late List<KanbanSubtask> _subtasks;
   double _progressFrom = 0;
   double _progressTo = 0;
 
-  int get _completedSubtasks =>
-      _subtasks.values.where((isDone) => isDone).length;
+  int get _completedSubtasks => _subtasks.where((s) => s.completed).length;
 
   int get _totalSubtasks => _subtasks.length;
 
@@ -33,14 +41,21 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
   @override
   void initState() {
     super.initState();
-    _subtasks = Map<String, bool>.from(widget.initialSubtasks);
+    _subtasks = List<KanbanSubtask>.from(widget.initialSubtasks);
     final initial = _subtaskProgress;
     _progressFrom = initial;
     _progressTo = initial;
   }
 
-  void _emitChange() {
-    widget.onChanged?.call(Map<String, bool>.from(_subtasks));
+  @override
+  void didUpdateWidget(covariant SubtasksSideMenu oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialSubtasks.length != widget.initialSubtasks.length ||
+        oldWidget.taskId != widget.taskId) {
+      _subtasks = List<KanbanSubtask>.from(widget.initialSubtasks);
+      _progressFrom = _subtaskProgress;
+      _progressTo = _subtaskProgress;
+    }
   }
 
   void _bumpProgress() {
@@ -101,25 +116,28 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
                 itemCount: _subtasks.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
-                  final entry = _subtasks.entries.elementAt(index);
+                  final subtask = _subtasks[index];
                   return Row(
                     children: [
                       Checkbox(
-                        value: entry.value,
+                        value: subtask.completed,
                         onChanged: (checked) {
+                          final v = checked ?? false;
                           setState(() {
-                            _subtasks[entry.key] = checked ?? false;
+                            _subtasks = List.from(_subtasks)
+                              ..[index] = subtask.copyWith(completed: v);
                             _bumpProgress();
                           });
-                          _emitChange();
+                          widget.onSubtaskToggled(subtask.id, v);
                         },
                       ),
                       Expanded(
                         child: Text(
-                          entry.key,
+                          subtask.name,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            decoration:
-                                entry.value ? TextDecoration.lineThrough : null,
+                            decoration: subtask.completed
+                                ? TextDecoration.lineThrough
+                                : null,
                           ),
                         ),
                       ),
@@ -130,8 +148,10 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
                           color: theme.colorScheme.tertiary,
                           width: 20,
                         ),
-                        onPressed: () =>
-                            _openSubtaskDialog(existingTitle: entry.key),
+                        onPressed: () => _openSubtaskDialog(
+                          existingSubtaskId: subtask.id,
+                          existingTitle: subtask.name,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       IconButton(
@@ -143,10 +163,12 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _subtasks.remove(entry.key);
+                            _subtasks = _subtasks
+                                .where((s) => s.id != subtask.id)
+                                .toList();
                             _bumpProgress();
                           });
-                          _emitChange();
+                          widget.onSubtaskDeleted(subtask.id);
                         },
                       ),
                     ],
@@ -180,7 +202,10 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
     );
   }
 
-  Future<void> _openSubtaskDialog({String? existingTitle}) async {
+  Future<void> _openSubtaskDialog({
+    String? existingSubtaskId,
+    String? existingTitle,
+  }) async {
     final theme = Theme.of(context);
     final controller = TextEditingController(text: existingTitle ?? '');
     await showDialog<void>(
@@ -188,14 +213,14 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
       builder: (context) {
         return AlertDialog(
           title: Text(
-            existingTitle == null ? 'Add Subtask' : 'Edit Subtask',
+            existingSubtaskId == null ? 'Add Subtask' : 'Edit Subtask',
             style: theme.textTheme.displaySmall,
           ),
           content: CustomTextfield(
             controller: controller,
             keyboardType: TextInputType.text,
             theme: theme,
-            onchange: (value) {},
+            onchange: (_) {},
             hintText: 'Enter subtask title',
           ),
           actions: [
@@ -211,21 +236,26 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
               onClick: () {
                 final title = controller.text.trim();
                 if (title.isEmpty) return;
-                setState(() {
-                  if (existingTitle != null) {
-                    final wasDone = _subtasks[existingTitle] ?? false;
-                    _subtasks.remove(existingTitle);
-                    _subtasks[title] = wasDone;
-                  } else {
-                    _subtasks[title] = false;
-                  }
-                  _bumpProgress();
-                });
-                _emitChange();
+                if (existingSubtaskId != null) {
+                  widget.onSubtaskRenamed(existingSubtaskId, title);
+                  setState(() {
+                    final i =
+                        _subtasks.indexWhere((s) => s.id == existingSubtaskId);
+                    if (i != -1) {
+                      _subtasks = List.from(_subtasks)
+                        ..[i] = _subtasks[i].copyWith(name: title);
+                    }
+                  });
+                } else {
+                  widget.onSubtaskAdded(title);
+                  setState(() {
+                    _bumpProgress();
+                  });
+                }
                 Navigator.of(context).pop();
               },
               child: Text(
-                existingTitle == null ? 'Add' : 'Save',
+                existingSubtaskId == null ? 'Add' : 'Save',
                 style:
                     theme.textTheme.labelLarge?.copyWith(color: Colors.white),
               ),

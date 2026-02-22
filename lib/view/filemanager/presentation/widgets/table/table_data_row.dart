@@ -352,6 +352,7 @@ class _TableDataRowState extends State<TableDataRow> {
                                               bloc: bloc,
                                               sharedUsers: sharedUsers,
                                               fileId: fileItem.file.id,
+                                              ownerId: fileItem.file.ownerId,
                                             );
                                           },
                                         ),

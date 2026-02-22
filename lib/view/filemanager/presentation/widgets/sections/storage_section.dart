@@ -178,6 +178,7 @@ class _StorageSectionState extends State<StorageSection>
                     children: [
                       _buildStorageHeader(widget.theme),
                       AnimatedContainer(
+                        key: ValueKey('$_isExpanded'),
                         duration: const Duration(milliseconds: 300),
                         height: _isExpanded ? 170 : 0,
                         child: AnimatedOpacity(
