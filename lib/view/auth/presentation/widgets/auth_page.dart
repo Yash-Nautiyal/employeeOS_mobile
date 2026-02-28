@@ -2,9 +2,10 @@ import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/common/components/custom_textfield.dart';
 import 'package:employeeos/core/common/components/custom_toast.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/auth/presentation/bloc/auth_bloc.dart';
+import 'package:employeeos/view/auth/presentation/cubit/sign_in_cubit.dart';
 import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:toastification/toastification.dart';
 
@@ -26,28 +27,35 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocListener<AuthBloc, AuthState>(
-      listenWhen: (previous, current) => current is AuthListenState,
+    return BlocListener<SignInCubit, SignInState>(
       listener: (context, state) {
-        if (state is AuthError) {
-          showCustomToast(
-            context: context,
-            type: ToastificationType.error,
-            title: 'Error',
-            description: state.message,
-          );
+        if (state.status == SignInStatus.failure &&
+            state.errorMessage != null) {
+          final message = state.errorMessage!;
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            showCustomToast(
+              context: context,
+              type: ToastificationType.error,
+              title: 'Error',
+              description: message,
+            );
+          });
         }
-        if (state is AuthSuccessState) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const Layout()),
-            (route) => false,
-          );
-          showCustomToast(
-            context: context,
-            type: ToastificationType.success,
-            title: 'Success',
-            description: state.message,
-          );
+        if (state.status == SignInStatus.success) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const Layout()),
+              (route) => false,
+            );
+            showCustomToast(
+              context: context,
+              type: ToastificationType.success,
+              title: 'Success',
+              description: 'Sign-in successful',
+            );
+          });
         }
       },
       child: Column(
@@ -112,11 +120,9 @@ class _AuthPageState extends State<AuthPage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: BlocBuilder<AuthBloc, AuthState>(
-                  buildWhen: (previous, current) =>
-                      current is AuthLoading || previous is AuthLoading,
+                child: BlocBuilder<SignInCubit, SignInState>(
                   builder: (context, state) {
-                    final isLoading = state is AuthLoading;
+                    final isLoading = state.isLoading;
                     return CustomTextButton(
                       onClick: isLoading
                           ? () {}
@@ -132,11 +138,9 @@ class _AuthPageState extends State<AuthPage> {
                                 );
                                 return;
                               }
-                              context.read<AuthBloc>().add(
-                                    AuthSignInRequested(
-                                      email: email,
-                                      password: password,
-                                    ),
+                              context.read<SignInCubit>().signIn(
+                                    email: email,
+                                    password: password,
                                   );
                             },
                       backgroundColor: isLoading

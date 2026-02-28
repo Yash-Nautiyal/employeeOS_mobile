@@ -60,12 +60,25 @@ class SettingsFontCard extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SvgPicture.asset(
-                            'assets/icons/setting/ic-font.svg',
-                            height: 30,
-                            color: isSelected
-                                ? theme.primaryColor
-                                : theme.dividerColor,
+                          ShaderMask(
+                            shaderCallback: (Rect bounds) {
+                              return LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  theme.primaryColor,
+                                  theme.colorScheme.primaryFixed,
+                                ],
+                              ).createShader(bounds);
+                            },
+                            blendMode: BlendMode.srcIn,
+                            child: SvgPicture.asset(
+                              'assets/icons/setting/ic-font.svg',
+                              height: 30,
+                              color: isSelected
+                                  ? theme.primaryColor
+                                  : theme.dividerColor,
+                            ),
                           ),
                           Text(
                             entry.value,

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/index.dart' show CustomTextfield;
 import 'package:employeeos/view/kanban/domain/index.dart' show KanbanAssignee;
@@ -77,63 +79,105 @@ class ContactDialog extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                itemCount: filtered.length,
-                itemBuilder: (context, index) {
-                  final user = filtered[index];
-                  final isSelected = selected.contains(user.userId);
-                  return ListTile(
-                    horizontalTitleGap: 10,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                    leading: CircleAvatar(
-                      backgroundColor: theme.colorScheme.surfaceDim,
-                      backgroundImage:
-                          user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                              ? NetworkImage(user.avatarUrl!)
-                              : null,
-                      child: user.avatarUrl == null || user.avatarUrl!.isEmpty
-                          ? Text(
-                              user.initials,
-                              style: theme.textTheme.labelMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            )
-                          : null,
-                    ),
-                    title: Text(user.name,
-                        style: theme.textTheme.titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w600)),
-                    subtitle:
-                        Text(user.email, style: theme.textTheme.bodySmall),
-                    trailing: isSelected
-                        ? Icon(Icons.check_circle_rounded,
-                            color: theme.colorScheme.tertiary, size: 24)
-                        : CustomTextButton(
-                            padding: 0,
-                            onClick: () => onAssign(user),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SvgPicture.asset(
-                                  'assets/icons/common/solid/ic-mingcute_add-line.svg',
-                                  color: theme.colorScheme.tertiary,
-                                  width: 13,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  'Assign',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                      color: theme.colorScheme.tertiary,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final user = filtered[index];
+                        final isSelected = selected.contains(user.userId);
+                        return ListTile(
+                          horizontalTitleGap: 10,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 0),
+                          leading: CircleAvatar(
+                            backgroundColor: theme.colorScheme.surfaceDim,
+                            backgroundImage: user.avatarUrl != null &&
+                                    user.avatarUrl!.isNotEmpty
+                                ? NetworkImage(user.avatarUrl!)
+                                : null,
+                            child: user.avatarUrl == null ||
+                                    user.avatarUrl!.isEmpty
+                                ? Text(
+                                    user.initials,
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(fontWeight: FontWeight.w700),
+                                  )
+                                : null,
                           ),
-                    onTap: () => onTap(isSelected, user),
-                  );
-                },
+                          title: Text(user.name,
+                              style: theme.textTheme.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w600)),
+                          subtitle: Text(user.email,
+                              style: theme.textTheme.bodySmall),
+                          trailing: isSelected
+                              ? Icon(Icons.check_circle_rounded,
+                                  color: theme.colorScheme.tertiary, size: 24)
+                              : CustomTextButton(
+                                  padding: 0,
+                                  onClick: () => onAssign(user),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/common/solid/ic-mingcute_add-line.svg',
+                                        color: theme.colorScheme.tertiary,
+                                        width: 13,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        'Assign',
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                                color:
+                                                    theme.colorScheme.tertiary,
+                                                fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                          onTap: () => onTap(isSelected, user),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CustomTextButton(
+                                padding: 1,
+                                onClick: () => {},
+                                backgroundColor: theme.colorScheme.tertiary,
+                                child: Text(
+                                  'Assign',
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                      color: theme.scaffoldBackgroundColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
           ],

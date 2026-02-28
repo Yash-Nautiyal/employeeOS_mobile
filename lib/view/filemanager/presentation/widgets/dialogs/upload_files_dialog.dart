@@ -180,6 +180,7 @@ class _UploadFilesDialogState extends State<UploadFilesDialog> {
     return PopScope(
       canPop: !_isUploading,
       child: Dialog(
+        backgroundColor: theme.colorScheme.surface,
         insetPadding: EdgeInsets.symmetric(
             horizontal: 20, vertical: isWideScreen ? 10 : 0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -193,12 +194,20 @@ class _UploadFilesDialogState extends State<UploadFilesDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Upload files',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.tertiary,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Upload files',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.tertiary,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: theme.disabledColor))
+                  ],
                 ),
                 const SizedBox(height: 16),
                 if (isLandscape)

@@ -57,10 +57,26 @@ class SettingsPresetCard extends StatelessWidget {
                       ),
                     ),
                     child: Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/setting/ic-siderbar-duotone.svg',
-                        height: 30,
-                        color: colors["Main"],
+                      child: ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          return LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              colors["Main"] as Color,
+                              theme.brightness == Brightness.dark
+                                  ? colors["Light"] as Color
+                                  : colors["Dark"] as Color,
+                            ],
+                          ).createShader(bounds);
+                        },
+                        blendMode: BlendMode.srcIn,
+                        child: SvgPicture.asset(
+                          'assets/icons/setting/ic-siderbar-duotone.svg',
+                          height: 30,
+                          color: Colors
+                              .white, // Set to white to act as a mask for the gradient
+                        ),
                       ),
                     ),
                   ),

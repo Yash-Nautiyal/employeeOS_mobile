@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'dart:ui';
 
 import 'package:employeeos/core/common/components/custom_bagde.dart';
@@ -11,12 +12,22 @@ class HomeNav extends StatefulWidget implements PreferredSizeWidget {
   final bool signinPage;
   final bool dashboardPage;
   final Function? onPressed;
-  const HomeNav(
-      {super.key,
-      required this.theme,
-      this.signinPage = false,
-      this.dashboardPage = false,
-      this.onPressed});
+
+  /// When true, the back button is disabled and taps show [onBackPressedWhenDisabled].
+  final bool backDisabled;
+
+  /// Called when user taps back while [backDisabled] is true (e.g. show "Sign-in in progress" toast).
+  final VoidCallback? onBackPressedWhenDisabled;
+
+  const HomeNav({
+    super.key,
+    required this.theme,
+    this.signinPage = false,
+    this.dashboardPage = false,
+    this.onPressed,
+    this.backDisabled = false,
+    this.onBackPressedWhenDisabled,
+  });
 
   @override
   State<HomeNav> createState() => _HomeNavState();
@@ -65,11 +76,14 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
             )
           : Navigator.canPop(context)
               ? IconButton(
-                  icon: Icon(Icons.arrow_back,
-                      color: widget.theme.iconTheme.color),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  icon: Opacity(
+                    opacity: widget.backDisabled ? 0.5 : 1,
+                    child: Icon(Icons.arrow_back,
+                        color: widget.theme.iconTheme.color),
+                  ),
+                  onPressed: widget.backDisabled
+                      ? () => widget.onBackPressedWhenDisabled?.call()
+                      : () => Navigator.pop(context),
                 )
               : Padding(
                   padding: const EdgeInsets.only(left: 5),
@@ -182,7 +196,7 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
           ),
         if (widget.signinPage)
           Padding(
-            padding: const EdgeInsets.only(right: 20.0),
+            padding: const EdgeInsets.only(right: 5.0),
             child: TextButton(
               onPressed: () => widget.onPressed?.call(),
               child: Text(

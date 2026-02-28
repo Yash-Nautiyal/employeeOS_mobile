@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
+import 'package:employeeos/view/auth/data/auth_repository.dart';
 import 'package:employeeos/view/auth/presentation/bloc/auth_bloc.dart';
 import 'package:employeeos/view/home/presentation/pages/home_view.dart';
 import 'package:employeeos/view/layout/presentation/pages/layout.dart';
@@ -22,12 +23,19 @@ void main() async {
   await FastCachedImageConfig.init(
       clearCacheAfter: const Duration(days: 7), subDir: 'employeeos');
   runApp(
-    MultiBlocProvider(
+    MultiRepositoryProvider(
       providers: [
-        BlocProvider.value(value: themeBloc),
-        BlocProvider(create: (_) => AuthBloc()),
+        RepositoryProvider<AuthRepository>(
+          create: (_) => AuthRepository(supabase.Supabase.instance.client),
+        ),
       ],
-      child: const MyApp(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: themeBloc),
+          BlocProvider(create: (_) => AuthBloc()),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -61,8 +69,7 @@ class _MyAppState extends State<MyApp> {
               } else if (authState is Unauthenticated) {
                 return const HomeView();
               }
-              return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()));
+              return const Layout();
             },
           ),
         ),

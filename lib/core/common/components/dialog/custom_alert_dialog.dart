@@ -55,7 +55,7 @@ class CustomAlertDialog extends StatelessWidget {
       iconPadding: const EdgeInsets.only(bottom: 0, top: 18),
       titlePadding: const EdgeInsets.symmetric(
         horizontal: 18,
-      ).copyWith(top: icon != null ? 20 : 0),
+      ).copyWith(top: 20),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
       actionsPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       title: Text(

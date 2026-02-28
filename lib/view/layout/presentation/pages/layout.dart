@@ -55,7 +55,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
 
     // Start hide timer for landscape mode
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startHideTimer();
+      if (mounted) _startHideTimer();
     });
   }
 
@@ -67,6 +67,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
   }
 
   void _startHideTimer() {
+    if (!mounted) return;
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -85,6 +86,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
   }
 
   void _showAppBar() {
+    if (!mounted) return;
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -106,6 +108,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     // Detect orientation change
     if (_previousOrientation != currentOrientation) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         if (isLandscape) {
           // Just switched to landscape - show appbar and start hide timer
           if (!_appBarController.isCompleted) {

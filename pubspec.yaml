@@ -72,6 +72,8 @@ dependencies:
   liquid_progress_indicator_v2: ^0.5.0
   keyboard_sticky: ^0.2.0
   photo_view: ^0.15.0
+  url_launcher: ^6.3.1
+  flutter_file_downloader: ^2.1.1
 
 dev_dependencies:
   flutter_test:

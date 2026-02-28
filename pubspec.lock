@@ -342,6 +342,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.1"
+  flutter_file_downloader:
+    dependency: "direct main"
+    description:
+      name: flutter_file_downloader
+      sha256: b0ec675d000d88125a4f0daf3d7013a6d1c2fbdc29aa4fe3498f463c43a5c8fe
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -1054,7 +1062,7 @@ packages:
     source: hosted
     version: "2.2.2"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: "9d06212b1362abc2f0f0d78e6f09f726608c74e3b9462e8368bb03314aa8d603"

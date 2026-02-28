@@ -1,3 +1,4 @@
+import 'package:employeeos/core/index.dart' show CustomDivider;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -42,6 +43,45 @@ class ResponsivePopupItem extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class DestructivePopupItem extends StatelessWidget {
+  final VoidCallback onTap;
+  final String title;
+  final String svgIcon;
+  final Color color;
+  const DestructivePopupItem({
+    super.key,
+    required this.onTap,
+    this.title = 'Delete',
+    this.svgIcon =
+        'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+    this.color = Colors.red,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        CustomDivider(
+          color: theme.dividerColor.withAlpha(100),
+          dashWidth: 2.3,
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: ResponsivePopupItem(
+            title: title,
+            svgIcon:
+                'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+            color: color,
+            onTap: () => onTap(),
+          ),
+        ),
+      ],
     );
   }
 }

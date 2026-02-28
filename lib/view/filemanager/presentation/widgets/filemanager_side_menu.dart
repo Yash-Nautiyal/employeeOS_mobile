@@ -1,5 +1,12 @@
 import 'package:employeeos/core/index.dart'
-    show CustomDivider, fmtDate, fmtTime, formatFileSize, getFileIcon;
+    show
+        CustomDivider,
+        fmtDate,
+        fmtTime,
+        formatFileSize,
+        getFileIcon,
+        showCustomImageViewer,
+        showCustomToast;
 import 'package:employeeos/view/filemanager/presentation/widgets/side_menu/share_file_dialog_runner.dart';
 import 'package:employeeos/view/filemanager/presentation/widgets/side_menu/side_menu_share_section.dart';
 import 'package:employeeos/view/filemanager/presentation/widgets/side_menu/side_menu_tag_section.dart';
@@ -7,6 +14,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:toastification/toastification.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 
 import '../../index.dart'
     show
@@ -20,6 +30,7 @@ import '../../index.dart'
         FilemanagerLoaded,
         FileRole,
         FolderItem,
+        LogFileActivityEvent,
         RemoveShareParticipantEvent,
         SharedUser,
         SideMenuBottom,
@@ -86,6 +97,38 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
                     style: theme.textTheme.displaySmall,
                   ),
                   const Spacer(),
+                  IconButton(
+                    onPressed: () => _onViewPressed(
+                      context,
+                      isFile: isFile,
+                      file: file,
+                    ),
+                    icon: SvgPicture.asset(
+                      'assets/icons/common/solid/ic-solar_eye-bold.svg',
+                      colorFilter: ColorFilter.mode(
+                          theme.colorScheme.tertiary, BlendMode.srcIn),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => _onDownloadPressed(
+                      context,
+                      isFile: isFile,
+                      file: file,
+                      itemId: itemId,
+                      bloc: bloc,
+                    ),
+                    icon: SvgPicture.asset(
+                      'assets/icons/common/solid/ic-mingcute-download-line.svg',
+                      width: 22,
+                      colorFilter: ColorFilter.mode(
+                        theme.colorScheme.tertiary,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    tooltip: isFile
+                        ? 'Download File'
+                        : 'Only files can be downloaded',
+                  ),
                   FavoriteStarButton(
                     isFavorite: isFavorite,
                     onTap: () => bloc.add(ToggleFavoriteEvent(itemId)),
@@ -323,6 +366,141 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
       fileId: widget.item.id,
       ownerId: ownerId,
     );
+  }
+
+  Future<void> _onViewPressed(
+    BuildContext context, {
+    required bool isFile,
+    required FileEntity? file,
+  }) async {
+    if (!isFile || file == null) {
+      showCustomToast(
+        context: context,
+        type: ToastificationType.info,
+        title: 'Only files can be viewed',
+      );
+      return;
+    }
+
+    final url = file.path;
+    if (url.isEmpty) {
+      showCustomToast(
+        context: context,
+        type: ToastificationType.error,
+        title: 'No link available',
+      );
+      return;
+    }
+
+    // Determine if this is an image file (by MIME/extension and by name as fallback).
+    bool isImage(FileEntity f) {
+      final type = (f.fileType ?? '').toLowerCase();
+      final typeExt = type.split('/').last;
+      const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'image'];
+      if (imageExts.contains(typeExt)) return true;
+
+      final name = f.name.toLowerCase();
+      final nameExt = name.contains('.') ? name.split('.').last : '';
+      if (imageExts.contains(nameExt)) return true;
+
+      return false;
+    }
+
+    if (isImage(file)) {
+      await showCustomImageViewer(
+        context,
+        imageUrls: [url],
+        initialIndex: 0,
+      );
+      return;
+    }
+
+    // Non-image files: open in user's default browser
+    try {
+      final uri = Uri.parse(url);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && context.mounted) {
+        showCustomToast(
+          context: context,
+          type: ToastificationType.error,
+          title: 'Cannot open in browser',
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showCustomToast(
+          context: context,
+          type: ToastificationType.error,
+          title: 'Open failed',
+          description: e.toString(),
+        );
+      }
+    }
+  }
+
+  Future<void> _onDownloadPressed(
+    BuildContext context, {
+    required bool isFile,
+    required FileEntity? file,
+    required String itemId,
+    required FilemanagerBloc bloc,
+  }) async {
+    if (!isFile || file == null) {
+      showCustomToast(
+        context: context,
+        type: ToastificationType.info,
+        title: 'Only files can be downloaded',
+      );
+      return;
+    }
+    final url = file.path;
+    if (url.isEmpty) {
+      showCustomToast(
+        context: context,
+        type: ToastificationType.error,
+        title: 'No link available',
+      );
+      return;
+    }
+    try {
+      await FileDownloader.downloadFile(
+        url: url,
+        name: file.name,
+        notificationType: NotificationType.all,
+        onDownloadCompleted: (path) {
+          bloc.add(LogFileActivityEvent(itemId));
+          if (context.mounted) {
+            showCustomToast(
+              context: context,
+              type: ToastificationType.success,
+              title: 'Download completed',
+            );
+          }
+        },
+        onDownloadError: (error) {
+          if (context.mounted) {
+            showCustomToast(
+              context: context,
+              type: ToastificationType.error,
+              title: 'Download failed',
+              description: error,
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        showCustomToast(
+          context: context,
+          type: ToastificationType.error,
+          title: 'Download failed',
+          description: e.toString(),
+        );
+      }
+    }
   }
 }
 
