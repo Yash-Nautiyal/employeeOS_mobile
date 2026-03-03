@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'dart:ui';
+import 'package:employeeos/core/auth/auth_error_handler.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
 import 'package:employeeos/view/auth/data/auth_repository.dart';
@@ -11,33 +14,63 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  PlatformDispatcher.instance.onPlatformConfigurationChanged = () {};
-  await dotenv.load(fileName: '.env');
-  await supabase.Supabase.initialize(
-    url: dotenv.env['VITE_SUPABASE_URL'] ?? '',
-    anonKey: dotenv.env['VITE_SUPABASE_ANON_KEY'] ?? '',
-  );
-  final themeBloc = await ThemeBloc.create();
-  await FastCachedImageConfig.init(
-      clearCacheAfter: const Duration(days: 7), subDir: 'employeeos');
-  runApp(
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<AuthRepository>(
-          create: (_) => AuthRepository(supabase.Supabase.instance.client),
-        ),
-      ],
-      child: MultiBlocProvider(
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    // Global error handler: treat network/retryable auth errors as non-fatal
+    // (do not sign out, do not hang). Only explicit auth failures (401, revoked
+    // token) should lead to sign-out.
+    PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+      if (AuthErrorHandler.handleUnhandledError(error, stack)) {
+        return true; // Handled; error is not propagated.
+      }
+      FlutterError.presentError(
+        FlutterErrorDetails(exception: error, stack: stack),
+      );
+      // We reported it; prevent default handler from double-reporting.
+      return true;
+    };
+
+    PlatformDispatcher.instance.onPlatformConfigurationChanged = () {};
+    await dotenv.load(fileName: '.env');
+    await supabase.Supabase.initialize(
+      url: dotenv.env['VITE_SUPABASE_URL'] ?? '',
+      anonKey: dotenv.env['VITE_SUPABASE_ANON_KEY'] ?? '',
+    );
+    final themeBloc = await ThemeBloc.create();
+    await FastCachedImageConfig.init(
+      clearCacheAfter: const Duration(days: 7),
+      subDir: 'employeeos',
+    );
+    runApp(
+      MultiRepositoryProvider(
         providers: [
-          BlocProvider.value(value: themeBloc),
-          BlocProvider(create: (_) => AuthBloc()),
+          RepositoryProvider<AuthRepository>(
+            create: (_) => AuthRepository(supabase.Supabase.instance.client),
+          ),
         ],
-        child: const MyApp(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: themeBloc),
+            BlocProvider(
+              create: (context) => AuthBloc(
+                context.read<AuthRepository>(),
+              ),
+            ),
+          ],
+          child: const MyApp(),
+        ),
       ),
-    ),
-  );
+    );
+  }, (Object error, StackTrace stack) {
+    if (AuthErrorHandler.handleUnhandledError(error, stack)) {
+      return; // Handled; do not rethrow.
+    }
+    FlutterError.presentError(
+      FlutterErrorDetails(exception: error, stack: stack),
+    );
+  });
 }
 
 class MyApp extends StatefulWidget {

@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:employeeos/core/auth/auth_error_handler.dart';
+import 'package:employeeos/view/auth/data/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc()
+  AuthBloc(this._authRepository)
       : _client = Supabase.instance.client,
         super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
@@ -22,14 +24,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _authSubscription = _client.auth.onAuthStateChange.listen((event) {
       final session = _client.auth.currentSession;
       if (session != null) {
+        AuthErrorHandler.clearRetryableErrorFlag();
         add(AuthLoggedIn());
       } else {
-        add(AuthLoggedOut());
+        // Do not sign out on transient session loss (e.g. token refresh failed
+        // due to network). Only emit logout when we did not just see a
+        // retryable auth/network error.
+        if (!AuthErrorHandler.wasRetryableAuthErrorRecently()) {
+          add(AuthLoggedOut());
+        }
       }
     });
     add(AuthCheckRequested());
   }
 
+  final AuthRepository _authRepository;
   final SupabaseClient _client;
   late final StreamSubscription _authSubscription;
 
@@ -70,22 +79,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final response = await _client.auth.signInWithPassword(
+      await _authRepository.signIn(
         email: event.email,
         password: event.password,
       );
-      final user = response.user;
+      final user = _client.auth.currentUser;
       if (user != null) {
         emit(AuthSuccessState('Sign-in successful'));
         emit(Authenticated(user));
-        // TEST: one-off in 5 minutes
       } else {
         emit(AuthError('User not found.'));
         emit(Unauthenticated());
       }
-    } catch (e) {
-      final errorMessage = (e is AuthException) ? e.message : e.toString();
-      emit(AuthError('Sign-in failed: $errorMessage'));
+    } on AuthFailure catch (e) {
+      emit(AuthError(e.message));
       emit(Unauthenticated());
     }
   }
@@ -96,27 +103,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final response = await _client.auth.signUp(
+      await _authRepository.signUp(
         email: event.email,
         password: event.password,
-        data: {
-          if (event.firstname != null) 'first_name': event.firstname,
-          if (event.lastname != null) 'last_name': event.lastname,
-          if (event.firstname != null && event.lastname != null)
-            'display_name': '${event.firstname} ${event.lastname}',
-        },
+        firstname: event.firstname,
+        lastname: event.lastname,
       );
-      final user = response.user;
+      final user = _client.auth.currentUser;
       if (user != null) {
         emit(AuthSuccessState('Sign-Up successful'));
-
         emit(Authenticated(user));
       } else {
         emit(AuthError('Sign-up failed. Please check your details.'));
         emit(Unauthenticated());
       }
-    } catch (e) {
-      emit(AuthError('Sign-up failed: ${e.toString()}'));
+    } on AuthFailure catch (e) {
+      emit(AuthError(e.message));
       emit(Unauthenticated());
     }
   }
@@ -126,7 +128,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    await _client.auth.signOut();
+    AuthErrorHandler.clearRetryableErrorFlag();
+    try {
+      await _authRepository.signOut();
+    } on AuthFailure catch (e) {
+      // Surface the error but still move to an unauthenticated state so the
+      // user is not left in a broken "half signed-out" state.
+      emit(AuthError(e.message));
+    }
     // The listener above will emit the logout state
     emit(Unauthenticated());
   }
@@ -137,13 +146,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      await _client.auth.resetPasswordForEmail(event.email);
+      await _authRepository.resetPasswordForEmail(email: event.email);
       emit(AuthSuccessState(
           'If an account exists for ${event.email}, a reset link has been sent.'));
       emit(Unauthenticated());
-    } catch (e) {
-      final errorMessage = (e is AuthException) ? e.message : e.toString();
-      emit(AuthError('Reset password failed: $errorMessage'));
+    } on AuthFailure catch (e) {
+      emit(AuthError('Reset password failed: ${e.message}'));
       emit(Unauthenticated());
     }
   }
