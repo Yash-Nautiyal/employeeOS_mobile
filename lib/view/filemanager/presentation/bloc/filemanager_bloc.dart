@@ -76,7 +76,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       final users = await fetchUsersUsecase.call();
       emit(currentState.copyWith(availableUsers: users));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to fetch available users'));
       emit(currentState.copyWith(availableUsers: []));
     }
   }
@@ -92,7 +92,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       } catch (_) {}
       emit(FilemanagerLoaded(items, recentFileIds: recentIds));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to load files'));
       emit(FilemanagerError(e.toString()));
     }
   }
@@ -120,7 +120,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await toggleFavoritesUsecase.call(event.fileId, wasFavorite);
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to toggle favorite'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -138,7 +138,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
         items: [...currentState.items, ...newItems],
       ));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to upload files'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -156,7 +156,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
             .toList(),
       ));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to delete file'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -202,7 +202,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await addShareParticipantUsecase.call(event.fileId, event.user);
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to add share participant'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -230,7 +230,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       await updateSharePermissionUsecase.call(
           event.fileId, event.userId, event.permission);
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to update share permission'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -253,7 +253,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await removeShareParticipantUsecase.call(event.fileId, event.userId);
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to remove share participant'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -275,7 +275,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       await toggleFolderFavoriteUsecase.call(
           event.folderId, event.currentlyFavorited);
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to toggle folder favorite'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -292,7 +292,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
           .toList();
       emit(currentState.copyWith(items: newItems));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to delete folder'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -348,7 +348,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       emit(FilemanagerSuccessActionState(message));
       emit(currentState.copyWith(items: newItems));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to delete selected'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -375,7 +375,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
         items: [...updatedItems, newItem],
       ));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to create folder'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -402,7 +402,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       emit(FilemanagerSuccessActionState(message));
       emit(currentState.copyWith(items: optimisticItems));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to move file to folder'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -422,7 +422,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await moveFileToRootUsecase.call(event.fileId);
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to move file to root'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -433,7 +433,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       await logFileActivityUsecase.call(event.fileId);
     } catch (e) {
       if (state is FilemanagerLoaded) {
-        emit(FilemanagerErrorActionState(e.toString()));
+        emit(FilemanagerErrorActionState('Failed to log file activity'));
       }
     }
   }
@@ -461,7 +461,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       }).toList();
       emit(currentState.copyWith(items: newItems));
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to add tag'));
       emit(currentState.copyWith(items: previousItems));
     }
   }
@@ -487,7 +487,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       await deleteTagUsecase.call(event.fileId, event.tagName,
           isPersonal: event.isPersonal);
     } catch (e) {
-      emit(FilemanagerErrorActionState(e.toString()));
+      emit(FilemanagerErrorActionState('Failed to delete tag'));
       emit(currentState.copyWith(items: previousItems));
     }
   }

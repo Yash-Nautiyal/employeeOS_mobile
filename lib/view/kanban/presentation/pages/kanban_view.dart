@@ -4,6 +4,7 @@ import 'package:employeeos/core/index.dart'
     show
         CustomAlertDialog,
         CustomAlertDialogStyle,
+        CustomTextButton,
         EmptyContent,
         KanbanDimensions,
         showCustomToast;
@@ -369,15 +370,20 @@ class _KanbanViewState extends State<KanbanView> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          EmptyContent(
-                              icon: 'assets/icons/empty/ic-folder-empty.svg',
-                              title: 'Failed to load board',
-                              description: state.message),
+                          const EmptyContent(
+                            icon: 'assets/icons/empty/ic-folder-empty.svg',
+                            title: 'Failed to load board',
+                          ),
                           const SizedBox(height: 12),
-                          TextButton(
-                            onPressed: () =>
+                          CustomTextButton(
+                            onClick: () =>
                                 _bloc.add(const KanbanLoadRequested()),
-                            child: const Text('Retry'),
+                            backgroundColor: theme.colorScheme.tertiary,
+                            padding: 1,
+                            child: Text('Retry',
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.scaffoldBackgroundColor,
+                                )),
                           ),
                         ],
                       ),

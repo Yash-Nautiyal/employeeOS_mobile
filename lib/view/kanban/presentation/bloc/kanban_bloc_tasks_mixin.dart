@@ -26,7 +26,7 @@ extension KanbanTaskHandlers on KanbanBloc {
       emit(KanbanSuccessActionState('Task added successfully'));
       emit(current.copyWith(columns: newColumns, isActionLoading: false));
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to add task'));
       emit(current.copyWith(isActionLoading: false));
     }
   }
@@ -102,7 +102,7 @@ extension KanbanTaskHandlers on KanbanBloc {
         event.payload.fromSection,
         fromIndex,
       );
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to move task'));
       emit(latest.copyWith(columns: rollbackColumns));
     }
   }
@@ -141,7 +141,7 @@ extension KanbanTaskHandlers on KanbanBloc {
       emit(KanbanSuccessActionState('Task deleted successfully'));
       emit(current.copyWith(columns: newColumns, isActionLoading: false));
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to delete task'));
       emit(current.copyWith(isActionLoading: false));
     }
   }
@@ -218,7 +218,7 @@ extension KanbanTaskHandlers on KanbanBloc {
         event.fromSection,
         fromIndex,
       );
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to move task to column'));
       emit(latest.copyWith(columns: rollbackColumns));
     }
   }
@@ -247,7 +247,7 @@ extension KanbanTaskHandlers on KanbanBloc {
       );
       emit(next);
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to update priority'));
       emit(current.copyWith(isActionLoading: false));
     }
   }
@@ -274,7 +274,7 @@ extension KanbanTaskHandlers on KanbanBloc {
       );
       emit(next);
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to update description'));
       emit(current);
     }
   }
@@ -336,7 +336,7 @@ extension KanbanTaskHandlers on KanbanBloc {
           dueEnd: previousTask.dueEnd,
         ),
       );
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to update due date'));
       emit(latest.copyWith(columns: rollbackColumns));
     }
   }
@@ -375,7 +375,7 @@ extension KanbanTaskHandlers on KanbanBloc {
       );
       emit(next);
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to update assignees'));
       emit(current.copyWith(isActionLoading: false));
     }
   }

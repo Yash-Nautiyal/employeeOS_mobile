@@ -23,7 +23,7 @@ extension KanbanColumnHandlers on KanbanBloc {
       newColumns.sort((a, b) => a.position.compareTo(b.position));
       emit(current.copyWith(columns: newColumns, isActionLoading: false));
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to add column'));
       emit(current.copyWith(isActionLoading: false));
     }
   }
@@ -51,7 +51,7 @@ extension KanbanColumnHandlers on KanbanBloc {
       }).toList();
       emit(current.copyWith(columns: newColumns, isActionLoading: false));
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to rename column'));
       emit(current.copyWith(isActionLoading: false));
     }
   }
@@ -69,7 +69,7 @@ extension KanbanColumnHandlers on KanbanBloc {
           current.columns.where((c) => c.id != event.columnId).toList();
       emit(current.copyWith(columns: newColumns, isActionLoading: false));
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to delete column'));
       emit(current.copyWith(isActionLoading: false));
     }
   }
@@ -95,7 +95,7 @@ extension KanbanColumnHandlers on KanbanBloc {
       }).toList();
       emit(current.copyWith(columns: newColumns, isActionLoading: false));
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to clear column'));
       emit(current.copyWith(isActionLoading: false));
     }
   }

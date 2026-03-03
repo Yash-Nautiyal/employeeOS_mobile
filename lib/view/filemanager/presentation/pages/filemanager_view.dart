@@ -1,4 +1,5 @@
-import 'package:employeeos/core/index.dart' show showCustomToast;
+import 'package:employeeos/core/index.dart'
+    show CustomTextButton, EmptyContent, showCustomToast;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:toastification/toastification.dart';
@@ -105,11 +106,30 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                   child: CircularProgressIndicator(),
                 );
               } else if (state is FilemanagerError) {
-                return Center(
-                  child: Text(
-                    'Error: ${state.message}',
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: theme.colorScheme.error),
+                return SizedBox(
+                  height: screenHeight * .8,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Center(
+                          child: EmptyContent(
+                            icon: 'assets/icons/empty/ic-folder-empty.svg',
+                            title: 'Failed to load files',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        CustomTextButton(
+                          onClick: () => _bloc.add(FilemanagerLoadingEvent()),
+                          backgroundColor: theme.colorScheme.tertiary,
+                          padding: 1,
+                          child: Text('Retry',
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: theme.scaffoldBackgroundColor,
+                              )),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               } else if (state is FilemanagerLoaded) {

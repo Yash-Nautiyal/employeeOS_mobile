@@ -9,11 +9,11 @@ extension KanbanLoadDetailHandlers on KanbanBloc {
       final columns = await _loadBoardUseCase();
       emit(KanbanLoaded(columns));
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to load board'));
       if (previousLoaded != null) {
         emit(previousLoaded);
       } else {
-        emit(KanbanError(e.toString()));
+        emit(const KanbanError('Failed to load board'));
       }
     }
   }

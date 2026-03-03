@@ -30,7 +30,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
         emit(current.copyWith(isActionLoading: false));
       }
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to add subtask'));
       emit(current.copyWith(isActionLoading: false));
     }
   }
@@ -73,7 +73,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
         emit(next);
       }
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to toggle subtask'));
       emit(current);
     }
   }
@@ -114,7 +114,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
         emit(next);
       }
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to rename subtask'));
       emit(current);
     }
   }
@@ -147,7 +147,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
         emit(next);
       }
     } catch (e) {
-      emit(KanbanErrorActionState(e.toString()));
+      emit(KanbanErrorActionState('Failed to delete subtask'));
       emit(current);
     }
   }

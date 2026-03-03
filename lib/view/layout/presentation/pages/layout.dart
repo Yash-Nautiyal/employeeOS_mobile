@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:employeeos/core/common/components/connectivity_banner.dart';
 import 'package:employeeos/core/common/components/home_nav.dart';
 import 'package:employeeos/view/index.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_drawer.dart';
@@ -225,6 +226,9 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
                 ),
               ),
             ),
+
+          // Global "No internet connection" banner shown above the nav bar.
+          const ConnectivityBanner(),
         ],
       ),
     );
