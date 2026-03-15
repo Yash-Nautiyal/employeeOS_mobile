@@ -12,6 +12,10 @@ class Popup extends StatefulWidget {
   final Offset manualOffset;
   final double? arrowOffset;
   final double width;
+
+  /// If set, uses this color for the arrow; otherwise uses [ThemeData.cardColor].
+  final Color? arrowColor;
+
   const Popup({
     super.key,
     required this.popupAnchorKey,
@@ -23,6 +27,7 @@ class Popup extends StatefulWidget {
     this.manualOffset = const Offset(0, 8),
     this.arrowOffset,
     this.width = 130,
+    this.arrowColor,
   });
 
   @override
@@ -44,10 +49,12 @@ class _PopupState extends State<Popup> {
             anchorKey: widget.popupAnchorKey,
             preferredPosition: widget.preferredPosition,
             manualOffset: widget.manualOffset,
+            popupWidth: widget.width,
             childBuilder: (placement) => ResponsivePopupContainer(
               width: widget.width,
               arrowSide: placement.arrowSide,
               arrowOffset: widget.arrowOffset ?? placement.arrowOffset,
+              arrowColor: widget.arrowColor,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: Column(

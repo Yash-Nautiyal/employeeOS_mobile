@@ -10,11 +10,15 @@ class PopupDropdownStylePainter extends CustomPainter {
     required this.theme,
     required this.arrowSide,
     this.arrowOffset = 0.5,
+    this.arrowColor,
   });
 
   final ThemeData theme;
   final PopupArrowSide arrowSide;
   final double arrowOffset;
+
+  /// If set, the arrow is drawn with this color instead of the gradient.
+  final Color? arrowColor;
 
   static const double _borderRadius = 8.0;
   static const double _triangleHeight = 12.0;
@@ -24,6 +28,7 @@ class PopupDropdownStylePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = _buildPath(size);
+    final bodyPath = _buildBodyOnlyPath(size);
 
     final shadowPaint = Paint()
       ..color = Colors.black.withOpacity(0.15)
@@ -31,7 +36,7 @@ class PopupDropdownStylePainter extends CustomPainter {
 
     canvas.save();
     canvas.translate(0, 2);
-    canvas.drawPath(path, shadowPaint);
+    canvas.drawPath(bodyPath, shadowPaint);
     canvas.restore();
 
     final gradientPaint = Paint()
@@ -59,6 +64,16 @@ class PopupDropdownStylePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     canvas.drawPath(path, gradientPaint);
+
+    if (arrowColor != null) {
+      final arrowPath = _buildArrowOnlyPath(size);
+      canvas.drawPath(
+        arrowPath,
+        Paint()
+          ..color = arrowColor!
+          ..style = PaintingStyle.fill,
+      );
+    }
   }
 
   Path _buildPath(Size size) {
@@ -91,6 +106,88 @@ class PopupDropdownStylePainter extends CustomPainter {
         break;
     }
     path.close();
+    return path;
+  }
+
+  /// Path for the arrow triangle only (for drawing with [arrowColor] when set).
+  Path _buildArrowOnlyPath(Size size) {
+    final w = size.width;
+    final h = size.height;
+    final length =
+        arrowSide == PopupArrowSide.top || arrowSide == PopupArrowSide.bottom
+            ? w
+            : h;
+    final triCenter = _inset +
+        (length - _inset * 2 - _triangleWidth).clamp(0.0, double.infinity) *
+            arrowOffset.clamp(0.0, 1.0);
+    final triLeft = triCenter - _triangleWidth / 2;
+    final triRight = triCenter + _triangleWidth / 2;
+    final path = Path();
+
+    switch (arrowSide) {
+      case PopupArrowSide.top:
+        path.moveTo(triLeft + _triangleWidth / 2, 0);
+        path.lineTo(
+            triRight.clamp(_borderRadius, w - _borderRadius), _triangleHeight);
+        path.lineTo(
+            triLeft.clamp(_borderRadius, w - _borderRadius), _triangleHeight);
+        break;
+      case PopupArrowSide.bottom:
+        final bodyH = h - _triangleHeight;
+        path.moveTo(triLeft + _triangleWidth / 2, h);
+        path.lineTo(triLeft.clamp(_borderRadius, w - _borderRadius), bodyH);
+        path.lineTo(triRight.clamp(_borderRadius, w - _borderRadius), bodyH);
+        break;
+      case PopupArrowSide.left:
+        path.moveTo(0, triLeft + _triangleWidth / 2);
+        path.lineTo(
+            _triangleHeight, triRight.clamp(_borderRadius, h - _borderRadius));
+        path.lineTo(
+            _triangleHeight, triLeft.clamp(_borderRadius, h - _borderRadius));
+        break;
+      case PopupArrowSide.right:
+        final bodyW = w - _triangleHeight;
+        path.moveTo(w, triLeft + _triangleWidth / 2);
+        path.lineTo(bodyW, triRight.clamp(_borderRadius, h - _borderRadius));
+        path.lineTo(bodyW, triLeft.clamp(_borderRadius, h - _borderRadius));
+        break;
+    }
+    path.close();
+    return path;
+  }
+
+  /// Path for the popup body only (no arrow notch), used for shadow so arrow shadow doesn't overlap the fill.
+  Path _buildBodyOnlyPath(Size size) {
+    final w = size.width;
+    final h = size.height;
+    final path = Path();
+
+    switch (arrowSide) {
+      case PopupArrowSide.top:
+        path.addRRect(RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, _triangleHeight, w, h - _triangleHeight),
+          const Radius.circular(_borderRadius),
+        ));
+        break;
+      case PopupArrowSide.bottom:
+        path.addRRect(RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, w, h - _triangleHeight),
+          const Radius.circular(_borderRadius),
+        ));
+        break;
+      case PopupArrowSide.left:
+        path.addRRect(RRect.fromRectAndRadius(
+          Rect.fromLTWH(_triangleHeight, 0, w - _triangleHeight, h),
+          const Radius.circular(_borderRadius),
+        ));
+        break;
+      case PopupArrowSide.right:
+        path.addRRect(RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, w - _triangleHeight, h),
+          const Radius.circular(_borderRadius),
+        ));
+        break;
+    }
     return path;
   }
 
@@ -174,5 +271,6 @@ class PopupDropdownStylePainter extends CustomPainter {
   bool shouldRepaint(covariant PopupDropdownStylePainter old) =>
       old.arrowSide != arrowSide ||
       old.arrowOffset != arrowOffset ||
-      old.theme != theme;
+      old.theme != theme ||
+      old.arrowColor != arrowColor;
 }

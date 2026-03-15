@@ -3,15 +3,18 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:employeeos/core/auth/auth_error_handler.dart';
-import 'package:employeeos/view/auth/data/auth_repository.dart';
+import 'package:employeeos/core/user/current_user_profile.dart';
+import 'package:employeeos/core/user/user_info_service.dart';
+import 'package:employeeos/core/auth/data/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(this._authRepository)
+  AuthBloc(this._authRepository, [UserInfoService? userInfoService])
       : _client = Supabase.instance.client,
+        _userInfoService = userInfoService,
         super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<AuthLoggedIn>(_onAuthLoggedIn);
@@ -40,24 +43,48 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   final AuthRepository _authRepository;
   final SupabaseClient _client;
+  final UserInfoService? _userInfoService;
   late final StreamSubscription _authSubscription;
+
+  Future<CurrentUserProfile?> _loadProfile(String userId) async {
+    final service = _userInfoService;
+    if (userId.isEmpty || service == null) return null;
+    try {
+      final entity = await service.fetchUserById(userId);
+      if (entity == null) return null;
+      final supabaseUser = _client.auth.currentUser;
+      Map<String, dynamic>? metadata;
+      if (supabaseUser != null) {
+        final meta = <String, dynamic>{
+          ...?supabaseUser.userMetadata,
+          ...supabaseUser.appMetadata,
+        };
+        metadata = meta.isEmpty ? null : meta;
+      }
+      return CurrentUserProfile.fromUserInfo(entity, metadata: metadata);
+    } catch (_) {
+      return null;
+    }
+  }
 
   void _onAuthCheckRequested(
     AuthCheckRequested event,
     Emitter<AuthState> emit,
-  ) {
+  ) async {
     final session = _client.auth.currentSession;
     if (session != null) {
-      emit(Authenticated(session.user));
+      final profile = await _loadProfile(session.user.id);
+      emit(Authenticated(session.user, profile));
     } else {
       emit(Unauthenticated());
     }
   }
 
-  void _onAuthLoggedIn(AuthLoggedIn event, Emitter<AuthState> emit) {
+  void _onAuthLoggedIn(AuthLoggedIn event, Emitter<AuthState> emit) async {
     final session = _client.auth.currentSession;
     if (session != null) {
-      emit(Authenticated(session.user));
+      final profile = await _loadProfile(session.user.id);
+      emit(Authenticated(session.user, profile));
     } else {
       emit(Unauthenticated());
     }
@@ -85,8 +112,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       final user = _client.auth.currentUser;
       if (user != null) {
+        final profile = await _loadProfile(user.id);
         emit(AuthSuccessState('Sign-in successful'));
-        emit(Authenticated(user));
+        emit(Authenticated(user, profile));
       } else {
         emit(AuthError('User not found.'));
         emit(Unauthenticated());
@@ -111,8 +139,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       final user = _client.auth.currentUser;
       if (user != null) {
+        final profile = await _loadProfile(user.id);
         emit(AuthSuccessState('Sign-Up successful'));
-        emit(Authenticated(user));
+        emit(Authenticated(user, profile));
       } else {
         emit(AuthError('Sign-up failed. Please check your details.'));
         emit(Unauthenticated());

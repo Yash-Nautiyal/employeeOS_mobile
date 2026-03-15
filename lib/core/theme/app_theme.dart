@@ -58,7 +58,15 @@ ThemeData buildTheme({
           ? AppPallete.grey600
           : AppPallete.grey500,
     ),
-    labelLarge: AppTypography.button.copyWith(
+    labelLarge: AppTypography.buttonLarge.copyWith(
+      color:
+          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+    ),
+    labelMedium: AppTypography.buttonMedium.copyWith(
+      color:
+          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+    ),
+    labelSmall: AppTypography.buttonSmall.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
@@ -290,7 +298,7 @@ ThemeData buildTheme({
 
     //Tab Bar Theme
     tabBarTheme: TabBarTheme(
-      labelStyle: AppTypography.button.copyWith(
+      labelStyle: AppTypography.buttonLarge.copyWith(
         color: brightness == Brightness.dark
             ? AppPallete.white
             : AppPallete.grey800,

@@ -83,9 +83,21 @@ class AppTypography {
   static const TextStyle bodySmall = TextStyle(fontSize: 12, height: 1.5);
 
   // Button Text
-  static const TextStyle button = TextStyle(
+  static const TextStyle buttonLarge = TextStyle(
     fontWeight: bold,
     fontSize: 14,
     height: 24 / 14,
+  );
+
+  static const TextStyle buttonMedium = TextStyle(
+    fontWeight: bold,
+    fontSize: 12,
+    height: 22 / 12,
+  );
+
+  static const TextStyle buttonSmall = TextStyle(
+    fontWeight: bold,
+    fontSize: 10,
+    height: 16 / 10,
   );
 }

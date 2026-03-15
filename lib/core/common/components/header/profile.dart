@@ -1,6 +1,6 @@
 import 'package:employeeos/core/common/components/dialog/slide_dialog.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/auth/presentation/bloc/auth_bloc.dart';
+import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/view/home/presentation/pages/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,10 +10,30 @@ class ProfileDialog extends StatelessWidget {
 
   const ProfileDialog({super.key, required this.theme});
 
+  static String _roleDisplay(String? roleValue) {
+    if (roleValue == null || roleValue.isEmpty) return '—';
+    switch (roleValue.toLowerCase()) {
+      case 'hr':
+        return 'HR';
+      case 'admin':
+        return 'Admin';
+      case 'employee':
+      default:
+        return roleValue.length > 1
+            ? '${roleValue[0].toUpperCase()}${roleValue.substring(1)}'
+            : roleValue.toUpperCase();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final screenWidth = MediaQuery.of(context).size.width;
-    // final screenHeight = MediaQuery.of(context).size.height;
+    final profile = context.watch<AuthBloc>().state.currentProfile;
+    final name = profile?.fullName ?? profile?.email ?? 'Unknown';
+    final avatarUrl = profile?.avatarUrl;
+    final hasAvatar = avatarUrl != null && avatarUrl.isNotEmpty;
+    final initials = name.length >= 2
+        ? name.substring(0, 2).toUpperCase()
+        : name.substring(0, 1).toUpperCase();
     return SlideDialog(
       theme: theme,
       title: "Profile",
@@ -46,15 +66,30 @@ class ProfileDialog extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const CircleAvatar(radius: 30),
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage:
+                          hasAvatar ? NetworkImage(avatarUrl) : null,
+                      child: !hasAvatar
+                          ? Text(
+                              initials,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                              ),
+                            )
+                          : null,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text('Yash Nautiyal',
-                    style: theme.textTheme.titleLarge?.copyWith(fontSize: 20)),
+                Text(
+                  profile?.fullName ?? profile?.email ?? '—',
+                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 20),
+                ),
                 const SizedBox(height: 10),
                 Text(
-                  'Software Engineer',
+                  _roleDisplay(profile?.role.value),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),

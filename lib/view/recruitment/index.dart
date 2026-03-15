@@ -10,7 +10,7 @@ export 'presentation/widget/interview_scheduling/table/interview_table_header_se
 export 'presentation/widget/interview_scheduling/table/interview_table_paginator.dart';
 export 'presentation/bloc/interview_scheduling/interview_scheduling_bloc.dart';
 
-export 'presentation/widget/job_application_card.dart';
-export 'presentation/widget/job_posting_card.dart';
-export 'presentation/widget/job_posting_card_header.dart';
-export 'presentation/widget/job_posting_card_footer.dart';
+export 'presentation/widget/job_application/job_application_card.dart';
+export 'presentation/widget/job_posting/components/job_posting_card.dart';
+export 'presentation/widget/job_posting/components/job_posting_card_header.dart';
+export 'presentation/widget/job_posting/components/job_posting_card_footer.dart';

@@ -25,11 +25,15 @@ class ResponsivePopupItem extends StatelessWidget {
       child: Row(
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 18, color: color),
+            Icon(icon,
+                size: 18,
+                color: color ?? Theme.of(context).colorScheme.tertiary),
             const SizedBox(width: 10),
           ],
           if (svgIcon != null) ...[
-            SvgPicture.asset(svgIcon!, width: 20, color: color),
+            SvgPicture.asset(svgIcon!,
+                width: 20,
+                color: color ?? Theme.of(context).colorScheme.tertiary),
             const SizedBox(width: 10),
           ],
           Expanded(
@@ -66,11 +70,12 @@ class DestructivePopupItem extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
+        const SizedBox(height: 10),
         CustomDivider(
           color: theme.dividerColor.withAlpha(100),
           dashWidth: 2.3,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: ResponsivePopupItem(
@@ -84,4 +89,24 @@ class DestructivePopupItem extends StatelessWidget {
       ],
     );
   }
+}
+
+class ViewPopupItem extends ResponsivePopupItem {
+  const ViewPopupItem({
+    super.key,
+    super.title = 'View',
+    required super.onTap,
+    super.svgIcon = 'assets/icons/common/solid/ic-solar_eye-bold.svg',
+    super.color,
+  });
+}
+
+class EditPopupItem extends ResponsivePopupItem {
+  const EditPopupItem({
+    super.key,
+    super.title = 'Edit',
+    required super.onTap,
+    super.svgIcon = 'assets/icons/common/solid/ic-solar_pen-bold.svg',
+    super.color,
+  });
 }

@@ -93,12 +93,22 @@ class _SlideDialogState extends State<SlideDialog>
                   height: MediaQuery.of(context).size.height,
                   child: ClipRRect(
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
                         decoration: BoxDecoration(
                             gradient:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? AppPallete.darkBackgroundGradient
+                                    ? const LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(102, 46, 43, 0.85),
+                                          Color.fromRGBO(26, 26, 32, 0.851),
+                                          Color.fromRGBO(32, 39, 46, 0.851),
+                                          Color.fromRGBO(33, 71, 91, 0.85)
+                                        ],
+                                        stops: [0.0, .26, .83, 1],
+                                        begin: Alignment(-1.8, 1),
+                                        end: Alignment(1.2, -1),
+                                      )
                                     : AppPallete.lightBackgroundGradient),
                         child: SafeArea(
                           child: Padding(

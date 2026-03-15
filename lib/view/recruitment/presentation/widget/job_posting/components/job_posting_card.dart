@@ -1,5 +1,5 @@
-import 'package:employeeos/core/index.dart'
-    show AppPallete, CustomDivider, ResponsivePopupController;
+import 'package:employeeos/core/index.dart' show AppPallete, CustomDivider;
+import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
 import 'package:employeeos/view/recruitment/index.dart'
     show JobPostingCardHeader, JobPostingCardFooter;
 import 'package:flutter/material.dart';
@@ -7,7 +7,21 @@ import 'package:flutter_svg/svg.dart';
 
 class JobPostingCard extends StatefulWidget {
   final ThemeData theme;
-  const JobPostingCard({super.key, required this.theme});
+  final VoidCallback onViewTap;
+  final VoidCallback onEditTap;
+  final JobPosting? job;
+
+  /// When false, Edit and Delete are hidden (Phase 1: HR only for own jobs, Admin for any).
+  final bool canEditAndDelete;
+
+  const JobPostingCard({
+    super.key,
+    required this.theme,
+    required this.onViewTap,
+    required this.onEditTap,
+    this.job,
+    this.canEditAndDelete = true,
+  });
 
   @override
   State<JobPostingCard> createState() => _JobPostingCardState();
@@ -15,68 +29,9 @@ class JobPostingCard extends StatefulWidget {
 
 class _JobPostingCardState extends State<JobPostingCard>
     with SingleTickerProviderStateMixin {
-  bool _showDropdown = false;
-  bool _closeDropdown = true;
-
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  final GlobalKey _popupAnchorKey = GlobalKey();
-  final LayerLink _layerLink = LayerLink();
-  final ResponsivePopupController _popupController =
-      ResponsivePopupController();
-
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _popupController.dispose();
-    super.dispose();
-  }
-
-  void toggleDropdown() {
-    if (_showDropdown) {
-      // Close animation first
-      _controller.reverse();
-      setState(() {
-        _showDropdown = false;
-      });
-      // Then hide dropdown after animation completes
-      Future.delayed(const Duration(milliseconds: 200)).then((_) {
-        setState(() {
-          _closeDropdown = true;
-        });
-      });
-    } else {
-      // First make container visible
-      setState(() {
-        _closeDropdown = false;
-        _showDropdown = false;
-      });
-
-      // Then trigger the animation
-      Future.microtask(() {
-        setState(() {
-          _showDropdown = true;
-        });
-        _controller.forward();
-      });
-    }
   }
 
   @override
@@ -102,18 +57,17 @@ class _JobPostingCardState extends State<JobPostingCard>
           Flexible(
             child: JobPostingCardHeader(
               theme: widget.theme,
-              onSelect: toggleDropdown,
+              onViewTap: widget.onViewTap,
+              onEditTap: widget.onEditTap,
+              canEditAndDelete: widget.canEditAndDelete,
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
           Text(
-            "Cloud Internship - AWS",
+            widget.job?.title ?? 'Cloud Internship - AWS',
             style: widget.theme.textTheme.displaySmall?.copyWith(fontSize: 20),
           ),
           Text(
-            "Tech",
+            widget.job?.department ?? 'Tech',
             style: widget.theme.textTheme.bodyMedium
                 ?.copyWith(color: widget.theme.disabledColor),
           ),
@@ -121,8 +75,8 @@ class _JobPostingCardState extends State<JobPostingCard>
             height: 20,
           ),
           Text(
-            'Posted date: 23 Jun 2025',
-            style: widget.theme.textTheme.bodyMedium
+            'Posted date: ${_formatDate(widget.job?.createdAt)}',
+            style: widget.theme.textTheme.bodySmall
                 ?.copyWith(fontWeight: FontWeight.w600),
           ),
           Padding(
@@ -142,7 +96,7 @@ class _JobPostingCardState extends State<JobPostingCard>
                       width: 5,
                     ),
                     Text(
-                      '1 position',
+                      '${widget.job?.positions ?? 1} position${(widget.job?.positions ?? 1) == 1 ? '' : 's'}',
                       style: widget.theme.textTheme.labelLarge
                           ?.copyWith(color: AppPallete.successMain),
                     ),
@@ -160,7 +114,9 @@ class _JobPostingCardState extends State<JobPostingCard>
                       width: 5,
                     ),
                     Text(
-                      '190 applications',
+                      widget.job != null
+                          ? '— applications'
+                          : '190 applications',
                       style: widget.theme.textTheme.labelLarge
                           ?.copyWith(color: AppPallete.infoMain),
                     ),
@@ -174,14 +130,14 @@ class _JobPostingCardState extends State<JobPostingCard>
               SvgPicture.asset(
                 'assets/icons/common/solid/ic-solar_user-id-bold.svg',
                 color: widget.theme.disabledColor,
-                width: 22,
+                width: 20,
               ),
               const SizedBox(
                 width: 5,
               ),
               Text(
-                'Posted by: Yash Nautiyal',
-                style: widget.theme.textTheme.bodyMedium?.copyWith(
+                'Posted by: ${widget.job?.postedByName ?? 'Yash Nautiyal'}',
+                style: widget.theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: widget.theme.dividerColor,
                 ),
@@ -193,14 +149,14 @@ class _JobPostingCardState extends State<JobPostingCard>
               SvgPicture.asset(
                 'assets/icons/common/solid/ic-fluent_mail-24-filled.svg',
                 color: widget.theme.disabledColor,
-                width: 22,
+                width: 20,
               ),
               const SizedBox(
                 width: 5,
               ),
               Text(
-                'nautiyalyash4@gmail.com',
-                style: widget.theme.textTheme.bodyMedium?.copyWith(
+                widget.job?.postedByEmail ?? 'nautiyalyash4@gmail.com',
+                style: widget.theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: widget.theme.dividerColor,
                 ),
@@ -208,7 +164,7 @@ class _JobPostingCardState extends State<JobPostingCard>
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 20.0),
+            padding: const EdgeInsets.only(top: 20.0, bottom: 10),
             child: CustomDivider(
               color: widget.theme.dividerColor,
             ),
@@ -220,5 +176,24 @@ class _JobPostingCardState extends State<JobPostingCard>
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime? d) {
+    if (d == null) return '23 Jun 2025';
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
 }

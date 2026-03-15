@@ -20,6 +20,7 @@ export 'package:employeeos/view/layout/presentation/pages/layout.dart';
 // Recruitment
 export 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
 export 'package:employeeos/view/recruitment/presentation/pages/job_posting_view.dart';
+export 'package:employeeos/view/recruitment/presentation/pages/job_posting_section.dart';
 export 'package:employeeos/view/recruitment/presentation/pages/interview_scheduling_view.dart';
 
 // User Management

@@ -9,6 +9,7 @@ class CustomDropdown extends StatefulWidget {
   final List<DropdownMenuItem> items;
   final DropdownButtonBuilder? selectedItemBuilder;
   final bool isSearchable;
+  final FormFieldValidator<dynamic>? validator;
   const CustomDropdown({
     super.key,
     this.value,
@@ -18,6 +19,7 @@ class CustomDropdown extends StatefulWidget {
     required this.items,
     this.selectedItemBuilder,
     this.isSearchable = false,
+    this.validator,
   });
 
   @override
@@ -38,6 +40,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
     return DropdownButtonFormField2(
       isExpanded: true,
       value: widget.value,
+      validator: widget.validator,
       enableFeedback: true,
       alignment: AlignmentDirectional.centerStart,
       decoration: InputDecoration(

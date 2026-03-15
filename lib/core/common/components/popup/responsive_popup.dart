@@ -48,6 +48,7 @@ class ResponsivePopupController {
   ///
   /// - [preferredPosition]: open on left, right, top, bottom, or [PopupPreferredPosition.auto].
   /// - [manualOffset]: delta added to the computed offset (e.g. to nudge position).
+  /// - [popupWidth]: if set, used for placement centering (should match the actual popup width).
   /// - [arrowOffsetOverride]: when non-null, used instead of computed arrow alignment (0.0–1.0).
   /// - When [anchorKey] and [childBuilder] are provided, placement is computed from [preferredPosition].
   void show({
@@ -58,6 +59,7 @@ class ResponsivePopupController {
     Offset offset = const Offset(0, 8),
     PopupPreferredPosition preferredPosition = PopupPreferredPosition.auto,
     Offset? manualOffset,
+    double? popupWidth,
     double? arrowOffsetOverride,
     GlobalKey? anchorKey,
   }) {
@@ -76,6 +78,7 @@ class ResponsivePopupController {
         preferredPosition,
         manualOffset ?? Offset.zero,
         arrowOffsetOverride,
+        popupWidth: popupWidth,
       );
       if (placement != null) {
         finalOffset = placement.offset;
@@ -134,8 +137,10 @@ class ResponsivePopupController {
     GlobalKey anchorKey,
     PopupPreferredPosition preferredPosition,
     Offset manualOffset,
-    double? arrowOffsetOverride,
-  ) {
+    double? arrowOffsetOverride, {
+    double? popupWidth,
+  }) {
+    final effectiveWidth = popupWidth ?? _popupWidth;
     final anchorContext = anchorKey.currentContext;
     if (anchorContext == null) return null;
 
@@ -161,7 +166,7 @@ class ResponsivePopupController {
       dy += manualOffset.dy;
       dx = dx.clamp(
         -anchorPos.dx,
-        screenSize.width - anchorPos.dx - _popupWidth,
+        screenSize.width - anchorPos.dx - effectiveWidth,
       );
       dy = dy.clamp(
         -anchorPos.dy,
@@ -185,30 +190,30 @@ class ResponsivePopupController {
             bestScore = spaceAbove;
             bestSide = PopupArrowSide.bottom;
             bestDy = -_popupHeight - _gap;
-            final preferredDx = anchorSize.width / 2 - _popupWidth / 2;
+            final preferredDx = anchorSize.width / 2 - effectiveWidth / 2;
             bestDx = preferredDx.clamp(
               -anchorPos.dx,
-              screenSize.width - anchorPos.dx - _popupWidth,
+              screenSize.width - anchorPos.dx - effectiveWidth,
             );
-            bestArrowOffset =
-                ((anchorSize.width / 2 - bestDx) / _popupWidth).clamp(0.0, 1.0);
+            bestArrowOffset = ((anchorSize.width / 2 - bestDx) / effectiveWidth)
+                .clamp(0.0, 1.0);
           }
           if (below && spaceBelow > bestScore) {
             bestScore = spaceBelow;
             bestSide = PopupArrowSide.top;
             bestDy = anchorSize.height + _gap;
-            final preferredDx = anchorSize.width / 2 - _popupWidth / 2;
+            final preferredDx = anchorSize.width / 2 - effectiveWidth / 2;
             bestDx = preferredDx.clamp(
               -anchorPos.dx,
-              screenSize.width - anchorPos.dx - _popupWidth,
+              screenSize.width - anchorPos.dx - effectiveWidth,
             );
-            bestArrowOffset =
-                ((anchorSize.width / 2 - bestDx) / _popupWidth).clamp(0.0, 1.0);
+            bestArrowOffset = ((anchorSize.width / 2 - bestDx) / effectiveWidth)
+                .clamp(0.0, 1.0);
           }
           if (left && spaceLeft > bestScore) {
             bestScore = spaceLeft;
             bestSide = PopupArrowSide.right;
-            bestDx = -_popupWidth - _gap;
+            bestDx = -effectiveWidth - _gap;
             final preferredDy = anchorSize.height / 2 - _popupHeight / 2;
             bestDy = preferredDy.clamp(
               -anchorPos.dy,
@@ -242,7 +247,7 @@ class ResponsivePopupController {
               arrowOffset: arrowOffset,
             );
           }
-          dx = anchorSize.width / 2 - _popupWidth / 2;
+          dx = anchorSize.width / 2 - effectiveWidth / 2;
           dy = -_popupHeight - _gap;
           arrowSide = PopupArrowSide.bottom;
           arrowOffset = arrowOffsetOverride ?? 0.5;
@@ -257,29 +262,29 @@ class ResponsivePopupController {
       case PopupPreferredPosition.top:
         dy = -_popupHeight - _gap;
         arrowSide = PopupArrowSide.bottom;
-        final preferredDx = anchorSize.width / 2 - _popupWidth / 2;
+        final preferredDx = anchorSize.width / 2 - effectiveWidth / 2;
         dx = preferredDx.clamp(
           -anchorPos.dx,
-          screenSize.width - anchorPos.dx - _popupWidth,
+          screenSize.width - anchorPos.dx - effectiveWidth,
         );
         arrowOffset =
-            ((anchorSize.width / 2 - dx) / _popupWidth).clamp(0.0, 1.0);
+            ((anchorSize.width / 2 - dx) / effectiveWidth).clamp(0.0, 1.0);
         applyManualOffset();
         break;
       case PopupPreferredPosition.bottom:
         dy = anchorSize.height + _gap;
         arrowSide = PopupArrowSide.top;
-        final preferredDxB = anchorSize.width / 2 - _popupWidth / 2;
+        final preferredDxB = anchorSize.width / 2 - effectiveWidth / 2;
         dx = preferredDxB.clamp(
           -anchorPos.dx,
-          screenSize.width - anchorPos.dx - _popupWidth,
+          screenSize.width - anchorPos.dx - effectiveWidth,
         );
         arrowOffset =
-            ((anchorSize.width / 2 - dx) / _popupWidth).clamp(0.0, 1.0);
+            ((anchorSize.width / 2 - dx) / effectiveWidth).clamp(0.0, 1.0);
         applyManualOffset();
         break;
       case PopupPreferredPosition.left:
-        dx = -_popupWidth - _gap;
+        dx = -effectiveWidth - _gap;
         arrowSide = PopupArrowSide.right;
         final preferredDyL = anchorSize.height / 2 - _popupHeight / 2;
         dy = preferredDyL.clamp(

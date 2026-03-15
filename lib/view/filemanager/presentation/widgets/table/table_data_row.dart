@@ -1,11 +1,11 @@
 // ignore_for_file: deprecated_member_use
+import 'package:employeeos/core/common/components/popup/popup.dart';
 import 'package:employeeos/core/index.dart'
     show
         AvatarStackItem,
         CustomAvatarStack,
-        CustomDivider,
+        DestructivePopupItem,
         PopupPreferredPosition,
-        ResponsivePopupContainer,
         ResponsivePopupController,
         ResponsivePopupItem,
         fmtDate,
@@ -254,190 +254,127 @@ class _TableDataRowState extends State<TableDataRow> {
                         inactiveColor: theme.disabledColor,
                       ),
                     ),
-                    CompositedTransformTarget(
-                      key: _popupAnchorKey,
-                      link: _layerLink,
-                      child: IconButton(
-                        icon: const Icon(Icons.more_vert),
-                        onPressed: () {
-                          _popupController.show(
-                            context: context,
-                            link: _layerLink,
-                            anchorKey: _popupAnchorKey,
-                            preferredPosition: PopupPreferredPosition.left,
-
-                            manualOffset: Offset(
-                                60,
-                                (widget.item as FileItem).file.folderId != null
-                                    ? (widget.item as FileItem).file.role ==
-                                            FileRole.owner
-                                        ? -40
-                                        : -10
-                                    : (widget.item as FileItem).file.role ==
-                                            FileRole.viewer
-                                        ? 25
-                                        : 10),
-                            // arrowOffsetOverride: 0.5,
-                            childBuilder: (placement) =>
-                                ResponsivePopupContainer(
-                              width: 130,
-                              arrowSide: placement.arrowSide,
-                              arrowOffset:
-                                  (widget.item as FileItem).file.folderId !=
-                                          null
-                                      ? placement.arrowOffset
-                                      : 0.2,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5.0),
-                                      child: ResponsivePopupItem(
-                                        title: 'Copy Link',
-                                        svgIcon:
-                                            'assets/icons/common/solid/ic-solar-link-bold.svg',
-                                        onTap: () {
-                                          _popupController.hide();
-                                          final link = (widget.item as FileItem)
-                                              .file
-                                              .path;
-                                          if (link.isNotEmpty) {
-                                            Clipboard.setData(
-                                                ClipboardData(text: link));
-                                          } else {
-                                            showCustomToast(
-                                              context: context,
-                                              type: ToastificationType.error,
-                                              title: 'No link available',
-                                            );
-                                          }
-                                        },
-                                        color: theme.colorScheme.tertiary,
-                                      ),
-                                    ),
-                                    if ((widget.item as FileItem).file.role !=
-                                        FileRole.viewer)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                                horizontal: 5.0)
-                                            .copyWith(
-                                                bottom:
-                                                    (widget.item as FileItem)
-                                                                .file
-                                                                .role ==
-                                                            FileRole.editor
-                                                        ? 0
-                                                        : 10,
-                                                top: 10),
-                                        child: ResponsivePopupItem(
-                                          title: 'Share',
-                                          svgIcon:
-                                              'assets/icons/common/solid/ic-solar_share-bold.svg',
-                                          color: theme.colorScheme.tertiary,
-                                          onTap: () {
-                                            _popupController.hide();
-                                            final fileItem =
-                                                widget.item as FileItem;
-                                            final bloc =
-                                                context.read<FilemanagerBloc>();
-                                            final sharedUsers =
-                                                fileItem.file.sharedWith ??
-                                                    const <SharedUser>[];
-                                            ShareFileDialogRunner.show(
-                                              context,
-                                              bloc: bloc,
-                                              sharedUsers: sharedUsers,
-                                              fileId: fileItem.file.id,
-                                              ownerId: fileItem.file.ownerId,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    if ((widget.item as FileItem)
-                                            .file
-                                            .folderId !=
-                                        null) ...[
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                                horizontal: 5.0)
-                                            .copyWith(
-                                                bottom:
-                                                    (widget.item as FileItem)
-                                                                .file
-                                                                .role ==
-                                                            FileRole.owner
-                                                        ? 10
-                                                        : 0),
-                                        child: ResponsivePopupItem(
-                                          title: 'Remove',
-                                          svgIcon:
-                                              'assets/icons/common/solid/ic-lets-icons-out.svg',
-                                          color: theme.colorScheme.tertiary,
-                                          onTap: () {
-                                            _popupController.hide();
-                                            context.read<FilemanagerBloc>().add(
-                                                  MoveFileToRootEvent(
-                                                    (widget.item as FileItem)
-                                                        .file
-                                                        .id,
-                                                  ),
-                                                );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                    if ((widget.item as FileItem).file.role ==
-                                        FileRole.owner) ...[
-                                      CustomDivider(
-                                        color:
-                                            theme.dividerColor.withAlpha(100),
-                                        dashWidth: 2.3,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5.0),
-                                        child: ResponsivePopupItem(
-                                          title: 'Delete',
-                                          svgIcon:
-                                              'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
-                                          color: Colors.red,
-                                          onTap: () {
-                                            _popupController.hide();
-                                            final fileItem =
-                                                widget.item as FileItem;
-                                            final bloc =
-                                                context.read<FilemanagerBloc>();
-                                            showDialog<void>(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (ctx) => BlocProvider<
-                                                  FilemanagerBloc>.value(
-                                                value: bloc,
-                                                child: DeleteConfirmDialog(
-                                                  fileCount: 1,
-                                                  folderCount: 0,
-                                                  filesInsideFoldersCount: 0,
-                                                  fileIds: [fileItem.file.id],
-                                                  folderIds: const [],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
+                    Popup(
+                      popupAnchorKey: _popupAnchorKey,
+                      layerLink: _layerLink,
+                      popupController: _popupController,
+                      icon: const Icon(Icons.more_vert),
+                      preferredPosition: PopupPreferredPosition.left,
+                      manualOffset: Offset(
+                          10,
+                          (widget.item as FileItem).file.folderId != null
+                              ? (widget.item as FileItem).file.role ==
+                                      FileRole.owner
+                                  ? -35
+                                  : (widget.item as FileItem).file.role ==
+                                          FileRole.editor
+                                      ? -10
+                                      : 10
+                              : (widget.item as FileItem).file.role ==
+                                      FileRole.viewer
+                                  ? 25
+                                  : (widget.item as FileItem).file.role ==
+                                          FileRole.editor
+                                      ? 20
+                                      : 10),
+                      arrowOffset:
+                          (widget.item as FileItem).file.folderId != null
+                              ? null
+                              : 0.2,
+                      items: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: ResponsivePopupItem(
+                            title: 'Copy Link',
+                            svgIcon:
+                                'assets/icons/common/solid/ic-solar-link-bold.svg',
+                            onTap: () {
+                              _popupController.hide();
+                              final link = (widget.item as FileItem).file.path;
+                              if (link.isNotEmpty) {
+                                Clipboard.setData(ClipboardData(text: link));
+                              } else {
+                                showCustomToast(
+                                  context: context,
+                                  type: ToastificationType.error,
+                                  title: 'No link available',
+                                );
+                              }
+                            },
+                            color: theme.colorScheme.tertiary,
+                          ),
+                        ),
+                        if ((widget.item as FileItem).file.role !=
+                            FileRole.viewer)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5.0)
+                                .copyWith(top: 10),
+                            child: ResponsivePopupItem(
+                              title: 'Share',
+                              svgIcon:
+                                  'assets/icons/common/solid/ic-solar_share-bold.svg',
+                              color: theme.colorScheme.tertiary,
+                              onTap: () {
+                                _popupController.hide();
+                                final fileItem = widget.item as FileItem;
+                                final bloc = context.read<FilemanagerBloc>();
+                                final sharedUsers = fileItem.file.sharedWith ??
+                                    const <SharedUser>[];
+                                ShareFileDialogRunner.show(
+                                  context,
+                                  bloc: bloc,
+                                  sharedUsers: sharedUsers,
+                                  fileId: fileItem.file.id,
+                                  ownerId: fileItem.file.ownerId,
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        if ((widget.item as FileItem).file.folderId != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5.0)
+                                .copyWith(top: 10),
+                            child: ResponsivePopupItem(
+                              title: 'Remove',
+                              svgIcon:
+                                  'assets/icons/common/solid/ic-lets-icons-out.svg',
+                              color: theme.colorScheme.tertiary,
+                              onTap: () {
+                                _popupController.hide();
+                                context.read<FilemanagerBloc>().add(
+                                      MoveFileToRootEvent(
+                                        (widget.item as FileItem).file.id,
+                                      ),
+                                    );
+                              },
+                            ),
+                          ),
+                        if ((widget.item as FileItem).file.role ==
+                            FileRole.owner) ...[
+                          DestructivePopupItem(
+                            onTap: () {
+                              _popupController.hide();
+                              final fileItem = widget.item as FileItem;
+                              final bloc = context.read<FilemanagerBloc>();
+                              showDialog<void>(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (ctx) =>
+                                    BlocProvider<FilemanagerBloc>.value(
+                                  value: bloc,
+                                  child: DeleteConfirmDialog(
+                                    fileCount: 1,
+                                    folderCount: 0,
+                                    filesInsideFoldersCount: 0,
+                                    fileIds: [fileItem.file.id],
+                                    folderIds: const [],
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        ],
+                      ],
                     ),
                   ]
                 ],

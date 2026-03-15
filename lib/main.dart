@@ -4,8 +4,9 @@ import 'dart:ui';
 import 'package:employeeos/core/auth/auth_error_handler.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
-import 'package:employeeos/view/auth/data/auth_repository.dart';
-import 'package:employeeos/view/auth/presentation/bloc/auth_bloc.dart';
+import 'package:employeeos/core/user/user_info_service.dart';
+import 'package:employeeos/core/auth/data/auth_repository.dart';
+import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/view/home/presentation/pages/home_view.dart';
 import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
@@ -13,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runZonedGuarded(() async {
@@ -49,6 +52,9 @@ void main() {
           RepositoryProvider<AuthRepository>(
             create: (_) => AuthRepository(supabase.Supabase.instance.client),
           ),
+          RepositoryProvider<UserInfoService>(
+            create: (_) => UserInfoService(),
+          ),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -56,6 +62,7 @@ void main() {
             BlocProvider(
               create: (context) => AuthBloc(
                 context.read<AuthRepository>(),
+                context.read<UserInfoService>(),
               ),
             ),
           ],
@@ -95,12 +102,19 @@ class _MyAppState extends State<MyApp> {
           title: 'EmployeeOS',
           debugShowCheckedModeBanner: false,
           theme: state.themeData,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            FlutterQuillLocalizations.delegate,
+          ],
           home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, authState) {
+              if (authState is Unauthenticated) {
+                return const HomeView();
+              }
               if (authState is Authenticated) {
                 return const Layout();
-              } else if (authState is Unauthenticated) {
-                return const HomeView();
               }
               return const Layout();
             },

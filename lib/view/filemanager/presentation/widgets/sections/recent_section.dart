@@ -157,7 +157,7 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                   icon: const Icon(Icons.more_vert),
                   popupController: _popupController,
                   manualOffset: Offset(
-                      60,
+                      10,
                       widget.file.role == FileRole.owner
                           ? 10
                           : widget.file.role == FileRole.viewer
@@ -191,10 +191,7 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                     if (widget.file.role != FileRole.viewer)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0)
-                            .copyWith(
-                                bottom:
-                                    widget.file.role == FileRole.owner ? 10 : 0,
-                                top: 10),
+                            .copyWith(top: 10),
                         child: ResponsivePopupItem(
                           title: 'Share',
                           svgIcon:

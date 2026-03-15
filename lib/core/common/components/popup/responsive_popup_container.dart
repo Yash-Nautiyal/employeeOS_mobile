@@ -18,6 +18,9 @@ class ResponsivePopupContainer extends StatelessWidget {
   /// Position along the arrow edge (0.0 = start, 1.0 = end). Not necessarily center.
   final double arrowOffset;
 
+  /// If set, uses this color for the arrow; otherwise uses [ThemeData.cardColor].
+  final Color? arrowColor;
+
   /// Style: [PopupStyle.card] (default) or [PopupStyle.dropdown] (gradient like dropdown).
   final PopupStyle style;
 
@@ -27,6 +30,7 @@ class ResponsivePopupContainer extends StatelessWidget {
     this.width = 180,
     this.arrowSide,
     this.arrowOffset = 0.5,
+    this.arrowColor,
     this.style = PopupStyle.card,
   });
 
@@ -50,6 +54,7 @@ class ResponsivePopupContainer extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          if (hasArrow) _buildArrowShadow(theme),
           Container(
             width: width,
             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -117,6 +122,7 @@ class ResponsivePopupContainer extends StatelessWidget {
         theme: theme,
         arrowSide: arrowSide!,
         arrowOffset: arrowOffset,
+        arrowColor: arrowColor,
       ),
       child: Padding(
         padding: padding,
@@ -131,7 +137,8 @@ class ResponsivePopupContainer extends StatelessWidget {
     );
   }
 
-  Widget _buildArrow(ThemeData theme) {
+  Widget _buildArrowShadow(ThemeData theme) {
+    final color = arrowColor ?? theme.cardColor;
     const strip = _arrowSize * 2.0;
     switch (arrowSide!) {
       case PopupArrowSide.bottom:
@@ -145,8 +152,9 @@ class ResponsivePopupContainer extends StatelessWidget {
             painter: _PopupArrowPainter(
               side: PopupArrowSide.bottom,
               offset: arrowOffset,
-              color: theme.cardColor,
+              color: color,
               shadowColor: Colors.black26,
+              shadowOnly: true,
             ),
           ),
         );
@@ -161,8 +169,9 @@ class ResponsivePopupContainer extends StatelessWidget {
             painter: _PopupArrowPainter(
               side: PopupArrowSide.top,
               offset: arrowOffset,
-              color: theme.cardColor,
+              color: color,
               shadowColor: Colors.black26,
+              shadowOnly: true,
             ),
           ),
         );
@@ -177,8 +186,9 @@ class ResponsivePopupContainer extends StatelessWidget {
             painter: _PopupArrowPainter(
               side: PopupArrowSide.right,
               offset: arrowOffset,
-              color: theme.cardColor,
+              color: color,
               shadowColor: Colors.black26,
+              shadowOnly: true,
             ),
           ),
         );
@@ -193,8 +203,84 @@ class ResponsivePopupContainer extends StatelessWidget {
             painter: _PopupArrowPainter(
               side: PopupArrowSide.left,
               offset: arrowOffset,
-              color: theme.cardColor,
+              color: color,
               shadowColor: Colors.black26,
+              shadowOnly: true,
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget _buildArrow(ThemeData theme) {
+    final color = arrowColor ?? theme.cardColor;
+    const strip = _arrowSize * 2.0;
+    switch (arrowSide!) {
+      case PopupArrowSide.bottom:
+        return Positioned(
+          left: 0,
+          right: 0,
+          bottom: -_arrowSize,
+          height: strip,
+          child: CustomPaint(
+            size: Size(width, strip),
+            painter: _PopupArrowPainter(
+              side: PopupArrowSide.bottom,
+              offset: arrowOffset,
+              color: color,
+              shadowColor: Colors.black26,
+              shadowOnly: false,
+            ),
+          ),
+        );
+      case PopupArrowSide.top:
+        return Positioned(
+          left: 0,
+          right: 0,
+          top: -_arrowSize,
+          height: strip,
+          child: CustomPaint(
+            size: Size(width, strip),
+            painter: _PopupArrowPainter(
+              side: PopupArrowSide.top,
+              offset: arrowOffset,
+              color: color,
+              shadowColor: Colors.black26,
+              shadowOnly: false,
+            ),
+          ),
+        );
+      case PopupArrowSide.right:
+        return Positioned(
+          top: 0,
+          bottom: 0,
+          right: -_arrowSize,
+          width: strip,
+          child: CustomPaint(
+            size: Size(strip, width),
+            painter: _PopupArrowPainter(
+              side: PopupArrowSide.right,
+              offset: arrowOffset,
+              color: color,
+              shadowColor: Colors.black26,
+              shadowOnly: false,
+            ),
+          ),
+        );
+      case PopupArrowSide.left:
+        return Positioned(
+          top: 0,
+          bottom: 0,
+          left: -_arrowSize,
+          width: strip,
+          child: CustomPaint(
+            size: Size(strip, width),
+            painter: _PopupArrowPainter(
+              side: PopupArrowSide.left,
+              offset: arrowOffset,
+              color: color,
+              shadowColor: Colors.black26,
+              shadowOnly: false,
             ),
           ),
         );
@@ -207,12 +293,14 @@ class _PopupArrowPainter extends CustomPainter {
   final double offset;
   final Color color;
   final Color shadowColor;
+  final bool shadowOnly;
 
   _PopupArrowPainter({
     required this.side,
     required this.offset,
     required this.color,
     required this.shadowColor,
+    this.shadowOnly = false,
   });
 
   static const double _arrowSize = 10;
@@ -268,15 +356,20 @@ class _PopupArrowPainter extends CustomPainter {
 
     final path = Path()..addPolygon(triangle, true);
 
-    canvas.save();
-    canvas.translate(2, 4);
-    canvas.drawPath(path, Paint()..color = shadowColor.withOpacity(0.05));
-    canvas.restore();
-
-    canvas.drawPath(path, Paint()..color = color);
+    if (shadowOnly) {
+      canvas.save();
+      canvas.translate(2, 4);
+      canvas.drawPath(path, Paint()..color = shadowColor.withOpacity(0.05));
+      canvas.restore();
+    } else {
+      canvas.drawPath(path, Paint()..color = color);
+    }
   }
 
   @override
   bool shouldRepaint(covariant _PopupArrowPainter old) =>
-      old.side != side || old.offset != offset || old.color != color;
+      old.side != side ||
+      old.offset != offset ||
+      old.color != color ||
+      old.shadowOnly != shadowOnly;
 }
