@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:employeeos/core/index.dart'
-    show CustomDropdown, CustomTextButton, CustomTextfield;
+    show CustomDropdown, CustomTextfield;
 import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_datasource.dart';
-import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/detail_section.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/components/tool_bar.dart';
+import 'package:employeeos/view/recruitment/data/index.dart'
+    show JobPostingMockDatasource, JobPostingModel;
+import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
+import 'package:employeeos/view/recruitment/presentation/index.dart'
+    show DetailSection, ToolBar;
+import '../components/common/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
@@ -141,7 +142,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
 
   void _openDescriptionFullScreen() {
     setState(() => _isDescriptionFullScreenOpen = true);
-    Navigator.of(context)
+    Navigator.of(context, rootNavigator: true)
         .push(
       MaterialPageRoute(
         fullscreenDialog: true,
@@ -160,7 +161,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
                       controller: _descriptionController,
                       theme: theme,
                       openDescriptionFullScreen: () =>
-                          Navigator.of(context).pop(),
+                          Navigator.of(context, rootNavigator: true).pop(),
                       isFullScreen: true,
                     )),
                 const SizedBox(height: 8),
@@ -412,23 +413,8 @@ class _JobEditingPageState extends State<JobEditingPage> {
 
   Widget _buildSubmitButton(ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: CustomTextButton(
-        onClick: _submit,
-        backgroundColor: theme.colorScheme.tertiary,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.save, size: 20, color: theme.scaffoldBackgroundColor),
-            const SizedBox(width: 8),
-            Text('Update Job Posting',
-                style: theme.textTheme.labelMedium
-                    ?.copyWith(color: theme.scaffoldBackgroundColor)),
-          ],
-        ),
-      ),
-    );
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: SaveButton(
+            onClick: _submit, theme: theme, text: 'Update Job Posting'));
   }
 }

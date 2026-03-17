@@ -1,7 +1,13 @@
-import 'package:employeeos/core/common/components/popup/popup.dart';
-import 'package:employeeos/core/common/components/popup/responsive_popup.dart';
-import 'package:employeeos/core/common/components/popup/responsive_popup_item.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/core/index.dart'
+    show
+        Popup,
+        AppPallete,
+        EditPopupItem,
+        ViewPopupItem,
+        ResponsivePopupItem,
+        DestructivePopupItem,
+        PopupPreferredPosition,
+        ResponsivePopupController;
 import 'package:flutter/material.dart';
 
 class JobPostingCardHeader extends StatefulWidget {
@@ -68,7 +74,11 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
             layerLink: _layerLink,
             popupController: _popupController,
             preferredPosition: PopupPreferredPosition.left,
-            arrowOffset: 0.2,
+            arrowOffset: widget.canEditAndDelete ? 0.2 : 0.5,
+            manualOffset: const Offset(10, 0),
+            arrowColor: widget.theme.brightness == Brightness.dark
+                ? AppPallete.darkBackgroundGradient.colors[1]
+                : AppPallete.lightBackgroundGradient.colors[1],
             icon: const Icon(Icons.more_vert_rounded),
             items: [
               Padding(
@@ -93,7 +103,7 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
                 padding: const EdgeInsets.symmetric(horizontal: 5.0)
                     .copyWith(top: 10),
                 child: ResponsivePopupItem(
-                  title: 'Copy Link',
+                  title: 'Close Job',
                   svgIcon: 'assets/icons/common/solid/ic-solar-lock-bold.svg',
                   onTap: () {},
                   color: AppPallete.warningMain,

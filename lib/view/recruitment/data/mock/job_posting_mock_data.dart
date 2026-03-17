@@ -19,6 +19,33 @@ List<Map<String, dynamic>> get jobPostingMockList => [
         'posted_by_name': 'Yash Nautiyal',
         'posted_by_email': 'nautiyalyash4@gmail.com',
         'created_at': '2025-06-23T10:00:00.000Z',
+        'pipeline': [
+          {
+            'id': 'e1',
+            'name': 'Shortlist',
+            'type': 'statusOnly',
+          },
+          {
+            'id': 'e2',
+            'name': 'Telephone',
+            'type': 'interview',
+          },
+          {
+            'id': 'e3',
+            'name': 'Task Submit',
+            'type': 'submission',
+          },
+          {
+            'id': 'e4',
+            'name': 'Technical',
+            'type': 'interview',
+          },
+          {
+            'id': 'e5',
+            'name': 'Onboarding',
+            'type': 'interview',
+          },
+        ],
       },
       {
         'id': 'job-mock-2',
@@ -34,6 +61,33 @@ List<Map<String, dynamic>> get jobPostingMockList => [
         'posted_by_name': 'Yash Nautiyal',
         'posted_by_email': 'nautiyalyash4@gmail.com',
         'created_at': '2025-06-20T09:00:00.000Z',
+        'pipeline': [
+          {
+            'id': 't1',
+            'name': 'Shortlist',
+            'type': 'statusOnly',
+          },
+          {
+            'id': 't2',
+            'name': 'Telephone',
+            'type': 'interview',
+          },
+          {
+            'id': 't3',
+            'name': 'Task Submit',
+            'type': 'submission',
+          },
+          {
+            'id': 't4',
+            'name': 'Technical',
+            'type': 'interview',
+          },
+          {
+            'id': 't5',
+            'name': 'Onboarding',
+            'type': 'interview',
+          },
+        ],
       },
     ];
 

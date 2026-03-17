@@ -1,9 +1,8 @@
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_posting_view.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/job_editing.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/job_view_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../../domain/index.dart' show JobPosting;
+import '../index.dart' show JobEditingPage, JobPostingView, JobViewPage;
 
 /// Wrapper that provides a [Navigator] for the Job Posting section.
 /// Keeps the layout's app bar visible while only the content area transitions

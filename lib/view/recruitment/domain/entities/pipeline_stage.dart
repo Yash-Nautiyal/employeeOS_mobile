@@ -67,7 +67,7 @@ extension StageTypeX on PipelineStageType {
         PipelineStageType.statusOnly =>
           'assets/icons/common/solid/ic-solar-flag-bold.svg',
         PipelineStageType.interview =>
-          'assets/icons/common/solid/ic-solar_users-group-rounded-bold.svg',
+          'assets/icons/common/solid/ic-solar-users-group.svg',
         PipelineStageType.submission =>
           'assets/icons/common/solid/ic-solar-file-send-bold.svg',
         PipelineStageType.assessment =>

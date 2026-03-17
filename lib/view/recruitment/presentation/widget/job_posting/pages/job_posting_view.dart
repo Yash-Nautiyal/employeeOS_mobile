@@ -7,8 +7,8 @@ import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_da
 import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
 import 'package:employeeos/view/recruitment/index.dart' show JobPostingCard;
 import 'package:employeeos/view/recruitment/presentation/pages/job_posting_section.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/add_department_page.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_job_posting_page.dart';
+import 'package:employeeos/view/recruitment/presentation/widget/job_posting/pages/add_pages/add_department_page.dart';
+import 'package:employeeos/view/recruitment/presentation/widget/job_posting/pages/add_pages/add_job_posting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -96,13 +96,16 @@ class _JobPostingViewState extends State<JobPostingView> {
                           child: ResponsivePopupItem(
                             title: 'Add Posting',
                             svgIcon: 'assets/icons/nav/ic-job.svg',
-                            onTap: () {
+                            onTap: () async {
                               _popupController.hide();
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
+                              final result = await Navigator.of(context).push(
+                                MaterialPageRoute<bool>(
                                   builder: (_) => const AddJobPostingPage(),
                                 ),
                               );
+                              if (result == true && mounted) {
+                                _refreshJobs();
+                              }
                             },
                             color: theme.colorScheme.tertiary,
                           ),

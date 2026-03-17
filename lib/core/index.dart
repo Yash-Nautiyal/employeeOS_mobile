@@ -34,6 +34,7 @@ export 'common/components/header/settings/settings_switch.dart';
 export 'common/components/popup/responsive_popup.dart';
 export 'common/components/popup/responsive_popup_container.dart';
 export 'common/components/popup/responsive_popup_item.dart';
+export 'common/components/popup/popup.dart';
 
 export 'theme/app_pallete.dart';
 

@@ -1,4 +1,5 @@
 import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
+import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
 
 class JobPostingModel extends JobPosting {
   const JobPostingModel({
@@ -15,6 +16,7 @@ class JobPostingModel extends JobPosting {
     required super.postedByName,
     required super.postedByEmail,
     super.createdAt,
+    super.pipeline,
   });
 
   factory JobPostingModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,19 @@ class JobPostingModel extends JobPosting {
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'] as String)
           : null,
+      pipeline: (json['pipeline'] as List<dynamic>?)?.map((e) {
+        final map = e as Map<String, dynamic>;
+        final typeName = map['type'] as String? ?? 'statusOnly';
+        final type = PipelineStageType.values.firstWhere(
+          (t) => t.name == typeName,
+          orElse: () => PipelineStageType.statusOnly,
+        );
+        return PipelineStage(
+          id: map['id'] as String? ?? '',
+          name: map['name'] as String? ?? '',
+          type: type,
+        );
+      }).toList(),
     );
   }
 
@@ -54,6 +69,13 @@ class JobPostingModel extends JobPosting {
       'posted_by_name': postedByName,
       'posted_by_email': postedByEmail,
       'created_at': createdAt?.toIso8601String(),
+      'pipeline': pipeline
+          ?.map((s) => {
+                'id': s.id,
+                'name': s.name,
+                'type': s.type.name,
+              })
+          .toList(),
     };
   }
 }

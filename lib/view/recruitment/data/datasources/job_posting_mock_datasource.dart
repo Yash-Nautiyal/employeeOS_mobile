@@ -27,6 +27,28 @@ class JobPostingMockDatasource {
     return List<JobPostingModel>.from(_jobs);
   }
 
+  /// Adds a new job with a generated id and createdAt.
+  JobPostingModel create(JobPostingModel job) {
+    final newJob = JobPostingModel(
+      id: job.id.isNotEmpty ? job.id : 'job-mock-${_jobs.length + 1}',
+      title: job.title,
+      department: job.department,
+      description: job.description,
+      location: job.location,
+      positions: job.positions,
+      lastDateToApply: job.lastDateToApply,
+      joiningType: job.joiningType,
+      isInternship: job.isInternship,
+      ctcRange: job.ctcRange,
+      postedByName: job.postedByName,
+      postedByEmail: job.postedByEmail,
+      createdAt: job.createdAt ?? DateTime.now().toUtc(),
+      pipeline: job.pipeline,
+    );
+    _jobs = [..._jobs, newJob];
+    return newJob;
+  }
+
   /// Replaces the job with the same id. Used by [JobEditingPage] on save.
   void update(JobPostingModel job) {
     final i = _jobs.indexWhere((j) => j.id == job.id);

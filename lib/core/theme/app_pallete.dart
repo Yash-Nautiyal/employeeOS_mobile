@@ -145,12 +145,12 @@ class AppPallete {
 
   static LinearGradient darkBackgroundGradient = const LinearGradient(
     colors: [
-      Color.fromARGB(255, 57, 30, 28),
-      Color.fromARGB(255, 14, 17, 21),
-      Color.fromARGB(255, 20, 23, 27),
-      Color.fromARGB(255, 33, 52, 62)
+      Color.fromRGBO(102, 46, 43, 0.84),
+      Color.fromRGBO(26, 26, 32, 0.84),
+      Color.fromRGBO(32, 39, 46, 0.84),
+      Color.fromRGBO(33, 71, 91, 0.84)
     ],
-    stops: [0.0, .25, .88, 1],
+    stops: [0.0, .23, .84, 1],
     begin: Alignment(-1.8, 1),
     end: Alignment(1.2, -1),
   );

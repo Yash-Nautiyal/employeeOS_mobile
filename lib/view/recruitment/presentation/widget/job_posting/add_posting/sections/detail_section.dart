@@ -1,12 +1,11 @@
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/index.dart'
-    show CustomDivider, CustomDropdown, CustomTextfield;
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/pipeline_section.dart';
+    show CustomDivider, CustomDropdown, CustomTextButton, CustomTextfield;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
-import '../components/tool_bar.dart';
+import '../../../../../domain/index.dart' show PipelineStage;
+import '../../../../index.dart' show PipelineSection;
+import '../../components/tool_bar.dart';
 
 class DetailSection extends StatelessWidget {
   final ThemeData theme;

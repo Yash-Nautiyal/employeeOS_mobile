@@ -10,11 +10,13 @@ class AddStageSheet extends StatelessWidget {
     required this.theme,
     required this.available,
     required this.onAdd,
+    required this.scrollController,
   });
 
   final ThemeData theme;
   final List<PipelineStage> available;
   final ValueChanged<PipelineStage> onAdd;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class AddStageSheet extends StatelessWidget {
       ),
       child: SafeArea(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Handle bar
@@ -85,20 +87,38 @@ class AddStageSheet extends StatelessWidget {
             ),
 
             const SizedBox(height: 8),
-
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: available.length,
+                itemBuilder: (context, index) {
+                  final stage = available[index];
+                  final accent = stage.type.resolvedAccent(cs);
+                  final bg = stage.type.resolvedColor(cs);
+                  return SheetStageTile(
+                    stage: stage,
+                    accent: accent,
+                    bg: bg,
+                    textTheme: tt,
+                    colorScheme: cs,
+                    onTap: () => onAdd(stage),
+                  );
+                },
+              ),
+            ),
             // Stage tiles
-            ...available.map((stage) {
-              final accent = stage.type.resolvedAccent(cs);
-              final bg = stage.type.resolvedColor(cs);
-              return SheetStageTile(
-                stage: stage,
-                accent: accent,
-                bg: bg,
-                textTheme: tt,
-                colorScheme: cs,
-                onTap: () => onAdd(stage),
-              );
-            }),
+            // ...available.map((stage) {
+            //   final accent = stage.type.resolvedAccent(cs);
+            //   final bg = stage.type.resolvedColor(cs);
+            //   return SheetStageTile(
+            //     stage: stage,
+            //     accent: accent,
+            //     bg: bg,
+            //     textTheme: tt,
+            //     colorScheme: cs,
+            //     onTap: () => onAdd(stage),
+            //   );
+            // }),
 
             const SizedBox(height: 12),
           ],

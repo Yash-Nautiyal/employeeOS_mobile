@@ -30,7 +30,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
     final screenWidth = MediaQuery.of(context).size.width;
     return ClipRRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           width: isWideScreen ? screenWidth * 0.4 : screenWidth * 0.75,
           decoration: BoxDecoration(

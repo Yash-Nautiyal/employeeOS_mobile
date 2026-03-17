@@ -2,11 +2,11 @@ import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../data/mock/department_presets_mock.dart'
+import '../../../../../data/mock/department_presets_mock.dart'
     show nextPipelineStageId;
-import '../../../../domain/entities/pipeline_stage.dart';
-import 'pipeline_component/add_sheet_stage.dart';
-import 'pipeline_component/stage_row.dart';
+import '../../../../../domain/entities/pipeline_stage.dart';
+import '../pipeline_component/add_sheet_stage.dart';
+import '../pipeline_component/stage_row.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -82,10 +82,18 @@ class _PipelineSectionState extends State<PipelineSection>
       backgroundColor: Colors.transparent,
       barrierColor: widget.theme.scaffoldBackgroundColor.withValues(alpha: 0.5),
       isScrollControlled: true,
-      builder: (ctx) => AddStageSheet(
-        theme: widget.theme,
-        available: available,
-        onAdd: (stage) => _addStage(ctx, stage),
+      useSafeArea: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.35,
+        minChildSize: 0.25,
+        maxChildSize: 0.7,
+        expand: false,
+        builder: (ctx, scrollController) => AddStageSheet(
+          theme: widget.theme,
+          available: available,
+          onAdd: (stage) => _addStage(ctx, stage),
+          scrollController: scrollController,
+        ),
       ),
     );
   }

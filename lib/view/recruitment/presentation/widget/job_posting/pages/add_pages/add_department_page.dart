@@ -2,12 +2,14 @@
 
 import 'dart:ui';
 
-import 'package:employeeos/core/index.dart'
-    show CustomTextButton, CustomTextfield;
+import 'package:employeeos/core/index.dart' show CustomTextfield;
 import 'package:employeeos/view/recruitment/data/mock/department_presets_mock.dart';
 import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/pipeline_section.dart';
+import 'package:employeeos/view/recruitment/presentation/index.dart'
+    show PipelineSection;
 import 'package:flutter/material.dart';
+
+import '../../components/common/save_button.dart';
 
 class AddDepartmentPage extends StatefulWidget {
   const AddDepartmentPage({super.key});
@@ -193,23 +195,6 @@ class _AddDepartmentPageState extends State<AddDepartmentPage> {
   }
 
   Widget _buildSaveButton(ThemeData theme) {
-    return CustomTextButton(
-      onClick: _submit,
-      backgroundColor: theme.colorScheme.tertiary,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.save, size: 20, color: theme.scaffoldBackgroundColor),
-          const SizedBox(width: 8),
-          Text(
-            'Save Department',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.scaffoldBackgroundColor,
-            ),
-          ),
-        ],
-      ),
-    );
+    return SaveButton(onClick: _submit, theme: theme, text: 'Save Department');
   }
 }

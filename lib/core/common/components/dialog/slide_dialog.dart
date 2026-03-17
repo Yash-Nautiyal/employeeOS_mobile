@@ -98,17 +98,7 @@ class _SlideDialogState extends State<SlideDialog>
                         decoration: BoxDecoration(
                             gradient:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? const LinearGradient(
-                                        colors: [
-                                          Color.fromRGBO(102, 46, 43, 0.85),
-                                          Color.fromRGBO(26, 26, 32, 0.851),
-                                          Color.fromRGBO(32, 39, 46, 0.851),
-                                          Color.fromRGBO(33, 71, 91, 0.85)
-                                        ],
-                                        stops: [0.0, .26, .83, 1],
-                                        begin: Alignment(-1.8, 1),
-                                        end: Alignment(1.2, -1),
-                                      )
+                                    ? AppPallete.darkBackgroundGradient
                                     : AppPallete.lightBackgroundGradient),
                         child: SafeArea(
                           child: Padding(
