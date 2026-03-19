@@ -91,12 +91,10 @@ ThemeData buildTheme({
     cardColor:
         brightness == Brightness.dark ? AppPallete.grey800 : AppPallete.white,
     shadowColor: brightness == Brightness.dark
-        ? AppPallete.grey900
+        ? AppPallete.black.withOpacity(.09)
         // ignore: deprecated_member_use
         : AppPallete.black.withOpacity(.08),
-    indicatorColor: brightness == Brightness.dark
-        ? AppPallete.infoDark
-        : AppPallete.infoMain,
+    indicatorColor: AppPallete.infoMain,
     hoverColor: brightness == Brightness.dark
         ? const Color.fromARGB(255, 33, 41, 49)
         : AppPallete.grey300,
@@ -130,7 +128,7 @@ ThemeData buildTheme({
             primaryFixedDim: colorscheme["Light"],
             primaryContainer: colorscheme["Lighter"],
             primaryFixed: colorscheme["Lighter"],
-            secondary: secondaryScheme["Dark"],
+            secondary: secondaryScheme["Main"],
             secondaryFixedDim: secondaryScheme["Darker"],
             secondaryContainer: secondaryScheme["Lighter"],
             error: AppPallete.errorMain,

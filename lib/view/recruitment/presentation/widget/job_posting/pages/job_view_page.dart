@@ -125,6 +125,8 @@ class _JobViewPageState extends State<JobViewPage> {
                       child: Column(
                         children: [
                           TabBar(
+                            dividerColor: theme.dividerColor.withAlpha(30),
+                            tabAlignment: TabAlignment.fill,
                             automaticIndicatorColorAdjustment: true,
                             overlayColor: const WidgetStatePropertyAll(
                                 Colors.transparent),
@@ -146,7 +148,6 @@ class _JobViewPageState extends State<JobViewPage> {
                                         _descriptionController,
                                     theme: theme,
                                     includeDescription: true,
-                                    includePipeline: false,
                                   ),
                                 ),
                                 SingleChildScrollView(

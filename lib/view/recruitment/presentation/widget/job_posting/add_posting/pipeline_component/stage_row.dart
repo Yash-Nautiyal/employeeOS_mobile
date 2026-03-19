@@ -100,7 +100,7 @@ class _StageRowState extends State<StageRow>
                         ),
                         child: Center(
                           child: SvgPicture.asset(
-                            stage.type.icon,
+                            stage.type.iconOutline,
                             width: 13,
                             colorFilter:
                                 ColorFilter.mode(accent, BlendMode.srcIn),

@@ -95,7 +95,7 @@ class _FavoriteStarButtonState extends State<FavoriteStarButton>
           child: SvgPicture.asset(
             widget.isFavorite
                 ? 'assets/icons/common/solid/ic-eva_star-fill.svg'
-                : 'assets/icons/common/solid/ic-eva_star-outline.svg',
+                : 'assets/icons/common/outline/ic-eva_star-outline.svg',
             width: widget.size,
             height: widget.size,
             colorFilter: ColorFilter.mode(color, BlendMode.srcIn),

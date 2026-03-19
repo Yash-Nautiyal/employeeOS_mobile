@@ -9,19 +9,14 @@ class JobContent extends StatelessWidget {
   final JobPosting job;
   final QuillController? descriptionController;
   final ThemeData theme;
-
-  /// When false, the first card shows only title and application link (no description).
   final bool includeDescription;
 
-  /// When false, the hiring pipeline section is not shown (e.g. when pipeline has its own tab).
-  final bool includePipeline;
   const JobContent({
     super.key,
     required this.job,
     required this.descriptionController,
     required this.theme,
     this.includeDescription = true,
-    this.includePipeline = true,
   });
 
   @override

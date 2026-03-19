@@ -92,7 +92,7 @@ class _ChatInputState extends State<ChatInput> {
                   maxHeight: 38,
                 ),
                 icon: SvgPicture.asset(
-                  "assets/icons/common/solid/ic-eva_smiling-face-outline.svg",
+                  "assets/icons/common/outline/ic-eva_smiling-face-outline.svg",
                   color: AppPallete.grey600,
                 ),
               ),

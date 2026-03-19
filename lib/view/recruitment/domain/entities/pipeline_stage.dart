@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
@@ -50,10 +52,10 @@ class PipelineStage extends Equatable {
 
 extension StageTypeX on PipelineStageType {
   Color resolvedColor(ColorScheme cs) => switch (this) {
-        PipelineStageType.statusOnly => cs.primary.withValues(alpha: 0.15),
-        PipelineStageType.interview => cs.tertiary.withValues(alpha: 0.15),
-        PipelineStageType.submission => cs.secondary.withValues(alpha: 0.15),
-        PipelineStageType.assessment => cs.error.withValues(alpha: 0.15),
+        PipelineStageType.statusOnly => cs.primary.withOpacity(0.1),
+        PipelineStageType.interview => cs.tertiary.withOpacity(0.08),
+        PipelineStageType.submission => cs.secondary.withOpacity(0.08),
+        PipelineStageType.assessment => cs.error.withOpacity(0.08),
       };
 
   Color resolvedAccent(ColorScheme cs) => switch (this) {
@@ -65,12 +67,23 @@ extension StageTypeX on PipelineStageType {
 
   String get icon => switch (this) {
         PipelineStageType.statusOnly =>
-          'assets/icons/common/solid/ic-solar-flag-bold.svg',
+          'assets/icons/common/duotone/ic-solar-flag-bold-duotone.svg',
         PipelineStageType.interview =>
-          'assets/icons/common/solid/ic-solar-users-group.svg',
+          'assets/icons/common/duotone/ic-solar-users-group-duotone.svg',
         PipelineStageType.submission =>
-          'assets/icons/common/solid/ic-solar-file-send-bold.svg',
+          'assets/icons/common/duotone/ic-solar-file-send-bold-duotone.svg',
         PipelineStageType.assessment =>
-          'assets/icons/common/solid/ic-solar-clipboard.svg',
+          'assets/icons/common/duotone/ic-solar-clipboard-duotone.svg',
+      };
+
+  String get iconOutline => switch (this) {
+        PipelineStageType.statusOnly =>
+          'assets/icons/common/outline/ic-solar-flag-outline.svg',
+        PipelineStageType.interview =>
+          'assets/icons/common/outline/ic-solar-users-group-rounded-outline.svg',
+        PipelineStageType.submission =>
+          'assets/icons/common/outline/ic-solar-file-send-outline.svg',
+        PipelineStageType.assessment =>
+          'assets/icons/common/outline/ic-solar-clipboard-outline.svg',
       };
 }

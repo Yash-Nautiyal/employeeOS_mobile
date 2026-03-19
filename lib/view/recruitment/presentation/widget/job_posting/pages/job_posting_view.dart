@@ -117,7 +117,7 @@ class _JobPostingViewState extends State<JobPostingView> {
                             child: ResponsivePopupItem(
                               title: 'Add Department',
                               svgIcon:
-                                  'assets/icons/common/solid/ic-solar-server-bold-duotone.svg',
+                                  'assets/icons/common/duotone/ic-solar-server-bold-duotone.svg',
                               onTap: () {
                                 _popupController.hide();
                                 Navigator.of(context).push(

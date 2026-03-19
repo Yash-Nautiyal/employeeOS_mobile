@@ -238,7 +238,8 @@ class _HiringViewState extends State<HiringView> {
         'value': '619',
         'valueColor': AppPallete.grey600,
         'height': isPortrait ? 120 : 100,
-        'iconPath': 'assets/icons/common/solid/ic-solar-clipboard.svg',
+        'iconPath':
+            'assets/icons/common/duotone/ic-solar-clipboard-duotone.svg',
       },
       {
         'title': 'Total Shortlisted',
@@ -252,7 +253,8 @@ class _HiringViewState extends State<HiringView> {
         'value': '0',
         'valueColor': AppPallete.errorMain,
         'height': isPortrait ? 120 : 100,
-        'iconPath': 'assets/icons/common/solid/ic-solar-shield-warning.svg',
+        'iconPath':
+            'assets/icons/common/duotone/ic-solar-shield-warning-duotone.svg',
       },
       {
         'title': 'Pending',
@@ -266,14 +268,14 @@ class _HiringViewState extends State<HiringView> {
         'value': '4',
         'valueColor': AppPallete.successMain,
         'height': isPortrait ? 120 : 100,
-        'iconPath': 'assets/icons/common/solid/ic-solar-case.svg',
+        'iconPath': 'assets/icons/common/duotone/ic-solar-case-duotone.svg',
       },
       {
         'title': 'Positions',
         'value': '6',
         'valueColor': AppPallete.infoMain,
         'height': isPortrait ? 120 : 100,
-        'iconPath': 'assets/icons/common/solid/ic-solar-user.svg',
+        'iconPath': 'assets/icons/common/duotone/ic-solar-user-duotone.svg',
       },
     ];
     return HiringStatsCard(data: data);

@@ -8,13 +8,6 @@ import '../../../../../domain/entities/pipeline_stage.dart';
 import '../pipeline_component/add_sheet_stage.dart';
 import '../pipeline_component/stage_row.dart';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// PipelineSection (StatefulWidget for animations)
-// ---------------------------------------------------------------------------
 
 class PipelineSection extends StatefulWidget {
   const PipelineSection({
@@ -41,10 +34,6 @@ class _PipelineSectionState extends State<PipelineSection>
 
   // The last added stage id – drives the entrance animation
   String? _justAddedId;
-
-  // -------------------------------------------------------------------------
-  // Mutations (identical logic, kept in State for access to setState)
-  // -------------------------------------------------------------------------
 
   void _removeAt(int index) {
     final next = List<PipelineStage>.from(widget.stages)..removeAt(index);

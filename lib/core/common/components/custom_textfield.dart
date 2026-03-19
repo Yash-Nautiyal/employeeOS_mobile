@@ -138,7 +138,7 @@ class CustomTextfield extends StatelessWidget {
       return IconButton(
         onPressed: () => _selectDate(context),
         icon: SvgPicture.asset(
-          'assets/icons/common/solid/ic-solar-calendar-mark-bold-duotone.svg',
+          'assets/icons/common/duotone/ic-solar-calendar-mark-bold-duotone.svg',
           color: theme.disabledColor,
           width: 20,
         ),

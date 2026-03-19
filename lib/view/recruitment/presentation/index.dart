@@ -24,6 +24,9 @@ export 'widget/job_posting/components/job_posting_card_footer.dart';
 export 'widget/job_posting/components/tool_bar.dart';
 
 export 'widget/job_posting/view_posting/applications_content.dart';
-export 'widget/job_posting/view_posting/description_content.dart';
 export 'widget/job_posting/view_posting/job_content.dart';
 export 'widget/job_posting/view_posting/pipeline_content.dart';
+
+export 'widget/job_posting/view_posting/pipeline_widgets/page_heading.dart';
+export 'widget/job_posting/view_posting/pipeline_widgets/stage_card.dart';
+export 'widget/job_posting/view_posting/pipeline_widgets/timeline_item.dart';

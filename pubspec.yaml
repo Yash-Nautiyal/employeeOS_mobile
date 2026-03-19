@@ -119,6 +119,8 @@ flutter:
     - assets/icons/common/
     - assets/icons/setting/
     - assets/icons/common/solid/
+    - assets/icons/common/outline/
+    - assets/icons/common/duotone/
     - assets/illustrations/
     - assets/illustrations/characters/
   #   - images/a_dot_ham.jpeg
