@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:employeeos/core/index.dart'
-    show CustomDropdown, CustomTextfield;
-import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/recruitment/data/index.dart'
-    show JobPostingMockDatasource, JobPostingModel;
-import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
+    show
+        JobPostingMockDatasource,
+        JobPostingModel,
+        getAllDepartmentNames,
+        getPresetForDepartment,
+        getStagePool;
+import 'package:employeeos/view/recruitment/domain/index.dart'
+    show JobPosting, PipelineStage;
 import 'package:employeeos/view/recruitment/presentation/index.dart'
-    show DetailSection, ToolBar;
+    show AdditionalDetailSection, DetailSection, ToolBar;
 import '../components/common/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -27,8 +30,10 @@ class _JobEditingPageState extends State<JobEditingPage> {
   final _scrollController = ScrollController();
 
   final _jobTitleController = TextEditingController();
-  final _departmentController = TextEditingController();
+  String? _selectedDepartment;
   late QuillController _descriptionController;
+  List<PipelineStage> _pipelineStages = [];
+  List<String> get _departments => getAllDepartmentNames();
 
   final _qualificationsController = TextEditingController();
   final _locationController = TextEditingController();
@@ -47,7 +52,10 @@ class _JobEditingPageState extends State<JobEditingPage> {
     super.initState();
     final j = widget.job;
     _jobTitleController.text = j.title;
-    _departmentController.text = j.department;
+    _selectedDepartment = j.department;
+    _pipelineStages = j.pipeline != null && j.pipeline!.isNotEmpty
+        ? List<PipelineStage>.from(j.pipeline!)
+        : getPresetForDepartment(j.department);
     _locationController.text = j.location ?? '';
     _positionsController = TextEditingController(text: '${j.positions}');
     _lastDateController.text = _formatDateForField(j.lastDateToApply);
@@ -82,7 +90,6 @@ class _JobEditingPageState extends State<JobEditingPage> {
   @override
   void dispose() {
     _jobTitleController.dispose();
-    _departmentController.dispose();
     _descriptionController.dispose();
     _qualificationsController.dispose();
     _locationController.dispose();
@@ -104,7 +111,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
     final updated = JobPostingModel(
       id: j.id,
       title: _jobTitleController.text.trim(),
-      department: _departmentController.text.trim(),
+      department: _selectedDepartment ?? '',
       description: descriptionJson,
       location: _locationController.text.trim().isEmpty
           ? null
@@ -119,6 +126,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
       postedByName: _postedByNameController.text.trim(),
       postedByEmail: _postedByEmailController.text.trim(),
       createdAt: j.createdAt,
+      pipeline: List<PipelineStage>.from(_pipelineStages),
     );
     JobPostingMockDatasource.instance.update(updated);
     Navigator.of(context).pop(true);
@@ -237,176 +245,42 @@ class _JobEditingPageState extends State<JobEditingPage> {
             DetailSection(
               theme: theme,
               jobTitleController: _jobTitleController,
-              departmentController: _departmentController,
               descriptionController: _descriptionController,
               openDescriptionFullScreen: _openDescriptionFullScreen,
               isFullScreen: false,
               isDescriptionFullScreenOpen: _isDescriptionFullScreenOpen,
+              departmentOptions: _departments,
+              selectedDepartment: _selectedDepartment,
+              onDepartmentChanged: (v) {
+                setState(() {
+                  _selectedDepartment = v;
+                  _pipelineStages = v != null ? getPresetForDepartment(v) : [];
+                });
+              },
+              pipelineStages: _pipelineStages,
+              onPipelineChanged: (list) =>
+                  setState(() => _pipelineStages = list),
+              stagePool: getStagePool(),
             ),
             const SizedBox(height: 24),
-            _buildAdditionalFieldsSection(theme),
+            AdditionalDetailSection(
+              theme: theme,
+              locationController: _locationController,
+              positionsController: _positionsController,
+              lastDateController: _lastDateController,
+              ctcRangeController: _ctcRangeController,
+              postedByNameController: _postedByNameController,
+              postedByEmailController: _postedByEmailController,
+              joiningType: _joiningType,
+              isInternship: _isInternship,
+              onJoiningTypeChanged: (v) => setState(() => _joiningType = v),
+              onIsInternshipChanged: (v) => setState(() => _isInternship = v),
+            ),
             const SizedBox(height: 32),
             _buildSubmitButton(theme),
             const SizedBox(height: 20),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAdditionalFieldsSection(ThemeData theme) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: theme.shadowColor, spreadRadius: 0, blurRadius: 4)
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Location',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          CustomTextfield(
-            controller: _locationController,
-            theme: theme,
-            hintText: 'Enter location...',
-            keyboardType: TextInputType.streetAddress,
-            onchange: (_) {},
-          ),
-          const SizedBox(height: 16),
-          Text('Positions',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          CustomTextfield(
-            controller: _positionsController,
-            theme: theme,
-            hintText: '1',
-            keyboardType: TextInputType.number,
-            onchange: (_) {},
-          ),
-          const SizedBox(height: 16),
-          Text('Last Date to Apply',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          CustomTextfield(
-            controller: _lastDateController,
-            theme: theme,
-            hintText: 'Tap to select date',
-            keyboardType: TextInputType.datetime,
-            firstDate: DateTime.now(),
-            lastDate: DateTime(2030),
-            onchange: (_) {},
-          ),
-          const SizedBox(height: 16),
-          Text('Joining Type',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          CustomDropdown(
-            theme: theme,
-            label: 'Joining Type',
-            value: _joiningType,
-            items: ['Immediate', 'Notice Period', 'Flexible']
-                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
-                .toList(),
-            onChange: (v) => setState(() => _joiningType = v as String),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Transform.scale(
-                scale: 0.75,
-                child: Switch(
-                  value: _isInternship,
-                  onChanged: (v) => setState(() => _isInternship = v),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text('Is this an internship?',
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.w600)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text('Expected CTC Range',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          CustomTextfield(
-            controller: _ctcRangeController,
-            theme: theme,
-            hintText: 'e.g., ₹5-7 LPA',
-            keyboardType: TextInputType.text,
-            prefix: Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: Text('₹',
-                  style: theme.textTheme.bodyLarge
-                      ?.copyWith(color: theme.disabledColor)),
-            ),
-            onchange: (_) {},
-          ),
-          const SizedBox(height: 6),
-          Text('Format: ₹X-Y per Month',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.disabledColor)),
-          const SizedBox(height: 16),
-          Text('Posted By',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          TextFormField(
-            controller: _postedByNameController,
-            readOnly: true,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(fontSize: 14, color: theme.colorScheme.tertiary),
-            decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
-              hintText: 'Posted by',
-              hintStyle: theme.textTheme.bodyMedium,
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(7),
-                borderSide: BorderSide(color: AppPallete.grey500),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text('Email',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          TextFormField(
-            controller: _postedByEmailController,
-            readOnly: true,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(fontSize: 14, color: theme.colorScheme.tertiary),
-            decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
-              hintText: 'Email',
-              hintStyle: theme.textTheme.bodyMedium,
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(7),
-                borderSide: BorderSide(color: AppPallete.grey500),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

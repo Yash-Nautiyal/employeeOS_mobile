@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:flutter/material.dart';
 
@@ -32,32 +34,17 @@ Future<void> showRightSideTaskDetails(
               width: dialogWidth,
               height: double.infinity,
               child: ClipRRect(
-                child: Container(
-                    height: screenHeight,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 62, 36, 35)
-                              : AppPallete.errorLighter,
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 14, 16, 19)
-                              : const Color.fromARGB(255, 251, 251, 251),
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 16, 18, 22)
-                              : const Color.fromARGB(255, 251, 251, 251),
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 38, 55, 66)
-                              : const Color.fromARGB(255, 212, 251, 251),
-                        ],
-                        stops: theme.brightness == Brightness.dark
-                            ? [0.0, .17, .84, .98]
-                            : [0.05, 0.3, .7, 0.99],
-                        begin: const Alignment(-1.7, 1),
-                        end: const Alignment(1.2, -1),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+                  child: Container(
+                      height: screenHeight,
+                      decoration: BoxDecoration(
+                        gradient: theme.brightness == Brightness.dark
+                            ? AppPallete.darkBackgroundGradient
+                            : AppPallete.lightBackgroundGradient,
                       ),
-                    ),
-                    child: child),
+                      child: child),
+                ),
               )),
         ),
       );
