@@ -9,7 +9,7 @@ import 'package:employeeos/view/recruitment/presentation/index.dart'
     show PipelineSection;
 import 'package:flutter/material.dart';
 
-import '../../components/common/save_button.dart';
+import '../../../common/button/save_button.dart';
 
 class AddDepartmentPage extends StatefulWidget {
   const AddDepartmentPage({super.key});

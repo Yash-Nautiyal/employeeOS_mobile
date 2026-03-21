@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../../../../core/index.dart' show CustomTextButton;
+import '../../../../../../core/index.dart' show CustomTextButton;
 
 class SaveButton extends StatelessWidget {
   final String text;

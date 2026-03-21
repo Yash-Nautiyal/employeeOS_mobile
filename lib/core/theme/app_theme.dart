@@ -80,8 +80,8 @@ ThemeData buildTheme({
     useMaterial3: true,
     brightness: brightness,
     primaryColor: colorscheme["Main"],
-    primaryColorDark: colorscheme["Darker"],
-    primaryColorLight: colorscheme["Lighter"],
+    primaryColorDark: colorscheme["Dark"],
+    primaryColorLight: colorscheme["Light"],
     scaffoldBackgroundColor:
         brightness == Brightness.dark ? AppPallete.grey900 : AppPallete.white,
     dividerColor:

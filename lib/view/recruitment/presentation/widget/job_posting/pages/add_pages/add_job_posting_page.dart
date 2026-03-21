@@ -12,7 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../index.dart'
     show AdditionalDetailSection, DetailSection, ToolBar;
-import '../../components/common/save_button.dart';
+import '../../../common/button/save_button.dart';
 
 class AddJobPostingPage extends StatefulWidget {
   const AddJobPostingPage({super.key});

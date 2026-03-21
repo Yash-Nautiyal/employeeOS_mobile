@@ -148,10 +148,16 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
       _previousOrientation = currentOrientation;
     }
 
-    // Ensure appbar is visible in portrait mode
+    // Ensure appbar is visible in portrait mode.
+    // Do not trigger animation directly during build.
     if (isPortrait && !_appBarController.isCompleted) {
-      _appBarController.forward();
-      _hideTimer?.cancel();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (!_appBarController.isCompleted) {
+          _appBarController.forward();
+        }
+        _hideTimer?.cancel();
+      });
     }
 
     return PopScope(

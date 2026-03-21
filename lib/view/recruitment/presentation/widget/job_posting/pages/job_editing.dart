@@ -12,7 +12,7 @@ import 'package:employeeos/view/recruitment/domain/index.dart'
     show JobPosting, PipelineStage;
 import 'package:employeeos/view/recruitment/presentation/index.dart'
     show AdditionalDetailSection, DetailSection, ToolBar;
-import '../components/common/save_button.dart';
+import '../../common/button/save_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 

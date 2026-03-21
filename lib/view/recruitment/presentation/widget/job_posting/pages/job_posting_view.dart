@@ -1,7 +1,6 @@
 import 'package:employeeos/core/index.dart'
     show
         CustomBreadCrumbs,
-        CustomTextfield,
         Popup,
         PopupPreferredPosition,
         ResponsivePopupController,
@@ -15,10 +14,10 @@ import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/view/recruitment/data/index.dart'
     show JobPostingMockDatasource, JobPostingModel;
 import 'package:employeeos/view/recruitment/presentation/index.dart'
-    show JobPostingSection, JobPostingCard;
+    show JobPostingSection, JobPostingCard, RecruitmentListFilterBar;
 import 'add_pages/add_department_page.dart';
 import 'add_pages/add_job_posting_page.dart';
-import 'job_filter_panel.dart';
+import '../../common/filter/job_filter_panel.dart';
 
 class JobPostingView extends StatefulWidget {
   const JobPostingView({super.key});
@@ -116,8 +115,7 @@ class _JobPostingViewState extends State<JobPostingView> {
         if (!hay.contains(search)) return false;
       }
 
-      if (_filterJobId.trim().isNotEmpty &&
-          !job.id.toLowerCase().contains(_filterJobId.trim().toLowerCase())) {
+      if (_filterJobId.isNotEmpty && job.id != _filterJobId) {
         return false;
       }
 
@@ -255,82 +253,12 @@ class _JobPostingViewState extends State<JobPostingView> {
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                Flexible(
-                  child: Wrap(
-                    spacing: 14,
-                    runSpacing: 5,
-                    alignment: WrapAlignment.start,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Container(
-                        constraints:
-                            const BoxConstraints(maxWidth: 200, minWidth: 100),
-                        height: 46,
-                        child: CustomTextfield(
-                          controller: _searchController,
-                          onchange: (_) => setState(() {}),
-                          keyboardType: TextInputType.text,
-                          theme: theme,
-                          hintText: 'Search...',
-                          isSearchField: true,
-                          close: true,
-                          onClose: () {
-                            _searchController.clear();
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                      InkWell(
-                        onTap: _openFilterPanel,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Filters',
-                              style: theme.textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(width: 6),
-                            Icon(Icons.filter_list_rounded,
-                                size: 18, color: theme.iconTheme.color),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Sort by: ',
-                            style: theme.textTheme.titleSmall
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _sortBy,
-                              items: const [
-                                DropdownMenuItem(
-                                    value: 'Latest', child: Text('Latest')),
-                                DropdownMenuItem(
-                                    value: 'Oldest', child: Text('Oldest')),
-                              ],
-                              onChanged: (v) {
-                                if (v == null) return;
-                                setState(() => _sortBy = v);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          RecruitmentListFilterBar(
+            searchController: _searchController,
+            onSearchChanged: (_) => setState(() {}),
+            onFiltersTap: _openFilterPanel,
+            sortBy: _sortBy,
+            onSortChanged: (v) => setState(() => _sortBy = v),
           ),
           const SizedBox(height: 16),
           Flexible(
@@ -347,20 +275,17 @@ class _JobPostingViewState extends State<JobPostingView> {
                     ));
                   }
                   final jobs = _applyFiltersAndSort(snapshot.data!);
-                  return ListView.builder(
-                    controller: scrollController,
-                    itemCount: jobs.length,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (context, index) {
-                      final job = jobs[index];
-                      final canEditAndDelete = profile != null &&
-                          (profile.canManageAnyJob ||
-                              (profile.canManageOwnJobs &&
-                                  job.postedByEmail == profile.email));
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 15),
-                        child: JobPostingCard(
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = constraints.maxWidth;
+                      final useGrid = width >= 720;
+
+                      Widget buildCard(JobPostingModel job) {
+                        final canEditAndDelete = profile != null &&
+                            (profile.canManageAnyJob ||
+                                (profile.canManageOwnJobs &&
+                                    job.postedByEmail == profile.email));
+                        return JobPostingCard(
                           theme: theme,
                           job: job,
                           canEditAndDelete: canEditAndDelete,
@@ -377,7 +302,43 @@ class _JobPostingViewState extends State<JobPostingView> {
                             );
                             if (mounted) _refreshJobs();
                           },
+                        );
+                      }
+
+                      if (!useGrid) {
+                        return ListView.builder(
+                          controller: scrollController,
+                          itemCount: jobs.length,
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 15),
+                            child: buildCard(jobs[index]),
+                          ),
+                        );
+                      }
+
+                      // Responsive grid across tablet and desktop widths.
+                      final crossAxisCount = (width / 340).floor().clamp(2, 5);
+                      const spacing = 12.0;
+                      final cardWidth =
+                          (width - ((crossAxisCount - 1) * spacing)) /
+                              crossAxisCount;
+                      final aspectRatio =
+                          (cardWidth / 360).clamp(0.75, 1.15).toDouble();
+
+                      return GridView.builder(
+                        controller: scrollController,
+                        itemCount: jobs.length,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisSpacing: spacing,
+                          crossAxisSpacing: spacing,
+                          childAspectRatio: aspectRatio,
                         ),
+                        itemBuilder: (context, index) => buildCard(jobs[index]),
                       );
                     },
                   );

@@ -1,181 +1,148 @@
-import 'package:employeeos/core/index.dart' show AppPallete, CustomTextButton;
+import 'package:employeeos/core/index.dart' show AppPallete;
+import 'job_application_full_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
-class JobApplicationCard extends StatefulWidget {
-  final ScrollController scrollController;
+import 'widgets/action_button.dart';
+import 'widgets/status_badge.dart';
+
+class JobApplicationCard extends StatelessWidget {
+  const JobApplicationCard({
+    super.key,
+    required this.theme,
+    required this.applicationId,
+    required this.candidateName,
+    required this.jobTitle, // The job position this person applied TO
+    required this.phone,
+    required this.email,
+    required this.appliedOnText,
+    required this.status,
+    required this.resumeUrl,
+    this.compact = false,
+  });
+
   final ThemeData theme;
-  const JobApplicationCard(
-      {super.key, required this.scrollController, required this.theme});
+  final String applicationId;
+  final String candidateName;
+  final String
+      jobTitle; // e.g. "Senior Flutter Developer" — the role they're applying for
+  final String phone;
+  final String email;
+  final String appliedOnText;
+  final String status;
+  final String resumeUrl;
+  final bool compact;
 
-  @override
-  State<JobApplicationCard> createState() => _JobApplicationCardState();
-}
-
-class _JobApplicationCardState extends State<JobApplicationCard>
-    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      controller: widget.scrollController,
-      itemCount: 3,
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      itemBuilder: (context, index) => Stack(
+    final norm = status.toLowerCase().trim();
+    final darkColor = switch (norm) {
+      'shortlisted' => AppPallete.successDark,
+      'applied' => AppPallete.infoDark,
+      'rejected' => AppPallete.errorDark,
+      'pending' => AppPallete.warningDark,
+      _ => AppPallete.infoDark,
+    };
+    final lightColor = switch (norm) {
+      'shortlisted' => AppPallete.successMain,
+      'applied' => AppPallete.infoMain,
+      'rejected' => AppPallete.errorMain,
+      'pending' => AppPallete.warningMain,
+      _ => AppPallete.infoMain,
+    };
+
+    final statusColor = {'lightColor': lightColor, 'darkColor': darkColor};
+    return compact
+        ? _buildCompact(context, statusColor)
+        : JobApplicationFullCard(
+            theme: theme,
+            candidateName: candidateName,
+            jobTitle: jobTitle,
+            status: status,
+            statusColor: statusColor,
+            appliedOnText: appliedOnText,
+            phone: phone,
+            email: email,
+            applicationId: applicationId,
+            resumeUrl: resumeUrl);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Compact card — single row, shown in grid on wide screens
+  // ---------------------------------------------------------------------------
+
+  Widget _buildCompact(BuildContext context, Map<String, Color> statusColor) {
+    final cs = theme.colorScheme;
+    final tt = theme.textTheme;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.shadowColor),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor,
+            spreadRadius: 0,
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
         children: [
-          Container(
-            margin: const EdgeInsets.only(bottom: 15),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-            decoration: BoxDecoration(
-              color: widget.theme.cardColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: widget.theme.shadowColor),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.theme.shadowColor,
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                ),
-              ],
-            ),
+          // Name + "Applying for [job]"
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "LAKSHMAN REDDY THUMMALA",
-                  maxLines: 2,
+                  candidateName,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: widget.theme.textTheme.displaySmall
-                      ?.copyWith(fontSize: 17),
+                  style: tt.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: cs.onSurface,
+                  ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  "ID: APP1545",
-                  style: widget.theme.textTheme.bodyMedium
-                      ?.copyWith(color: widget.theme.disabledColor),
-                ),
+                const SizedBox(height: 2),
                 Row(
                   children: [
-                    SvgPicture.asset(
-                      'assets/icons/common/solid/ic-solar_case-minimalistic-bold.svg',
-                      color: widget.theme.disabledColor,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
                     Text(
-                      'Cloud Internship - AWS',
-                      style: widget.theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: widget.theme.dividerColor,
+                      'For  ',
+                      style: tt.labelSmall?.copyWith(
+                        color: theme.disabledColor,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 10,
                       ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/common/solid/ic-solar_phone-bold.svg',
-                      color: widget.theme.disabledColor,
                     ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      '9381279955',
-                      style: widget.theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: widget.theme.dividerColor,
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/common/solid/ic-fluent_mail-24-filled.svg',
-                      color: widget.theme.disabledColor,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      'nautiyalyash4@gmail.com',
-                      style: widget.theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: widget.theme.dividerColor,
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/ic-calender.svg',
-                      color: widget.theme.disabledColor,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      '02 Aug 2025 2:47 pm',
-                      style: widget.theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: widget.theme.dividerColor,
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
                     Expanded(
-                      child: CustomTextButton(
-                          backgroundColor: widget.theme.colorScheme.tertiary,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/common/solid/ic-solar_file-text-bold.svg',
-                                color: widget.theme.scaffoldBackgroundColor,
-                                width: 20,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                'Resume',
-                                style: widget.theme.textTheme.labelLarge
-                                    ?.copyWith(
-                                        color: widget
-                                            .theme.scaffoldBackgroundColor),
-                              ),
-                            ],
-                          ),
-                          onClick: () {}),
-                    ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: SvgPicture.asset(
-                        'assets/icons/arrow/ic-eva_checkmark-fill.svg',
-                        color: AppPallete.successMain,
+                      child: Text(
+                        jobTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                        ),
                       ),
                     ),
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.close_rounded,
-                          color: AppPallete.errorMain,
-                        )),
                   ],
-                )
+                ),
               ],
             ),
           ),
+
+          const SizedBox(width: 8),
+
+          StatusBadge(status: status, colors: statusColor, textTheme: tt),
+          const SizedBox(width: 8),
+
+          // Resume icon button
+          ResumeIconButton(theme: theme, resumeUrl: resumeUrl),
         ],
       ),
     );

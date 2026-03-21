@@ -1,5 +1,7 @@
-import 'package:employeeos/core/common/components/custom_textfield.dart';
-import 'package:employeeos/core/index.dart';
+import 'package:employeeos/core/index.dart'
+    show CustomDropdown, CustomTextfield;
+import 'package:employeeos/view/recruitment/data/index.dart'
+    show JobPostingMockDatasource, JobPostingModel;
 import 'package:flutter/material.dart';
 
 class JobPostingFilterPanel extends StatefulWidget {
@@ -36,17 +38,21 @@ class JobPostingFilterPanel extends StatefulWidget {
 }
 
 class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
-  late final TextEditingController _jobIdController;
   late final TextEditingController _hrController;
   late bool _joinImmediate;
   late bool _joinAfterMonths;
   late String _jobType;
   DateTimeRange? _dateRange;
 
+  /// Empty string = all jobs (no Job ID filter).
+  late String _selectedJobId;
+  late final Future<List<JobPostingModel>> _jobsFuture;
+
   @override
   void initState() {
     super.initState();
-    _jobIdController = TextEditingController(text: widget.initialJobId);
+    _jobsFuture = JobPostingMockDatasource.instance.getAll();
+    _selectedJobId = widget.initialJobId.trim();
     _hrController = TextEditingController(text: widget.initialHr);
     _joinImmediate = widget.initialJoinImmediate;
     _joinAfterMonths = widget.initialJoinAfterMonths;
@@ -56,14 +62,13 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
 
   @override
   void dispose() {
-    _jobIdController.dispose();
     _hrController.dispose();
     super.dispose();
   }
 
   void _apply() {
     widget.onApply(
-      jobId: _jobIdController.text,
+      jobId: _selectedJobId,
       hr: _hrController.text,
       joinImmediate: _joinImmediate,
       joinAfterMonths: _joinAfterMonths,
@@ -95,6 +100,77 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
         '${e.day.toString().padLeft(2, '0')}/${e.month.toString().padLeft(2, '0')}/${e.year}';
   }
 
+  Widget _jobIdDropdown(ThemeData theme) {
+    return FutureBuilder<List<JobPostingModel>>(
+      future: _jobsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox(
+            height: 52,
+            child: Center(
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          );
+        }
+
+        final jobs = snapshot.data ?? <JobPostingModel>[];
+        final ids = jobs.map((j) => j.id).toSet().toList()..sort();
+
+        final items = <DropdownMenuItem<String>>[
+          const DropdownMenuItem<String>(
+            value: '',
+            child: Text('All jobs'),
+          ),
+          ...ids.map((id) {
+            final j = jobs.firstWhere((e) => e.id == id);
+            return DropdownMenuItem<String>(
+              value: id,
+              child: Text(
+                '${j.id} — ${j.title}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }),
+        ];
+
+        var value = _selectedJobId;
+        if (value.isNotEmpty && !ids.contains(value)) {
+          items.add(
+            DropdownMenuItem<String>(
+              value: value,
+              child: Text(value, maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+          );
+        }
+
+        if (!items.any((e) => e.value == value)) {
+          value = '';
+        }
+
+        return SizedBox(
+          height: 52,
+          child: CustomDropdown(
+            value: value,
+            theme: theme,
+            isSearchable: true,
+            onChange: (dynamic v) {
+              if (v == null) return;
+              setState(() => _selectedJobId = v as String);
+              _apply();
+            },
+            label: '',
+            items: items,
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -120,7 +196,7 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
                     tooltip: 'Reset',
                     onPressed: () {
                       setState(() {
-                        _jobIdController.clear();
+                        _selectedJobId = '';
                         _hrController.clear();
                         _joinImmediate = false;
                         _joinAfterMonths = false;
@@ -146,11 +222,7 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _label(theme, 'Job ID'),
-                  _field(
-                    theme,
-                    controller: _jobIdController,
-                    hint: 'Enter job ID...',
-                  ),
+                  _jobIdDropdown(theme),
                   const SizedBox(height: 20),
                   _label(theme, 'HR Filter'),
                   _field(
