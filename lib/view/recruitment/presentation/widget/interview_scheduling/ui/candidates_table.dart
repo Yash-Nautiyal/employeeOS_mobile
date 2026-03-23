@@ -4,7 +4,7 @@ import 'package:employeeos/view/recruitment/index.dart'
         InterviewTableHeaderRow,
         InterviewTablePaginator,
         ScheduleButton;
-import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';

@@ -35,9 +35,9 @@ class CustomDataRow extends StatelessWidget {
     final status = row['status'] as String? ?? '';
     final date = formatDate(DateTime.parse(row['applied_on'] as String));
 
-    final bodyStyle = tt.bodyMedium?.copyWith(color: cs.tertiary);
+    final bodyStyle = tt.bodyMedium?.copyWith(color: cs.onSurface);
 
-    final mutedStyle = tt.bodyMedium?.copyWith(color: cs.tertiary);
+    final mutedStyle = tt.bodyMedium?.copyWith(color: cs.onSurface);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
@@ -65,7 +65,7 @@ class CustomDataRow extends StatelessWidget {
                   name,
                   style: tt.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: cs.tertiary,
+                    color: cs.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

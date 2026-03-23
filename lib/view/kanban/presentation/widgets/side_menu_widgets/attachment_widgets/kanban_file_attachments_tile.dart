@@ -41,7 +41,7 @@ class KanbanFileAttachmentsTile extends StatelessWidget {
       trailing: SvgPicture.asset(
         'assets/icons/arrow/ic-eva_arrow-ios-downward-fill.svg',
         width: 24,
-        color: theme.colorScheme.tertiary,
+        color: theme.colorScheme.onSurface,
       ),
       title: Text(
         'Files (${attachments.length})',

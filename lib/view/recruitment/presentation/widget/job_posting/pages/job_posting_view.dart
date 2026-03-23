@@ -203,7 +203,7 @@ class _JobPostingViewState extends State<JobPostingView> {
                         'assets/icons/common/solid/ic-solar_add-circle-bold.svg',
                         width: 30,
                         colorFilter: ColorFilter.mode(
-                          theme.colorScheme.tertiary,
+                          theme.colorScheme.onSurface,
                           BlendMode.srcIn,
                         ),
                       ),
@@ -224,7 +224,7 @@ class _JobPostingViewState extends State<JobPostingView> {
                                 _refreshJobs();
                               }
                             },
-                            color: theme.colorScheme.tertiary,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                         if (canManageDepartment)
@@ -243,7 +243,7 @@ class _JobPostingViewState extends State<JobPostingView> {
                                   ),
                                 );
                               },
-                              color: theme.colorScheme.tertiary,
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
                       ])
@@ -289,6 +289,10 @@ class _JobPostingViewState extends State<JobPostingView> {
                           theme: theme,
                           job: job,
                           canEditAndDelete: canEditAndDelete,
+                          onJobActiveChanged: (jobId, isActive) async {
+                            _mockDatasource.setJobActive(jobId, isActive);
+                            if (mounted) _refreshJobs();
+                          },
                           onViewTap: () {
                             Navigator.of(context).pushNamed(
                               JobPostingSection.routeJobView,

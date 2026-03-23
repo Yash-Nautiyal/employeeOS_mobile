@@ -28,7 +28,7 @@ class DateSelectorButton extends StatelessWidget {
       style: theme.textTheme.bodyMedium?.copyWith(
         color: date != null
             ? theme.colorScheme.primary
-            : theme.colorScheme.tertiary,
+            : theme.colorScheme.onSurface,
         fontWeight: date != null ? FontWeight.w800 : FontWeight.normal,
       ),
       decoration: InputDecoration(

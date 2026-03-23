@@ -9,6 +9,7 @@ class InterviewCandidate extends Equatable {
   final String jobId;
   final String interviewer;
   final String status;
+  final String roundStageId;
 
   const InterviewCandidate({
     required this.id,
@@ -19,6 +20,7 @@ class InterviewCandidate extends Equatable {
     required this.jobId,
     required this.interviewer,
     required this.status,
+    required this.roundStageId,
   });
 
   bool get isScheduled => status.trim().toLowerCase() == 'scheduled';
@@ -33,6 +35,6 @@ class InterviewCandidate extends Equatable {
         jobId,
         interviewer,
         status,
+        roundStageId,
       ];
 }
-

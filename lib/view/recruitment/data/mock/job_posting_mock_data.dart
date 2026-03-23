@@ -12,13 +12,14 @@ List<Map<String, dynamic>> get jobPostingMockList => [
         'description': _description1,
         'location': 'Remote',
         'positions': 2,
-        'last_date_to_apply': '2025-07-15T23:59:59.000Z',
+        'is_active': true,
+        'last_date_to_apply': '2026-12-15T23:59:59.000Z',
         'joining_type': 'Notice Period',
         'is_internship': false,
         'ctc_range': '₹15–22 LPA',
         'posted_by_name': 'Yash Nautiyal',
         'posted_by_email': 'nautiyalyash4@gmail.com',
-        'created_at': '2025-06-23T10:00:00.000Z',
+        'created_at': '2026-01-23T10:00:00.000Z',
         'pipeline': [
           {
             'id': 'e1',
@@ -54,13 +55,14 @@ List<Map<String, dynamic>> get jobPostingMockList => [
         'description': _description2,
         'location': 'Bangalore',
         'positions': 1,
-        'last_date_to_apply': '2025-06-30T23:59:59.000Z',
+        'is_active': true,
+        'last_date_to_apply': '2026-08-30T23:59:59.000Z',
         'joining_type': 'Immediate',
         'is_internship': true,
         'ctc_range': null,
         'posted_by_name': 'Yash Nautiyal',
         'posted_by_email': 'nautiyalyash4@gmail.com',
-        'created_at': '2025-06-20T09:00:00.000Z',
+        'created_at': '2026-02-20T09:00:00.000Z',
         'pipeline': [
           {
             'id': 't1',

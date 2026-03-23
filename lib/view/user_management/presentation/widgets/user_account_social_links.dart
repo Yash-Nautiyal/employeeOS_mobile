@@ -100,7 +100,7 @@ class UserAccountSocialLinks extends StatelessWidget {
                   prefix: SvgPicture.asset(
                     'assets/icons/social/ic-twitter.svg',
                     width: 30,
-                    color: theme.colorScheme.tertiary,
+                    color: theme.colorScheme.onSurface,
                   ),
                   alwaysFloatingLabel: true,
                 ),
@@ -109,7 +109,7 @@ class UserAccountSocialLinks extends StatelessWidget {
                 ),
                 CustomTextButton(
                   onClick: () {},
-                  backgroundColor: theme.colorScheme.tertiary,
+                  backgroundColor: theme.colorScheme.onSurface,
                   child: Text(
                     "Save Changes",
                     style: theme.textTheme.labelLarge

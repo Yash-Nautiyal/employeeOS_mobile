@@ -16,6 +16,8 @@ ThemeData buildTheme({
   Brightness brightness = Brightness.light,
   Fonts font = Fonts.publicSans,
 }) {
+  final bool isDark = brightness == Brightness.dark;
+
   final colorscheme = AppPallete.primaryPresets.entries
       .firstWhere((entry) => entry.key == preset)
       .value;
@@ -25,50 +27,37 @@ ThemeData buildTheme({
 
   final baseTextTheme = TextTheme(
     displayLarge: AppTypography.displayLarge.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     displayMedium: AppTypography.displayMedium.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     displaySmall: AppTypography.displaySmall.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     titleLarge: AppTypography.titleLarge.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     titleMedium: AppTypography.titleMedium.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     bodyLarge: AppTypography.bodyLarge.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     bodyMedium: AppTypography.bodyMedium.copyWith(
-      color: brightness == Brightness.dark
-          ? AppPallete.grey500
-          : AppPallete.grey600,
+      color: isDark ? AppPallete.grey500 : AppPallete.grey600,
     ),
     bodySmall: AppTypography.bodySmall.copyWith(
-      color: brightness == Brightness.dark
-          ? AppPallete.grey600
-          : AppPallete.grey500,
+      color: isDark ? AppPallete.grey600 : AppPallete.grey500,
     ),
     labelLarge: AppTypography.buttonLarge.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     labelMedium: AppTypography.buttonMedium.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
     labelSmall: AppTypography.buttonSmall.copyWith(
-      color:
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+      color: isDark ? AppPallete.white : AppPallete.grey800,
     ),
   );
   final googleTextTheme = GoogleFonts.getTextTheme(
@@ -82,22 +71,17 @@ ThemeData buildTheme({
     primaryColor: colorscheme["Main"],
     primaryColorDark: colorscheme["Dark"],
     primaryColorLight: colorscheme["Light"],
-    scaffoldBackgroundColor:
-        brightness == Brightness.dark ? AppPallete.grey900 : AppPallete.white,
-    dividerColor:
-        brightness == Brightness.dark ? AppPallete.grey600 : AppPallete.grey500,
-    disabledColor:
-        brightness == Brightness.dark ? AppPallete.grey500 : AppPallete.grey600,
-    cardColor:
-        brightness == Brightness.dark ? AppPallete.grey800 : AppPallete.white,
-    shadowColor: brightness == Brightness.dark
+    scaffoldBackgroundColor: isDark ? AppPallete.grey900 : AppPallete.white,
+    dividerColor: isDark ? AppPallete.grey600 : AppPallete.grey500,
+    disabledColor: isDark ? AppPallete.grey500 : AppPallete.grey600,
+    cardColor: isDark ? AppPallete.grey800 : AppPallete.white,
+    shadowColor: isDark
         ? AppPallete.black.withOpacity(.09)
         // ignore: deprecated_member_use
         : AppPallete.black.withOpacity(.08),
     indicatorColor: AppPallete.infoMain,
-    hoverColor: brightness == Brightness.dark
-        ? const Color.fromARGB(255, 33, 41, 49)
-        : AppPallete.grey300,
+    hoverColor:
+        isDark ? const Color.fromARGB(255, 33, 41, 49) : AppPallete.grey300,
     //-------------------------------------------------------------------------------------
 
     //Text Theme
@@ -109,50 +93,98 @@ ThemeData buildTheme({
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
       iconTheme: IconThemeData(
-        color: brightness == Brightness.dark
-            ? AppPallete.white
-            : AppPallete.grey800,
+        color: isDark ? AppPallete.white : AppPallete.grey800,
       ),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-            brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
     ),
-    //-------------------------------------------------------------------------------------
-
-    //Color Scheme
-    colorScheme: brightness == Brightness.dark
+    colorScheme: isDark
         ? ColorScheme.dark(
+            //--------Primary Colors--------
             primary: colorscheme["Main"],
+            primaryFixed: colorscheme["Lighter"],
             primaryFixedDim: colorscheme["Light"],
             primaryContainer: colorscheme["Lighter"],
-            primaryFixed: colorscheme["Lighter"],
+            onPrimaryContainer: colorscheme['Darker']!,
+            onPrimary: AppPallete.white,
+
+            //--------Secondary Colors--------
             secondary: secondaryScheme["Main"],
+            secondaryFixed: secondaryScheme["Lighter"],
             secondaryFixedDim: secondaryScheme["Darker"],
             secondaryContainer: secondaryScheme["Lighter"],
+            onSecondaryContainer: secondaryScheme['Darker']!,
+            onSecondary: AppPallete.white,
+
+            //--------Error Colors--------
             error: AppPallete.errorMain,
-            errorContainer: AppPallete.errorMain,
+            errorContainer: AppPallete.errorDark,
+            onError: AppPallete.white,
+
+            //--------Surface Colors--------
             surface: AppPallete.grey800,
-            tertiary: AppPallete.white,
+            surfaceDim: AppPallete.containerDark,
+            surfaceBright: AppPallete.grey700,
             surfaceContainer: AppPallete.containerColor,
-            surfaceDim: AppPallete.grey700,
-            surfaceContainerHigh: AppPallete.grey900,
+            surfaceContainerLow: AppPallete.containerColor,
+            surfaceContainerHigh: AppPallete.grey700,
+
+            //--------Tertiary Colors--------
+            tertiary: AppPallete.infoMain,
+            onTertiary: AppPallete.white,
+
+            // Text / icon on surfaces
+            onSurface: AppPallete.white,
+            onSurfaceVariant: AppPallete.grey400,
+
+            // Borders
+            outline: AppPallete.grey600,
+            outlineVariant: AppPallete.grey700,
+
+            // Misc
+            shadow: AppPallete.black,
+            scrim: AppPallete.black,
+            inverseSurface: AppPallete.grey100,
+            onInverseSurface: AppPallete.grey800,
+            inversePrimary: colorscheme['Dark']!,
           )
         : ColorScheme.light(
+            //--------Primary Colors--------
             primary: colorscheme["Main"],
-            primaryFixedDim: colorscheme["Dark"],
-            primaryContainer: colorscheme["Lighter"],
             primaryFixed: colorscheme["Dark"],
+            primaryFixedDim: colorscheme["Darker"],
+            primaryContainer: colorscheme["Lighter"],
+            onPrimaryContainer: colorscheme['Darker']!,
+            onPrimary: AppPallete.white,
+
+            //--------Secondary Colors--------
             secondary: secondaryScheme["Main"],
+            secondaryFixed: secondaryScheme['Lighter']!,
             secondaryFixedDim: secondaryScheme["Light"],
             secondaryContainer: secondaryScheme["Dark"],
+            onSecondaryContainer: secondaryScheme['Darker']!,
+            onSecondary: AppPallete.white,
+
+            //--------Error Colors--------
             error: AppPallete.errorMain,
             errorContainer: AppPallete.errorLight,
+
+            //--------Tertiary Colors--------
+            tertiary: AppPallete.infoMain,
+            onTertiary: AppPallete.white,
+
+            // Text / icon on surfaces
+            onSurface: AppPallete.grey900,
+            onSurfaceVariant: AppPallete.grey600,
+
+            //--------Surface Colors--------
             surface: AppPallete.grey200,
-            tertiary: AppPallete.grey900,
+            surfaceDim: AppPallete.grey100,
+            surfaceBright: AppPallete.white,
             surfaceContainer: AppPallete.grey300,
-            surfaceDim: AppPallete.grey300,
+            surfaceContainerLow: AppPallete.grey50,
             surfaceContainerHigh: AppPallete.grey300,
           ),
 
@@ -176,9 +208,7 @@ ThemeData buildTheme({
           RoundedRectangleBorder(
             borderRadius: const BorderRadius.all(Radius.circular(12)),
             side: BorderSide(
-              color: brightness == Brightness.dark
-                  ? AppPallete.grey600
-                  : AppPallete.grey300,
+              color: isDark ? AppPallete.grey600 : AppPallete.grey300,
               width: 1.3,
             ),
           ),
@@ -213,10 +243,10 @@ ThemeData buildTheme({
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
         backgroundColor: WidgetStatePropertyAll(
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+          isDark ? AppPallete.white : AppPallete.grey800,
         ),
         foregroundColor: WidgetStatePropertyAll(
-          brightness == Brightness.dark ? AppPallete.grey800 : AppPallete.white,
+          isDark ? AppPallete.grey800 : AppPallete.white,
         ),
       ),
       cancelButtonStyle: ButtonStyle(
@@ -227,19 +257,19 @@ ThemeData buildTheme({
       ),
       dayPeriodTextColor: WidgetStateColor.resolveWith(
         (states) => states.contains(WidgetState.selected)
-            ? brightness == Brightness.dark
+            ? isDark
                 ? AppPallete.grey800
                 : AppPallete.white
-            : brightness == Brightness.dark
+            : isDark
                 ? AppPallete.white
                 : AppPallete.grey800,
       ),
       dayPeriodColor: WidgetStateColor.resolveWith(
         (states) => states.contains(WidgetState.selected)
-            ? brightness == Brightness.dark
+            ? isDark
                 ? AppPallete.white
                 : AppPallete.grey800
-            : brightness == Brightness.dark
+            : isDark
                 ? AppPallete.grey800
                 : AppPallete.white,
       ),
@@ -261,10 +291,10 @@ ThemeData buildTheme({
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
         backgroundColor: WidgetStatePropertyAll(
-          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+          isDark ? AppPallete.white : AppPallete.grey800,
         ),
         foregroundColor: WidgetStatePropertyAll(
-          brightness == Brightness.dark ? AppPallete.grey800 : AppPallete.white,
+          isDark ? AppPallete.grey800 : AppPallete.white,
         ),
       ),
       cancelButtonStyle: ButtonStyle(
@@ -285,11 +315,11 @@ ThemeData buildTheme({
     //Switch Theme
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStatePropertyAll(
-        brightness == Brightness.dark ? AppPallete.black : AppPallete.white,
+        isDark ? AppPallete.black : AppPallete.white,
       ),
       trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       trackColor: WidgetStatePropertyAll(
-        brightness == Brightness.dark ? AppPallete.white : AppPallete.grey400,
+        isDark ? AppPallete.white : AppPallete.grey400,
       ),
     ),
     //-------------------------------------------------------------------------------------
@@ -297,21 +327,15 @@ ThemeData buildTheme({
     //Tab Bar Theme
     tabBarTheme: TabBarTheme(
       labelStyle: AppTypography.buttonLarge.copyWith(
-        color: brightness == Brightness.dark
-            ? AppPallete.white
-            : AppPallete.grey800,
+        color: isDark ? AppPallete.white : AppPallete.grey800,
       ),
-      unselectedLabelColor: brightness == Brightness.dark
-          ? AppPallete.grey500
-          : AppPallete.grey600,
+      unselectedLabelColor: isDark ? AppPallete.grey500 : AppPallete.grey600,
       indicatorSize: TabBarIndicatorSize.label,
       dividerColor: Colors.transparent,
       indicator: UnderlineTabIndicator(
         borderSide: BorderSide(
           width: 2,
-          color: brightness == Brightness.dark
-              ? AppPallete.white
-              : AppPallete.grey800,
+          color: isDark ? AppPallete.white : AppPallete.grey800,
         ),
         insets: const EdgeInsets.symmetric(horizontal: 4),
       ),

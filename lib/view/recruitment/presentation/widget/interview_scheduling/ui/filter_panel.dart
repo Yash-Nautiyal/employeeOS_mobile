@@ -20,6 +20,9 @@ class InterviewFilterPanel extends StatefulWidget {
     required DateTimeRange? range,
   }) onApply;
 
+  /// When set, the job filter is read-only (scheduling scoped to one job).
+  final String? lockedJobTitle;
+
   const InterviewFilterPanel({
     super.key,
     required this.selectedJob,
@@ -31,6 +34,7 @@ class InterviewFilterPanel extends StatefulWidget {
     required this.statusOptions,
     required this.onReset,
     required this.onApply,
+    this.lockedJobTitle,
   });
 
   @override
@@ -107,7 +111,9 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
                     tooltip: 'Reset',
                     onPressed: () {
                       setState(() {
-                        _job = widget.jobOptions.first;
+                        _job = widget.lockedJobTitle != null
+                            ? widget.selectedJob
+                            : widget.jobOptions.first;
                         _interviewer = widget.interviewerOptions.first;
                         _status = widget.statusOptions.first;
                         _range = null;
@@ -132,15 +138,36 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildLabel(theme, 'Job ID'),
-                _buildDropdown(
-                  theme: theme,
-                  value: _job,
-                  items: widget.jobOptions,
-                  onChanged: (v) {
-                    setState(() => _job = v ?? _job);
-                    _apply();
-                  },
-                ),
+                if (widget.lockedJobTitle != null)
+                  Container(
+                    height: 52,
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    alignment: Alignment.centerLeft,
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: theme.dividerColor),
+                    ),
+                    child: Text(
+                      widget.lockedJobTitle!,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+                else
+                  _buildDropdown(
+                    theme: theme,
+                    value: _job,
+                    items: widget.jobOptions,
+                    onChanged: (v) {
+                      setState(() => _job = v ?? _job);
+                      _apply();
+                    },
+                  ),
                 const SizedBox(height: 20),
                 _buildLabel(theme, 'Interviewer'),
                 _buildDropdown(

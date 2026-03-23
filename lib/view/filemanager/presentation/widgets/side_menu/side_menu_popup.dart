@@ -90,7 +90,7 @@ class _SideMenuPopupState extends State<SideMenuPopup> {
             'Can ${formatUserPermission(effective).toLowerCase()}',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
-              color: theme.colorScheme.tertiary,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(width: 4),

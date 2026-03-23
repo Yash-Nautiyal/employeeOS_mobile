@@ -19,7 +19,8 @@ class FilemanagerHeader extends StatelessWidget {
         const Spacer(),
         TextButton(
           style: ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(theme.colorScheme.tertiary),
+            backgroundColor:
+                WidgetStatePropertyAll(theme.colorScheme.onSurface),
           ),
           onPressed: onUploadTap,
           child: Row(

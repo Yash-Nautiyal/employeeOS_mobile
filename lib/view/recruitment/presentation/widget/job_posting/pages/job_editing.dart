@@ -127,6 +127,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
       postedByEmail: _postedByEmailController.text.trim(),
       createdAt: j.createdAt,
       pipeline: List<PipelineStage>.from(_pipelineStages),
+      isActive: j.isActive,
     );
     JobPostingMockDatasource.instance.update(updated);
     Navigator.of(context).pop(true);

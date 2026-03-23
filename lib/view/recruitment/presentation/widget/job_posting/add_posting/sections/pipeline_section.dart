@@ -4,10 +4,9 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../../../data/mock/department_presets_mock.dart'
     show nextPipelineStageId;
-import '../../../../../domain/entities/pipeline_stage.dart';
+import '../../../../../domain/job_posting/entities/pipeline_stage.dart';
 import '../pipeline_component/add_sheet_stage.dart';
 import '../pipeline_component/stage_row.dart';
-
 
 class PipelineSection extends StatefulWidget {
   const PipelineSection({
@@ -116,7 +115,7 @@ class _PipelineSectionState extends State<PipelineSection>
                   'assets/icons/common/solid/ic-material-account-tree.svg',
                   width: 16,
                   colorFilter: ColorFilter.mode(
-                      widget.theme.colorScheme.tertiary, BlendMode.srcIn),
+                      widget.theme.colorScheme.onSurface, BlendMode.srcIn),
                 ),
                 const SizedBox(width: 6),
                 Text('Pipeline Stages', style: tt.labelMedium),

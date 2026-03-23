@@ -145,7 +145,7 @@ class _AuthPageState extends State<AuthPage> {
                             },
                       backgroundColor: isLoading
                           ? theme.disabledColor.withAlpha(150)
-                          : theme.colorScheme.tertiary,
+                          : theme.colorScheme.onSurface,
                       child: Text(
                         isLoading ? "Sign in..." : "Sign in",
                         style: theme.textTheme.labelLarge?.copyWith(
@@ -196,7 +196,7 @@ class _AuthPageState extends State<AuthPage> {
           //             Text(
           //               "Continue with Google",
           //               style: theme.textTheme.labelLarge?.copyWith(
-          //                   color: theme.colorScheme.tertiary, fontSize: 16),
+          //                   color: theme.colorScheme.onSurface, fontSize: 16),
           //             ),
           //           ],
           //         ),

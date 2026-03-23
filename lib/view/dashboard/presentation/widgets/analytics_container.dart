@@ -1,3 +1,4 @@
+import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -39,13 +40,7 @@ class AnalyticsContainer extends StatelessWidget {
             color.withOpacity(0.5),
           ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.35),
-            offset: const Offset(4, 4),
-            blurRadius: 7,
-          ),
-        ],
+        boxShadow: AppShadows.card(theme.brightness),
         image: const DecorationImage(
           alignment: Alignment.centerLeft,
           opacity: .1,

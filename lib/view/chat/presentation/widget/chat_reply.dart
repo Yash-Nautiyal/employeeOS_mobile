@@ -73,7 +73,7 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w900,
-                color: theme.colorScheme.tertiary,
+                color: theme.colorScheme.onSurface,
                 fontSize: 16,
               ),
             ),

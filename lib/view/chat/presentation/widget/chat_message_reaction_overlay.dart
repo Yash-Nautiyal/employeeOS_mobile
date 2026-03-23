@@ -95,7 +95,7 @@ class _ChatMessageReactionsOverlayState
                 indicatorColor: AppPallete.primaryMain,
               ),
               bottomActionBarConfig: BottomActionBarConfig(
-                backgroundColor: theme.colorScheme.surfaceDim,
+                backgroundColor: theme.colorScheme.surfaceContainer,
                 buttonColor: Colors.transparent,
               ),
               searchViewConfig: const SearchViewConfig(),

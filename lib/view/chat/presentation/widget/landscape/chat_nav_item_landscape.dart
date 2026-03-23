@@ -108,7 +108,7 @@ class ChatNavItemLandscape extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.tertiary,
+                                    color: theme.colorScheme.onSurface,
                                     fontSize: 15,
                                   ),
                                 ),

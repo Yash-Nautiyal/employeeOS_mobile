@@ -61,7 +61,7 @@ class DropSlot extends StatelessWidget {
           height: show ? 14 : 0,
           decoration: BoxDecoration(
             color: _isActive
-                ? Theme.of(context).colorScheme.tertiary.withOpacity(0.10)
+                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.10)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),

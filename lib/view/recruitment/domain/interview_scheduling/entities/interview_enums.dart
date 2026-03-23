@@ -1,0 +1,4 @@
+enum InterviewCandidateTab {
+  eligible,
+  scheduled,
+}

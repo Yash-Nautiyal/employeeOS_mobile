@@ -47,7 +47,7 @@ class ResumeIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: theme.colorScheme.tertiary.withValues(alpha: 0.12),
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
@@ -57,7 +57,7 @@ class ResumeIconButton extends StatelessWidget {
           child: SvgPicture.asset(
             'assets/icons/common/solid/ic-solar_file-text-bold.svg',
             colorFilter: ColorFilter.mode(
-              theme.colorScheme.tertiary,
+              theme.colorScheme.onSurface,
               BlendMode.srcIn,
             ),
             width: 18,

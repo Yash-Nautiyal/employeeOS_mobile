@@ -45,7 +45,7 @@ class FilterDateRangeWidget extends StatelessWidget {
               'assets/icons/ic-calender.svg',
               color: isActive
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.tertiary,
+                  : theme.colorScheme.onSurface,
             ),
             const SizedBox(width: 8),
             Text(
@@ -53,14 +53,14 @@ class FilterDateRangeWidget extends StatelessWidget {
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: isActive
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.tertiary,
+                    : theme.colorScheme.onSurface,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
             const SizedBox(width: 8),
             Icon(
               Icons.arrow_drop_down_rounded,
-              color: theme.colorScheme.tertiary,
+              color: theme.colorScheme.onSurface,
             ),
           ],
         ),
@@ -128,7 +128,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
             onPressed: () => Navigator.of(context).pop(),
             icon: SvgPicture.asset(
               'assets/icons/common/solid/ic-mingcute_close-line.svg',
-              color: widget.theme.colorScheme.tertiary,
+              color: widget.theme.colorScheme.onSurface,
             ),
           ),
         ],
@@ -221,7 +221,7 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
             widget.controller.updateDateRangeFilter(rangeToApply);
             Navigator.of(context).pop();
           },
-          backgroundColor: widget.theme.colorScheme.tertiary,
+          backgroundColor: widget.theme.colorScheme.onSurface,
           child: Text(
             'Apply',
             style: widget.theme.textTheme.labelLarge?.copyWith(

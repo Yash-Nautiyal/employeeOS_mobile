@@ -116,7 +116,7 @@ class ChatNavItem extends StatelessWidget {
                                       .join(", "),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w700,
-                                    color: theme.colorScheme.tertiary,
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                 ),
                               ),

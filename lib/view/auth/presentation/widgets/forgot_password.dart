@@ -4,7 +4,6 @@ import 'package:employeeos/view/auth/presentation/widgets/confirm_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-
 class ForgotPassword extends StatefulWidget {
   final ThemeData theme;
   const ForgotPassword({super.key, required this.theme});
@@ -82,13 +81,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => ConfirmPage(theme: widget.theme),
+                              builder: (context) =>
+                                  ConfirmPage(theme: widget.theme),
                             ),
                           );
                         }
                       },
-                      backgroundColor: widget.theme.colorScheme.tertiary,
+                      backgroundColor: widget.theme.colorScheme.onSurface,
                       child: Text(
                         "Send Request",
                         style: widget.theme.textTheme.labelLarge?.copyWith(

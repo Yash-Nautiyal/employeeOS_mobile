@@ -141,7 +141,7 @@ class UserAccountGeneral extends StatelessWidget {
                   width: double.infinity,
                   child: CustomTextButton(
                     onClick: () {},
-                    backgroundColor: theme.colorScheme.tertiary,
+                    backgroundColor: theme.colorScheme.onSurface,
                     child: Text(
                       "Save Changes",
                       style: theme.textTheme.labelLarge

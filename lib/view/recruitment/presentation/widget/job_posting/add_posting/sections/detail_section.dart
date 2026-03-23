@@ -210,7 +210,7 @@ class DetailSection extends StatelessWidget {
           const SizedBox(height: 16),
           CustomTextButton(
             onClick: openDescriptionFullScreen,
-            backgroundColor: theme.colorScheme.tertiary,
+            backgroundColor: theme.colorScheme.onSurface,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,

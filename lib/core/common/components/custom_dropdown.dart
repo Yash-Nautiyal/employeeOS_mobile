@@ -54,7 +54,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
       ),
       style: widget.theme.textTheme.bodyMedium?.copyWith(
         fontWeight: FontWeight.w600,
-        color: widget.theme.colorScheme.tertiary,
+        color: widget.theme.colorScheme.onSurface,
       ),
       dropdownStyleData: DropdownStyleData(
         maxHeight: 230,

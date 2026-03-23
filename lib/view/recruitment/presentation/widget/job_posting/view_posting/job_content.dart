@@ -82,7 +82,7 @@ class JobContent extends StatelessWidget {
                           Align(
                             alignment: Alignment.centerRight,
                             child: CustomTextButton(
-                                backgroundColor: theme.colorScheme.tertiary,
+                                backgroundColor: theme.colorScheme.onSurface,
                                 onClick: () {},
                                 padding: 0,
                                 child: Row(
@@ -119,7 +119,7 @@ class JobContent extends StatelessWidget {
                     customStyles: DefaultStyles(
                       lists: DefaultListBlockStyle(
                           theme.textTheme.bodyMedium!.copyWith(
-                            color: theme.colorScheme.tertiary,
+                            color: theme.colorScheme.onSurface,
                           ),
                           HorizontalSpacing.zero,
                           VerticalSpacing.zero,
@@ -128,7 +128,7 @@ class JobContent extends StatelessWidget {
                           null),
                       paragraph: DefaultTextBlockStyle(
                         theme.textTheme.bodyMedium!.copyWith(
-                          color: theme.colorScheme.tertiary,
+                          color: theme.colorScheme.onSurface,
                         ),
                         HorizontalSpacing.zero,
                         VerticalSpacing.zero,
@@ -137,7 +137,7 @@ class JobContent extends StatelessWidget {
                       ),
                       h1: DefaultTextBlockStyle(
                         theme.textTheme.titleLarge!.copyWith(
-                          color: theme.colorScheme.tertiary,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
                         ),
                         HorizontalSpacing.zero,
@@ -148,7 +148,7 @@ class JobContent extends StatelessWidget {
                       h2: DefaultTextBlockStyle(
                         theme.textTheme.titleMedium!.copyWith(
                           fontWeight: FontWeight.w900,
-                          color: theme.colorScheme.tertiary,
+                          color: theme.colorScheme.onSurface,
                         ),
                         HorizontalSpacing.zero,
                         VerticalSpacing.zero,
@@ -157,7 +157,7 @@ class JobContent extends StatelessWidget {
                       ),
                       h3: DefaultTextBlockStyle(
                         theme.textTheme.titleSmall!.copyWith(
-                          color: theme.colorScheme.tertiary,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
                         ),
                         HorizontalSpacing.zero,
@@ -165,7 +165,7 @@ class JobContent extends StatelessWidget {
                         VerticalSpacing.zero,
                         null,
                       ),
-                      color: theme.colorScheme.tertiary,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -261,7 +261,7 @@ class JobContent extends StatelessWidget {
             iconPath,
             width: 23,
             colorFilter: ColorFilter.mode(
-              theme.colorScheme.tertiary,
+              theme.colorScheme.onSurface,
               BlendMode.srcIn,
             ),
           ),
@@ -279,7 +279,7 @@ class JobContent extends StatelessWidget {
                   value,
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.tertiary,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],

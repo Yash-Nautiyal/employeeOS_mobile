@@ -87,7 +87,7 @@ class CustomTextfield extends StatelessWidget {
       maxLines: maxLines,
       minLines: 1,
       style: theme.textTheme.bodyMedium?.copyWith(
-          fontSize: fontSize ?? 14, color: theme.colorScheme.tertiary),
+          fontSize: fontSize ?? 14, color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
           contentPadding:
               const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
@@ -126,7 +126,7 @@ class CustomTextfield extends StatelessWidget {
           (isPasswordVisible ?? false)
               ? 'assets/icons/common/solid/ic-solar_eye-bold.svg'
               : 'assets/icons/common/solid/ic-solar_eye-closed-bold.svg',
-          color: theme.colorScheme.tertiary,
+          color: theme.colorScheme.onSurface,
         ),
         onPressed: () {
           if (onClickPasswordVisisble != null) {

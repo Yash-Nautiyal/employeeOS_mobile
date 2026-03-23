@@ -77,7 +77,7 @@ class _UserAccountTabState extends State<UserAccountTab> {
               isScrollable: true,
               tabAlignment: TabAlignment.center,
               labelStyle: widget.theme.textTheme.labelLarge?.copyWith(
-                color: widget.theme.colorScheme.tertiary,
+                color: widget.theme.colorScheme.onSurface,
               ),
               unselectedLabelColor: widget.theme.disabledColor,
               indicatorSize: TabBarIndicatorSize.label,
@@ -85,7 +85,7 @@ class _UserAccountTabState extends State<UserAccountTab> {
               indicator: UnderlineTabIndicator(
                 borderSide: BorderSide(
                   width: 2,
-                  color: widget.theme.colorScheme.tertiary,
+                  color: widget.theme.colorScheme.onSurface,
                 ),
                 insets: const EdgeInsets.symmetric(horizontal: 4),
               ),

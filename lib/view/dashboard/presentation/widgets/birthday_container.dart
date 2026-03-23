@@ -15,6 +15,7 @@ class BirthdayContainer extends StatelessWidget {
         MediaQuery.of(context).orientation == Orientation.portrait;
     final isWideScreen = !isPortrait || wideScreen;
     return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
       elevation: 10,
       shadowColor: theme.shadowColor,
       shape: RoundedRectangleBorder(

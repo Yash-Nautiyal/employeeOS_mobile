@@ -121,7 +121,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                         const SizedBox(height: 12),
                         CustomTextButton(
                           onClick: () => _bloc.add(FilemanagerLoadingEvent()),
-                          backgroundColor: theme.colorScheme.tertiary,
+                          backgroundColor: theme.colorScheme.onSurface,
                           padding: 1,
                           child: Text('Retry',
                               style: theme.textTheme.labelLarge?.copyWith(
@@ -191,7 +191,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                           Text(
                             "Favorites",
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.tertiary,
+                              color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -243,7 +243,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                         child: Text(
                           "Recent Files",
                           style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.tertiary,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -292,7 +292,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                                         "Recent Files",
                                         style:
                                             theme.textTheme.bodyLarge?.copyWith(
-                                          color: theme.colorScheme.tertiary,
+                                          color: theme.colorScheme.onSurface,
                                           fontWeight: FontWeight.w900,
                                         ),
                                       ),
@@ -337,7 +337,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
                 child: Text(
                   'No Data Available',
                   style: theme.textTheme.bodyLarge
-                      ?.copyWith(color: theme.colorScheme.tertiary),
+                      ?.copyWith(color: theme.colorScheme.onSurface),
                 ),
               );
             },

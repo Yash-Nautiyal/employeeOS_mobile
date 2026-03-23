@@ -162,7 +162,7 @@ class JobApplicationFullCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.tertiary,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),

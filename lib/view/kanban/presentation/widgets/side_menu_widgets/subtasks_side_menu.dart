@@ -145,7 +145,7 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
                         tooltip: 'Edit',
                         icon: SvgPicture.asset(
                           'assets/icons/common/solid/ic-solar_pen-bold.svg',
-                          color: theme.colorScheme.tertiary,
+                          color: theme.colorScheme.onSurface,
                           width: 20,
                         ),
                         onPressed: () => _openSubtaskDialog(
@@ -183,7 +183,7 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
             children: [
               SvgPicture.asset(
                 'assets/icons/common/solid/ic-mingcute_add-line.svg',
-                color: theme.colorScheme.tertiary,
+                color: theme.colorScheme.onSurface,
                 width: 18,
               ),
               const SizedBox(width: 7),
@@ -191,7 +191,7 @@ class _SubtasksSideMenuState extends State<SubtasksSideMenu> {
                 'Add Subtask',
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],

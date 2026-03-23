@@ -115,7 +115,7 @@ class ContactDialog extends StatelessWidget {
                               style: theme.textTheme.bodySmall),
                           trailing: isSelected
                               ? Icon(Icons.check_circle_rounded,
-                                  color: theme.colorScheme.tertiary, size: 24)
+                                  color: theme.colorScheme.onSurface, size: 24)
                               : CustomTextButton(
                                   padding: 0,
                                   onClick: () => onAssign(user),
@@ -124,7 +124,7 @@ class ContactDialog extends StatelessWidget {
                                     children: [
                                       SvgPicture.asset(
                                         'assets/icons/common/solid/ic-mingcute_add-line.svg',
-                                        color: theme.colorScheme.tertiary,
+                                        color: theme.colorScheme.onSurface,
                                         width: 13,
                                       ),
                                       const SizedBox(width: 3),
@@ -133,7 +133,7 @@ class ContactDialog extends StatelessWidget {
                                         style: theme.textTheme.labelSmall
                                             ?.copyWith(
                                                 color:
-                                                    theme.colorScheme.tertiary,
+                                                    theme.colorScheme.onSurface,
                                                 fontWeight: FontWeight.w600),
                                       ),
                                     ],
@@ -164,7 +164,7 @@ class ContactDialog extends StatelessWidget {
                               CustomTextButton(
                                 padding: 1,
                                 onClick: () => {},
-                                backgroundColor: theme.colorScheme.tertiary,
+                                backgroundColor: theme.colorScheme.onSurface,
                                 child: Text(
                                   'Assign',
                                   style: theme.textTheme.labelLarge?.copyWith(

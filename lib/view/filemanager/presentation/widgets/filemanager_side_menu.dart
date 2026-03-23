@@ -106,7 +106,7 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
                     icon: SvgPicture.asset(
                       'assets/icons/common/solid/ic-solar_eye-bold.svg',
                       colorFilter: ColorFilter.mode(
-                          theme.colorScheme.tertiary, BlendMode.srcIn),
+                          theme.colorScheme.onSurface, BlendMode.srcIn),
                     ),
                   ),
                   IconButton(
@@ -121,7 +121,7 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
                       'assets/icons/common/solid/ic-mingcute-download-line.svg',
                       width: 22,
                       colorFilter: ColorFilter.mode(
-                        theme.colorScheme.tertiary,
+                        theme.colorScheme.onSurface,
                         BlendMode.srcIn,
                       ),
                     ),

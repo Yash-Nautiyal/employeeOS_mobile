@@ -15,6 +15,8 @@ class JobPostingCardHeader extends StatefulWidget {
   final VoidCallback? onViewTap;
   final VoidCallback? onEditTap;
   final bool canEditAndDelete;
+  final bool isActive;
+  final ValueChanged<bool>? onActiveChanged;
 
   const JobPostingCardHeader({
     super.key,
@@ -22,6 +24,8 @@ class JobPostingCardHeader extends StatefulWidget {
     this.onViewTap,
     this.onEditTap,
     this.canEditAndDelete = true, //HR only for own jobs, Admin for any.
+    this.isActive = true,
+    this.onActiveChanged,
   });
 
   @override
@@ -42,6 +46,7 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = widget.theme.brightness;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -52,20 +57,31 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: AppPallete.successMain.withOpacity(.2),
+            color: widget.isActive
+                ? AppPallete.successMain.withValues(alpha: .2)
+                : widget.theme.colorScheme.errorContainer.withValues(
+                    alpha: brightness == Brightness.dark ? .15 : .3),
           ),
           child: Text(
-            'Active',
+            widget.isActive ? 'Active' : 'InActive',
             style: widget.theme.textTheme.labelLarge?.copyWith(
-              color: AppPallete.successMain,
+              color: widget.isActive
+                  ? AppPallete.successMain
+                  : brightness == Brightness.dark
+                      ? AppPallete.errorMain
+                      : AppPallete.errorDarker,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
         Transform.scale(
           scale: .65,
           child: Switch(
-            value: false,
-            onChanged: (value) {},
+            value: widget.isActive,
+            onChanged: widget.canEditAndDelete && widget.onActiveChanged != null
+                ? widget.onActiveChanged
+                : null,
+            activeTrackColor: widget.theme.colorScheme.onSurface,
           ),
         ),
         const Spacer(),

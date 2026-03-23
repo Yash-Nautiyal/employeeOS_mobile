@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
 
 class InterviewCandidateModel extends InterviewCandidate {
   const InterviewCandidateModel({
@@ -10,6 +10,7 @@ class InterviewCandidateModel extends InterviewCandidate {
     required super.jobId,
     required super.interviewer,
     required super.status,
+    required super.roundStageId,
   });
 
   factory InterviewCandidateModel.fromMap(Map<String, dynamic> map) {
@@ -22,6 +23,7 @@ class InterviewCandidateModel extends InterviewCandidate {
       jobId: map['jobId'] as String,
       interviewer: map['interviewer'] as String,
       status: map['status'] as String,
+      roundStageId: map['roundStageId'] as String,
     );
   }
 
@@ -35,7 +37,7 @@ class InterviewCandidateModel extends InterviewCandidate {
       'jobId': jobId,
       'interviewer': interviewer,
       'status': status,
+      'roundStageId': roundStageId,
     };
   }
 }
-

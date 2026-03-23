@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_datasource.dart';
-import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
+import 'package:employeeos/view/recruitment/data/job_posting/datasources/job_posting_mock_datasource.dart';
+import 'package:employeeos/view/recruitment/data/job_posting/models/job_posting_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 

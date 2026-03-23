@@ -139,7 +139,7 @@ class _AddToFolderDialogState extends State<AddToFolderDialog> {
           onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 14,
-            color: theme.colorScheme.tertiary,
+            color: theme.colorScheme.onSurface,
           ),
           decoration: InputDecoration(
             hintText: 'e.g. Project files',
@@ -183,7 +183,7 @@ class _AddToFolderDialogState extends State<AddToFolderDialog> {
           onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 14,
-            color: theme.colorScheme.tertiary,
+            color: theme.colorScheme.onSurface,
           ),
           decoration: InputDecoration(
             hintText: 'e.g. Project files',
@@ -218,7 +218,7 @@ class _AddToFolderDialogState extends State<AddToFolderDialog> {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -233,7 +233,7 @@ class _AddToFolderDialogState extends State<AddToFolderDialog> {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -260,7 +260,7 @@ class _AddToFolderDialogState extends State<AddToFolderDialog> {
           backgroundColor: _canSubmit || _loading
               ? (_loading
                   ? theme.disabledColor.withValues(alpha: 0.3)
-                  : theme.colorScheme.tertiary)
+                  : theme.colorScheme.onSurface)
               : theme.disabledColor.withValues(alpha: 0.3),
           onClick: () {
             if (_loading) return;
@@ -424,7 +424,7 @@ class _OptionCard extends StatelessWidget {
                 width: 24,
                 color: isSelected
                     ? theme.primaryColor
-                    : theme.colorScheme.tertiary.withValues(alpha: 0.3),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.3),
               ),
               const SizedBox(width: 12),
               Expanded(

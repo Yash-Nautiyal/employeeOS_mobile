@@ -7,7 +7,20 @@ abstract class InterviewSchedulingEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class InterviewSchedulingStarted extends InterviewSchedulingEvent {}
+class InterviewSchedulingStarted extends InterviewSchedulingEvent {
+  final String jobId;
+  final List<InterviewSchedulingRoundTab> roundTabs;
+  final bool lockJobFilter;
+
+  const InterviewSchedulingStarted({
+    required this.jobId,
+    required this.roundTabs,
+    this.lockJobFilter = true,
+  });
+
+  @override
+  List<Object?> get props => [jobId, roundTabs, lockJobFilter];
+}
 
 class InterviewSearchChanged extends InterviewSchedulingEvent {
   final String query;
@@ -47,12 +60,12 @@ class InterviewTabChanged extends InterviewSchedulingEvent {
 }
 
 class InterviewRoundChanged extends InterviewSchedulingEvent {
-  final InterviewRound round;
+  final String roundId;
 
-  const InterviewRoundChanged(this.round);
+  const InterviewRoundChanged(this.roundId);
 
   @override
-  List<Object?> get props => [round];
+  List<Object?> get props => [roundId];
 }
 
 class InterviewSelectionChanged extends InterviewSchedulingEvent {
@@ -63,4 +76,3 @@ class InterviewSelectionChanged extends InterviewSchedulingEvent {
   @override
   List<Object?> get props => [selectedIds];
 }
-

@@ -5,8 +5,8 @@ import 'package:employeeos/core/common/components/connectivity_banner.dart';
 import 'package:employeeos/core/common/components/home_nav.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/view/index.dart';
-import 'package:employeeos/view/layout/presentation/widgets/exit_toast.dart';
-import 'package:employeeos/view/layout/presentation/widgets/menu_drawer.dart';
+import '../widgets/exit_toast.dart';
+import '../widgets/menu_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,7 +33,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     // 'Mail': const Center(child: Text('Mail Page')),
     'Job Posting': const JobPostingSection(),
     'Job Application': const JobApplicationView(),
-    'Interview Scheduling': const InterviewSchedulingView(),
+    'Interview Scheduling': const InterviewSchedulingSection(),
     'Account': const UserAccount(),
     'Profile': const UserProfile(),
     'Card': const UserCards(),
@@ -247,10 +247,13 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
                         child: _pages[_selectedItem] ??
                             const Center(child: Text('Page not found')),
                       )
-                    : _pages[_selectedItem] ??
-                        const Center(
-                          child: Text('Page not found'),
-                        ),
+                    : Padding(
+                        padding: EdgeInsets.only(top: isPortrait ? 0 : 10),
+                        child: _pages[_selectedItem] ??
+                            const Center(
+                              child: Text('Page not found'),
+                            ),
+                      ),
               ),
             ),
 

@@ -89,7 +89,7 @@ class _StorageSectionState extends State<StorageSection>
               Text(
                 'Storage',
                 style: widget.theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
                 ),
               ),

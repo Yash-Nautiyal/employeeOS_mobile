@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use
 
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -52,14 +51,14 @@ class PipelineStage extends Equatable {
 extension StageTypeX on PipelineStageType {
   Color resolvedColor(ColorScheme cs) => switch (this) {
         PipelineStageType.statusOnly => cs.primary.withOpacity(0.1),
-        PipelineStageType.interview => cs.tertiary.withOpacity(0.08),
+        PipelineStageType.interview => cs.onSurface.withOpacity(0.08),
         PipelineStageType.submission => cs.secondary.withOpacity(0.08),
         PipelineStageType.assessment => cs.error.withOpacity(0.08),
       };
 
   Color resolvedAccent(ColorScheme cs) => switch (this) {
         PipelineStageType.statusOnly => cs.primary,
-        PipelineStageType.interview => cs.tertiary,
+        PipelineStageType.interview => cs.onSurface,
         PipelineStageType.submission => cs.secondary,
         PipelineStageType.assessment => cs.error,
       };

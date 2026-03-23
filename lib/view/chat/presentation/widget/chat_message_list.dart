@@ -159,7 +159,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                                       .bodySmall
                                       ?.copyWith(
                                         color:
-                                            widget.theme.colorScheme.tertiary,
+                                            widget.theme.colorScheme.onSurface,
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),
@@ -238,8 +238,8 @@ class _ChatMessageListState extends State<ChatMessageList> {
                                         .textTheme
                                         .bodySmall
                                         ?.copyWith(
-                                          color:
-                                              widget.theme.colorScheme.tertiary,
+                                          color: widget
+                                              .theme.colorScheme.onSurface,
                                           fontWeight: FontWeight.w500,
                                         ),
                                   ),
@@ -309,7 +309,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                   child: Text(
                     _stickyDate!,
                     style: widget.theme.textTheme.bodySmall?.copyWith(
-                      color: widget.theme.colorScheme.tertiary,
+                      color: widget.theme.colorScheme.onSurface,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

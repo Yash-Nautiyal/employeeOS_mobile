@@ -108,7 +108,7 @@ class SharePropertyRow extends StatelessWidget {
                 Text(
                   user.name,
                   style: theme.textTheme.bodyMedium
-                      ?.copyWith(color: theme.colorScheme.tertiary),
+                      ?.copyWith(color: theme.colorScheme.onSurface),
                 ),
                 if (user.email.isNotEmpty)
                   Text(
@@ -132,7 +132,7 @@ class SharePropertyRow extends StatelessWidget {
               permissionText,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
-                color: theme.colorScheme.tertiary,
+                color: theme.colorScheme.onSurface,
               ),
             ),
         ],

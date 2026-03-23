@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
+import 'package:employeeos/view/recruitment/data/job_posting/models/job_posting_model.dart';
 import 'package:employeeos/view/recruitment/data/mock/job_posting_mock_data.dart';
 
 /// Mock data source for job postings. Holds mutable in-memory list so edits
@@ -44,6 +44,7 @@ class JobPostingMockDatasource {
       postedByEmail: job.postedByEmail,
       createdAt: job.createdAt ?? DateTime.now().toUtc(),
       pipeline: job.pipeline,
+      isActive: job.isActive,
     );
     _jobs = [..._jobs, newJob];
     return newJob;
@@ -53,5 +54,12 @@ class JobPostingMockDatasource {
   void update(JobPostingModel job) {
     final i = _jobs.indexWhere((j) => j.id == job.id);
     if (i >= 0) _jobs[i] = job;
+  }
+
+  /// Toggles whether the job is open for applications (mock persistence).
+  void setJobActive(String id, bool isActive) {
+    final i = _jobs.indexWhere((j) => j.id == id);
+    if (i < 0) return;
+    _jobs[i] = _jobs[i].copyWith(isActive: isActive);
   }
 }

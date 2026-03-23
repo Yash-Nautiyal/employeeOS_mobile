@@ -54,7 +54,7 @@ class TablePaginator extends StatelessWidget {
                         child: Text(
                           '$e',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.tertiary,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.w900,
                           ),
                         )))
@@ -74,7 +74,7 @@ class TablePaginator extends StatelessWidget {
                 child: Icon(
                   Icons.first_page,
                   color: pageIndex > 0
-                      ? theme.colorScheme.tertiary
+                      ? theme.colorScheme.onSurface
                       : theme.dividerColor,
                 ),
               ),
@@ -83,7 +83,7 @@ class TablePaginator extends StatelessWidget {
                 child: Icon(
                   Icons.chevron_left,
                   color: pageIndex > 0
-                      ? theme.colorScheme.tertiary
+                      ? theme.colorScheme.onSurface
                       : theme.dividerColor,
                 ),
               ),
@@ -94,7 +94,7 @@ class TablePaginator extends StatelessWidget {
                 child: Icon(
                   Icons.chevron_right,
                   color: pageIndex < pageCount - 1
-                      ? theme.colorScheme.tertiary
+                      ? theme.colorScheme.onSurface
                       : theme.dividerColor,
                 ),
               ),
@@ -103,7 +103,7 @@ class TablePaginator extends StatelessWidget {
                 child: Icon(
                   Icons.last_page,
                   color: pageIndex < pageCount - 1
-                      ? theme.colorScheme.tertiary
+                      ? theme.colorScheme.onSurface
                       : theme.dividerColor,
                 ),
               ),

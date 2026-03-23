@@ -21,7 +21,7 @@ export 'package:employeeos/view/layout/presentation/pages/layout.dart';
 export 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
 export 'package:employeeos/view/recruitment/presentation/widget/job_posting/pages/job_posting_view.dart';
 export 'package:employeeos/view/recruitment/presentation/pages/job_posting_section.dart';
-export 'package:employeeos/view/recruitment/presentation/pages/interview_scheduling_view.dart';
+export 'package:employeeos/view/recruitment/presentation/pages/interview_scheduling_section.dart';
 
 // User Management
 export 'package:employeeos/view/user_management/presentation/pages/user_account.dart';

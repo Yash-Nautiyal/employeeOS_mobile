@@ -57,8 +57,8 @@ class UserDashboardView extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0)
-            .copyWith(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
+        padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 20, bottom: 20),
         child: Column(
           children: [
             if (isWideScreen) ...[
@@ -84,7 +84,7 @@ class UserDashboardView extends StatelessWidget {
               const SizedBox(height: 20),
             ],
             GridView.builder(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

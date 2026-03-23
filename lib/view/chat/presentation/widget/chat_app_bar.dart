@@ -60,7 +60,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                   isPortrait
                       ? 'assets/icons/arrow/ic-eva_arrow-ios-back-fill.svg'
                       : 'assets/icons/common/solid/ic-mingcute_close-line.svg',
-                  color: widget.theme.colorScheme.tertiary,
+                  color: widget.theme.colorScheme.onSurface,
                   width: 18,
                 ),
               ),

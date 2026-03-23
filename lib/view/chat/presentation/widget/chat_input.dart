@@ -69,7 +69,7 @@ class _ChatInputState extends State<ChatInput> {
                     constraints: const BoxConstraints(),
                     icon: Icon(
                       Icons.close,
-                      color: widget.theme.colorScheme.tertiary,
+                      color: widget.theme.colorScheme.onSurface,
                       size: 16,
                     ),
                   ),

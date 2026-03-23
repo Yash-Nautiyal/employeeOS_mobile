@@ -51,7 +51,7 @@ class CustomBreadCrumbs extends StatelessWidget {
               Text(
                 routes[2],
                 style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.tertiary,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w600),
               ),
             ],

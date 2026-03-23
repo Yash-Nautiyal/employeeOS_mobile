@@ -208,7 +208,7 @@
 //                             },
 //                             backgroundColor: isLoading
 //                                 ? theme.disabledColor.withAlpha(150)
-//                                 : theme.colorScheme.tertiary,
+//                                 : theme.colorScheme.onSurface,
 //                             child: isLoading
 //                                 ? Text(
 //                                     "Sign Up ...",

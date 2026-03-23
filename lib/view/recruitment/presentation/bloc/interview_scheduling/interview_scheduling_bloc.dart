@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
-import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
-import 'package:employeeos/view/recruitment/domain/entities/interview_enums.dart';
-import 'package:employeeos/view/recruitment/domain/usecases/get_interview_candidates_usecase.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_enums.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/interview_scheduling_tabs.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/usecases/get_interview_candidates_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -34,13 +35,32 @@ class InterviewSchedulingBloc
   ) async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
     try {
-      final candidates = await getInterviewCandidatesUseCase.call();
+      if (event.roundTabs.isEmpty) {
+        emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: 'No scheduling rounds for this job.',
+          ),
+        );
+        return;
+      }
+
+      final candidates = await getInterviewCandidatesUseCase.call(event.jobId);
+
       emit(
         _applyFilters(
           state.copyWith(
             isLoading: false,
             candidates: candidates,
-            filteredCandidates: candidates,
+            jobId: event.jobId,
+            lockJobFilter: event.lockJobFilter,
+            roundTabs: event.roundTabs,
+            activeRoundId: event.roundTabs.first.id,
+            selectedJob: event.jobId,
+            selectedInterviewer: kAllInterviewers,
+            selectedStatus: kAllStatus,
+            selectedDateRange: null,
+            updateDateRange: true,
             selectedIds: const {},
           ),
         ),
@@ -83,10 +103,11 @@ class InterviewSchedulingBloc
     InterviewFiltersReset event,
     Emitter<InterviewSchedulingState> emit,
   ) {
+    final resetJob = state.lockJobFilter ? state.jobId : kAllJobs;
     emit(
       _applyFilters(
         state.copyWith(
-          selectedJob: kAllJobs,
+          selectedJob: resetJob,
           selectedInterviewer: kAllInterviewers,
           selectedStatus: kAllStatus,
           selectedDateRange: null,
@@ -108,7 +129,7 @@ class InterviewSchedulingBloc
     InterviewRoundChanged event,
     Emitter<InterviewSchedulingState> emit,
   ) {
-    emit(state.copyWith(activeRound: event.round));
+    emit(_applyFilters(state.copyWith(activeRoundId: event.roundId)));
   }
 
   void _onSelectionChanged(
@@ -123,6 +144,14 @@ class InterviewSchedulingBloc
   ) {
     final search = targetState.searchQuery.toLowerCase().trim();
     final filtered = targetState.candidates.where((candidate) {
+      if (!candidateMatchesSchedulingRound(
+        targetState.activeRoundId,
+        candidate.roundStageId,
+        candidate.status,
+      )) {
+        return false;
+      }
+
       final isSearchMatch = search.isEmpty ||
           candidate.name.toLowerCase().contains(search) ||
           candidate.jobTitle.toLowerCase().contains(search);
@@ -162,7 +191,6 @@ class InterviewSchedulingBloc
       return true;
     }).toList();
 
-    // Drop selections that are no longer visible.
     final visibleIds = filtered.map((c) => c.id).toSet();
     final selectedIds =
         targetState.selectedIds.where((id) => visibleIds.contains(id)).toSet();
@@ -174,4 +202,3 @@ class InterviewSchedulingBloc
     );
   }
 }
-

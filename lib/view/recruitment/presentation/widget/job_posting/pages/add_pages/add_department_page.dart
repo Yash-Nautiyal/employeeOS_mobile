@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:employeeos/core/index.dart' show CustomTextfield;
 import 'package:employeeos/view/recruitment/data/mock/department_presets_mock.dart';
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/pipeline_stage.dart';
 import 'package:employeeos/view/recruitment/presentation/index.dart'
     show PipelineSection;
 import 'package:flutter/material.dart';

@@ -208,7 +208,7 @@ class _HiringJobChartState extends State<HiringJobChart>
                         connectorLineSettings: ConnectorLineSettings(
                           type: ConnectorType.line,
                           length: '5%',
-                          color: widget.theme.colorScheme.tertiary
+                          color: widget.theme.colorScheme.onSurface
                               .withOpacity(0.5),
                         ),
                         textStyle: widget.theme.textTheme.bodySmall?.copyWith(

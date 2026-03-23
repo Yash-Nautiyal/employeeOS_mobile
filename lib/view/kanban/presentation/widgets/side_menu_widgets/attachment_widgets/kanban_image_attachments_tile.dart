@@ -1,4 +1,5 @@
-import 'package:employeeos/view/kanban/presentation/index.dart' show ActionButton, AttachmentOwnerAvatar;
+import 'package:employeeos/view/kanban/presentation/index.dart'
+    show ActionButton, AttachmentOwnerAvatar;
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:employeeos/core/index.dart'
@@ -41,7 +42,7 @@ class KanbanImageAttachmentsTile extends StatelessWidget {
       trailing: SvgPicture.asset(
         'assets/icons/arrow/ic-eva_arrow-ios-downward-fill.svg',
         width: 24,
-        color: theme.colorScheme.tertiary,
+        color: theme.colorScheme.onSurface,
       ),
       title: Text(
         'Images (${attachments.length})',

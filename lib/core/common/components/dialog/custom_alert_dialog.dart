@@ -40,7 +40,7 @@ class CustomAlertDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final effectivePrimaryColor = loading
         ? theme.disabledColor.withValues(alpha: 0.3)
-        : (primaryColor ?? theme.colorScheme.tertiary);
+        : (primaryColor ?? theme.colorScheme.onSurface);
     final effectiveIcon = icon ??
         (style == CustomAlertDialogStyle.danger
             ? SvgPicture.asset(

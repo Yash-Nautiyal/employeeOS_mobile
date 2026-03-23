@@ -103,7 +103,7 @@ class FeatureItem extends StatelessWidget {
           width: 35,
           height: 35,
           colorFilter:
-              ColorFilter.mode(theme.colorScheme.tertiary, BlendMode.srcIn),
+              ColorFilter.mode(theme.colorScheme.onSurface, BlendMode.srcIn),
         ),
         const SizedBox(width: 16),
         Expanded(

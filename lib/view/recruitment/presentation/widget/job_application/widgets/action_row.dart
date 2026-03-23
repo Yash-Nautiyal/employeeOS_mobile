@@ -25,7 +25,7 @@ class ActionRow extends StatelessWidget {
         Expanded(
           child: CustomTextButton(
             padding: 2,
-            backgroundColor: theme.colorScheme.tertiary,
+            backgroundColor: theme.colorScheme.onSurface,
             onClick: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Resume: $resumeUrl')),

@@ -77,7 +77,7 @@ class _UploadFilesDialogState extends State<UploadFilesDialog> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceDim,
+            color: theme.colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -97,11 +97,11 @@ class _UploadFilesDialogState extends State<UploadFilesDialog> {
                 'Drop or select file',
                 style: isLandscape
                     ? theme.textTheme.titleSmall?.copyWith(
-                        color: theme.colorScheme.tertiary,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       )
                     : theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.tertiary,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
               ),
@@ -200,7 +200,7 @@ class _UploadFilesDialogState extends State<UploadFilesDialog> {
                       'Upload files',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: theme.colorScheme.tertiary,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const Spacer(),
@@ -259,7 +259,7 @@ class _UploadFilesDialogState extends State<UploadFilesDialog> {
                     CustomTextButton(
                       backgroundColor: _selectedFiles.isEmpty || _isUploading
                           ? theme.disabledColor.withValues(alpha: 0.3)
-                          : theme.colorScheme.tertiary,
+                          : theme.colorScheme.onSurface,
                       padding: 0,
                       onClick: () => (_selectedFiles.isEmpty || _isUploading)
                           ? null
@@ -345,7 +345,7 @@ class _FileRow extends StatelessWidget {
                 Text(
                   name,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.tertiary,
+                    color: theme.colorScheme.onSurface,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

@@ -5,12 +5,15 @@ class InterviewSchedulingState extends Equatable {
   final List<InterviewCandidate> candidates;
   final List<InterviewCandidate> filteredCandidates;
   final String searchQuery;
+  final String jobId;
+  final bool lockJobFilter;
+  final List<InterviewSchedulingRoundTab> roundTabs;
+  final String activeRoundId;
   final String selectedJob;
   final String selectedInterviewer;
   final String selectedStatus;
   final DateTimeRange? selectedDateRange;
   final InterviewCandidateTab activeTab;
-  final InterviewRound activeRound;
   final Set<String> selectedIds;
   final String? errorMessage;
 
@@ -19,12 +22,15 @@ class InterviewSchedulingState extends Equatable {
     required this.candidates,
     required this.filteredCandidates,
     required this.searchQuery,
+    required this.jobId,
+    required this.lockJobFilter,
+    required this.roundTabs,
+    required this.activeRoundId,
     required this.selectedJob,
     required this.selectedInterviewer,
     required this.selectedStatus,
     required this.selectedDateRange,
     required this.activeTab,
-    required this.activeRound,
     required this.selectedIds,
     required this.errorMessage,
   });
@@ -35,12 +41,15 @@ class InterviewSchedulingState extends Equatable {
       candidates: [],
       filteredCandidates: [],
       searchQuery: '',
+      jobId: '',
+      lockJobFilter: false,
+      roundTabs: [],
+      activeRoundId: '',
       selectedJob: kAllJobs,
       selectedInterviewer: kAllInterviewers,
       selectedStatus: kAllStatus,
       selectedDateRange: null,
       activeTab: InterviewCandidateTab.eligible,
-      activeRound: InterviewRound.technical,
       selectedIds: {},
       errorMessage: null,
     );
@@ -51,13 +60,16 @@ class InterviewSchedulingState extends Equatable {
     List<InterviewCandidate>? candidates,
     List<InterviewCandidate>? filteredCandidates,
     String? searchQuery,
+    String? jobId,
+    bool? lockJobFilter,
+    List<InterviewSchedulingRoundTab>? roundTabs,
+    String? activeRoundId,
     String? selectedJob,
     String? selectedInterviewer,
     String? selectedStatus,
     DateTimeRange? selectedDateRange,
     bool updateDateRange = false,
     InterviewCandidateTab? activeTab,
-    InterviewRound? activeRound,
     Set<String>? selectedIds,
     String? errorMessage,
   }) {
@@ -66,22 +78,31 @@ class InterviewSchedulingState extends Equatable {
       candidates: candidates ?? this.candidates,
       filteredCandidates: filteredCandidates ?? this.filteredCandidates,
       searchQuery: searchQuery ?? this.searchQuery,
+      jobId: jobId ?? this.jobId,
+      lockJobFilter: lockJobFilter ?? this.lockJobFilter,
+      roundTabs: roundTabs ?? this.roundTabs,
+      activeRoundId: activeRoundId ?? this.activeRoundId,
       selectedJob: selectedJob ?? this.selectedJob,
       selectedInterviewer: selectedInterviewer ?? this.selectedInterviewer,
       selectedStatus: selectedStatus ?? this.selectedStatus,
-      selectedDateRange:
-          updateDateRange ? selectedDateRange : (selectedDateRange ?? this.selectedDateRange),
+      selectedDateRange: updateDateRange
+          ? selectedDateRange
+          : (selectedDateRange ?? this.selectedDateRange),
       activeTab: activeTab ?? this.activeTab,
-      activeRound: activeRound ?? this.activeRound,
       selectedIds: selectedIds ?? this.selectedIds,
       errorMessage: errorMessage,
     );
   }
 
-  List<String> get jobOptions => [
-        kAllJobs,
-        ...candidates.map((c) => c.jobId).where((id) => id.isNotEmpty).toSet()
-      ];
+  List<String> get jobOptions {
+    if (lockJobFilter && jobId.isNotEmpty) {
+      return [jobId];
+    }
+    return [
+      kAllJobs,
+      ...candidates.map((c) => c.jobId).where((id) => id.isNotEmpty).toSet()
+    ];
+  }
 
   List<String> get interviewerOptions => [
         kAllInterviewers,
@@ -93,10 +114,7 @@ class InterviewSchedulingState extends Equatable {
 
   List<String> get statusOptions => [
         kAllStatus,
-        ...candidates
-            .map((c) => c.status)
-            .where((id) => id.isNotEmpty)
-            .toSet()
+        ...candidates.map((c) => c.status).where((id) => id.isNotEmpty).toSet()
       ];
 
   @override
@@ -105,14 +123,16 @@ class InterviewSchedulingState extends Equatable {
         candidates,
         filteredCandidates,
         searchQuery,
+        jobId,
+        lockJobFilter,
+        roundTabs,
+        activeRoundId,
         selectedJob,
         selectedInterviewer,
         selectedStatus,
         selectedDateRange,
         activeTab,
-        activeRound,
         selectedIds,
         errorMessage,
       ];
 }
-

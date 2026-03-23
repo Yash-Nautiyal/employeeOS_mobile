@@ -34,7 +34,7 @@ class ChatNavPinned extends StatelessWidget {
                   SvgPicture.asset(
                     'assets/icons/common/solid/ic-solar-pin-bold.svg',
                     width: 17,
-                    color: theme.colorScheme.tertiary,
+                    color: theme.colorScheme.onSurface,
                   ),
                   const SizedBox(
                     width: 5,
@@ -42,7 +42,7 @@ class ChatNavPinned extends StatelessWidget {
                   Text(
                     'Pinned Chats',
                     style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.colorScheme.tertiary),
+                        ?.copyWith(color: theme.colorScheme.onSurface),
                   ),
                 ],
               ),

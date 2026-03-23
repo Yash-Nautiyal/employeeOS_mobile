@@ -326,7 +326,7 @@ class _JobApplicationViewState extends State<JobApplicationView> {
                         ? (width / 280).floor().clamp(2, 4)
                         : (width / 320).floor().clamp(2, 3);
 
-                    final mainAxisExtent = _compactMode ? 70.0 : 260.0;
+                    final mainAxisExtent = _compactMode ? 70.0 : 266.0;
 
                     return GridView.builder(
                       controller: _scrollController,

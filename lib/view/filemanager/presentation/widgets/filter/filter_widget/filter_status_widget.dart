@@ -46,7 +46,7 @@ class FilterStatusWidget extends StatelessWidget {
                   'Types :',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.tertiary,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 ..._buildActiveFilterChips(filterState, controller),
@@ -130,7 +130,7 @@ class _FilterChip extends StatelessWidget {
             label,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.tertiary,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(width: 5),

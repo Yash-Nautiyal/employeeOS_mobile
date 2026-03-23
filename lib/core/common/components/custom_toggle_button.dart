@@ -123,7 +123,7 @@ class _CustomToggleButtonState extends State<CustomToggleButton>
                   widget.values[index],
                   style: widget.theme.textTheme.bodySmall?.copyWith(
                     color: _selectedIndex == index
-                        ? widget.theme.colorScheme.tertiary
+                        ? widget.theme.colorScheme.onSurface
                         : widget.theme.disabledColor,
                     fontWeight: FontWeight.bold,
                   ),

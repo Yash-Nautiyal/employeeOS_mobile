@@ -2,7 +2,122 @@ import 'package:flutter/material.dart';
 
 enum Presets { blue, green, purple, orange, red, darkBlue }
 
+class AppShadows {
+  AppShadows._();
+
+  /// Primary card shadow — top + bottom — adapts to brightness.
+  static List<BoxShadow> card(Brightness brightness) =>
+      brightness == Brightness.dark ? _darkCard : _lightCard;
+
+  /// Subtle shadow for chips, tags, and inline badges.
+  static List<BoxShadow> chip(Brightness brightness) =>
+      brightness == Brightness.dark ? _darkChip : _lightChip;
+
+  /// Stronger shadow for modals, bottom sheets, and popovers.
+  static List<BoxShadow> modal(Brightness brightness) =>
+      brightness == Brightness.dark ? _darkModal : _lightModal;
+
+  // ── Light mode ────────────────────────────────────────────────────────────
+
+  static const _lightCard = [
+    BoxShadow(
+      color: Color(0x0A000000),
+      blurRadius: 1,
+      spreadRadius: 0,
+      offset: Offset(0, -1),
+    ),
+    BoxShadow(
+      color: Color(0x1A000000),
+      blurRadius: 10,
+      spreadRadius: 0,
+      offset: Offset(0, 4),
+    ),
+    BoxShadow(
+      color: Color(0x0D000000),
+      blurRadius: 3,
+      spreadRadius: 0,
+      offset: Offset(0, 1),
+    ),
+  ];
+
+  static const _lightChip = [
+    BoxShadow(
+      color: Color(0x0A000000),
+      blurRadius: 2,
+      offset: Offset(0, 1),
+    ),
+  ];
+
+  static const _lightModal = [
+    BoxShadow(
+      color: Color(0x0A000000),
+      blurRadius: 2,
+      offset: Offset(0, -1),
+    ),
+    BoxShadow(
+      color: Color(0x29000000),
+      blurRadius: 24,
+      offset: Offset(0, 8),
+    ),
+    BoxShadow(
+      color: Color(0x1A000000),
+      blurRadius: 6,
+      offset: Offset(0, 3),
+    ),
+  ];
+
+  // ── Dark mode ─────────────────────────────────────────────────────────────
+
+  static const _darkCard = [
+    BoxShadow(
+      color: Color(0x0FFFFFFF),
+      blurRadius: 0,
+      spreadRadius: 0,
+      offset: Offset(0, -1),
+    ),
+    BoxShadow(
+      color: Color(0x59000000),
+      blurRadius: 16,
+      spreadRadius: 0,
+      offset: Offset(0, 6),
+    ),
+    BoxShadow(
+      color: Color(0x33000000),
+      blurRadius: 4,
+      spreadRadius: 0,
+      offset: Offset(0, 2),
+    ),
+  ];
+
+  static const _darkChip = [
+    BoxShadow(
+      color: Color(0x40000000),
+      blurRadius: 4,
+      offset: Offset(0, 2),
+    ),
+  ];
+
+  static const _darkModal = [
+    BoxShadow(
+      color: Color(0x14FFFFFF),
+      blurRadius: 0,
+      offset: Offset(0, -1),
+    ),
+    BoxShadow(
+      color: Color(0x73000000),
+      blurRadius: 32,
+      offset: Offset(0, 12),
+    ),
+    BoxShadow(
+      color: Color(0x40000000),
+      blurRadius: 8,
+      offset: Offset(0, 4),
+    ),
+  ];
+}
+
 class AppPallete {
+  AppPallete._();
   // Primary Colors
   static const blue = {
     "Lighter": infoLighter,
@@ -112,6 +227,7 @@ class AppPallete {
   static const Color white = Color(0xFFFFFFFF);
 
   static const Color containerColor = Color(0xFF28323D);
+  static const Color containerDark = Color(0xFF171E25);
 
   static const Map<Presets, dynamic> primaryPresets = {
     Presets.blue: blue,

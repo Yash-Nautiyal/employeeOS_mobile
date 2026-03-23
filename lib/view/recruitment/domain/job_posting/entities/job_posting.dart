@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/pipeline_stage.dart';
 
 /// Job posting entity. [description] is stored as JSON (Quill Delta)
 /// from flutter_quill — use [Document.fromJson(jsonDecode(description))]
@@ -21,6 +21,7 @@ class JobPosting extends Equatable {
   final String postedByEmail;
   final DateTime? createdAt;
   final List<PipelineStage>? pipeline;
+  final bool isActive;
 
   const JobPosting({
     required this.id,
@@ -37,6 +38,7 @@ class JobPosting extends Equatable {
     required this.postedByEmail,
     this.createdAt,
     this.pipeline,
+    this.isActive = true,
   });
 
   @override
@@ -55,5 +57,6 @@ class JobPosting extends Equatable {
         postedByEmail,
         createdAt,
         pipeline,
+        isActive,
       ];
 }

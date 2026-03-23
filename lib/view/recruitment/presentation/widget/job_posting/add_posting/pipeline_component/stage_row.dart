@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/pipeline_stage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -174,7 +174,7 @@ class _StageRowState extends State<StageRow>
                                     stage.name,
                                     style: tt.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: widget.theme.colorScheme.tertiary,
+                                      color: widget.theme.colorScheme.onSurface,
                                     ),
                                   ),
                                   const SizedBox(height: 2),

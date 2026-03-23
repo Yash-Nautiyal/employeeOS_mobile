@@ -180,7 +180,7 @@ class _MenuItemState extends State<MenuItem>
                                         ?.copyWith(
                                       fontSize: 14,
                                       color: isSubmenuSelected
-                                          ? widget.theme.colorScheme.tertiary
+                                          ? widget.theme.colorScheme.onSurface
                                           : widget.theme.disabledColor,
                                     ),
                                   ),

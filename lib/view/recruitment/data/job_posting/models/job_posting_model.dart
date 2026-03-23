@@ -1,5 +1,5 @@
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_posting.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/pipeline_stage.dart';
 
 class JobPostingModel extends JobPosting {
   const JobPostingModel({
@@ -17,6 +17,7 @@ class JobPostingModel extends JobPosting {
     required super.postedByEmail,
     super.createdAt,
     super.pipeline,
+    super.isActive,
   });
 
   factory JobPostingModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +39,7 @@ class JobPostingModel extends JobPosting {
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'] as String)
           : null,
+      isActive: json['is_active'] as bool? ?? true,
       pipeline: (json['pipeline'] as List<dynamic>?)?.map((e) {
         final map = e as Map<String, dynamic>;
         final typeName = map['type'] as String? ?? 'statusOnly';
@@ -69,6 +71,7 @@ class JobPostingModel extends JobPosting {
       'posted_by_name': postedByName,
       'posted_by_email': postedByEmail,
       'created_at': createdAt?.toIso8601String(),
+      'is_active': isActive,
       'pipeline': pipeline
           ?.map((s) => {
                 'id': s.id,
@@ -77,5 +80,41 @@ class JobPostingModel extends JobPosting {
               })
           .toList(),
     };
+  }
+
+  JobPostingModel copyWith({
+    String? id,
+    String? title,
+    String? department,
+    String? description,
+    String? location,
+    int? positions,
+    DateTime? lastDateToApply,
+    String? joiningType,
+    bool? isInternship,
+    String? ctcRange,
+    String? postedByName,
+    String? postedByEmail,
+    DateTime? createdAt,
+    List<PipelineStage>? pipeline,
+    bool? isActive,
+  }) {
+    return JobPostingModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      department: department ?? this.department,
+      description: description ?? this.description,
+      location: location ?? this.location,
+      positions: positions ?? this.positions,
+      lastDateToApply: lastDateToApply ?? this.lastDateToApply,
+      joiningType: joiningType ?? this.joiningType,
+      isInternship: isInternship ?? this.isInternship,
+      ctcRange: ctcRange ?? this.ctcRange,
+      postedByName: postedByName ?? this.postedByName,
+      postedByEmail: postedByEmail ?? this.postedByEmail,
+      createdAt: createdAt ?? this.createdAt,
+      pipeline: pipeline ?? this.pipeline,
+      isActive: isActive ?? this.isActive,
+    );
   }
 }

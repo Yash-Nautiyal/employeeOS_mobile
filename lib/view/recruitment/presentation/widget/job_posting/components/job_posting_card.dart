@@ -1,6 +1,6 @@
 import 'package:employeeos/core/common/actions/date_time_actions.dart';
 import 'package:employeeos/core/index.dart' show AppPallete, CustomDivider;
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_posting.dart';
 import 'package:employeeos/view/recruitment/index.dart'
     show JobPostingCardHeader, JobPostingCardFooter;
 import 'package:flutter/material.dart';
@@ -15,6 +15,9 @@ class JobPostingCard extends StatefulWidget {
   /// When false, Edit and Delete are hidden (Phase 1: HR only for own jobs, Admin for any).
   final bool canEditAndDelete;
 
+  /// Persist active/closed toggle via [JobPostingMockDatasource.setJobActive].
+  final Future<void> Function(String jobId, bool isActive)? onJobActiveChanged;
+
   const JobPostingCard({
     super.key,
     required this.theme,
@@ -22,6 +25,7 @@ class JobPostingCard extends StatefulWidget {
     required this.onEditTap,
     this.job,
     this.canEditAndDelete = true,
+    this.onJobActiveChanged,
   });
 
   @override
@@ -61,6 +65,14 @@ class _JobPostingCardState extends State<JobPostingCard>
               onViewTap: widget.onViewTap,
               onEditTap: widget.onEditTap,
               canEditAndDelete: widget.canEditAndDelete,
+              isActive: widget.job?.isActive ?? true,
+              onActiveChanged: widget.job != null &&
+                      widget.canEditAndDelete &&
+                      widget.onJobActiveChanged != null
+                  ? (value) {
+                      widget.onJobActiveChanged!(widget.job!.id, value);
+                    }
+                  : null,
             ),
           ),
           Text(

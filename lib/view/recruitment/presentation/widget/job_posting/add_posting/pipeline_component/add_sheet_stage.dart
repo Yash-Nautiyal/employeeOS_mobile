@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../../domain/entities/pipeline_stage.dart';
+import '../../../../../domain/job_posting/entities/pipeline_stage.dart';
 import 'sheet_stage_title.dart';
 
 class AddStageSheet extends StatelessWidget {

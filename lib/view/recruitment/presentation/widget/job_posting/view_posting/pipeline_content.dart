@@ -1,3 +1,4 @@
+import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../domain/index.dart' show PipelineStage;
@@ -23,14 +24,9 @@ class PipelineContent extends StatelessWidget {
     return SingleChildScrollView(
       child: Container(
         decoration: BoxDecoration(
-            color: theme.brightness == Brightness.dark
-                ? const Color.fromARGB(255, 23, 30, 37)
-                : theme.cardColor,
+            color: theme.colorScheme.surfaceDim,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                  color: theme.shadowColor, blurRadius: 5, spreadRadius: 1),
-            ]),
+            boxShadow: AppShadows.card(theme.brightness)),
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

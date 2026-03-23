@@ -17,7 +17,7 @@ class SaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomTextButton(
-      backgroundColor: theme.colorScheme.tertiary,
+      backgroundColor: theme.colorScheme.onSurface,
       onClick: onClick,
       child: Row(
         mainAxisSize: MainAxisSize.min,

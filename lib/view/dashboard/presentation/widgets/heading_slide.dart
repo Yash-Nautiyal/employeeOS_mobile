@@ -85,6 +85,7 @@ class _HeadingSlideState extends State<HeadingSlide> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
@@ -254,7 +255,7 @@ class FeaturedCard extends StatelessWidget {
                   Text(
                     'FEATURED APP',
                     style: theme.textTheme.labelLarge?.copyWith(
-                      color: theme.colorScheme.primary,
+                      color: theme.colorScheme.primaryContainer,
                     ),
                   ),
                   const SizedBox(height: 12),

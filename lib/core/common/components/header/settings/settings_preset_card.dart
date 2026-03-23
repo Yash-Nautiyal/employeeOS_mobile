@@ -92,7 +92,7 @@ class SettingsPresetCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: theme.colorScheme.tertiary,
+              color: theme.colorScheme.onSurface,
             ),
             child: Text(
               "Presets",

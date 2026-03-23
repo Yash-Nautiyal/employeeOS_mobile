@@ -378,7 +378,7 @@ class _KanbanViewState extends State<KanbanView> {
                           CustomTextButton(
                             onClick: () =>
                                 _bloc.add(const KanbanLoadRequested()),
-                            backgroundColor: theme.colorScheme.tertiary,
+                            backgroundColor: theme.colorScheme.onSurface,
                             padding: 1,
                             child: Text('Retry',
                                 style: theme.textTheme.labelLarge?.copyWith(

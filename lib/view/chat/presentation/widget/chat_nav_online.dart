@@ -67,7 +67,7 @@ class ChatNavOnline extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.tertiary,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                   )

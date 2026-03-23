@@ -107,7 +107,7 @@ class QuickDateOptions extends StatelessWidget {
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: isSelected
                               ? theme.colorScheme.primary
-                              : theme.colorScheme.tertiary,
+                              : theme.colorScheme.onSurface,
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),

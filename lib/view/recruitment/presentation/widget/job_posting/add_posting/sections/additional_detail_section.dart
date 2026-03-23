@@ -146,7 +146,7 @@ class AdditionalDetailSection extends StatelessWidget {
             controller: postedByNameController,
             readOnly: true,
             style: theme.textTheme.bodyMedium
-                ?.copyWith(fontSize: 14, color: theme.colorScheme.tertiary),
+                ?.copyWith(fontSize: 14, color: theme.colorScheme.onSurface),
             decoration: InputDecoration(
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
@@ -169,7 +169,7 @@ class AdditionalDetailSection extends StatelessWidget {
             controller: postedByEmailController,
             readOnly: true,
             style: theme.textTheme.bodyMedium
-                ?.copyWith(fontSize: 14, color: theme.colorScheme.tertiary),
+                ?.copyWith(fontSize: 14, color: theme.colorScheme.onSurface),
             decoration: InputDecoration(
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 15, horizontal: 12),

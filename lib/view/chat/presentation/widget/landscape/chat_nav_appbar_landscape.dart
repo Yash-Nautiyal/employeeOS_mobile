@@ -98,7 +98,7 @@ class ChatNavAppbarLandscape extends StatelessWidget {
                     },
                     child: SvgPicture.asset(
                       'assets/icons/common/solid/ic-eva_more-vertical-fill.svg',
-                      color: theme.colorScheme.tertiary,
+                      color: theme.colorScheme.onSurface,
                       width: 20,
                     ),
                   ),
@@ -119,7 +119,7 @@ class ChatNavAppbarLandscape extends StatelessWidget {
                 curve: Curves.easeInOut,
                 child: SvgPicture.asset(
                   'assets/icons/arrow/ic-eva_arrow-ios-forward-fill.svg',
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),

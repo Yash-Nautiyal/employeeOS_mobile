@@ -27,13 +27,13 @@ class ResponsivePopupItem extends StatelessWidget {
           if (icon != null) ...[
             Icon(icon,
                 size: 18,
-                color: color ?? Theme.of(context).colorScheme.tertiary),
+                color: color ?? Theme.of(context).colorScheme.onSurface),
             const SizedBox(width: 10),
           ],
           if (svgIcon != null) ...[
             SvgPicture.asset(svgIcon!,
                 width: 20,
-                color: color ?? Theme.of(context).colorScheme.tertiary),
+                color: color ?? Theme.of(context).colorScheme.onSurface),
             const SizedBox(width: 10),
           ],
           Expanded(

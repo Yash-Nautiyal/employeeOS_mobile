@@ -1,6 +1,11 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:employeeos/core/index.dart'
-    show AppPallete, CustomDivider, CustomTextButton, CustomTextfield;
+    show
+        AppPallete,
+        AppShadows,
+        CustomDivider,
+        CustomTextButton,
+        CustomTextfield;
 import 'package:employeeos/view/kanban/domain/index.dart'
     show KanbanAssignee, KanbanAttachment, KanbanGroupItem, KanbanUploadFile;
 import 'package:employeeos/view/kanban/presentation/index.dart';
@@ -159,7 +164,7 @@ class OverviewSideMenu extends StatelessWidget {
                     task.reporter?.name ?? 'Unknown',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.tertiary,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -207,7 +212,7 @@ class OverviewSideMenu extends StatelessWidget {
                                 assignee.name,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.tertiary),
+                                    color: theme.colorScheme.onSurface),
                               )
                             ],
                           ),
@@ -218,9 +223,9 @@ class OverviewSideMenu extends StatelessWidget {
                           icon: Container(
                             padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              color:
-                                  theme.colorScheme.surfaceDim.withAlpha(100),
+                              color: theme.colorScheme.surfaceDim,
                               borderRadius: BorderRadius.circular(10),
+                              boxShadow: AppShadows.card(theme.brightness),
                             ),
                             child: Icon(Icons.add,
                                 color: theme.dividerColor, size: 18),
@@ -257,7 +262,7 @@ class OverviewSideMenu extends StatelessWidget {
                           Text(
                             _dueDateLabel(dueStart, dueEnd),
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.tertiary,
+                              color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -265,7 +270,7 @@ class OverviewSideMenu extends StatelessWidget {
                           Icon(
                             Icons.calendar_month_rounded,
                             size: 16,
-                            color: theme.colorScheme.tertiary,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ],
                       ),
@@ -291,7 +296,7 @@ class OverviewSideMenu extends StatelessWidget {
                         return ChoiceChip(
                           side: BorderSide(
                               color: currentPriority == level
-                                  ? theme.colorScheme.tertiary
+                                  ? theme.colorScheme.onSurface
                                   : theme.dividerColor,
                               width: currentPriority == level ? 2 : 1),
                           backgroundColor: Colors.transparent,
@@ -321,7 +326,7 @@ class OverviewSideMenu extends StatelessWidget {
                                 level,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.tertiary),
+                                    color: theme.colorScheme.onSurface),
                               ),
                             ],
                           ),
@@ -359,7 +364,7 @@ class OverviewSideMenu extends StatelessWidget {
                       ? Align(
                           alignment: Alignment.centerRight,
                           child: CustomTextButton(
-                              backgroundColor: theme.colorScheme.tertiary,
+                              backgroundColor: theme.colorScheme.onSurface,
                               padding: 0,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -445,7 +450,7 @@ class OverviewSideMenu extends StatelessWidget {
                       Positioned.fill(
                         child: IgnorePointer(
                           child: _MovingBorderIndicator(
-                            color: theme.colorScheme.tertiary,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                       ),

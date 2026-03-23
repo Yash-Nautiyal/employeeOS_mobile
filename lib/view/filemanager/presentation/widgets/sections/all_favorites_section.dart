@@ -42,7 +42,7 @@ class AllFavoritesSection extends StatelessWidget {
                   'assets/icons/arrow/ic-eva_arrow-ios-back-fill.svg',
                   width: 24,
                   height: 24,
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                 ),
                 tooltip: 'Back',
                 style: IconButton.styleFrom(
@@ -54,7 +54,7 @@ class AllFavoritesSection extends StatelessWidget {
                 'All Favorites',
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],

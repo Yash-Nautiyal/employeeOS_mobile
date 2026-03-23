@@ -84,7 +84,7 @@ class SettingsFontCard extends StatelessWidget {
                             entry.value,
                             style: theme.textTheme.labelLarge?.copyWith(
                               color: isSelected
-                                  ? theme.colorScheme.tertiary
+                                  ? theme.colorScheme.onSurface
                                   : theme.dividerColor,
                             ),
                           ),
@@ -104,7 +104,7 @@ class SettingsFontCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: theme.colorScheme.tertiary,
+              color: theme.colorScheme.onSurface,
             ),
             child: Text(
               "Font",

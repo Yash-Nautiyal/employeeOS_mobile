@@ -301,7 +301,7 @@ class _TableDataRowState extends State<TableDataRow> {
                                 );
                               }
                             },
-                            color: theme.colorScheme.tertiary,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                         if ((widget.item as FileItem).file.role !=
@@ -313,7 +313,7 @@ class _TableDataRowState extends State<TableDataRow> {
                               title: 'Share',
                               svgIcon:
                                   'assets/icons/common/solid/ic-solar_share-bold.svg',
-                              color: theme.colorScheme.tertiary,
+                              color: theme.colorScheme.onSurface,
                               onTap: () {
                                 _popupController.hide();
                                 final fileItem = widget.item as FileItem;
@@ -338,7 +338,7 @@ class _TableDataRowState extends State<TableDataRow> {
                               title: 'Remove',
                               svgIcon:
                                   'assets/icons/common/solid/ic-lets-icons-out.svg',
-                              color: theme.colorScheme.tertiary,
+                              color: theme.colorScheme.onSurface,
                               onTap: () {
                                 _popupController.hide();
                                 context.read<FilemanagerBloc>().add(

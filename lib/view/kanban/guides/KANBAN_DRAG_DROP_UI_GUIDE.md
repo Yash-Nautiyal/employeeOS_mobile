@@ -168,7 +168,7 @@ File: `drop_slot.dart`
 
 - `height: show ? 14 : 0` -> visible slot thickness
 - animation duration `120ms` -> slot open/close speed
-- active color `tertiary.withOpacity(0.10)` -> hover highlight strength
+- active color `onSurface.withOpacity(0.10)` -> hover highlight strength
 
 ### D) Before/after split line of a card
 

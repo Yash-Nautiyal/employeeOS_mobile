@@ -114,7 +114,7 @@ class _FileTypeFilterContentState extends State<_FileTypeFilterContent> {
                 child: Text(
                   'Clear',
                   style: widget.theme.textTheme.bodyMedium?.copyWith(
-                    color: widget.theme.colorScheme.tertiary,
+                    color: widget.theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -122,7 +122,7 @@ class _FileTypeFilterContentState extends State<_FileTypeFilterContent> {
               const SizedBox(width: 10),
               CustomTextButton(
                 onClick: _applySelection,
-                backgroundColor: widget.theme.colorScheme.tertiary,
+                backgroundColor: widget.theme.colorScheme.onSurface,
                 child: Text(
                   'Apply',
                   style: widget.theme.textTheme.bodyMedium?.copyWith(
@@ -252,14 +252,14 @@ class _FileTypeFilterTrigger extends StatelessWidget {
                 Text(
                   'All types',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.tertiary,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(width: 10),
                 Icon(
                   Icons.arrow_drop_down_rounded,
-                  color: theme.colorScheme.tertiary,
+                  color: theme.colorScheme.onSurface,
                 ),
               ],
             )
@@ -273,7 +273,7 @@ class _FileTypeFilterTrigger extends StatelessWidget {
     String display = '';
     int count = 0;
     final textStyle = theme.textTheme.bodyMedium?.copyWith(
-      color: theme.colorScheme.tertiary,
+      color: theme.colorScheme.onSurface,
       fontWeight: FontWeight.w600,
     );
 
@@ -310,7 +310,7 @@ class _FileTypeFilterTrigger extends StatelessWidget {
         ),
         Icon(
           Icons.arrow_drop_down_rounded,
-          color: theme.colorScheme.tertiary,
+          color: theme.colorScheme.onSurface,
         ),
       ],
     );

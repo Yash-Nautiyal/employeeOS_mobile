@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/pipeline_stage.dart';
 
 /// Mock department preset pipelines and stage pool (no backend).
 /// When HR selects a department, the preset is loaded; they can then add/delete/reorder.

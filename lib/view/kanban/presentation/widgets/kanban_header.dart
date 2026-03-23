@@ -31,7 +31,7 @@ class KanbanHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceDim,
+              color: theme.colorScheme.surfaceContainer,
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -92,10 +92,10 @@ class KanbanHeader extends StatelessWidget {
                 ],
               ),
             ),
-            child: Icon(Icons.more_horiz, color: theme.colorScheme.tertiary),
+            child: Icon(Icons.more_horiz, color: theme.colorScheme.onSurface),
           ),
           // PopupMenuButton<String>(
-          //   icon: Icon(Icons.more_horiz, color: theme.colorScheme.tertiary),
+          //   icon: Icon(Icons.more_horiz, color: theme.colorScheme.onSurface),
           //   onSelected: (val) {
           //     switch (val) {
           //       case 'edit':

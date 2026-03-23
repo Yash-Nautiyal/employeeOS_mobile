@@ -53,7 +53,7 @@ class DownloadBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomTextButton(
       onClick: onTap,
-      backgroundColor: theme.colorScheme.tertiary,
+      backgroundColor: theme.colorScheme.onSurface,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

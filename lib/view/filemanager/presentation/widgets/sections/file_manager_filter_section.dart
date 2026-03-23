@@ -128,7 +128,7 @@ class _FileManagerFilterSectionState extends State<FileManagerFilterSection> {
                         text: widget.filteredResultsCount.toString(),
                         style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.tertiary),
+                            color: theme.colorScheme.onSurface),
                       ),
                       TextSpan(
                         text: widget.filteredResultsCount == 1

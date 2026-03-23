@@ -26,7 +26,7 @@ class ScheduleButton extends StatelessWidget {
       padding: isWideScreen ? 4 : 0,
       onClick: isEnabled ? () => onPressed() : () {},
       backgroundColor:
-          isEnabled ? theme.colorScheme.tertiary : theme.colorScheme.surface,
+          isEnabled ? theme.colorScheme.onSurface : theme.colorScheme.surface,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

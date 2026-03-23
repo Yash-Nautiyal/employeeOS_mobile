@@ -105,7 +105,7 @@ class _SharedUsersList extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.tertiary),
+                          color: theme.colorScheme.onSurface),
                     ),
                     const SizedBox(height: 2),
                     Text(

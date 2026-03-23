@@ -68,7 +68,7 @@ class AttachmentOwnerAvatar extends StatelessWidget {
               initials,
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: theme.colorScheme.tertiary,
+                color: theme.colorScheme.onSurface,
               ),
             )
           : null,

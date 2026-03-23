@@ -122,14 +122,15 @@ class CustomPopupMenuItem extends StatelessWidget {
     if (isDestructive) {
       return AppPallete.errorMain;
     }
-    return theme.colorScheme.tertiary;
+    return theme.colorScheme.onSurface;
   }
 
   TextStyle _getTextStyle(ThemeData theme) {
     return theme.textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w600,
-          color:
-              isDestructive ? AppPallete.errorMain : theme.colorScheme.tertiary,
+          color: isDestructive
+              ? AppPallete.errorMain
+              : theme.colorScheme.onSurface,
         ) ??
         const TextStyle();
   }

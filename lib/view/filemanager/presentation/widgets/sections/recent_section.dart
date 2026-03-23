@@ -185,7 +185,7 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                             );
                           }
                         },
-                        color: widget.theme.colorScheme.tertiary,
+                        color: widget.theme.colorScheme.onSurface,
                       ),
                     ),
                     if (widget.file.role != FileRole.viewer)
@@ -196,7 +196,7 @@ class _RecentSectionRowState extends State<_RecentSectionRow> {
                           title: 'Share',
                           svgIcon:
                               'assets/icons/common/solid/ic-solar_share-bold.svg',
-                          color: widget.theme.colorScheme.tertiary,
+                          color: widget.theme.colorScheme.onSurface,
                           onTap: () {
                             _popupController.hide();
                             ShareFileDialogRunner.show(

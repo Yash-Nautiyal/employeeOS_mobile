@@ -68,7 +68,7 @@ class ShareFileDialog extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.tertiary,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -106,7 +106,7 @@ class ShareFileDialog extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.tertiary,
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                 ),
                                 Text(
@@ -154,7 +154,7 @@ class ShareFileDialog extends StatelessWidget {
                 const SizedBox(width: 8),
                 CustomTextButton(
                   padding: 0,
-                  backgroundColor: theme.colorScheme.tertiary,
+                  backgroundColor: theme.colorScheme.onSurface,
                   onClick: () => selectedUser == null ? null : onShare(),
                   child: Text('Share',
                       style: theme.textTheme.labelLarge

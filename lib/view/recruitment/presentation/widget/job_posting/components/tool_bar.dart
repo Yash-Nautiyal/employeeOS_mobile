@@ -59,7 +59,7 @@ class ToolBar extends StatelessWidget {
               ),
               iconButtonSelectedData: IconButtonData(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                color: theme.colorScheme.tertiary,
+                color: theme.colorScheme.onSurface,
                 style: ButtonStyle(
                   shape: WidgetStateProperty.all(const CircleBorder()),
                 ),
