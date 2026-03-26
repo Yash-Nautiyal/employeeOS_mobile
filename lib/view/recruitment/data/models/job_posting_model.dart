@@ -15,6 +15,7 @@ class JobPostingModel extends JobPosting {
     required super.postedByName,
     required super.postedByEmail,
     super.createdAt,
+    super.isActive,
   });
 
   factory JobPostingModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +37,7 @@ class JobPostingModel extends JobPosting {
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'] as String)
           : null,
+      isActive: json['is_active'] as bool? ?? true,
     );
   }
 
@@ -54,6 +56,41 @@ class JobPostingModel extends JobPosting {
       'posted_by_name': postedByName,
       'posted_by_email': postedByEmail,
       'created_at': createdAt?.toIso8601String(),
+      'is_active': isActive,
     };
+  }
+
+  JobPostingModel copyWith({
+    String? id,
+    String? title,
+    String? department,
+    String? description,
+    String? location,
+    int? positions,
+    DateTime? lastDateToApply,
+    String? joiningType,
+    bool? isInternship,
+    String? ctcRange,
+    String? postedByName,
+    String? postedByEmail,
+    DateTime? createdAt,
+    bool? isActive,
+  }) {
+    return JobPostingModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      department: department ?? this.department,
+      description: description ?? this.description,
+      location: location ?? this.location,
+      positions: positions ?? this.positions,
+      lastDateToApply: lastDateToApply ?? this.lastDateToApply,
+      joiningType: joiningType ?? this.joiningType,
+      isInternship: isInternship ?? this.isInternship,
+      ctcRange: ctcRange ?? this.ctcRange,
+      postedByName: postedByName ?? this.postedByName,
+      postedByEmail: postedByEmail ?? this.postedByEmail,
+      createdAt: createdAt ?? this.createdAt,
+      isActive: isActive ?? this.isActive,
+    );
   }
 }

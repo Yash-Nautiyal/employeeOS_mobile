@@ -19,6 +19,7 @@ class JobPosting extends Equatable {
   final String postedByName;
   final String postedByEmail;
   final DateTime? createdAt;
+  final bool isActive;
 
   const JobPosting({
     required this.id,
@@ -34,6 +35,7 @@ class JobPosting extends Equatable {
     required this.postedByName,
     required this.postedByEmail,
     this.createdAt,
+    this.isActive = true,
   });
 
   @override
@@ -51,6 +53,6 @@ class JobPosting extends Equatable {
         postedByName,
         postedByEmail,
         createdAt,
+        isActive,
       ];
 }
-

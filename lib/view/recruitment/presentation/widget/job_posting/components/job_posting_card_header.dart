@@ -1,7 +1,13 @@
 import 'package:employeeos/core/common/components/popup/popup.dart';
-import 'package:employeeos/core/common/components/popup/responsive_popup.dart';
-import 'package:employeeos/core/common/components/popup/responsive_popup_item.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/core/index.dart'
+    show
+        AppPallete,
+        EditPopupItem,
+        ViewPopupItem,
+        ResponsivePopupItem,
+        DestructivePopupItem,
+        PopupPreferredPosition,
+        ResponsivePopupController;
 import 'package:flutter/material.dart';
 
 class JobPostingCardHeader extends StatefulWidget {
@@ -9,6 +15,8 @@ class JobPostingCardHeader extends StatefulWidget {
   final VoidCallback? onViewTap;
   final VoidCallback? onEditTap;
   final bool canEditAndDelete;
+  final bool isActive;
+  final ValueChanged<bool>? onActiveChanged;
 
   const JobPostingCardHeader({
     super.key,
@@ -16,6 +24,8 @@ class JobPostingCardHeader extends StatefulWidget {
     this.onViewTap,
     this.onEditTap,
     this.canEditAndDelete = true, //HR only for own jobs, Admin for any.
+    this.isActive = true,
+    this.onActiveChanged,
   });
 
   @override
@@ -36,6 +46,7 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = widget.theme.brightness;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -46,20 +57,31 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: AppPallete.successMain.withOpacity(.2),
+            color: widget.isActive
+                ? AppPallete.successMain.withValues(alpha: .2)
+                : widget.theme.colorScheme.errorContainer.withValues(
+                    alpha: brightness == Brightness.dark ? .15 : .3),
           ),
           child: Text(
-            'Active',
+            widget.isActive ? 'Active' : 'InActive',
             style: widget.theme.textTheme.labelLarge?.copyWith(
-              color: AppPallete.successMain,
+              color: widget.isActive
+                  ? AppPallete.successMain
+                  : brightness == Brightness.dark
+                      ? AppPallete.errorMain
+                      : AppPallete.errorDarker,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
         Transform.scale(
           scale: .65,
           child: Switch(
-            value: false,
-            onChanged: (value) {},
+            value: widget.isActive,
+            onChanged: widget.canEditAndDelete && widget.onActiveChanged != null
+                ? widget.onActiveChanged
+                : null,
+            activeTrackColor: widget.theme.colorScheme.onSurface,
           ),
         ),
         const Spacer(),
@@ -68,7 +90,11 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
             layerLink: _layerLink,
             popupController: _popupController,
             preferredPosition: PopupPreferredPosition.left,
-            arrowOffset: 0.2,
+            arrowOffset: widget.canEditAndDelete ? 0.2 : 0.5,
+            manualOffset: const Offset(10, 0),
+            arrowColor: widget.theme.brightness == Brightness.dark
+                ? AppPallete.darkBackgroundGradient.colors[1]
+                : AppPallete.lightBackgroundGradient.colors[1],
             icon: const Icon(Icons.more_vert_rounded),
             items: [
               Padding(
@@ -93,7 +119,7 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
                 padding: const EdgeInsets.symmetric(horizontal: 5.0)
                     .copyWith(top: 10),
                 child: ResponsivePopupItem(
-                  title: 'Copy Link',
+                  title: 'Close Job',
                   svgIcon: 'assets/icons/common/solid/ic-solar-lock-bold.svg',
                   onTap: () {},
                   color: AppPallete.warningMain,

@@ -13,6 +13,7 @@ class JobPostingCard extends StatefulWidget {
 
   /// When false, Edit and Delete are hidden (Phase 1: HR only for own jobs, Admin for any).
   final bool canEditAndDelete;
+  final Future<void> Function(String jobId, bool isActive)? onJobActiveChanged;
 
   const JobPostingCard({
     super.key,
@@ -21,6 +22,7 @@ class JobPostingCard extends StatefulWidget {
     required this.onEditTap,
     this.job,
     this.canEditAndDelete = true,
+    this.onJobActiveChanged,
   });
 
   @override
@@ -60,6 +62,14 @@ class _JobPostingCardState extends State<JobPostingCard>
               onViewTap: widget.onViewTap,
               onEditTap: widget.onEditTap,
               canEditAndDelete: widget.canEditAndDelete,
+              isActive: widget.job?.isActive ?? true,
+              onActiveChanged: widget.job != null &&
+                      widget.canEditAndDelete &&
+                      widget.onJobActiveChanged != null
+                  ? (value) {
+                      widget.onJobActiveChanged!(widget.job!.id, value);
+                    }
+                  : null,
             ),
           ),
           Text(
