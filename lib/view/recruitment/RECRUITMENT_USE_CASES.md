@@ -75,29 +75,9 @@ These are the **intended** recruitment behaviours we discussed; not all are impl
 - **HR:** Create / edit / delete **own** jobs; list, filter, import applications; shortlist/reject (pending); full recruitment (all stage tabs); schedule & update interviews; upcoming interviews on dashboard.
 - **Admin:** View / edit / delete **any** job; all applications; full recruitment; plus ★ Department configuration, ★ Stage pool management, ★ Preset pipeline definition.
 
-### 3.2 Stage action types (pipeline building blocks)
-
-- **STATUS_ONLY:** HR advances/rejects; no scheduling or candidate action (e.g. shortlist).
-- **INTERVIEW:** HR schedules (interviewer, date); optional Google Calendar; candidate passive.
-- **SUBMISSION:** Candidate submits (doc/task/form) via magic-link portal; HR sees and can advance/reject.
-- **ASSESSMENT:** Reserved for future (e.g. structured tests).
-
-### 3.3 Department preset pipelines
-
-- Admin defines **per-department** pipelines (e.g. Engineering: Shortlist → Telephone → Task Submit → Technical → Onboarding).
-- When HR creates a job under a department, that **preset is copied** into the job; HR can then customize (delete/reorder/insert from stage pool). The job’s pipeline is **independent** of the department preset (not live-linked).
-
-### 3.4 Candidate application state machine
-
-- **Happy path:** PUBLIC APPLY → PENDING → SHORTLISTED → STAGE N (dynamic) → HIRED.
-- **Per-stage outcomes:**
-  - **INTERVIEW:** shortlisted → advance; rejected → terminal; standby → hold.
-  - **SUBMISSION:** candidate submits → HR approves → advance; HR rejects → terminal; not submitted → stays.
-  - **STATUS_ONLY:** advance or reject (terminal).
-
 ### 3.5 Key data flows (conceptual)
 
-- **Job creation:** HR selects department → preset pipeline fetched → HR customizes → submit → insert `jobs` + `job_pipeline_stages` (pipeline independent of preset).
+- **Job creation:** HR selects (or creates) a department → submit → insert `jobs`. Recruitment stages are constant (see `interview_enums.dart`).
 - **Submission stage:** Application reaches submission stage → magic link to candidate → candidate submits → insert `stage_submissions` → HR sees and advances/rejects.
 - **Interview scheduling:** Candidate in “Eligible Candidates” for interview stage → HR schedules (date, time, interviewer) → optional Google Cal → insert `interviews` → update `application.current_stage_id` → after interview HR advances/rejects.
 
@@ -110,7 +90,6 @@ These are the **intended** recruitment behaviours we discussed; not all are impl
   - Layout: redirect Employee off recruitment tabs to User.
 - **Job Posting list**
   - Add Posting: HR and Admin.
-  - Add Department: Admin only.
   - Per-card Edit/Delete: Admin for any job; HR for own jobs (by `postedByEmail == profile.email`).
 - **Current user source**
   - Profile (and role) from **AuthBloc** (`state.currentProfile`), loaded from `user_info` + auth metadata when the user signs in or on app start.

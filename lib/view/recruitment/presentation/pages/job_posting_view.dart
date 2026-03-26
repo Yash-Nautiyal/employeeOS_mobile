@@ -1,13 +1,10 @@
 import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
-import 'package:employeeos/core/common/components/popup/popup.dart';
-import 'package:employeeos/core/common/components/popup/responsive_popup.dart';
-import 'package:employeeos/core/common/components/popup/responsive_popup_item.dart';
+import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_datasource.dart';
 import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
 import 'package:employeeos/view/recruitment/index.dart' show JobPostingCard;
 import 'package:employeeos/view/recruitment/presentation/pages/job_posting_section.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/add_department_page.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_job_posting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,10 +19,7 @@ class JobPostingView extends StatefulWidget {
 
 class _JobPostingViewState extends State<JobPostingView> {
   final scrollController = ScrollController();
-  final GlobalKey _popupAnchorKey = GlobalKey();
-  final LayerLink _layerLink = LayerLink();
-  final ResponsivePopupController _popupController =
-      ResponsivePopupController();
+
   final _mockDatasource = JobPostingMockDatasource.instance;
   late Future<List<JobPostingModel>> _jobsFuture;
 
@@ -43,7 +37,6 @@ class _JobPostingViewState extends State<JobPostingView> {
 
   @override
   void dispose() {
-    _popupController.dispose();
     super.dispose();
   }
 
@@ -52,7 +45,6 @@ class _JobPostingViewState extends State<JobPostingView> {
     final theme = Theme.of(context);
     final profile = context.watch<AuthBloc>().state.currentProfile;
     final canManageJobs = profile?.canManageOwnJobs ?? false;
-    final canManageDepartment = profile?.canManageGlobalConfig ?? false;
 
     return SingleChildScrollView(
       controller: scrollController,
@@ -61,73 +53,58 @@ class _JobPostingViewState extends State<JobPostingView> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.only(right: 16.0),
-            height: 70,
-            child: Row(
-              children: [
-                Flexible(
-                  child: CustomBreadCrumbs(
-                    theme: theme,
-                    heading: 'Job Posting',
-                    routes: const ['Dashboard', 'Job', 'Posting'],
+          IntrinsicHeight(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Row(
+                children: [
+                  Flexible(
+                    child: CustomBreadCrumbs(
+                      theme: theme,
+                      heading: 'Job Posting',
+                      routes: const ['Dashboard', 'Job', 'Posting'],
+                    ),
                   ),
-                ),
-                if (canManageJobs)
-                  Popup(
-                      popupAnchorKey: _popupAnchorKey,
-                      layerLink: _layerLink,
-                      popupController: _popupController,
-                      preferredPosition: PopupPreferredPosition.bottom,
-                      manualOffset: const Offset(-10, 0),
-                      width: 170,
-                      arrowOffset: 0.95,
-                      icon: SvgPicture.asset(
-                        'assets/icons/common/solid/ic-solar_add-circle-bold.svg',
-                        width: 30,
-                        colorFilter: ColorFilter.mode(
-                          theme.colorScheme.tertiary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      items: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                          child: ResponsivePopupItem(
-                            title: 'Add Posting',
-                            svgIcon: 'assets/icons/nav/ic-job.svg',
-                            onTap: () {
-                              _popupController.hide();
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const AddJobPostingPage(),
-                                ),
-                              );
-                            },
-                            color: theme.colorScheme.tertiary,
+                  if (canManageJobs)
+                    CustomTextButton(
+                      backgroundColor: theme.colorScheme.tertiary,
+                      padding: 0,
+                      onClick: () async {
+                        final shouldRefresh =
+                            await Navigator.of(context).push<bool>(
+                          MaterialPageRoute<bool>(
+                            builder: (_) => const AddJobPostingPage(),
                           ),
-                        ),
-                        if (canManageDepartment)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 5.0, vertical: 10),
-                            child: ResponsivePopupItem(
-                              title: 'Add Department',
-                              svgIcon:
-                                  'assets/icons/common/solid/ic-solar-server-bold-duotone.svg',
-                              onTap: () {
-                                _popupController.hide();
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const AddDepartmentPage(),
-                                  ),
-                                );
-                              },
-                              color: theme.colorScheme.tertiary,
+                        );
+                        if (!mounted) return;
+                        if (shouldRefresh == true) _refreshJobs();
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/common/solid/ic-solar-case-round-bold.svg',
+                            width: 20,
+                            colorFilter: ColorFilter.mode(
+                              theme.scaffoldBackgroundColor,
+                              BlendMode.srcIn,
                             ),
                           ),
-                      ])
-              ],
+                          const SizedBox(width: 6),
+                          Text(
+                            'Add Posting',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.scaffoldBackgroundColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
           const SizedBox(

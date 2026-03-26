@@ -1,15 +1,19 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:employeeos/core/index.dart'
     show CustomDropdown, CustomTextButton, CustomTextfield;
 import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/recruitment/data/mock/department_presets_mock.dart';
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/detail_section.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/components/tool_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../data/datasources/job_posting_mock_datasource.dart';
+import '../../../data/repositories/job_posting_repository_impl.dart';
+import '../../../data/models/job_posting_model.dart';
+import '../../../domain/usecases/get_job_department.dart';
 
 class AddJobPostingPage extends StatefulWidget {
   const AddJobPostingPage({super.key});
@@ -26,10 +30,7 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
   final _jobTitleController = TextEditingController();
   String? _selectedDepartment;
   late QuillController _descriptionController;
-  List<PipelineStage> _pipelineStages = [];
-
-  List<String> get _departments => getAllDepartmentNames();
-
+  List<String> _departments = const [];
   // Qualifications (collapsible)
   final _qualificationsController = TextEditingController();
 
@@ -51,6 +52,14 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
     _descriptionController = QuillController.basic();
     _postedByNameController.text = _postedByName;
     _postedByEmailController.text = _postedByEmail;
+    _loadDepartments();
+  }
+
+  Future<void> _loadDepartments() async {
+    final repo = JobPostingRepositoryImpl(JobPostingMockDatasource.instance);
+    final departments = await GetJobDepartmentUseCase(repo).call();
+    if (!mounted) return;
+    setState(() => _departments = departments);
   }
 
   @override
@@ -80,11 +89,53 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
   }
 
   void _submit() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // When using DB later: save Quill as
-      // jsonEncode(_descriptionController.document.toDelta().toJson()).
-      Navigator.of(context).pop(true);
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final department = (_selectedDepartment ?? '').trim();
+
+    // For now, this screen writes into the in-memory datasource.
+    final descriptionJson = jsonEncode(
+      _descriptionController.document.toDelta().toJson(),
+    );
+
+    final job = JobPostingModel(
+      id: 'job-mock-${DateTime.now().microsecondsSinceEpoch}',
+      title: _jobTitleController.text.trim(),
+      department: department,
+      description: descriptionJson,
+      location: _locationController.text.trim().isEmpty
+          ? null
+          : _locationController.text.trim(),
+      positions: int.tryParse(_positionsController.text.trim()) ?? 1,
+      lastDateToApply: _parseDateFromField(_lastDateController.text.trim()),
+      joiningType: _joiningType,
+      isInternship: _isInternship,
+      ctcRange: _ctcRangeController.text.trim().isEmpty
+          ? null
+          : _ctcRangeController.text.trim(),
+      postedByName: _postedByNameController.text.trim(),
+      postedByEmail: _postedByEmailController.text.trim(),
+      createdAt: DateTime.now(),
+    );
+
+    JobPostingMockDatasource.instance.add(job);
+    Navigator.of(context).pop(true);
+  }
+
+  DateTime? _parseDateFromField(String text) {
+    if (text.isEmpty) return null;
+    final iso = DateTime.tryParse(text);
+    if (iso != null) return iso;
+    final parts = text.split('/');
+    if (parts.length == 3) {
+      final day = int.tryParse(parts[0]);
+      final month = int.tryParse(parts[1]);
+      final year = int.tryParse(parts[2]);
+      if (day != null && month != null && year != null) {
+        return DateTime(year, month, day);
+      }
     }
+    return null;
   }
 
   void _openDescriptionFullScreen() {
@@ -190,16 +241,12 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
               isDescriptionFullScreenOpen: _isDescriptionFullScreenOpen,
               departmentOptions: _departments,
               selectedDepartment: _selectedDepartment,
+              allowAddNewDepartment: true,
               onDepartmentChanged: (v) {
                 setState(() {
                   _selectedDepartment = v;
-                  _pipelineStages = v != null ? getPresetForDepartment(v) : [];
                 });
               },
-              pipelineStages: _pipelineStages,
-              onPipelineChanged: (list) =>
-                  setState(() => _pipelineStages = list),
-              stagePool: getStagePool(),
             ),
             const SizedBox(height: 24),
             _buildAdditionalFieldsSection(theme),

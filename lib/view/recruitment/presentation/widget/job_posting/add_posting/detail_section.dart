@@ -1,8 +1,6 @@
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/index.dart'
-    show CustomDivider, CustomDropdown, CustomTextfield;
-import 'package:employeeos/view/recruitment/domain/entities/pipeline_stage.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/pipeline_section.dart';
+import 'package:employeeos/core/index.dart' show CustomDivider, CustomTextfield;
+import 'package:employeeos/core/common/components/department_search_add_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
@@ -19,9 +17,7 @@ class DetailSection extends StatelessWidget {
   final List<String>? departmentOptions;
   final String? selectedDepartment;
   final ValueChanged<String?>? onDepartmentChanged;
-  final List<PipelineStage> pipelineStages;
-  final ValueChanged<List<PipelineStage>>? onPipelineChanged;
-  final List<PipelineStage> stagePool;
+  final bool allowAddNewDepartment;
 
   const DetailSection({
     super.key,
@@ -35,9 +31,7 @@ class DetailSection extends StatelessWidget {
     this.departmentOptions,
     this.selectedDepartment,
     this.onDepartmentChanged,
-    this.pipelineStages = const [],
-    this.onPipelineChanged,
-    this.stagePool = const [],
+    this.allowAddNewDepartment = false,
   });
 
   @override
@@ -85,18 +79,12 @@ class DetailSection extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           if (departmentOptions != null)
-            CustomDropdown(
+            DepartmentSearchAddField(
               theme: theme,
-              label: 'Department',
-              value: selectedDepartment,
-              items: departmentOptions!
-                  .map(
-                      (e) => DropdownMenuItem<String>(value: e, child: Text(e)))
-                  .toList(),
-              onChange: (v) => onDepartmentChanged?.call(v as String?),
-              validator: (v) => (v == null || v.toString().trim().isEmpty)
-                  ? 'Department is required'
-                  : null,
+              options: departmentOptions!,
+              selectedValue: selectedDepartment,
+              allowAddNewDepartment: allowAddNewDepartment,
+              onChanged: onDepartmentChanged,
             )
           else
             CustomTextfield(
@@ -109,25 +97,6 @@ class DetailSection extends StatelessWidget {
                   ? 'Department is required'
                   : null,
             ),
-          if (selectedDepartment != null && onPipelineChanged != null) ...[
-            const SizedBox(height: 16),
-            Text('Pipeline',
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
-            Text(
-              'Add, remove, or reorder stages. This pipeline will be saved with the job.',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.disabledColor),
-            ),
-            const SizedBox(height: 8),
-            PipelineSection(
-              theme: theme,
-              stages: pipelineStages,
-              onChanged: onPipelineChanged!,
-              stagePool: stagePool,
-            ),
-          ],
           const SizedBox(height: 16),
           Text('Description',
               style: theme.textTheme.bodyMedium

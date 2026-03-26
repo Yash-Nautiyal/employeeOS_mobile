@@ -6,7 +6,9 @@ import 'package:employeeos/core/index.dart'
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_datasource.dart';
 import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
+import 'package:employeeos/view/recruitment/data/repositories/job_posting_repository_impl.dart';
 import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
+import 'package:employeeos/view/recruitment/domain/usecases/get_job_department.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/detail_section.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/components/tool_bar.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +28,8 @@ class _JobEditingPageState extends State<JobEditingPage> {
   final _scrollController = ScrollController();
 
   final _jobTitleController = TextEditingController();
-  final _departmentController = TextEditingController();
+  List<String> _departments = const [];
+  String? _selectedDepartment;
   late QuillController _descriptionController;
 
   final _qualificationsController = TextEditingController();
@@ -46,7 +49,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
     super.initState();
     final j = widget.job;
     _jobTitleController.text = j.title;
-    _departmentController.text = j.department;
+    _selectedDepartment = j.department;
     _locationController.text = j.location ?? '';
     _positionsController = TextEditingController(text: '${j.positions}');
     _lastDateController.text = _formatDateForField(j.lastDateToApply);
@@ -71,6 +74,8 @@ class _JobEditingPageState extends State<JobEditingPage> {
     } else {
       _descriptionController = QuillController.basic();
     }
+
+    _loadDepartments();
   }
 
   String _formatDateForField(DateTime? d) {
@@ -78,10 +83,16 @@ class _JobEditingPageState extends State<JobEditingPage> {
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 
+  Future<void> _loadDepartments() async {
+    final repo = JobPostingRepositoryImpl(JobPostingMockDatasource.instance);
+    final departments = await GetJobDepartmentUseCase(repo).call();
+    if (!mounted) return;
+    setState(() => _departments = departments);
+  }
+
   @override
   void dispose() {
     _jobTitleController.dispose();
-    _departmentController.dispose();
     _descriptionController.dispose();
     _qualificationsController.dispose();
     _locationController.dispose();
@@ -103,7 +114,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
     final updated = JobPostingModel(
       id: j.id,
       title: _jobTitleController.text.trim(),
-      department: _departmentController.text.trim(),
+      department: (_selectedDepartment ?? '').trim(),
       description: descriptionJson,
       location: _locationController.text.trim().isEmpty
           ? null
@@ -236,11 +247,18 @@ class _JobEditingPageState extends State<JobEditingPage> {
             DetailSection(
               theme: theme,
               jobTitleController: _jobTitleController,
-              departmentController: _departmentController,
               descriptionController: _descriptionController,
               openDescriptionFullScreen: _openDescriptionFullScreen,
               isFullScreen: false,
               isDescriptionFullScreenOpen: _isDescriptionFullScreenOpen,
+              departmentOptions: _departments,
+              selectedDepartment: _selectedDepartment,
+              allowAddNewDepartment: true,
+              onDepartmentChanged: (v) {
+                setState(() {
+                  _selectedDepartment = v;
+                });
+              },
             ),
             const SizedBox(height: 24),
             _buildAdditionalFieldsSection(theme),

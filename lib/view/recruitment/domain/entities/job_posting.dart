@@ -53,3 +53,4 @@ class JobPosting extends Equatable {
         createdAt,
       ];
 }
+

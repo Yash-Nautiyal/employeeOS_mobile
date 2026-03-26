@@ -27,9 +27,18 @@ class JobPostingMockDatasource {
     return List<JobPostingModel>.from(_jobs);
   }
 
+  /// Adds a new job posting so the UI (and department dropdown) updates.
+  void add(JobPostingModel job) {
+    _jobs.add(job);
+  }
+
   /// Replaces the job with the same id. Used by [JobEditingPage] on save.
   void update(JobPostingModel job) {
     final i = _jobs.indexWhere((j) => j.id == job.id);
     if (i >= 0) _jobs[i] = job;
+  }
+
+  Future<List<String>> getJobDepartments() async {
+    return _jobs.map((e) => e.department).toSet().toList();
   }
 }
