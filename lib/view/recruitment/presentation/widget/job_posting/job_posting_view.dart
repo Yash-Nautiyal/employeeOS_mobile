@@ -1,18 +1,17 @@
-import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
-import 'package:employeeos/core/index.dart' show showRightSideTaskDetails;
-import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_datasource.dart';
-import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
-import 'package:employeeos/view/recruitment/index.dart' show JobPostingCard;
-import 'package:employeeos/view/recruitment/presentation/pages/job_posting_section.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_job_posting_page.dart';
+import 'package:employeeos/core/index.dart'
+    show CustomBreadCrumbs, CustomTextButton, showRightSideTaskDetails;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../widget/job_posting/components/filter/job_filter_panel.dart';
-import '../widget/job_posting/components/filter/recruitment_list_filter_bar.dart';
+import '../../../data/index.dart'
+    show JobPostingMockDatasource, JobPostingModel;
+import '../../pages/job_posting_section.dart';
+import 'add_posting/add_job_posting_page.dart';
+import 'components/filter/job_filter_panel.dart';
+import 'components/filter/recruitment_list_filter_bar.dart';
+import 'components/card/job_posting_card.dart';
 
 class JobPostingView extends StatefulWidget {
   const JobPostingView({super.key});
@@ -261,7 +260,7 @@ class _JobPostingViewState extends State<JobPostingView> {
                         return JobPostingCard(
                           theme: theme,
                           job: job,
-                        canEditAndDelete: canEditAndDelete,
+                          canEditAndDelete: canEditAndDelete,
                           onJobActiveChanged: (jobId, isActive) async {
                             _mockDatasource.setJobActive(jobId, isActive);
                             if (mounted) _refreshJobs();

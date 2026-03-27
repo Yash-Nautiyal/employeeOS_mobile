@@ -1,19 +1,21 @@
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, showRightSideTaskDetails;
-import 'package:employeeos/view/recruitment/data/datasources/interview_scheduling_local_data_source.dart';
-import 'package:employeeos/view/recruitment/data/repositories/interview_scheduling_repository_impl.dart';
-import 'package:employeeos/view/recruitment/domain/entities/interview_enums.dart';
-import 'package:employeeos/view/recruitment/domain/usecases/get_interview_candidates_usecase.dart';
-import 'package:employeeos/view/recruitment/index.dart'
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../data/index.dart'
+    show InterviewSchedulingLocalDataSource, InterviewSchedulingRepositoryImpl;
+import '../../domain/index.dart'
+    show GetInterviewCandidatesUseCase, InterviewCandidateTab, InterviewRound;
+
+import '../bloc/interview_scheduling/interview_scheduling_bloc.dart';
+import '../widget/index.dart'
     show
         ActionHeader,
         CandidateTabs,
         CandidatesTable,
         InterviewFilterPanel,
         InterviewRoundsTab;
-import 'package:employeeos/view/recruitment/presentation/bloc/interview_scheduling/interview_scheduling_bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InterviewSchedulingView extends StatefulWidget {
   const InterviewSchedulingView({super.key});
@@ -37,7 +39,8 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
       InterviewSchedulingLocalDataSource(),
     );
     _bloc = InterviewSchedulingBloc(
-      getInterviewCandidatesUseCase: const GetInterviewCandidatesUseCase(repository),
+      getInterviewCandidatesUseCase:
+          const GetInterviewCandidatesUseCase(repository),
     );
 
     _roundTabController = TabController(

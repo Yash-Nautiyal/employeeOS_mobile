@@ -1,5 +1,5 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/recruitment/domain/entities/interview_enums.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_enums.dart';
 import 'package:flutter/material.dart';
 
 class InterviewRoundsTab extends StatelessWidget {

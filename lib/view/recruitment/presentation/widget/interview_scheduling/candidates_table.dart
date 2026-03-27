@@ -1,13 +1,12 @@
-import 'package:employeeos/view/recruitment/index.dart'
-    show
-        InterviewTableDataRow,
-        InterviewTableHeaderRow,
-        InterviewTablePaginator,
-        ScheduleButton;
-import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
+
+import 'schedule_button.dart';
+import 'table/interview_table_data_row.dart';
+import 'table/interview_table_header_row.dart';
+import 'table/interview_table_paginator.dart';
 
 class CandidatesTable extends StatefulWidget {
   final double screenWidth;

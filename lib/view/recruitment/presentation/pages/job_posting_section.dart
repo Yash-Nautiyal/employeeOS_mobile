@@ -1,7 +1,7 @@
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_posting_view.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_posting.dart';
+import 'package:employeeos/view/recruitment/presentation/widget/job_posting/job_posting_view.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/job_editing.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/job_view_page.dart';
+import 'package:employeeos/view/recruitment/presentation/widget/job_posting/view_posting/job_view_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

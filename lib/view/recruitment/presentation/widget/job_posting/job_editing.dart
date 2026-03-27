@@ -1,18 +1,17 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:employeeos/core/index.dart'
-    show CustomDropdown, CustomTextButton, CustomTextfield;
-import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_datasource.dart';
-import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
-import 'package:employeeos/view/recruitment/data/repositories/job_posting_repository_impl.dart';
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
-import 'package:employeeos/view/recruitment/domain/usecases/get_job_department.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/detail_section.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/components/tool_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+
+import 'components/quill/tool_bar.dart';
+import 'add_posting/detail_section.dart';
+
+import 'package:employeeos/core/index.dart'
+    show AppPallete, CustomDropdown, CustomTextButton, CustomTextfield;
+import '../../../data/index.dart'
+    show JobPostingMockDatasource, JobPostingModel, JobPostingRepositoryImpl;
+import '../../../domain/index.dart' show GetJobDepartmentUseCase, JobPosting;
 
 class JobEditingPage extends StatefulWidget {
   final JobPosting job;
@@ -396,7 +395,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7),
-                borderSide: BorderSide(color: AppPallete.grey500),
+                borderSide: const BorderSide(color: AppPallete.grey500),
               ),
             ),
           ),
@@ -419,7 +418,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7),
-                borderSide: BorderSide(color: AppPallete.grey500),
+                borderSide: const BorderSide(color: AppPallete.grey500),
               ),
             ),
           ),

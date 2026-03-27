@@ -19,6 +19,7 @@ export 'common/components/custom_toast.dart';
 export 'common/components/custom_side_menu.dart';
 export 'common/components/custom_avatar_stack.dart';
 export 'common/components/custom_image_viewer.dart';
+export 'common/components/department_search_add_field.dart';
 
 export 'common/components/dialog/custom_alert_dialog.dart';
 export 'common/components/dialog/custom_dialog.dart';

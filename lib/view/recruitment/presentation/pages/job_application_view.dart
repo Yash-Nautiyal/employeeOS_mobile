@@ -1,6 +1,7 @@
 import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
-import 'package:employeeos/view/recruitment/index.dart' show JobApplicationCard;
 import 'package:flutter/material.dart';
+
+import '../widget/index.dart' show JobApplicationCard;
 
 class JobApplicationView extends StatelessWidget {
   const JobApplicationView({super.key});

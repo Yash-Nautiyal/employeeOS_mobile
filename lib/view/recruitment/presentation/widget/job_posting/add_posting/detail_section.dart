@@ -1,10 +1,13 @@
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/index.dart' show CustomDivider, CustomTextfield;
-import 'package:employeeos/core/common/components/department_search_add_field.dart';
+import 'package:employeeos/core/index.dart'
+    show
+        CustomDivider,
+        CustomTextButton,
+        CustomTextfield,
+        DepartmentSearchAddField;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
-import '../components/tool_bar.dart';
+import '../components/quill/tool_bar.dart';
 
 class DetailSection extends StatelessWidget {
   final ThemeData theme;

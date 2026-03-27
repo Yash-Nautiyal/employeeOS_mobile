@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_posting.dart';
 
 class JobPostingModel extends JobPosting {
   const JobPostingModel({

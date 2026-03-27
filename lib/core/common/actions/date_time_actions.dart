@@ -33,7 +33,8 @@ String formatRelativeTime(DateTime time) {
   return '${diff.inDays} days';
 }
 
-String fmtDate(DateTime d) {
+String fmtDate(DateTime? d) {
+  if (d == null) return '';
   const months = [
     'Jan',
     'Feb',

@@ -1,9 +1,11 @@
-import 'package:employeeos/core/index.dart' show AppPallete, CustomDivider;
-import 'package:employeeos/view/recruitment/domain/entities/job_posting.dart';
-import 'package:employeeos/view/recruitment/index.dart'
-    show JobPostingCardHeader, JobPostingCardFooter;
+import 'package:employeeos/core/index.dart' show AppPallete, CustomDivider, fmtDate;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+
+import '../../../../../domain/index.dart' show JobPosting;
+import 'job_posting_card_footer.dart';
+import 'job_posting_card_header.dart';
 
 class JobPostingCard extends StatefulWidget {
   final ThemeData theme;
@@ -85,7 +87,7 @@ class _JobPostingCardState extends State<JobPostingCard>
             height: 20,
           ),
           Text(
-            'Posted date: ${_formatDate(widget.job?.createdAt)}',
+            'Posted date: ${fmtDate(widget.job?.createdAt)}',
             style: widget.theme.textTheme.bodySmall
                 ?.copyWith(fontWeight: FontWeight.w600),
           ),
@@ -186,24 +188,5 @@ class _JobPostingCardState extends State<JobPostingCard>
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime? d) {
-    if (d == null) return '23 Jun 2025';
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
 }

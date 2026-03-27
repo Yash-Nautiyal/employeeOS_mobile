@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/data/models/interview_candidate_model.dart';
+import 'package:employeeos/view/recruitment/data/interview_scheduling/models/interview_candidate_model.dart';
 
 class InterviewSchedulingLocalDataSource {
   const InterviewSchedulingLocalDataSource();

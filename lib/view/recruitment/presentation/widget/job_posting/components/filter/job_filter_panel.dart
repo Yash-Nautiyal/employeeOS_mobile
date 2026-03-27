@@ -1,7 +1,7 @@
 import 'package:employeeos/core/index.dart'
     show CustomDropdown, CustomTextfield;
-import 'package:employeeos/view/recruitment/data/datasources/job_posting_mock_datasource.dart';
-import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
+import 'package:employeeos/view/recruitment/data/index.dart'
+    show JobPostingMockDatasource, JobPostingModel;
 import 'package:flutter/material.dart';
 
 class JobPostingFilterPanel extends StatefulWidget {

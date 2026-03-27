@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
 
 class InterviewCandidateModel extends InterviewCandidate {
   const InterviewCandidateModel({

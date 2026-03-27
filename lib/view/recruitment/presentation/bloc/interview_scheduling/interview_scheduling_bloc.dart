@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
-import 'package:employeeos/view/recruitment/domain/entities/interview_enums.dart';
-import 'package:employeeos/view/recruitment/domain/usecases/get_interview_candidates_usecase.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_enums.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/usecases/get_interview_candidates_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 

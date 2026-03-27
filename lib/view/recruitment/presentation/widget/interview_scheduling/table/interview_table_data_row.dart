@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/view/recruitment/domain/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';

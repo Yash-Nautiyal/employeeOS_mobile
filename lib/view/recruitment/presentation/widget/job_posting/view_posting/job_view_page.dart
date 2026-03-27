@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
-import '../../../data/datasources/job_posting_mock_datasource.dart';
-import '../../../data/models/job_posting_model.dart';
-import '../index.dart' show ApplicationsContent, JobContent;
+import '../../../../data/index.dart'
+    show JobPostingMockDatasource, JobPostingModel;
+import '../../index.dart' show ApplicationsContent, JobContent;
 
 class JobViewPage extends StatefulWidget {
   final Object? jobId;

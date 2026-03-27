@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:employeeos/view/recruitment/domain/usecases/get_job_department.dart';
+import 'package:employeeos/view/recruitment/domain/job_posting/usecases/get_job_department.dart';
 import 'package:equatable/equatable.dart';
 
 part 'job_posting_event.dart';

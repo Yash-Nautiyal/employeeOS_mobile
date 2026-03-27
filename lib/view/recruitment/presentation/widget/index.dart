@@ -1,11 +1,11 @@
-export 'job_posting/add_job_posting_page.dart';
+export 'job_posting/add_posting/add_job_posting_page.dart';
 export 'job_posting/job_editing.dart';
-export 'job_posting/job_view_page.dart';
+export 'job_posting/view_posting/job_view_page.dart';
 export 'job_posting/add_posting/detail_section.dart';
-export 'job_posting/components/job_posting_card.dart';
-export 'job_posting/components/job_posting_card_header.dart';
-export 'job_posting/components/job_posting_card_footer.dart';
-export 'job_posting/components/tool_bar.dart';
+export 'job_posting/components/card/job_posting_card.dart';
+export 'job_posting/components/card/job_posting_card_header.dart';
+export 'job_posting/components/card/job_posting_card_footer.dart';
+export 'job_posting/components/quill/tool_bar.dart';
 export 'job_posting/view_posting/applications_content.dart';
 export 'job_posting/view_posting/job_content.dart';
 

@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/data/models/job_posting_model.dart';
+import 'package:employeeos/view/recruitment/data/job_posting/models/job_posting_model.dart';
 import 'package:employeeos/view/recruitment/data/mock/job_posting_mock_data.dart';
 
 /// Mock data source for job postings. Holds mutable in-memory list so edits

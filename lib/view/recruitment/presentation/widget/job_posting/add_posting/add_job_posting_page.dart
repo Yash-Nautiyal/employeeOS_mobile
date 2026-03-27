@@ -2,18 +2,15 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:employeeos/core/index.dart'
-    show CustomDropdown, CustomTextButton, CustomTextfield;
-import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/detail_section.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/components/tool_bar.dart';
+    show AppPallete, CustomDropdown, CustomTextButton, CustomTextfield;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../data/datasources/job_posting_mock_datasource.dart';
-import '../../../data/repositories/job_posting_repository_impl.dart';
-import '../../../data/models/job_posting_model.dart';
-import '../../../domain/usecases/get_job_department.dart';
+import '../../../../data/index.dart';
+import '../../../../domain/index.dart' show GetJobDepartmentUseCase;
+import '../components/quill/tool_bar.dart';
+import 'detail_section.dart';
 
 class AddJobPostingPage extends StatefulWidget {
   const AddJobPostingPage({super.key});
@@ -384,7 +381,7 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7),
-                borderSide: BorderSide(color: AppPallete.grey500),
+                borderSide: const BorderSide(color: AppPallete.grey500),
               ),
             ),
           ),
@@ -407,7 +404,7 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7),
-                borderSide: BorderSide(color: AppPallete.grey500),
+                borderSide: const BorderSide(color: AppPallete.grey500),
               ),
             ),
           ),
