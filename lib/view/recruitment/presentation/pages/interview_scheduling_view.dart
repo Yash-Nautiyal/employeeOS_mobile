@@ -1,3 +1,4 @@
+import 'package:employeeos/core/common/components/empty_content.dart';
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, showRightSideTaskDetails;
 import 'package:flutter/material.dart';
@@ -5,9 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/index.dart'
     show InterviewSchedulingLocalDataSource, InterviewSchedulingRepositoryImpl;
-import '../../domain/index.dart'
-    show GetInterviewCandidatesUseCase, InterviewCandidateTab, InterviewRound;
-
+import '../../domain/index.dart' show GetInterviewCandidatesUseCase;
+import '../../domain/interview_scheduling/entities/interview_enums.dart';
 import '../bloc/interview_scheduling/interview_scheduling_bloc.dart';
 import '../widget/index.dart'
     show
@@ -16,6 +16,7 @@ import '../widget/index.dart'
         CandidatesTable,
         InterviewFilterPanel,
         InterviewRoundsTab;
+import '../widget/interview_scheduling/table/interview_table_action_tools.dart';
 
 class InterviewSchedulingView extends StatefulWidget {
   const InterviewSchedulingView({super.key});
@@ -35,18 +36,18 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
   @override
   void initState() {
     super.initState();
-    const repository = InterviewSchedulingRepositoryImpl(
-      InterviewSchedulingLocalDataSource(),
+    final repository = InterviewSchedulingRepositoryImpl(
+      InterviewSchedulingLocalDataSource.instance,
     );
     _bloc = InterviewSchedulingBloc(
-      getInterviewCandidatesUseCase:
-          const GetInterviewCandidatesUseCase(repository),
+      getInterviewCandidatesUseCase: GetInterviewCandidatesUseCase(repository),
+      repository: repository,
     );
 
     _roundTabController = TabController(
       length: InterviewRound.values.length,
       vsync: this,
-      initialIndex: InterviewRound.technical.index,
+      initialIndex: InterviewRound.telephone.index,
     );
     _candidateTabController = TabController(
       length: InterviewCandidateTab.values.length,
@@ -98,7 +99,8 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
             previous.activeTab != current.activeTab ||
             previous.activeRound != current.activeRound,
         listener: (context, state) {
-          if (_candidateTabController.index != state.activeTab.index) {
+          if (state.activeRound.usesEligibleScheduledTabs &&
+              _candidateTabController.index != state.activeTab.index) {
             _candidateTabController.animateTo(state.activeTab.index);
           }
           if (_roundTabController.index != state.activeRound.index) {
@@ -144,55 +146,42 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: theme.shadowColor),
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.shadowColor,
-                          spreadRadius: 1,
-                          blurRadius: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ActionHeader(
+                        theme: theme,
+                        isWideScreen: isWideScreen,
+                        searchController: _searchController,
+                        onFilterTap: () =>
+                            _openFilterPanel(context, theme, state),
+                        onSearchChanged: (value) => _bloc.add(
+                          InterviewSearchChanged(value),
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ActionHeader(
-                          theme: theme,
-                          isWideScreen: isWideScreen,
-                          searchController: _searchController,
-                          onFilterTap: () =>
-                              _openFilterPanel(context, theme, state),
-                          onSearchChanged: (value) => _bloc.add(
-                            InterviewSearchChanged(value),
-                          ),
+                      ),
+                      const SizedBox(height: 20),
+                      InterviewRoundsTab(
+                        theme: theme,
+                        isWideScreen: isWideScreen,
+                        controller: _roundTabController,
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: theme.shadowColor),
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.shadowColor,
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                        InterviewRoundsTab(
-                          theme: theme,
-                          isWideScreen: isWideScreen,
-                          controller: _roundTabController,
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: theme.cardColor,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: theme.shadowColor),
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.shadowColor,
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
+                        child: Column(
+                          children: [
+                            if (state.activeRound.usesEligibleScheduledTabs)
                               Row(
                                 children: [
                                   Expanded(
@@ -203,47 +192,64 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                                   ),
                                 ],
                               ),
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 200),
-                                child: state.filteredCandidates.isNotEmpty
-                                    ? CandidatesTable(
-                                        key: const ValueKey('table'),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: state.filteredCandidates.isNotEmpty
+                                  ? ClipRRect(
+                                      key: const ValueKey('table'),
+                                      borderRadius: state.activeRound
+                                              .usesEligibleScheduledTabs
+                                          ? BorderRadius.zero
+                                          : BorderRadius.circular(12),
+                                      child: CandidatesTable(
                                         screenWidth: screenWidth,
                                         candidates: state.filteredCandidates,
                                         selectedIds: state.selectedIds,
+                                        showRejectedRoundColumn:
+                                            state.activeRound ==
+                                                InterviewRound.rejected,
+                                        actionToolbar:
+                                            InterviewTableActionTools(
+                                          theme: theme,
+                                          state: state,
+                                          onOnboard: () => _bloc.add(
+                                            InterviewOnboardSubmitted(
+                                                state.selectedIds),
+                                          ),
+                                          onReject: () => _bloc.add(
+                                            InterviewRejectSubmitted(
+                                                state.selectedIds),
+                                          ),
+                                          onSchedule: () => _bloc.add(
+                                            InterviewScheduleSubmitted(
+                                                state.selectedIds),
+                                          ),
+                                          onSelect: () => _bloc.add(
+                                            InterviewSelectSubmitted(
+                                                state.selectedIds),
+                                          ),
+                                        ),
                                         onSelectedIdsChanged: (ids) =>
                                             _bloc.add(
                                                 InterviewSelectionChanged(ids)),
-                                        onSchedulePressed: (ids) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Schedule ${ids.length} candidate(s)',
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      )
-                                    : Center(
-                                        key: const ValueKey('empty'),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(40.0),
-                                          child: Text(
-                                            'No candidates match your filters',
-                                            style: theme.textTheme.bodyLarge
-                                                ?.copyWith(
-                                              color: theme.disabledColor,
-                                            ),
-                                          ),
+                                      ),
+                                    )
+                                  : const Center(
+                                      key: ValueKey('empty'),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(40.0),
+                                        child: EmptyContent(
+                                          icon:
+                                              'assets/icons/empty/ic-folder-empty.svg',
+                                          title: 'No candidates',
                                         ),
                                       ),
-                              ),
-                            ],
-                          ),
+                                    ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],

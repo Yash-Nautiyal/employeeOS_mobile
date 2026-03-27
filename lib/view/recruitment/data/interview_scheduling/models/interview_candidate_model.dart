@@ -1,4 +1,4 @@
-import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
+import '../../../domain/index.dart' show InterviewCandidate, InterviewRound;
 
 class InterviewCandidateModel extends InterviewCandidate {
   const InterviewCandidateModel({
@@ -10,6 +10,8 @@ class InterviewCandidateModel extends InterviewCandidate {
     required super.jobId,
     required super.interviewer,
     required super.status,
+    required super.pipelineRound,
+    super.rejectedFromRound,
   });
 
   factory InterviewCandidateModel.fromMap(Map<String, dynamic> map) {
@@ -22,6 +24,8 @@ class InterviewCandidateModel extends InterviewCandidate {
       jobId: map['jobId'] as String,
       interviewer: map['interviewer'] as String,
       status: map['status'] as String,
+      pipelineRound: map['pipelineRound'] as InterviewRound,
+      rejectedFromRound: map['rejectedFromRound'] as InterviewRound?,
     );
   }
 
@@ -35,7 +39,37 @@ class InterviewCandidateModel extends InterviewCandidate {
       'jobId': jobId,
       'interviewer': interviewer,
       'status': status,
+      'pipelineRound': pipelineRound,
+      'rejectedFromRound': rejectedFromRound,
     };
   }
-}
 
+  InterviewCandidateModel copyWith({
+    String? id,
+    String? name,
+    String? jobTitle,
+    DateTime? applicationDate,
+    DateTime? interviewDate,
+    String? jobId,
+    String? interviewer,
+    String? status,
+    InterviewRound? pipelineRound,
+    InterviewRound? rejectedFromRound,
+    bool clearRejectedFromRound = false,
+  }) {
+    return InterviewCandidateModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      jobTitle: jobTitle ?? this.jobTitle,
+      applicationDate: applicationDate ?? this.applicationDate,
+      interviewDate: interviewDate ?? this.interviewDate,
+      jobId: jobId ?? this.jobId,
+      interviewer: interviewer ?? this.interviewer,
+      status: status ?? this.status,
+      pipelineRound: pipelineRound ?? this.pipelineRound,
+      rejectedFromRound: clearRejectedFromRound
+          ? null
+          : (rejectedFromRound ?? this.rejectedFromRound),
+    );
+  }
+}

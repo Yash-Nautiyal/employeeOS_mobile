@@ -1,4 +1,5 @@
-import 'package:employeeos/core/index.dart' show AppPallete, CustomDivider, fmtDate;
+import 'package:employeeos/core/index.dart'
+    show AppPallete, CustomDivider, fmtDate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,6 +18,9 @@ class JobPostingCard extends StatefulWidget {
   final bool canEditAndDelete;
   final Future<void> Function(String jobId, bool isActive)? onJobActiveChanged;
 
+  /// Applications in mock store for this job (see [JobApplicationMockDatasource]).
+  final int applicationCount;
+
   const JobPostingCard({
     super.key,
     required this.theme,
@@ -25,6 +29,7 @@ class JobPostingCard extends StatefulWidget {
     this.job,
     this.canEditAndDelete = true,
     this.onJobActiveChanged,
+    this.applicationCount = 0,
   });
 
   @override
@@ -127,7 +132,7 @@ class _JobPostingCardState extends State<JobPostingCard>
                     ),
                     Text(
                       widget.job != null
-                          ? '— applications'
+                          ? '${widget.applicationCount} application${widget.applicationCount == 1 ? '' : 's'}'
                           : '190 applications',
                       style: widget.theme.textTheme.labelLarge
                           ?.copyWith(color: AppPallete.infoMain),

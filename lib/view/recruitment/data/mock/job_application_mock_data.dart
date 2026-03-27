@@ -7,6 +7,7 @@ List<Map<String, dynamic>> get jobApplicationMockList => [
       {
         'id': 'app-1',
         'job_id': 'job-mock-1',
+        'job_title': 'Senior Flutter Developer',
         'full_name': 'Alice Johnson',
         'email': 'alice@example.com',
         'phone': '+91-98765-00001',
@@ -18,6 +19,7 @@ List<Map<String, dynamic>> get jobApplicationMockList => [
       {
         'id': 'app-2',
         'job_id': 'job-mock-1',
+        'job_title': 'Senior Flutter Developer',
         'full_name': 'Rahul Verma',
         'email': 'rahul.verma@example.com',
         'phone': '+91-98765-00002',
@@ -29,6 +31,7 @@ List<Map<String, dynamic>> get jobApplicationMockList => [
       {
         'id': 'app-3',
         'job_id': 'job-mock-2',
+        'job_title': 'Cloud Internship – AWS',
         'full_name': 'Sneha Patel',
         'email': 'sneha.patel@example.com',
         'phone': '+91-98765-00003',
@@ -40,6 +43,7 @@ List<Map<String, dynamic>> get jobApplicationMockList => [
       {
         'id': 'app-4',
         'job_id': 'job-mock-2',
+        'job_title': 'Cloud Internship – AWS',
         'full_name': 'Michael Lee',
         'email': 'michael.lee@example.com',
         'phone': '+91-98765-00004',

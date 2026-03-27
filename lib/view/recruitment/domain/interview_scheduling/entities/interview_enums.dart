@@ -21,6 +21,10 @@ extension InterviewRoundLabel on InterviewRound {
         return 'Rejected';
     }
   }
+
+  /// Eligible / Scheduled sub-tabs apply only to main interview rounds (see RECRUITMENT_INTERVIEW_FLOW.md).
+  bool get usesEligibleScheduledTabs =>
+      this == InterviewRound.telephone || this == InterviewRound.technical;
 }
 
 enum InterviewCandidateTab {

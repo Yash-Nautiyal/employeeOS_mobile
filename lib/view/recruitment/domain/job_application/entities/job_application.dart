@@ -5,6 +5,7 @@ class JobApplication extends Equatable {
   const JobApplication({
     required this.id,
     required this.jobId,
+    required this.jobTitle,
     required this.fullName,
     required this.email,
     required this.phone,
@@ -15,6 +16,7 @@ class JobApplication extends Equatable {
 
   final String id;
   final String jobId;
+  final String jobTitle;
   final String fullName;
   final String email;
   final String phone;
@@ -23,6 +25,15 @@ class JobApplication extends Equatable {
   final String resumeUrl; // mock URL to resume file
 
   @override
-  List<Object?> get props =>
-      [id, jobId, fullName, email, phone, status, appliedOn, resumeUrl];
+  List<Object?> get props => [
+        id,
+        jobId,
+        jobTitle,
+        fullName,
+        email,
+        phone,
+        status,
+        appliedOn,
+        resumeUrl,
+      ];
 }

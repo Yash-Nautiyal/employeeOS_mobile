@@ -7,6 +7,8 @@ class InterviewTableHeaderRow extends StatelessWidget {
     required this.widthJobTitle,
     required this.widthApplicationDate,
     required this.widthResume,
+    this.widthRejectedRound = 0,
+    this.showRejectedRound = false,
     required this.checkboxValue,
     required this.onCheckboxChanged,
     required this.selectedCount,
@@ -14,6 +16,8 @@ class InterviewTableHeaderRow extends StatelessWidget {
   });
 
   final double widthName, widthJobTitle, widthApplicationDate, widthResume;
+  final double widthRejectedRound;
+  final bool showRejectedRound;
   final bool? checkboxValue; // tri-state
   final ValueChanged<bool?> onCheckboxChanged;
   final int selectedCount;
@@ -56,6 +60,11 @@ class InterviewTableHeaderRow extends StatelessWidget {
               width: widthApplicationDate,
               child: Text('Application Date', style: head)),
           SizedBox(width: widthResume, child: Text('Resume', style: head)),
+          if (showRejectedRound)
+            SizedBox(
+              width: widthRejectedRound,
+              child: Text('Rejected in round', style: head),
+            ),
         ],
       ),
     );

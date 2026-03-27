@@ -6,7 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../data/index.dart'
-    show JobPostingMockDatasource, JobPostingModel;
+    show
+        JobApplicationMockDatasource,
+        JobPostingMockDatasource,
+        JobPostingModel;
 import '../../pages/job_posting_section.dart';
 import 'add_posting/add_job_posting_page.dart';
 import 'components/filter/job_filter_panel.dart';
@@ -25,7 +28,11 @@ class _JobPostingViewState extends State<JobPostingView> {
   final TextEditingController _searchController = TextEditingController();
 
   final _mockDatasource = JobPostingMockDatasource.instance;
-  late Future<List<JobPostingModel>> _jobsFuture;
+  late Future<
+      ({
+        List<JobPostingModel> jobs,
+        Map<String, int> applicationCounts,
+      })> _jobsFuture;
   String _sortBy = 'Latest';
 
   // Filter state
@@ -36,15 +43,29 @@ class _JobPostingViewState extends State<JobPostingView> {
   String _jobType = 'All';
   DateTimeRange? _dateRange;
 
+  Future<
+      ({
+        List<JobPostingModel> jobs,
+        Map<String, int> applicationCounts,
+      })> _loadJobsAndCounts() async {
+    final jobs = await _mockDatasource.getAll();
+    final apps = await JobApplicationMockDatasource.instance.getApplications();
+    final counts = <String, int>{};
+    for (final a in apps) {
+      counts[a.jobId] = (counts[a.jobId] ?? 0) + 1;
+    }
+    return (jobs: jobs, applicationCounts: counts);
+  }
+
   @override
   void initState() {
     super.initState();
-    _jobsFuture = _mockDatasource.getAll();
+    _jobsFuture = _loadJobsAndCounts();
   }
 
   void _refreshJobs() {
     setState(() {
-      _jobsFuture = _mockDatasource.getAll();
+      _jobsFuture = _loadJobsAndCounts();
     });
   }
 
@@ -236,7 +257,11 @@ class _JobPostingViewState extends State<JobPostingView> {
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: FutureBuilder<List<JobPostingModel>>(
+              child: FutureBuilder<
+                  ({
+                    List<JobPostingModel> jobs,
+                    Map<String, int> applicationCounts,
+                  })>(
                 future: _jobsFuture,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -246,7 +271,9 @@ class _JobPostingViewState extends State<JobPostingView> {
                       child: CircularProgressIndicator(),
                     ));
                   }
-                  final jobs = _applyFiltersAndSort(snapshot.data!);
+                  final data = snapshot.data!;
+                  final jobs = _applyFiltersAndSort(data.jobs);
+                  final applicationCounts = data.applicationCounts;
                   return LayoutBuilder(
                     builder: (context, constraints) {
                       final width = constraints.maxWidth;
@@ -260,6 +287,7 @@ class _JobPostingViewState extends State<JobPostingView> {
                         return JobPostingCard(
                           theme: theme,
                           job: job,
+                          applicationCount: applicationCounts[job.id] ?? 0,
                           canEditAndDelete: canEditAndDelete,
                           onJobActiveChanged: (jobId, isActive) async {
                             _mockDatasource.setJobActive(jobId, isActive);

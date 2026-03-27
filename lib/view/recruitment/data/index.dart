@@ -8,3 +8,7 @@ export 'interview_scheduling/models/interview_candidate_model.dart';
 
 export 'mock/job_posting_mock_data.dart';
 export 'mock/job_application_mock_data.dart';
+
+export 'job_application/datasources/job_application_mock_datasource.dart';
+export 'job_application/models/job_application_model.dart';
+export 'job_application/repositories/job_application_repository_impl.dart';

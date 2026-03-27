@@ -2,6 +2,7 @@
 
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,8 @@ class InterviewTableDataRow extends StatefulWidget {
     required this.widthJobTitle,
     required this.widthApplicationDate,
     required this.widthResume,
+    this.widthRejectedRound = 0,
+    this.showRejectedRound = false,
     required this.onChanged,
     required this.onMenu,
   });
@@ -22,6 +25,8 @@ class InterviewTableDataRow extends StatefulWidget {
   final InterviewCandidate candidate;
   final bool selected;
   final double widthName, widthJobTitle, widthApplicationDate, widthResume;
+  final double widthRejectedRound;
+  final bool showRejectedRound;
   final ValueChanged<bool?> onChanged;
   final ValueChanged<String> onMenu;
 
@@ -109,6 +114,15 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
               ],
             ),
           ),
+          if (widget.showRejectedRound)
+            SizedBox(
+              width: widget.widthRejectedRound,
+              child: Text(
+                widget.candidate.rejectedFromRound?.label ?? '—',
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
         ],
       ),
     );

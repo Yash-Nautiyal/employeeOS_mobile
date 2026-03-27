@@ -64,3 +64,38 @@ class InterviewSelectionChanged extends InterviewSchedulingEvent {
   List<Object?> get props => [selectedIds];
 }
 
+class InterviewScheduleSubmitted extends InterviewSchedulingEvent {
+  final Set<String> candidateIds;
+
+  const InterviewScheduleSubmitted(this.candidateIds);
+
+  @override
+  List<Object?> get props => [candidateIds];
+}
+
+class InterviewSelectSubmitted extends InterviewSchedulingEvent {
+  final Set<String> candidateIds;
+
+  const InterviewSelectSubmitted(this.candidateIds);
+
+  @override
+  List<Object?> get props => [candidateIds];
+}
+
+class InterviewRejectSubmitted extends InterviewSchedulingEvent {
+  final Set<String> candidateIds;
+
+  const InterviewRejectSubmitted(this.candidateIds);
+
+  @override
+  List<Object?> get props => [candidateIds];
+}
+
+class InterviewOnboardSubmitted extends InterviewSchedulingEvent {
+  final Set<String> candidateIds;
+
+  const InterviewOnboardSubmitted(this.candidateIds);
+
+  @override
+  List<Object?> get props => [candidateIds];
+}

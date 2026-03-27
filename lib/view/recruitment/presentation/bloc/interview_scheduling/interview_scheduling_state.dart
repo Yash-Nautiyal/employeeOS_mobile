@@ -40,7 +40,7 @@ class InterviewSchedulingState extends Equatable {
       selectedStatus: kAllStatus,
       selectedDateRange: null,
       activeTab: InterviewCandidateTab.eligible,
-      activeRound: InterviewRound.technical,
+      activeRound: InterviewRound.telephone,
       selectedIds: {},
       errorMessage: null,
     );
@@ -69,8 +69,9 @@ class InterviewSchedulingState extends Equatable {
       selectedJob: selectedJob ?? this.selectedJob,
       selectedInterviewer: selectedInterviewer ?? this.selectedInterviewer,
       selectedStatus: selectedStatus ?? this.selectedStatus,
-      selectedDateRange:
-          updateDateRange ? selectedDateRange : (selectedDateRange ?? this.selectedDateRange),
+      selectedDateRange: updateDateRange
+          ? selectedDateRange
+          : (selectedDateRange ?? this.selectedDateRange),
       activeTab: activeTab ?? this.activeTab,
       activeRound: activeRound ?? this.activeRound,
       selectedIds: selectedIds ?? this.selectedIds,
@@ -93,10 +94,7 @@ class InterviewSchedulingState extends Equatable {
 
   List<String> get statusOptions => [
         kAllStatus,
-        ...candidates
-            .map((c) => c.status)
-            .where((id) => id.isNotEmpty)
-            .toSet()
+        ...candidates.map((c) => c.status).where((id) => id.isNotEmpty).toSet()
       ];
 
   @override
@@ -115,4 +113,3 @@ class InterviewSchedulingState extends Equatable {
         errorMessage,
       ];
 }
-

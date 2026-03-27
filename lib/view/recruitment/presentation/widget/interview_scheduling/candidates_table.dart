@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
-import 'schedule_button.dart';
 import 'table/interview_table_data_row.dart';
 import 'table/interview_table_header_row.dart';
 import 'table/interview_table_paginator.dart';
@@ -14,7 +13,8 @@ class CandidatesTable extends StatefulWidget {
   final Set<String> selectedIds;
   final ValueChanged<Set<String>> onSelectedIdsChanged;
   final ValueChanged<int>? onSelectionChanged;
-  final ValueChanged<Set<String>>? onSchedulePressed;
+  final Widget actionToolbar;
+  final bool showRejectedRoundColumn;
   final ScrollController? verticalController;
 
   const CandidatesTable({
@@ -23,8 +23,9 @@ class CandidatesTable extends StatefulWidget {
     required this.candidates,
     required this.selectedIds,
     required this.onSelectedIdsChanged,
+    required this.actionToolbar,
+    this.showRejectedRoundColumn = false,
     this.onSelectionChanged,
-    this.onSchedulePressed,
     this.verticalController,
   });
 
@@ -50,8 +51,15 @@ class _CandidatesTableState extends State<CandidatesTable> {
   static const double _wJobTitle = 200;
   static const double _wApplicationDate = 150;
   static const double _wResume = 120;
+  static const double _wRejectedRound = 160;
+  double get _wRejected => widget.showRejectedRoundColumn ? _wRejectedRound : 0;
   double get _tableWidth =>
-      _wName + _wJobTitle + _wApplicationDate + _wResume + 34; // + padding
+      _wName +
+      _wJobTitle +
+      _wApplicationDate +
+      _wResume +
+      _wRejected +
+      34; // + padding
 
   @override
   void initState() {
@@ -135,17 +143,7 @@ class _CandidatesTableState extends State<CandidatesTable> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: ScheduleButton(
-                  theme: theme,
-                  isEnabled: _selected.isNotEmpty,
-                  isFullWidth: true,
-                  onPressed: () {
-                    if (widget.onSchedulePressed != null &&
-                        _selected.isNotEmpty) {
-                      widget.onSchedulePressed!.call({..._selected});
-                    }
-                  },
-                ),
+                child: widget.actionToolbar,
               ),
               // Horizontal scrollable header (stays fixed vertically)
               SingleChildScrollView(
@@ -166,6 +164,8 @@ class _CandidatesTableState extends State<CandidatesTable> {
                       widthJobTitle: _wJobTitle,
                       widthApplicationDate: _wApplicationDate,
                       widthResume: _wResume,
+                      widthRejectedRound: _wRejectedRound,
+                      showRejectedRound: widget.showRejectedRoundColumn,
                       checkboxValue: _isAllSelectedOnPage
                           ? true
                           : (_isAnySelectedOnPage ? null : false),
@@ -214,6 +214,8 @@ class _CandidatesTableState extends State<CandidatesTable> {
                         widthJobTitle: _wJobTitle,
                         widthApplicationDate: _wApplicationDate,
                         widthResume: _wResume,
+                        widthRejectedRound: _wRejectedRound,
+                        showRejectedRound: widget.showRejectedRoundColumn,
                         onChanged: (v) => setState(() {
                           if (v == true) {
                             _selected.add(id);
