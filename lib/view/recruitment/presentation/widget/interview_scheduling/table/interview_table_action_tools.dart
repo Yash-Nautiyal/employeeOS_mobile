@@ -14,6 +14,7 @@ class InterviewTableActionTools extends StatelessWidget {
   final VoidCallback onReject;
   final VoidCallback onSchedule;
   final VoidCallback onSelect;
+  final VoidCallback onFlush;
   const InterviewTableActionTools({
     super.key,
     required this.theme,
@@ -22,6 +23,7 @@ class InterviewTableActionTools extends StatelessWidget {
     required this.onReject,
     required this.onSchedule,
     required this.onSelect,
+    required this.onFlush,
   });
 
   @override
@@ -75,11 +77,11 @@ class InterviewTableActionTools extends StatelessWidget {
       return CustomTextButton(
         padding: 0,
         backgroundColor: hasSelection
-            ? AppPallete.errorMain
+            ? theme.colorScheme.tertiary
             : theme.disabledColor.withAlpha(100),
-        onClick: hasSelection ? () => onReject.call() : () {},
+        onClick: hasSelection ? () => onFlush.call() : () {},
         child: Text(
-          'Reject',
+          'Flush to Employees',
           style: theme.textTheme.labelLarge?.copyWith(
             color: theme.scaffoldBackgroundColor,
           ),

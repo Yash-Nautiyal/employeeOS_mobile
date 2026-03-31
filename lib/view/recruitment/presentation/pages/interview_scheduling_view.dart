@@ -213,6 +213,12 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                                         showRejectedRoundColumn:
                                             state.activeRound ==
                                                 InterviewRound.rejected,
+                                        showResumeColumn: state.activeRound !=
+                                                InterviewRound.selected &&
+                                            state.activeRound !=
+                                                InterviewRound.onboarding &&
+                                            state.activeRound !=
+                                                InterviewRound.rejected,
                                         actionToolbar:
                                             InterviewTableActionTools(
                                           theme: theme,
@@ -232,6 +238,10 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                                           ),
                                           onSelect: () => _bloc.add(
                                             InterviewSelectSubmitted(
+                                                state.selectedIds),
+                                          ),
+                                          onFlush: () => _bloc.add(
+                                            InterviewFlushSubmitted(
                                                 state.selectedIds),
                                           ),
                                         ),

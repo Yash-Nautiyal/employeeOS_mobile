@@ -11,4 +11,6 @@ abstract class InterviewSchedulingRepository {
   Future<void> rejectInterviews(Set<String> ids, InterviewRound fromRound);
 
   Future<void> onboardFromSelected(Set<String> ids);
+
+  Future<void> flushOnboardingToEmployees(Set<String> ids);
 }

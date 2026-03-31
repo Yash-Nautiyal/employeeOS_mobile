@@ -33,6 +33,7 @@ class InterviewSchedulingBloc
     on<InterviewSelectSubmitted>(_onSelectSubmitted);
     on<InterviewRejectSubmitted>(_onRejectSubmitted);
     on<InterviewOnboardSubmitted>(_onOnboardSubmitted);
+    on<InterviewFlushSubmitted>(_onFlushSubmitted);
   }
 
   Future<void> _onStarted(
@@ -134,6 +135,20 @@ class InterviewSchedulingBloc
     if (state.activeRound != InterviewRound.selected) return;
     try {
       await repository.onboardFromSelected(event.candidateIds);
+      await _reloadAfterMutation(emit);
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onFlushSubmitted(
+    InterviewFlushSubmitted event,
+    Emitter<InterviewSchedulingState> emit,
+  ) async {
+    if (event.candidateIds.isEmpty) return;
+    if (state.activeRound != InterviewRound.onboarding) return;
+    try {
+      await repository.flushOnboardingToEmployees(event.candidateIds);
       await _reloadAfterMutation(emit);
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString()));

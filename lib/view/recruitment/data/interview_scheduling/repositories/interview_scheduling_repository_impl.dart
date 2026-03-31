@@ -51,4 +51,9 @@ class InterviewSchedulingRepositoryImpl
   Future<void> onboardFromSelected(Set<String> ids) {
     return localDataSource.onboardFromSelected(ids);
   }
+
+  @override
+  Future<void> flushOnboardingToEmployees(Set<String> ids) {
+    return localDataSource.flushOnboardingToEmployees(ids);
+  }
 }

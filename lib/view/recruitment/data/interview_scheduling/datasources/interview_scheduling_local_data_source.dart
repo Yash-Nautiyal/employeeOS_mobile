@@ -122,6 +122,14 @@ class InterviewSchedulingLocalDataSource {
     }
   }
 
+  /// Onboarding tab "flush": candidates are now employees, so remove from
+  /// interview pipeline table.
+  Future<void> flushOnboardingToEmployees(Set<String> ids) async {
+    _candidates.removeWhere(
+      (c) => ids.contains(c.id) && c.pipelineRound == InterviewRound.onboarding,
+    );
+  }
+
   static List<InterviewCandidateModel> _buildSeed() {
     InterviewCandidateModel row({
       required String id,

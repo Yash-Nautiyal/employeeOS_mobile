@@ -1,8 +1,8 @@
 enum InterviewRound {
   telephone,
   technical,
-  onboarding,
   selected,
+  onboarding,
   rejected,
 }
 
@@ -13,10 +13,10 @@ extension InterviewRoundLabel on InterviewRound {
         return 'Telephone Round';
       case InterviewRound.technical:
         return 'Technical Round';
-      case InterviewRound.onboarding:
-        return 'Onboarding';
       case InterviewRound.selected:
         return 'Selected';
+      case InterviewRound.onboarding:
+        return 'Onboarding';
       case InterviewRound.rejected:
         return 'Rejected';
     }

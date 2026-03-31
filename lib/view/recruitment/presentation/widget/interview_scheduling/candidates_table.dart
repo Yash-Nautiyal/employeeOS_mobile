@@ -15,6 +15,7 @@ class CandidatesTable extends StatefulWidget {
   final ValueChanged<int>? onSelectionChanged;
   final Widget actionToolbar;
   final bool showRejectedRoundColumn;
+  final bool showResumeColumn;
   final ScrollController? verticalController;
 
   const CandidatesTable({
@@ -25,6 +26,7 @@ class CandidatesTable extends StatefulWidget {
     required this.onSelectedIdsChanged,
     required this.actionToolbar,
     this.showRejectedRoundColumn = false,
+    this.showResumeColumn = true,
     this.onSelectionChanged,
     this.verticalController,
   });
@@ -52,12 +54,13 @@ class _CandidatesTableState extends State<CandidatesTable> {
   static const double _wApplicationDate = 150;
   static const double _wResume = 120;
   static const double _wRejectedRound = 160;
+  double get _wResumeEffective => widget.showResumeColumn ? _wResume : 0;
   double get _wRejected => widget.showRejectedRoundColumn ? _wRejectedRound : 0;
   double get _tableWidth =>
       _wName +
       _wJobTitle +
       _wApplicationDate +
-      _wResume +
+      _wResumeEffective +
       _wRejected +
       34; // + padding
 
@@ -134,128 +137,138 @@ class _CandidatesTableState extends State<CandidatesTable> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      children: [
-        Container(
-          color: theme.colorScheme.surfaceContainer,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: widget.actionToolbar,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final effectiveTableWidth = _tableWidth < constraints.maxWidth
+            ? constraints.maxWidth
+            : _tableWidth;
+        return Column(
+          children: [
+            Container(
+              color: theme.colorScheme.surfaceContainer,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: widget.actionToolbar,
+                  ),
+                  // Horizontal scrollable header (stays fixed vertically)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    controller: _hHeaderCtrl,
+                    child: SizedBox(
+                        height: 80,
+                        width: effectiveTableWidth,
+                        child: InterviewTableHeaderRow(
+                          selectedCount: _selected.length,
+                          onClear: _selected.isEmpty
+                              ? null
+                              : () => setState(() {
+                                    _selected.clear();
+                                    _notifySelection();
+                                  }),
+                          widthName: _wName,
+                          widthJobTitle: _wJobTitle,
+                          widthApplicationDate: _wApplicationDate,
+                          widthResume: _wResumeEffective,
+                          showResume: widget.showResumeColumn,
+                          widthRejectedRound: _wRejectedRound,
+                          showRejectedRound: widget.showRejectedRoundColumn,
+                          checkboxValue: _isAllSelectedOnPage
+                              ? true
+                              : (_isAnySelectedOnPage ? null : false),
+                          onCheckboxChanged: (val) {
+                            setState(() {
+                              if (val == true) {
+                                for (final f in _pageItems) {
+                                  _selected.add(f.id);
+                                }
+                              } else {
+                                for (final f in _pageItems) {
+                                  _selected.remove(f.id);
+                                }
+                              }
+                              _notifySelection();
+                            });
+                          },
+                        )),
+                  ),
+                ],
               ),
-              // Horizontal scrollable header (stays fixed vertically)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                controller: _hHeaderCtrl,
-                child: SizedBox(
-                    height: 80,
-                    width: _tableWidth,
-                    child: InterviewTableHeaderRow(
-                      selectedCount: _selected.length,
-                      onClear: _selected.isEmpty
-                          ? null
-                          : () => setState(() {
-                                _selected.clear();
-                                _notifySelection();
-                              }),
-                      widthName: _wName,
-                      widthJobTitle: _wJobTitle,
-                      widthApplicationDate: _wApplicationDate,
-                      widthResume: _wResume,
-                      widthRejectedRound: _wRejectedRound,
-                      showRejectedRound: widget.showRejectedRoundColumn,
-                      checkboxValue: _isAllSelectedOnPage
-                          ? true
-                          : (_isAnySelectedOnPage ? null : false),
-                      onCheckboxChanged: (val) {
-                        setState(() {
-                          if (val == true) {
-                            for (final f in _pageItems) {
-                              _selected.add(f.id);
-                            }
-                          } else {
-                            for (final f in _pageItems) {
-                              _selected.remove(f.id);
-                            }
-                          }
-                          _notifySelection();
-                        });
-                      },
-                    )),
-              ),
-            ],
-          ),
-        ),
+            ),
 
-        // spacing between header and rows
-        const SizedBox(height: 8),
+            // spacing between header and rows
+            const SizedBox(height: 8),
 
-        // ---------- Rows: horizontally linked to header ----------
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          controller: _hBodyCtrl,
-          child: SizedBox(
-            width: _tableWidth,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (int i = 0; i < _pageItems.length; i++)
-                  Builder(
-                    builder: (context) {
-                      final candidate = _pageItems[i];
-                      final id = candidate.id;
-                      final selected = _selected.contains(id);
-                      return InterviewTableDataRow(
-                        candidate: candidate,
-                        selected: selected,
-                        widthName: _wName,
-                        widthJobTitle: _wJobTitle,
-                        widthApplicationDate: _wApplicationDate,
-                        widthResume: _wResume,
-                        widthRejectedRound: _wRejectedRound,
-                        showRejectedRound: widget.showRejectedRoundColumn,
-                        onChanged: (v) => setState(() {
-                          if (v == true) {
-                            _selected.add(id);
-                          } else {
-                            _selected.remove(id);
-                          }
-                          _notifySelection();
-                        }),
-                        onMenu: (action) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text('$action → ${candidate.name}')),
+            // ---------- Rows: horizontally linked to header ----------
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: _hBodyCtrl,
+              child: SizedBox(
+                width: effectiveTableWidth,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (int i = 0; i < _pageItems.length; i++)
+                      Builder(
+                        builder: (context) {
+                          final candidate = _pageItems[i];
+                          final id = candidate.id;
+                          final selected = _selected.contains(id);
+                          return InterviewTableDataRow(
+                            candidate: candidate,
+                            selected: selected,
+                            widthName: _wName,
+                            widthJobTitle: _wJobTitle,
+                            widthApplicationDate: _wApplicationDate,
+                            widthResume: _wResumeEffective,
+                            showResume: widget.showResumeColumn,
+                            widthRejectedRound: _wRejectedRound,
+                            showRejectedRound: widget.showRejectedRoundColumn,
+                            onChanged: (v) => setState(() {
+                              if (v == true) {
+                                _selected.add(id);
+                              } else {
+                                _selected.remove(id);
+                              }
+                              _notifySelection();
+                            }),
+                            onMenu: (action) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content:
+                                        Text('$action → ${candidate.name}')),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                  ),
-              ],
+                      ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
 
-        // ---------- External Paginator (fixed, does not scroll with rows) ----------
-        InterviewTablePaginator(
-          total: _total,
-          pageIndex: _pageIndex,
-          rowsPerPage: _rowsPerPage,
-          pageCount: _pageCount,
-          startIndex: _startIndex,
-          endIndex: _endIndex,
-          rppOptions: _rppOptions,
-          onFirst: _pageIndex > 0 ? _goFirst : null,
-          onPrev: _pageIndex > 0 ? _goPrev : null,
-          onNext: _pageIndex < _pageCount - 1 ? _goNext : null,
-          onLast: _pageIndex < _pageCount - 1 ? _goLast : null,
-          onRowsPerPageChanged: (v) {
-            if (v != null) _changeRpp(v);
-          },
-        ),
-      ],
+            // ---------- External Paginator (fixed, does not scroll with rows) ----------
+            InterviewTablePaginator(
+              total: _total,
+              pageIndex: _pageIndex,
+              rowsPerPage: _rowsPerPage,
+              pageCount: _pageCount,
+              startIndex: _startIndex,
+              endIndex: _endIndex,
+              rppOptions: _rppOptions,
+              onFirst: _pageIndex > 0 ? _goFirst : null,
+              onPrev: _pageIndex > 0 ? _goPrev : null,
+              onNext: _pageIndex < _pageCount - 1 ? _goNext : null,
+              onLast: _pageIndex < _pageCount - 1 ? _goLast : null,
+              onRowsPerPageChanged: (v) {
+                if (v != null) _changeRpp(v);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

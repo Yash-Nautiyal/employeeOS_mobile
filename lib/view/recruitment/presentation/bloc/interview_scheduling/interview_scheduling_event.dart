@@ -99,3 +99,12 @@ class InterviewOnboardSubmitted extends InterviewSchedulingEvent {
   @override
   List<Object?> get props => [candidateIds];
 }
+
+class InterviewFlushSubmitted extends InterviewSchedulingEvent {
+  final Set<String> candidateIds;
+
+  const InterviewFlushSubmitted(this.candidateIds);
+
+  @override
+  List<Object?> get props => [candidateIds];
+}

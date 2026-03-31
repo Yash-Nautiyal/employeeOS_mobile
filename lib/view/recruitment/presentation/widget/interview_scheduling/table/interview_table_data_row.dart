@@ -16,6 +16,7 @@ class InterviewTableDataRow extends StatefulWidget {
     required this.widthJobTitle,
     required this.widthApplicationDate,
     required this.widthResume,
+    this.showResume = true,
     this.widthRejectedRound = 0,
     this.showRejectedRound = false,
     required this.onChanged,
@@ -25,6 +26,7 @@ class InterviewTableDataRow extends StatefulWidget {
   final InterviewCandidate candidate;
   final bool selected;
   final double widthName, widthJobTitle, widthApplicationDate, widthResume;
+  final bool showResume;
   final double widthRejectedRound;
   final bool showRejectedRound;
   final ValueChanged<bool?> onChanged;
@@ -92,28 +94,29 @@ class _InterviewTableDataRowState extends State<InterviewTableDataRow> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          SizedBox(
-            width: widget.widthResume,
-            child: Row(
-              children: [
-                CustomTextButton(
-                  padding: 0,
-                  onClick: () => widget.onMenu('download'),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/common/solid/ic-mingcute-download-line.svg',
-                        width: 20,
-                        color: theme.colorScheme.tertiary,
-                      ),
-                      const SizedBox(width: 10),
-                      Text('Resume', style: theme.textTheme.labelLarge),
-                    ],
+          if (widget.showResume)
+            SizedBox(
+              width: widget.widthResume,
+              child: Row(
+                children: [
+                  CustomTextButton(
+                    padding: 0,
+                    onClick: () => widget.onMenu('download'),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/common/solid/ic-mingcute-download-line.svg',
+                          width: 20,
+                          color: theme.colorScheme.tertiary,
+                        ),
+                        const SizedBox(width: 10),
+                        Text('Resume', style: theme.textTheme.labelLarge),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           if (widget.showRejectedRound)
             SizedBox(
               width: widget.widthRejectedRound,
