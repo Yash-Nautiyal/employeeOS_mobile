@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'user_info_entity.dart';
+import 'user_role.dart';
 
 /// Common service to fetch user info from [public.user_info].
 /// Use anywhere in the project when you need user profile data (name, avatar, email, etc.).
@@ -10,6 +11,27 @@ class UserInfoService {
   final SupabaseClient _client;
 
   static const String _table = 'user_info';
+
+  /// HR and Admin users from [user_info] (recruitment scheduling pickers).
+  /// Falls back to filtering [fetchAllUsers] if the role filter returns empty.
+  Future<List<UserInfoEntity>> fetchHrUsers() async {
+    try {
+      final res = await _client
+          .from(_table)
+          .select(
+              'id, email, full_name, avatar_url, phone_number, date_of_birth, role, email_verified, phone_verified, created_at, last_activity, status')
+          .inFilter('role', ['hr', 'admin']).order('full_name');
+      final list = _mapRows(res);
+      if (list.isNotEmpty) return list;
+    } catch (_) {
+      // Fall through to client-side filter.
+    }
+    final all = await fetchAllUsers();
+    return all.where((u) {
+      final r = UserRole.fromString(u.role);
+      return r.isHR || r.isAdmin;
+    }).toList();
+  }
 
   /// Fetches all users from user_info, ordered by full_name.
   Future<List<UserInfoEntity>> fetchAllUsers() async {

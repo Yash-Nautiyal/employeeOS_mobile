@@ -1,8 +1,10 @@
 import 'package:employeeos/core/common/components/empty_content.dart';
 import 'package:employeeos/core/index.dart'
-    show CustomBreadCrumbs, showRightSideTaskDetails;
+    show CustomBreadCrumbs, UserInfoService, showRightSideTaskDetails;
+import 'package:employeeos/core/user/user_info_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../data/index.dart'
     show InterviewSchedulingLocalDataSource, InterviewSchedulingRepositoryImpl;
@@ -16,6 +18,9 @@ import '../widget/index.dart'
         CandidatesTable,
         InterviewFilterPanel,
         InterviewRoundsTab;
+import '../utils/interview_calendar_event_copy.dart';
+import '../utils/open_google_calendar.dart';
+import '../widget/interview_scheduling/dialogs/schedule_interview_dialogs.dart';
 import '../widget/interview_scheduling/table/interview_table_action_tools.dart';
 
 class InterviewSchedulingView extends StatefulWidget {
@@ -220,9 +225,10 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                                             InterviewRejectSubmitted(
                                                 state.selectedIds),
                                           ),
-                                          onSchedule: () => _bloc.add(
-                                            InterviewScheduleSubmitted(
-                                                state.selectedIds),
+                                          onSchedule: () =>
+                                              _openGoogleCalendarForScheduling(
+                                            context,
+                                            state,
                                           ),
                                           onSelect: () => _bloc.add(
                                             InterviewSelectSubmitted(
@@ -258,6 +264,105 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
         },
       ),
     );
+  }
+
+  /// Form → Google Calendar (TEMPLATE) → confirmation → optional pipeline update.
+  Future<void> _openGoogleCalendarForScheduling(
+    BuildContext context,
+    InterviewSchedulingState state,
+  ) async {
+    if (state.selectedIds.isEmpty) return;
+    if (!state.activeRound.usesEligibleScheduledTabs ||
+        state.activeTab != InterviewCandidateTab.eligible) {
+      return;
+    }
+
+    final userInfoService = context.read<UserInfoService>();
+    final form = await showScheduleInterviewFormDialog(
+      context: context,
+      theme: Theme.of(context),
+      userInfoService: userInfoService,
+      round: state.activeRound,
+    );
+
+    if (!context.mounted || form == null) return;
+
+    final selectedCandidates = state.candidates
+        .where((candidate) => state.selectedIds.contains(candidate.id))
+        .toList();
+    final applicantEmails = selectedCandidates
+        .map((candidate) => candidate.email.trim())
+        .where(_looksLikeEmail)
+        .toSet()
+        .toList();
+    final organizerEmail =
+        Supabase.instance.client.auth.currentUser?.email?.trim() ?? '';
+
+    final interviewerName = _hrDisplayName(form.interviewer);
+    final assignedByName = _hrDisplayName(form.assignedBy);
+
+    final candidateNamesSummary = selectedCandidates
+        .map((c) => c.name.trim())
+        .where((n) => n.isNotEmpty)
+        .join(', ');
+
+    final title = buildCalendarEventTitle(state.activeRound);
+    final details = buildCalendarEventDetails(
+      round: state.activeRound,
+      interviewerName: interviewerName,
+      assignedByName: assignedByName,
+      selectedCount: state.selectedIds.length,
+      candidateNamesSummary: candidateNamesSummary,
+    );
+
+    // Guests: organizer (logged-in user) + selected applicants + interviewer.
+    // [Set] dedupes so the same email is never added twice.
+    final guests = <String>{
+      if (_looksLikeEmail(organizerEmail)) organizerEmail,
+      ...applicantEmails,
+      if (_looksLikeEmail(form.interviewer.email))
+        form.interviewer.email.trim(),
+    }.toList();
+
+    final ok = await openGoogleCalendarTemplateEvent(
+      title: title,
+      startLocal: form.startLocal,
+      endLocal: form.endLocal,
+      details: details,
+      guests: guests,
+    );
+
+    if (!context.mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open Google Calendar')),
+      );
+      return;
+    }
+
+    final confirmed = await showMeetingScheduledConfirmationDialog(
+      context: context,
+      theme: Theme.of(context),
+    );
+
+    if (!context.mounted) return;
+    if (confirmed) {
+      _bloc.add(InterviewScheduleSubmitted(state.selectedIds));
+    }
+  }
+
+  String _hrDisplayName(UserInfoEntity u) {
+    final name = u.fullName.trim();
+    if (name.isNotEmpty) return name;
+    final email = u.email.trim();
+    if (email.isNotEmpty) return email;
+    return '—';
+  }
+
+  bool _looksLikeEmail(String value) {
+    final v = value.trim();
+    if (v.isEmpty) return false;
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v);
   }
 
   void _openFilterPanel(

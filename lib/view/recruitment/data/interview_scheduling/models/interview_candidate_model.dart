@@ -4,6 +4,7 @@ class InterviewCandidateModel extends InterviewCandidate {
   const InterviewCandidateModel({
     required super.id,
     required super.name,
+    required super.email,
     required super.jobTitle,
     required super.applicationDate,
     required super.interviewDate,
@@ -18,6 +19,7 @@ class InterviewCandidateModel extends InterviewCandidate {
     return InterviewCandidateModel(
       id: map['id'] as String,
       name: map['name'] as String,
+      email: map['email'] as String,
       jobTitle: map['jobTitle'] as String,
       applicationDate: map['applicationDate'] as DateTime,
       interviewDate: map['interviewDate'] as DateTime,
@@ -33,6 +35,7 @@ class InterviewCandidateModel extends InterviewCandidate {
     return {
       'id': id,
       'name': name,
+      'email': email,
       'jobTitle': jobTitle,
       'applicationDate': applicationDate,
       'interviewDate': interviewDate,
@@ -47,6 +50,7 @@ class InterviewCandidateModel extends InterviewCandidate {
   InterviewCandidateModel copyWith({
     String? id,
     String? name,
+    String? email,
     String? jobTitle,
     DateTime? applicationDate,
     DateTime? interviewDate,
@@ -60,6 +64,7 @@ class InterviewCandidateModel extends InterviewCandidate {
     return InterviewCandidateModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      email: email ?? this.email,
       jobTitle: jobTitle ?? this.jobTitle,
       applicationDate: applicationDate ?? this.applicationDate,
       interviewDate: interviewDate ?? this.interviewDate,

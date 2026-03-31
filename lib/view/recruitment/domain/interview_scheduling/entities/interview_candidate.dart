@@ -5,6 +5,7 @@ import 'interview_enums.dart';
 class InterviewCandidate extends Equatable {
   final String id;
   final String name;
+  final String email;
   final String jobTitle;
   final DateTime applicationDate;
   final DateTime interviewDate;
@@ -23,6 +24,7 @@ class InterviewCandidate extends Equatable {
   const InterviewCandidate({
     required this.id,
     required this.name,
+    required this.email,
     required this.jobTitle,
     required this.applicationDate,
     required this.interviewDate,
@@ -39,6 +41,7 @@ class InterviewCandidate extends Equatable {
   List<Object?> get props => [
         id,
         name,
+        email,
         jobTitle,
         applicationDate,
         interviewDate,

@@ -1,4 +1,3 @@
-
 import '../../../domain/index.dart' show InterviewRound;
 import '../models/interview_candidate_model.dart';
 
@@ -83,6 +82,7 @@ class InterviewSchedulingLocalDataSource {
   Future<void> syncEligibleFromShortlistedApplication({
     required String applicationId,
     required String fullName,
+    required String email,
     required String jobTitle,
     required DateTime appliedOn,
     required String jobId,
@@ -91,6 +91,7 @@ class InterviewSchedulingLocalDataSource {
     final row = InterviewCandidateModel(
       id: applicationId,
       name: fullName,
+      email: email,
       jobTitle: jobTitle,
       applicationDate: appliedOn,
       interviewDate: appliedOn,
@@ -125,6 +126,7 @@ class InterviewSchedulingLocalDataSource {
     InterviewCandidateModel row({
       required String id,
       required String name,
+      required String email,
       required String jobTitle,
       required DateTime applicationDate,
       required DateTime interviewDate,
@@ -137,6 +139,7 @@ class InterviewSchedulingLocalDataSource {
       return InterviewCandidateModel(
         id: id,
         name: name,
+        email: email,
         jobTitle: jobTitle,
         applicationDate: applicationDate,
         interviewDate: interviewDate,
@@ -152,6 +155,7 @@ class InterviewSchedulingLocalDataSource {
       row(
         id: '1',
         name: 'Yash katara',
+        email: 'itscrzy45@gmail.com',
         jobTitle: 'AWS Cloud Intern',
         applicationDate: DateTime(2025, 4, 16),
         interviewDate: DateTime(2025, 4, 16),
@@ -163,6 +167,7 @@ class InterviewSchedulingLocalDataSource {
       row(
         id: '2',
         name: 'Lakshman Reddy Thummala',
+        email: 'ynautiyal811@gmail.com',
         jobTitle: 'Full Stack Developer',
         applicationDate: DateTime(2025, 4, 15),
         interviewDate: DateTime(2025, 4, 15),
@@ -174,6 +179,7 @@ class InterviewSchedulingLocalDataSource {
       row(
         id: '3',
         name: 'Priya Sharma',
+        email: 'yashnautiyal04@gmail.com',
         jobTitle: 'Frontend Developer',
         applicationDate: DateTime(2025, 4, 14),
         interviewDate: DateTime(2025, 4, 14),
@@ -181,74 +187,6 @@ class InterviewSchedulingLocalDataSource {
         interviewer: 'Alex Chen',
         status: 'Scheduled',
         pipelineRound: InterviewRound.telephone,
-      ),
-      row(
-        id: '4',
-        name: 'Rahul Kumar',
-        jobTitle: 'Backend Developer',
-        applicationDate: DateTime(2025, 4, 13),
-        interviewDate: DateTime(2025, 4, 13),
-        jobId: 'BE-04',
-        interviewer: 'Sam Lee',
-        status: 'Eligible',
-        pipelineRound: InterviewRound.technical,
-      ),
-      row(
-        id: '5',
-        name: 'Anjali Gupta',
-        jobTitle: 'DevOps Engineer',
-        applicationDate: DateTime(2025, 4, 12),
-        interviewDate: DateTime(2025, 4, 12),
-        jobId: 'DEV-05',
-        interviewer: 'Maria Garcia',
-        status: 'Scheduled',
-        pipelineRound: InterviewRound.technical,
-      ),
-      row(
-        id: '6',
-        name: 'Vikram Singh',
-        jobTitle: 'Data Analyst',
-        applicationDate: DateTime(2025, 4, 11),
-        interviewDate: DateTime(2025, 4, 11),
-        jobId: 'DA-06',
-        interviewer: 'Sam Lee',
-        status: 'Selected',
-        pipelineRound: InterviewRound.selected,
-      ),
-      row(
-        id: '7',
-        name: 'Sneha Patel',
-        jobTitle: 'UI/UX Designer',
-        applicationDate: DateTime(2025, 4, 10),
-        interviewDate: DateTime(2025, 4, 10),
-        jobId: 'UX-07',
-        interviewer: 'Alex Chen',
-        status: 'Onboarding',
-        pipelineRound: InterviewRound.onboarding,
-      ),
-      row(
-        id: '8',
-        name: 'Amit Verma',
-        jobTitle: 'Mobile Developer',
-        applicationDate: DateTime(2025, 4, 9),
-        interviewDate: DateTime(2025, 4, 9),
-        jobId: 'MB-08',
-        interviewer: 'Maria Garcia',
-        status: 'Rejected',
-        pipelineRound: InterviewRound.rejected,
-        rejectedFromRound: InterviewRound.telephone,
-      ),
-      row(
-        id: '9',
-        name: 'Kavita Rao',
-        jobTitle: 'QA Engineer',
-        applicationDate: DateTime(2025, 4, 8),
-        interviewDate: DateTime(2025, 4, 8),
-        jobId: 'QA-09',
-        interviewer: 'Sam Lee',
-        status: 'Rejected',
-        pipelineRound: InterviewRound.rejected,
-        rejectedFromRound: InterviewRound.technical,
       ),
     ];
   }

@@ -12,20 +12,30 @@ class CustomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final wideScreen = MediaQuery.of(context).size.width > 500;
+    final size = MediaQuery.sizeOf(context);
+    final padding = MediaQuery.paddingOf(context);
+    final wideScreen = size.width > 500;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final isWideScreen = !isPortrait || wideScreen;
+    final isLandscape = size.width > size.height;
+    final availableH = size.height - padding.top - padding.bottom;
+    // Short landscape (e.g. phone rotated): cap height so content scrolls inside.
+    final maxH = (availableH - (isLandscape ? 16 : 28)).clamp(220.0, 520.0);
 
     return Dialog(
-      insetPadding:
-          EdgeInsets.symmetric(horizontal: 20, vertical: isWideScreen ? 10 : 0),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: isLandscape ? 8 : (isWideScreen ? 10 : 0),
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: maxWidth,
-          ),
-          child: child),
+        constraints: BoxConstraints(
+          maxWidth: maxWidth,
+          maxHeight: maxH,
+        ),
+        child: child,
+      ),
     );
   }
 }

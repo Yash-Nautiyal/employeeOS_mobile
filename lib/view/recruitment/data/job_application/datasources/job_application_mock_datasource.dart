@@ -33,6 +33,7 @@ class JobApplicationMockDatasource {
         .syncEligibleFromShortlistedApplication(
       applicationId: updated.id,
       fullName: updated.fullName,
+      email: updated.email,
       jobTitle: updated.jobTitle,
       appliedOn: updated.appliedOn,
       jobId: updated.jobId,

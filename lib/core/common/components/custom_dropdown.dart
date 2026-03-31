@@ -65,17 +65,17 @@ class _CustomDropdownState extends State<CustomDropdown> {
           gradient: LinearGradient(
             colors: [
               Theme.of(context).brightness == Brightness.dark
-                  ? const Color.fromARGB(255, 84, 47, 45)
-                  : const Color.fromARGB(255, 253, 239, 226),
+                  ? const Color.fromRGBO(84, 47, 45, 1)
+                  : const Color.fromRGBO(253, 239, 226, 0.9),
               Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 27, 31, 37)
-                  : const Color.fromARGB(255, 251, 251, 251),
+                  : const Color.fromRGBO(251, 251, 251, 0.9),
               Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 25, 29, 37)
-                  : const Color.fromARGB(255, 251, 251, 251),
+                  : const Color.fromRGBO(251, 251, 251, 0.9),
               Theme.of(context).brightness == Brightness.dark
                   ? const Color.fromARGB(255, 37, 59, 67)
-                  : const Color.fromARGB(255, 224, 255, 255),
+                  : const Color.fromRGBO(224, 255, 255, 0.9),
             ],
             stops: widget.theme.brightness == Brightness.dark
                 ? [0.0, .17, .87, .99]

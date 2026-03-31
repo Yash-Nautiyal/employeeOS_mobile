@@ -27,6 +27,15 @@ class CustomTextfield extends StatelessWidget {
   final Function? onSubmitted;
   final Function? onTapOutside;
 
+  /// Used with [TextInputType.datetime] date picker as the initial calendar day.
+  final DateTime? initialDateForPicker;
+
+  /// When set, overrides read-only behavior (e.g. time field with [onFieldTap]).
+  final bool? readOnly;
+
+  /// e.g. open time picker when [readOnly] is true.
+  final VoidCallback? onFieldTap;
+
   const CustomTextfield({
     super.key,
     required this.controller,
@@ -51,15 +60,24 @@ class CustomTextfield extends StatelessWidget {
     this.validator,
     this.onSubmitted,
     this.onTapOutside,
+    this.initialDateForPicker,
+    this.readOnly,
+    this.onFieldTap,
   }) : assert(close == null || close == false || onClose != null,
             'onClose is required when close is true');
 
   Future<void> _selectDate(BuildContext context) async {
+    final first = firstDate ?? DateTime(2020);
+    final last = lastDate ?? DateTime(2030);
+    var initial = initialDateForPicker ?? DateTime.now();
+    if (initial.isBefore(first)) initial = first;
+    if (initial.isAfter(last)) initial = last;
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: firstDate ?? DateTime(2020),
-      lastDate: lastDate ?? DateTime(2030),
+      initialDate: initial,
+      firstDate: first,
+      lastDate: last,
     );
 
     if (picked != null) {
@@ -72,6 +90,7 @@ class CustomTextfield extends StatelessWidget {
   Widget build(BuildContext context) {
     // Check if this is a datetime field
     bool isDateTimeField = keyboardType == TextInputType.datetime;
+    final effectiveReadOnly = readOnly ?? isDateTimeField;
 
     return TextFormField(
       onFieldSubmitted: (value) => onSubmitted?.call(value),
@@ -82,8 +101,10 @@ class CustomTextfield extends StatelessWidget {
       onTapOutside: (event) =>
           onTapOutside ?? FocusManager.instance.primaryFocus?.unfocus(),
       onChanged: (value) => onchange(value),
-      onTap: isDateTimeField ? () => _selectDate(context) : null,
-      readOnly: isDateTimeField,
+      onTap: onFieldTap != null
+          ? () => onFieldTap!()
+          : (isDateTimeField ? () => _selectDate(context) : null),
+      readOnly: effectiveReadOnly,
       maxLines: maxLines,
       minLines: 1,
       style: theme.textTheme.bodyMedium?.copyWith(

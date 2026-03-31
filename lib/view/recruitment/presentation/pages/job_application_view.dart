@@ -1,14 +1,12 @@
 import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
-import 'package:employeeos/view/recruitment/data/job_application/datasources/job_application_mock_datasource.dart';
-import 'package:employeeos/view/recruitment/data/job_application/repositories/job_application_repository_impl.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/usecases/get_job_applications.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/usecases/reject_job_application.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/usecases/shortlist_job_application.dart';
 import 'package:employeeos/view/recruitment/presentation/bloc/job_application/job_application_bloc.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/index.dart'
     show JobApplicationCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../widget/job_application/job_application_injection.dart'
+    show JobApplicationInjection;
 
 class JobApplicationView extends StatefulWidget {
   const JobApplicationView({super.key});
@@ -19,33 +17,29 @@ class JobApplicationView extends StatefulWidget {
 
 class _JobApplicationViewState extends State<JobApplicationView> {
   late final ScrollController _scrollController;
+  late final JobApplicationBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _bloc = JobApplicationInjection.createBloc();
+    _bloc.add(const JobApplicationsLoadRequested());
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _bloc.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final repository = JobApplicationRepositoryImpl(
-      JobApplicationMockDatasource.instance,
-    );
 
-    return BlocProvider(
-      create: (_) => JobApplicationBloc(
-        getJobApplicationsUseCase: GetJobApplicationsUseCase(repository),
-        shortlistJobApplicationUseCase:
-            ShortlistJobApplicationUseCase(repository),
-        rejectJobApplicationUseCase: RejectJobApplicationUseCase(repository),
-      )..add(const JobApplicationsLoadRequested()),
+    return BlocProvider.value(
+      value: _bloc,
       child: BlocBuilder<JobApplicationBloc, JobApplicationState>(
         builder: (context, state) {
           return CustomScrollView(

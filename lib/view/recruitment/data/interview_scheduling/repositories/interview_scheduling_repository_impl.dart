@@ -22,6 +22,7 @@ class InterviewSchedulingRepositoryImpl
         await localDataSource.syncEligibleFromShortlistedApplication(
           applicationId: a.id,
           fullName: a.fullName,
+          email: a.email,
           jobTitle: a.jobTitle,
           appliedOn: a.appliedOn,
           jobId: a.jobId,
