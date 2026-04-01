@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 
 import '../../../domain/index.dart'
     show
+        ApplicationPipelineStage,
+        ApplicationDbStatus,
         GetJobApplicationsPage,
         GetJobById,
         JobApplicationSummary,
@@ -124,7 +126,11 @@ class JobPostingDetailCubit extends Cubit<JobPostingDetailState> {
   Future<int> shortlistSelected() async {
     final ids = state.selectedApplicationIds.toList(growable: false);
     if (ids.isEmpty) return 0;
-    await _updateApplicationsStatus(applicationIds: ids, status: 'Shortlisted');
+    await _updateApplicationsStatus(
+      applicationIds: ids,
+      status: ApplicationDbStatus.shortlisted,
+      currentStage: ApplicationPipelineStage.firstInterviewRound,
+    );
     await loadApplicationsPage(page: state.applicationsPage);
     return ids.length;
   }
@@ -132,7 +138,11 @@ class JobPostingDetailCubit extends Cubit<JobPostingDetailState> {
   Future<int> rejectSelected() async {
     final ids = state.selectedApplicationIds.toList(growable: false);
     if (ids.isEmpty) return 0;
-    await _updateApplicationsStatus(applicationIds: ids, status: 'Rejected');
+    await _updateApplicationsStatus(
+      applicationIds: ids,
+      status: ApplicationDbStatus.rejected,
+      currentStage: ApplicationDbStatus.rejected,
+    );
     await loadApplicationsPage(page: state.applicationsPage);
     return ids.length;
   }

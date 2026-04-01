@@ -77,6 +77,7 @@ class _JobPostingViewState extends State<JobPostingView> {
           required bool joinAfterMonths,
           required String jobType,
           required DateTimeRange? dateRange,
+          String applicationStatus = '',
         }) {
           setState(() {
             _filterJobId = jobId;
@@ -175,7 +176,7 @@ class _JobPostingViewState extends State<JobPostingView> {
       child: SingleChildScrollView(
         controller: scrollController,
         padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top,
+          top: MediaQuery.of(context).padding.top + 5,
           bottom: 20,
         ),
         child: Column(

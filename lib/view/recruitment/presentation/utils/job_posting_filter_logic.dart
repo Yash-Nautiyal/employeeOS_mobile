@@ -45,8 +45,12 @@ List<JobPosting> applyJobPostingFiltersAndSort(
     }
 
     if (criteria.joinImmediate || criteria.joinAfterMonths) {
-      final isImmediate = job.joiningType.toLowerCase() == 'immediate';
-      final isAfterMonths = job.joiningType.toLowerCase() == 'notice period';
+      final jt = job.joiningType.toLowerCase();
+      final isImmediate = jt == 'immediate';
+      final isAfterMonths = jt == 'notice period' ||
+          jt == 'flexible' ||
+          jt == 'after_months' ||
+          jt.contains('month');
       final joinMatch = (criteria.joinImmediate && isImmediate) ||
           (criteria.joinAfterMonths && isAfterMonths);
       if (!joinMatch) return false;

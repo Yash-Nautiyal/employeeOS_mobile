@@ -1,6 +1,5 @@
 import 'package:employeeos/core/index.dart'
     show CustomDropdown, CustomTextfield;
-import '../../../../../domain/index.dart' show JobPosting;
 import 'package:flutter/material.dart';
 
 class JobPostingFilterPanel extends StatefulWidget {
@@ -15,15 +14,21 @@ class JobPostingFilterPanel extends StatefulWidget {
     required this.initialDateRange,
     required this.onReset,
     required this.onApply,
+    this.showApplicationStatusFilter = false,
+    this.initialApplicationStatus = '',
   });
 
-  final List<JobPosting> jobs;
+  final List<dynamic> jobs;
   final String initialJobId;
   final String initialHr;
   final bool initialJoinImmediate;
   final bool initialJoinAfterMonths;
   final String initialJobType;
   final DateTimeRange? initialDateRange;
+
+  /// When true (job applications screen), shows **Application status** dropdown.
+  final bool showApplicationStatusFilter;
+  final String initialApplicationStatus;
   final VoidCallback onReset;
   final void Function({
     required String jobId,
@@ -32,6 +37,7 @@ class JobPostingFilterPanel extends StatefulWidget {
     required bool joinAfterMonths,
     required String jobType,
     required DateTimeRange? dateRange,
+    String applicationStatus,
   }) onApply;
 
   @override
@@ -46,6 +52,7 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
   DateTimeRange? _dateRange;
 
   late String _selectedJobId;
+  late String _applicationStatus;
 
   @override
   void initState() {
@@ -56,6 +63,7 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
     _joinAfterMonths = widget.initialJoinAfterMonths;
     _jobType = widget.initialJobType;
     _dateRange = widget.initialDateRange;
+    _applicationStatus = widget.initialApplicationStatus.trim();
   }
 
   @override
@@ -72,6 +80,8 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
       joinAfterMonths: _joinAfterMonths,
       jobType: _jobType,
       dateRange: _dateRange,
+      applicationStatus:
+          widget.showApplicationStatusFilter ? _applicationStatus : '',
     );
   }
 
@@ -182,6 +192,7 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
                         _joinAfterMonths = false;
                         _jobType = 'All';
                         _dateRange = null;
+                        _applicationStatus = '';
                       });
                       widget.onReset();
                     },
@@ -254,6 +265,43 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
                       ],
                     ),
                   ),
+                  if (widget.showApplicationStatusFilter) ...[
+                    const SizedBox(height: 20),
+                    _label(theme, 'Application status'),
+                    SizedBox(
+                      height: 52,
+                      child: CustomDropdown(
+                        value: _applicationStatus.isEmpty
+                            ? ''
+                            : _applicationStatus,
+                        theme: theme,
+                        onChange: (v) {
+                          if (v == null) return;
+                          setState(() => _applicationStatus = v as String);
+                          _apply();
+                        },
+                        label: '',
+                        items: const [
+                          DropdownMenuItem(
+                            value: '',
+                            child: Text('All statuses'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'pending',
+                            child: Text('Pending'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'shortlisted',
+                            child: Text('Shortlisted'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'rejected',
+                            child: Text('Rejected'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 20),
                   _label(theme, 'Date Range'),
                   InkWell(

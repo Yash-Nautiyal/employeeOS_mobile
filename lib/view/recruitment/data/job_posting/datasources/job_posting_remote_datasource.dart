@@ -132,7 +132,7 @@ class JobPostingRemoteDatasource {
         fullName: row['applicant_name']?.toString() ?? '',
         email: row['email']?.toString() ?? '',
         phone: row['phone_number']?.toString() ?? '',
-        status: row['status']?.toString() ?? 'Applied',
+        status: row['status']?.toString() ?? 'pending',
         appliedOn: DateTime.tryParse(appliedOnRaw ?? '') ?? DateTime.now(),
         resumeUrl: row['resume_url']?.toString() ?? '',
       );
@@ -158,10 +158,16 @@ class JobPostingRemoteDatasource {
   Future<void> updateApplicationsStatus({
     required List<String> applicationIds,
     required String status,
+    String? currentStage,
   }) async {
     if (applicationIds.isEmpty) return;
+    final payload = <String, dynamic>{'status': status};
+    if (currentStage != null) {
+      payload['current_stage'] = currentStage;
+    }
     await _client
         .from('applications')
-        .update({'status': status}).inFilter('id', applicationIds);
+        .update(payload)
+        .inFilter('id', applicationIds);
   }
 }

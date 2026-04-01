@@ -58,7 +58,7 @@ class UserDashboardView extends StatelessWidget {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0)
-            .copyWith(top: MediaQuery.of(context).padding.top + 10, bottom: 20),
+            .copyWith(top: MediaQuery.of(context).padding.top + 21, bottom: 20),
         child: Column(
           children: [
             if (isWideScreen) ...[

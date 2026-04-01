@@ -1,13 +1,13 @@
-# Recruitment implementation — phased plan (mock-first)
+# Recruitment implementation — phased plan
 
 ## Principle: swap only the data layer later
 
-| Layer                                                  | Now                                                         | Later (database)                               |
-| ------------------------------------------------------ | ----------------------------------------------------------- | ---------------------------------------------- |
-| **Presentation** (pages, widgets, blocs)               | Unchanged                                                   | Unchanged                                      |
-| **Domain** (entities, repository contracts, use cases) | Unchanged                                                   | Unchanged                                      |
-| **Data — repository impl**                             | Thin: delegates to mock datasource                          | Thin: delegates to remote/API datasource       |
-| **Data — datasource**                                  | `*MockDatasource` / `*LocalDataSource` with in-memory lists | `*RemoteDataSource` with HTTP/Supabase queries |
+| Layer                                                  | Now                                                    | Later (database)        |
+| ------------------------------------------------------ | ------------------------------------------------------ | ----------------------- |
+| **Presentation** (pages, widgets, blocs)               | Unchanged                                              | Unchanged               |
+| **Domain** (entities, repository contracts, use cases) | Unchanged                                              | Unchanged               |
+| **Data — repository impl**                             | Thin: delegates to remote datasource                   | Same                    |
+| **Data — datasource**                                  | `*RemoteDatasource` (Supabase) for jobs / applications | Same or additional APIs |
 
 **Rule:** All “fetch / save” logic lives in **datasources**. Repositories only map DTOs ↔ entities and call one datasource. Use cases stay one-liners calling repositories.
 
@@ -15,15 +15,13 @@
 
 ## Phase 1 — Job applications (done)
 
-**Goal:** List applications from mock data; HR can shortlist or reject; status chip reflects state; Resume is a stub (URL launch or snackbar).
+**Goal:** List applications from Supabase `applications`; HR can shortlist or reject; status reflects DB values; resume via URL.
 
 **Deliverables:**
 
-- `JobApplicationRepository` + `JobApplicationRepositoryImpl` + `JobApplicationMockDatasource` (mutable in-memory).
+- `JobApplicationRepository` + `JobApplicationRepositoryImpl` + `JobApplicationRemoteDatasource`.
 - Use cases: load applications, shortlist, reject.
 - `JobApplicationBloc` + wire `JobApplicationView` / `JobApplicationCard`.
-
-**Later DB swap:** Replace `JobApplicationMockDatasource` with `JobApplicationRemoteDatasource` implementing the same method signatures (or same repository with constructor injection).
 
 ### Phase 1 — implemented (files)
 
@@ -32,9 +30,8 @@
 | Entity                | `domain/job_application/entities/job_application.dart`                                                                       |
 | Repository (abstract) | `domain/job_application/repositories/job_application_repository.dart`                                                        |
 | Use cases             | `domain/job_application/usecases/get_job_applications.dart`, `shortlist_job_application.dart`, `reject_job_application.dart` |
-| Mock JSON             | `data/mock/job_application_mock_data.dart`                                                                                   |
 | Model                 | `data/job_application/models/job_application_model.dart`                                                                     |
-| Datasource            | `data/job_application/datasources/job_application_mock_datasource.dart`                                                      |
+| Datasource            | `data/job_application/datasources/job_application_remote_datasource.dart`                                                    |
 | Repository impl       | `data/job_application/repositories/job_application_repository_impl.dart`                                                     |
 | Bloc                  | `presentation/bloc/job_application/job_application_bloc.dart` (+ `*_event.dart`, `*_state.dart` part files)                  |
 | UI                    | `presentation/pages/job_application_view.dart`, `presentation/widget/job_application/job_application_card.dart`              |

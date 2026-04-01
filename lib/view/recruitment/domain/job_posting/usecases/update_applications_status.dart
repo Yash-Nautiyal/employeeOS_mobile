@@ -8,10 +8,12 @@ class UpdateApplicationsStatus {
   Future<void> call({
     required List<String> applicationIds,
     required String status,
+    String? currentStage,
   }) {
     return repository.updateApplicationsStatus(
       applicationIds: applicationIds,
       status: status,
+      currentStage: currentStage,
     );
   }
 }

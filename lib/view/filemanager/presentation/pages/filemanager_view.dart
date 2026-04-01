@@ -78,7 +78,7 @@ class _FilemanagerViewState extends State<FilemanagerView> {
         controller: _scrollController,
         child: Padding(
           padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 10, bottom: 20),
+              top: MediaQuery.of(context).padding.top + 16, bottom: 20),
           child: BlocConsumer<FilemanagerBloc, FilemanagerState>(
             listenWhen: (previous, current) =>
                 current is FilemanagerActionState,

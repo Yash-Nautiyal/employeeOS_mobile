@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-/// A single application to a job posting (mock only for now).
+/// A single application to a job posting (`applications` table).
 class JobApplication extends Equatable {
   const JobApplication({
     required this.id,
@@ -20,9 +20,11 @@ class JobApplication extends Equatable {
   final String fullName;
   final String email;
   final String phone;
-  final String status; // e.g. 'Applied', 'Shortlisted', 'Rejected'
+
+  /// `applications.status` (e.g. `pending`, `shortlisted`, `rejected` — see `application_db_values.dart`).
+  final String status;
   final DateTime appliedOn;
-  final String resumeUrl; // mock URL to resume file
+  final String resumeUrl;
 
   @override
   List<Object?> get props => [

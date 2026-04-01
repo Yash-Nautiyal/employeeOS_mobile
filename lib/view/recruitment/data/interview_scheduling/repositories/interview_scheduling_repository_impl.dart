@@ -1,6 +1,6 @@
 import '../../../domain/index.dart'
     show InterviewCandidate, InterviewRound, InterviewSchedulingRepository;
-import '../../index.dart' show JobApplicationMockDatasource;
+import '../../job_application/datasources/job_application_mock_datasource.dart';
 import '../datasources/interview_scheduling_local_data_source.dart';
 
 class InterviewSchedulingRepositoryImpl

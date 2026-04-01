@@ -29,6 +29,26 @@ This document is a working reference for the Recruitment module so implementatio
 - Indexes: `job_id`, `created_at`, `status`
 - Trigger: `update_applications_updated_at` (before update)
 
+#### `applications.status`
+
+The app treats three values as the main lifecycle (lowercase in DB):
+
+| Value         | Meaning                         |
+| ------------- | ------------------------------- |
+| `pending`     | Not yet shortlisted or rejected |
+| `shortlisted` | Moving into the interview flow  |
+| `rejected`    | Not proceeding                  |
+
+Legacy rows may still use other strings (e.g. `Applied`); shortlist/reject guards accept `pending`, `applied`, or empty as “still actionable” for shortlist.
+
+#### `applications.current_stage`
+
+- **Shortlist:** set `current_stage` to the first interview round (`ApplicationPipelineStage.firstInterviewRound` → `telephone` in code; change if your pipeline uses another first step).
+- **Reject:** set `current_stage` to `rejected` (same literal as `status`).
+- As candidates progress, later updates (other screens / backend) can change `current_stage` to further rounds; this module only defines the two writes above.
+
+Constants: `domain/job_application/application_db_values.dart`.
+
 ### `interviews`
 
 - Primary key: `id` (uuid)
@@ -86,5 +106,5 @@ Under `lib/view/recruitment/` there are 3 feature sections:
 ## Next Planned Phases
 
 1. Job Posting hardening complete (add/update/delete/close, HTML description support)
-2. Move Job Applications from mock to `applications` table
+2. Job Applications use `applications` table (Supabase)
 3. Move Interview Scheduling from local/mock to `interviews` table and align pipeline transitions

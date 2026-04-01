@@ -1,4 +1,5 @@
 import 'package:employeeos/core/index.dart' show AppPallete, CustomTextButton;
+import 'package:employeeos/view/recruitment/domain/job_application/application_db_values.dart';
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,6 +22,16 @@ class JobApplicationCard extends StatelessWidget {
 
   static final _dateFmt = DateFormat('dd MMM yyyy, h:mm a');
 
+  static String _statusLabel(String raw) {
+    final n = ApplicationStatusActions.normalize(raw);
+    if (n.isEmpty) return 'Pending';
+    return n
+        .split('_')
+        .map((part) =>
+            part.isEmpty ? '' : '${part[0].toUpperCase()}${part.substring(1)}')
+        .join(' ');
+  }
+
   Future<void> _openResume(BuildContext context) async {
     final uri = Uri.tryParse(application.resumeUrl);
     if (uri == null) return;
@@ -33,16 +44,21 @@ class JobApplicationCard extends StatelessWidget {
   }
 
   (Color bg, Color fg) _statusColors() {
-    switch (application.status) {
-      case 'Shortlisted':
+    switch (ApplicationStatusActions.normalize(application.status)) {
+      case ApplicationDbStatus.shortlisted:
         return (
           AppPallete.successMain.withAlpha(50),
           AppPallete.successMain,
         );
-      case 'Rejected':
+      case ApplicationDbStatus.rejected:
         return (
           AppPallete.errorMain.withAlpha(50),
           AppPallete.errorMain,
+        );
+      case ApplicationDbStatus.pending:
+        return (
+          AppPallete.warningMain.withAlpha(50),
+          AppPallete.warningMain,
         );
       default:
         return (
@@ -54,10 +70,15 @@ class JobApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canAct = application.status == 'Applied';
+    final showActions =
+        ApplicationStatusActions.canUpdateStatus(application.status);
     final statusColors = _statusColors();
 
     return Container(
+      constraints: const BoxConstraints(
+        maxHeight: 270,
+        minHeight: 250,
+      ),
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       decoration: BoxDecoration(
@@ -73,6 +94,7 @@ class JobApplicationCard extends StatelessWidget {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -94,7 +116,7 @@ class JobApplicationCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  application.status,
+                  _statusLabel(application.status),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: statusColors.$2,
                   ),
@@ -184,7 +206,7 @@ class JobApplicationCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const Spacer(),
           Row(
             children: [
               Expanded(
@@ -213,22 +235,19 @@ class JobApplicationCard extends StatelessWidget {
                   onClick: () => _openResume(context),
                 ),
               ),
-              if (canAct) ...[
+              if (showActions) ...[
+                const SizedBox(width: 10),
                 IconButton(
-                  onPressed: canAct ? onShortlist : null,
-                  icon: SvgPicture.asset(
-                    'assets/icons/arrow/ic-eva_checkmark-fill.svg',
-                    colorFilter: ColorFilter.mode(
-                      canAct ? AppPallete.successMain : theme.disabledColor,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ),
+                    onPressed: onShortlist,
+                    icon: const Icon(
+                      Icons.check_circle_rounded,
+                      color: AppPallete.successMain,
+                    )),
                 IconButton(
-                  onPressed: canAct ? onReject : null,
-                  icon: Icon(
-                    Icons.close_rounded,
-                    color: canAct ? AppPallete.errorMain : theme.disabledColor,
+                  onPressed: onReject,
+                  icon: const Icon(
+                    Icons.close,
+                    color: AppPallete.errorMain,
                   ),
                 ),
               ]

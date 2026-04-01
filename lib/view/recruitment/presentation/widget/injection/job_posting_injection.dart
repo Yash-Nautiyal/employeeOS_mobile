@@ -12,7 +12,7 @@ class JobPostingInjection {
 
   static JobPostingRepository get jobPostingRepository {
     return _jobPostingRepository ??=
-        JobPostingRepositoryImpl.remote(JobPostingRemoteDatasource());
+        JobPostingRepositoryImpl(JobPostingRemoteDatasource());
   }
 
   // —— Use cases (call from blocs / pages; do not construct repos in widgets.) ——

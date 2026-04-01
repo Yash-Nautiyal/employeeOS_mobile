@@ -177,31 +177,29 @@ class _JobViewPageState extends State<JobViewPage> {
                     includeDescription: true,
                   ),
                 ),
-                SingleChildScrollView(
-                  child: ApplicationsContent(
-                    theme: theme,
-                    rows: state.applications,
-                    selectedIds: state.selectedApplicationIds,
-                    isLoading: state.isApplicationsLoading,
-                    error: state.applicationsError,
-                    currentPage: state.applicationsPage,
-                    totalPages: state.applicationsTotalPages,
-                    sortAsc: state.sortAsc,
-                    onToggleSelect: cubit.toggleSelectApplication,
-                    onToggleSelectAll: cubit.toggleSelectAllApplications,
-                    onSortDate: cubit.toggleApplicationsSort,
-                    onPrevPage: cubit.goPreviousApplicationsPage,
-                    onNextPage: cubit.goNextApplicationsPage,
-                    onRetry: cubit.retryApplicationsPage,
-                    onResume: _openResume,
-                    onDownload: () => _downloadResumes(state),
-                    onShortlist: state.hasSelection
-                        ? () => _onShortlistSelected(cubit)
-                        : null,
-                    onReject: state.hasSelection
-                        ? () => _onRejectSelected(cubit)
-                        : null,
-                  ),
+                ApplicationsContent(
+                  theme: theme,
+                  rows: state.applications,
+                  selectedIds: state.selectedApplicationIds,
+                  isLoading: state.isApplicationsLoading,
+                  error: state.applicationsError,
+                  currentPage: state.applicationsPage,
+                  totalPages: state.applicationsTotalPages,
+                  sortAsc: state.sortAsc,
+                  onToggleSelect: cubit.toggleSelectApplication,
+                  onToggleSelectAll: cubit.toggleSelectAllApplications,
+                  onSortDate: cubit.toggleApplicationsSort,
+                  onPrevPage: cubit.goPreviousApplicationsPage,
+                  onNextPage: cubit.goNextApplicationsPage,
+                  onRetry: cubit.retryApplicationsPage,
+                  onResume: _openResume,
+                  onDownload: () => _downloadResumes(state),
+                  onShortlist: state.hasSelection
+                      ? () => _onShortlistSelected(cubit)
+                      : null,
+                  onReject: state.hasSelection
+                      ? () => _onRejectSelected(cubit)
+                      : null,
                 ),
               ],
             ),

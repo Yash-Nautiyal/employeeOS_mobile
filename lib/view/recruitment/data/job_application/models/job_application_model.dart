@@ -21,11 +21,37 @@ class JobApplicationModel extends JobApplication {
       fullName: json['full_name'] as String? ?? '',
       email: json['email'] as String? ?? '',
       phone: json['phone'] as String? ?? '',
-      status: json['status'] as String? ?? 'Applied',
+      status: json['status'] as String? ?? 'pending',
       appliedOn: json['applied_on'] != null
           ? DateTime.tryParse(json['applied_on'] as String) ?? DateTime.now()
           : DateTime.now(),
       resumeUrl: json['resume_url'] as String? ?? '',
+    );
+  }
+
+  /// Row from `applications` with optional nested `jobs(job_id, title)` from PostgREST.
+  factory JobApplicationModel.fromDbJson(Map<String, dynamic> row) {
+    var businessJobId = '';
+    var jobTitle = '';
+    final jobs = row['jobs'];
+    if (jobs is Map) {
+      final m = Map<String, dynamic>.from(jobs);
+      businessJobId = m['job_id']?.toString() ?? '';
+      jobTitle = m['title']?.toString() ?? '';
+    }
+
+    final appliedRaw = row['created_at']?.toString();
+
+    return JobApplicationModel(
+      id: row['id']?.toString() ?? '',
+      jobId: businessJobId,
+      jobTitle: jobTitle,
+      fullName: row['applicant_name']?.toString() ?? '',
+      email: row['email']?.toString() ?? '',
+      phone: row['phone_number']?.toString() ?? '',
+      status: row['status']?.toString() ?? 'pending',
+      appliedOn: DateTime.tryParse(appliedRaw ?? '') ?? DateTime.now(),
+      resumeUrl: row['resume_url']?.toString() ?? '',
     );
   }
 

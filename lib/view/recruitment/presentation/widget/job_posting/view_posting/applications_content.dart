@@ -3,6 +3,7 @@ import 'package:employeeos/view/recruitment/domain/index.dart'
     show JobApplicationSummary;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
 import 'application_widgets/buttons.dart';
 import 'application_widgets/data_row.dart';
@@ -82,6 +83,65 @@ class _State extends State<ApplicationsContent> {
   ColorScheme get _cs => _t.colorScheme;
   TextTheme get _tt => _t.textTheme;
 
+  ScrollController? _headerHCtrl;
+  final List<ScrollController> _rowHCtrls = [];
+
+  static const Map<String, double> _widths = {
+    'applicant': _applicantWidth,
+    'email': _emailWidth,
+    'phone': _phoneWidth,
+    'status': _statusWidth,
+    'appliedOn': _appliedOnWidth,
+    'resume': _resumeWidth,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _syncHorizontalControllersIfNeeded();
+  }
+
+  @override
+  void didUpdateWidget(covariant ApplicationsContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.rows.length != widget.rows.length ||
+        oldWidget.currentPage != widget.currentPage) {
+      _syncHorizontalControllersIfNeeded();
+    }
+  }
+
+  void _syncHorizontalControllersIfNeeded() {
+    final n = widget.rows.length;
+    if (n == 0) {
+      _disposeHorizontalControllers();
+      return;
+    }
+    if (_headerHCtrl != null && _rowHCtrls.length == n) {
+      return;
+    }
+    _disposeHorizontalControllers();
+    final g = LinkedScrollControllerGroup();
+    _headerHCtrl = g.addAndGet();
+    for (var i = 0; i < n; i++) {
+      _rowHCtrls.add(g.addAndGet());
+    }
+  }
+
+  void _disposeHorizontalControllers() {
+    _headerHCtrl?.dispose();
+    for (final c in _rowHCtrls) {
+      c.dispose();
+    }
+    _rowHCtrls.clear();
+    _headerHCtrl = null;
+  }
+
+  @override
+  void dispose() {
+    _disposeHorizontalControllers();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.isLoading && widget.rows.isEmpty) {
@@ -101,103 +161,116 @@ class _State extends State<ApplicationsContent> {
 
     final allChecked =
         rows.isNotEmpty && rows.every((r) => widget.selectedIds.contains(r.id));
-    // Divider color
     final divColor = _cs.outlineVariant.withValues(alpha: 0.18);
 
-    return SingleChildScrollView(
+    final tableW = MediaQuery.sizeOf(context).width.clamp(
+          _totalWidth + 100,
+          double.infinity,
+        );
+
+    final headerCtrl = _headerHCtrl!;
+
+    final cardColor = _t.brightness == Brightness.dark
+        ? const Color.fromARGB(255, 23, 30, 37)
+        : _t.cardColor;
+
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: _t.brightness == Brightness.dark
-                ? const Color.fromARGB(255, 23, 30, 37)
-                : _t.cardColor,
-            boxShadow: [
-              BoxShadow(
-                color: _t.shadowColor,
-                blurRadius: 5,
-                spreadRadius: 2,
-              ),
-            ]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _TopBar(
-              theme: _t,
-              selectedCount: widget.selectedIds.length,
-              onDownload: widget.onDownload,
-              onShortlist: widget.onShortlist,
-              onReject: widget.onReject,
+          borderRadius: BorderRadius.circular(16),
+          color: cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: _t.shadowColor,
+              blurRadius: 5,
+              spreadRadius: 2,
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: MediaQuery.of(context)
-                    .size
-                    .width
-                    .clamp(_totalWidth + 100, double.infinity),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(color: _cs.surface),
-                      child: HeaderRow(
-                        widths: const {
-                          'applicant': _applicantWidth,
-                          'email': _emailWidth,
-                          'phone': _phoneWidth,
-                          'status': _statusWidth,
-                          'appliedOn': _appliedOnWidth,
-                          'resume': _resumeWidth,
-                        },
-                        theme: _t,
-                        allChecked: allChecked,
-                        sortAsc: widget.sortAsc,
-                        onCheckAll: widget.onToggleSelectAll,
-                        onSortDate: widget.onSortDate,
-                      ),
-                    ),
-                    for (var i = 0; i < rows.length; i++) ...[
-                      if (i > 0) CustomDivider(height: 1, color: divColor),
-                      Builder(builder: (_) {
-                        final row = rows[i];
-                        final rowMap = {
-                          'id': row.id,
-                          'full_name': row.fullName,
-                          'email': row.email,
-                          'phone': row.phone,
-                          'status': row.status,
-                          'applied_on': row.appliedOn.toIso8601String(),
-                          'resume_url': row.resumeUrl,
-                        };
-                        final sel = widget.selectedIds.contains(row.id);
-                        return CustomDataRow(
-                          key: ValueKey(row.id),
-                          theme: _t,
-                          row: rowMap,
-                          selected: sel,
-                          backgroundColor: Colors.transparent,
-                          onToggle: () => widget.onToggleSelect(row.id),
-                          onResume: () => widget.onResume(row.resumeUrl),
-                          widths: const {
-                            'applicant': _applicantWidth,
-                            'email': _emailWidth,
-                            'phone': _phoneWidth,
-                            'status': _statusWidth,
-                            'appliedOn': _appliedOnWidth,
-                            'resume': _resumeWidth,
-                          },
-                        );
-                      }),
-                    ],
-                    _PaginatorRow(
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: _TopBar(
+                theme: _t,
+                selectedCount: widget.selectedIds.length,
+                onDownload: widget.onDownload,
+                onShortlist: widget.onShortlist,
+                onReject: widget.onReject,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                controller: headerCtrl,
+                child: SizedBox(
+                  width: tableW,
+                  child: Container(
+                    decoration: BoxDecoration(color: _cs.surface),
+                    child: HeaderRow(
+                      widths: _widths,
                       theme: _t,
-                      currentPage: widget.currentPage,
-                      totalPages: widget.totalPages,
-                      onPrev: widget.onPrevPage,
-                      onNext: widget.onNextPage,
+                      allChecked: allChecked,
+                      sortAsc: widget.sortAsc,
+                      onCheckAll: widget.onToggleSelectAll,
+                      onSortDate: widget.onSortDate,
                     ),
-                  ],
+                  ),
+                ),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final row = rows[index];
+                  final rowMap = {
+                    'id': row.id,
+                    'full_name': row.fullName,
+                    'email': row.email,
+                    'phone': row.phone,
+                    'status': row.status,
+                    'applied_on': row.appliedOn.toIso8601String(),
+                    'resume_url': row.resumeUrl,
+                  };
+                  final sel = widget.selectedIds.contains(row.id);
+                  return Column(
+                    key: ValueKey(row.id),
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (index > 0) CustomDivider(height: 1, color: divColor),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        controller: _rowHCtrls[index],
+                        child: SizedBox(
+                          width: tableW,
+                          child: CustomDataRow(
+                            theme: _t,
+                            row: rowMap,
+                            selected: sel,
+                            backgroundColor: Colors.transparent,
+                            onToggle: () => widget.onToggleSelect(row.id),
+                            onResume: () => widget.onResume(row.resumeUrl),
+                            widths: _widths,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                childCount: rows.length,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                width: tableW,
+                child: _PaginatorRow(
+                  theme: _t,
+                  currentPage: widget.currentPage,
+                  totalPages: widget.totalPages,
+                  onPrev: widget.onPrevPage,
+                  onNext: widget.onNextPage,
                 ),
               ),
             ),

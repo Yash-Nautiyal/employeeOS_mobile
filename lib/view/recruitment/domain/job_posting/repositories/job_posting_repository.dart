@@ -28,5 +28,6 @@ abstract class JobPostingRepository {
   Future<void> updateApplicationsStatus({
     required List<String> applicationIds,
     required String status,
+    String? currentStage,
   });
 }
