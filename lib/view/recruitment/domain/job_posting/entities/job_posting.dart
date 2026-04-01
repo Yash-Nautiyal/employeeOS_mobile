@@ -1,14 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-/// Job posting entity. [description] is stored as JSON (Quill Delta)
-/// from flutter_quill — use [Document.fromJson(jsonDecode(description))]
-/// to display in a read-only QuillEditor.
 class JobPosting extends Equatable {
   final String id;
   final String title;
   final String department;
-
-  /// Quill document as JSON string (Delta format from flutter_quill).
   final String? description;
   final String? location;
   final int positions;

@@ -1,8 +1,9 @@
 import 'package:employeeos/core/index.dart' show CustomDivider;
+import 'package:employeeos/view/recruitment/domain/index.dart'
+    show JobApplicationSummary;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../data/mock/job_application_mock_data.dart';
 import 'application_widgets/buttons.dart';
 import 'application_widgets/data_row.dart';
 import 'application_widgets/header_row.dart';
@@ -34,56 +35,76 @@ class ApplicationsContent extends StatefulWidget {
   const ApplicationsContent({
     super.key,
     required this.theme,
-    this.jobId,
+    required this.rows,
+    required this.selectedIds,
+    required this.isLoading,
+    required this.error,
+    required this.currentPage,
+    required this.totalPages,
+    required this.sortAsc,
+    required this.onToggleSelect,
+    required this.onToggleSelectAll,
+    required this.onSortDate,
+    required this.onPrevPage,
+    required this.onNextPage,
+    required this.onRetry,
+    required this.onResume,
+    required this.onDownload,
+    this.onShortlist,
+    this.onReject,
   });
 
   final ThemeData theme;
-  final String? jobId;
+  final List<JobApplicationSummary> rows;
+  final Set<String> selectedIds;
+  final bool isLoading;
+  final String? error;
+  final int currentPage;
+  final int totalPages;
+  final bool sortAsc;
+  final ValueChanged<String> onToggleSelect;
+  final VoidCallback onToggleSelectAll;
+  final VoidCallback onSortDate;
+  final VoidCallback onPrevPage;
+  final VoidCallback onNextPage;
+  final VoidCallback onRetry;
+  final ValueChanged<String> onResume;
+  final VoidCallback onDownload;
+  final VoidCallback? onShortlist;
+  final VoidCallback? onReject;
 
   @override
   State<ApplicationsContent> createState() => _State();
 }
 
 class _State extends State<ApplicationsContent> {
-  final Set<int> _selected = {};
-  bool _sortAsc = false;
-
   ThemeData get _t => widget.theme;
   ColorScheme get _cs => _t.colorScheme;
   TextTheme get _tt => _t.textTheme;
 
-  List<Map<String, dynamic>> get _rows {
-    if (widget.jobId == null || widget.jobId!.isEmpty) return [];
-    final list = jobApplicationMockList
-        .where((a) => a['job_id'] == widget.jobId)
-        .toList()
-      ..sort((a, b) {
-        final cmp = ((a['applied_on'] as String?) ?? '')
-            .compareTo((b['applied_on'] as String?) ?? '');
-        return _sortAsc ? cmp : -cmp;
-      });
-    return list;
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (widget.jobId == null || widget.jobId!.isEmpty) {
-      return _empty(
-          'No job selected', 'Open a job posting to view its applications.');
+    if (widget.isLoading && widget.rows.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
     }
 
-    final rows = _rows;
+    if (widget.error != null && widget.rows.isEmpty) {
+      return _empty('Failed to load applications', widget.error!);
+    }
+
+    final rows = widget.rows;
 
     if (rows.isEmpty) {
       return _empty('No applications yet',
           'Applications will appear here once candidates apply.');
     }
 
-    final allChecked = rows.isNotEmpty && _selected.length == rows.length;
+    final allChecked =
+        rows.isNotEmpty && rows.every((r) => widget.selectedIds.contains(r.id));
     // Divider color
     final divColor = _cs.outlineVariant.withValues(alpha: 0.18);
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Container(
         decoration: BoxDecoration(
@@ -101,36 +122,63 @@ class _State extends State<ApplicationsContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Top action bar ───────────────────────────────────────────────
             _TopBar(
               theme: _t,
-              selectedCount: _selected.length,
-              onDownload: () => _snack('Downloading all resumes…'),
-              onShortlist:
-                  _selected.isEmpty ? null : () => _bulkAction('Shortlisted'),
-              onReject:
-                  _selected.isEmpty ? null : () => _bulkAction('Rejected'),
+              selectedCount: widget.selectedIds.length,
+              onDownload: widget.onDownload,
+              onShortlist: widget.onShortlist,
+              onReject: widget.onReject,
             ),
-
-            // ── Table ────────────────────────────────────────────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                // Horizontal scroll for narrow screens
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.of(context)
-                      .size
-                      .width
-                      .clamp(_totalWidth + 100, double.infinity),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // ── Header row ─────────────────────────────────────────
-                      Container(
-                        decoration: BoxDecoration(
-                          color: _cs.surface,
-                        ),
-                        child: HeaderRow(
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: MediaQuery.of(context)
+                    .size
+                    .width
+                    .clamp(_totalWidth + 100, double.infinity),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(color: _cs.surface),
+                      child: HeaderRow(
+                        widths: const {
+                          'applicant': _applicantWidth,
+                          'email': _emailWidth,
+                          'phone': _phoneWidth,
+                          'status': _statusWidth,
+                          'appliedOn': _appliedOnWidth,
+                          'resume': _resumeWidth,
+                        },
+                        theme: _t,
+                        allChecked: allChecked,
+                        sortAsc: widget.sortAsc,
+                        onCheckAll: widget.onToggleSelectAll,
+                        onSortDate: widget.onSortDate,
+                      ),
+                    ),
+                    for (var i = 0; i < rows.length; i++) ...[
+                      if (i > 0) CustomDivider(height: 1, color: divColor),
+                      Builder(builder: (_) {
+                        final row = rows[i];
+                        final rowMap = {
+                          'id': row.id,
+                          'full_name': row.fullName,
+                          'email': row.email,
+                          'phone': row.phone,
+                          'status': row.status,
+                          'applied_on': row.appliedOn.toIso8601String(),
+                          'resume_url': row.resumeUrl,
+                        };
+                        final sel = widget.selectedIds.contains(row.id);
+                        return CustomDataRow(
+                          key: ValueKey(row.id),
+                          theme: _t,
+                          row: rowMap,
+                          selected: sel,
+                          backgroundColor: Colors.transparent,
+                          onToggle: () => widget.onToggleSelect(row.id),
+                          onResume: () => widget.onResume(row.resumeUrl),
                           widths: const {
                             'applicant': _applicantWidth,
                             'email': _emailWidth,
@@ -139,55 +187,17 @@ class _State extends State<ApplicationsContent> {
                             'appliedOn': _appliedOnWidth,
                             'resume': _resumeWidth,
                           },
-                          theme: _t,
-                          allChecked: allChecked,
-                          sortAsc: _sortAsc,
-                          onCheckAll: () => setState(() {
-                            if (allChecked) {
-                              _selected.clear();
-                            } else {
-                              _selected
-                                  .addAll(List.generate(rows.length, (i) => i));
-                            }
-                          }),
-                          onSortDate: () =>
-                              setState(() => _sortAsc = !_sortAsc),
-                        ),
-                      ),
-
-                      // ── Data rows ──────────────────────────────────────────
-                      Expanded(
-                        child: ListView.separated(
-                          separatorBuilder: (_, __) =>
-                              CustomDivider(height: 1, color: divColor),
-                          itemCount: rows.length,
-                          itemBuilder: (ctx, i) {
-                            final row = rows[i];
-                            final sel = _selected.contains(i);
-                            return CustomDataRow(
-                              key: ValueKey(row['id'] ?? i),
-                              theme: _t,
-                              row: row,
-                              selected: sel,
-                              backgroundColor: Colors.transparent,
-                              onToggle: () => setState(() =>
-                                  sel ? _selected.remove(i) : _selected.add(i)),
-                              onResume: () => _snack(
-                                  'Open resume:\n${row['resume_url'] ?? ''}'),
-                              widths: const {
-                                'applicant': _applicantWidth,
-                                'email': _emailWidth,
-                                'phone': _phoneWidth,
-                                'status': _statusWidth,
-                                'appliedOn': _appliedOnWidth,
-                                'resume': _resumeWidth,
-                              },
-                            );
-                          },
-                        ),
-                      ),
+                        );
+                      }),
                     ],
-                  ),
+                    _PaginatorRow(
+                      theme: _t,
+                      currentPage: widget.currentPage,
+                      totalPages: widget.totalPages,
+                      onPrev: widget.onPrevPage,
+                      onNext: widget.onNextPage,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -196,14 +206,6 @@ class _State extends State<ApplicationsContent> {
       ),
     );
   }
-
-  void _bulkAction(String status) {
-    _snack('${_selected.length} applicant(s) → $status');
-    setState(() => _selected.clear());
-  }
-
-  void _snack(String msg) =>
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
   Widget _empty(String title, String msg) => Center(
         child: Padding(
@@ -230,6 +232,12 @@ class _State extends State<ApplicationsContent> {
                   style: _tt.bodySmall?.copyWith(
                       color: _cs.onSurfaceVariant.withValues(alpha: 0.5),
                       height: 1.5)),
+              const SizedBox(height: 12),
+              if (widget.error != null)
+                OutlinedButton(
+                  onPressed: widget.onRetry,
+                  child: const Text('Retry'),
+                ),
             ],
           ),
         ),
@@ -260,11 +268,75 @@ class _TopBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          Row(
+            children: [
+              if (onShortlist != null)
+                ActionBtn(
+                  label: 'Shortlist',
+                  color: Colors.green,
+                  onTap: onShortlist!,
+                  theme: theme,
+                ),
+              if (onShortlist != null) const SizedBox(width: 8),
+              if (onReject != null)
+                ActionBtn(
+                  label: 'Reject',
+                  color: Colors.redAccent,
+                  onTap: onReject!,
+                  theme: theme,
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
           DownloadBtn(
               theme: theme, onTap: onDownload, selectedCount: selectedCount),
+        ],
+      ),
+    );
+  }
+}
+
+class _PaginatorRow extends StatelessWidget {
+  const _PaginatorRow({
+    required this.theme,
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPrev,
+    required this.onNext,
+  });
+
+  final ThemeData theme;
+  final int currentPage;
+  final int totalPages;
+  final VoidCallback onPrev;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final canPrev = currentPage > 1;
+    final canNext = currentPage < totalPages;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Text(
+            'Page $currentPage of $totalPages',
+            style: theme.textTheme.bodySmall,
+          ),
+          const Spacer(),
+          IconButton(
+            tooltip: 'Previous page',
+            onPressed: canPrev ? onPrev : null,
+            icon: const Icon(Icons.chevron_left_rounded),
+          ),
+          IconButton(
+            tooltip: 'Next page',
+            onPressed: canNext ? onNext : null,
+            icon: const Icon(Icons.chevron_right_rounded),
+          ),
         ],
       ),
     );

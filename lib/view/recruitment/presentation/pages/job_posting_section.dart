@@ -1,9 +1,12 @@
 import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_posting.dart';
+import 'package:employeeos/view/recruitment/presentation/bloc/job_posting/job_posting_bloc.dart';
+import 'package:employeeos/view/recruitment/presentation/widget/job_posting/edit_posting/job_editing.dart';
+import 'package:employeeos/view/recruitment/presentation/widget/injection/job_posting_injection.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/job_posting_view.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/job_editing.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/job_posting/view_posting/job_view_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Wrapper that provides a [Navigator] for the Job Posting section.
 /// Keeps the layout's app bar visible while only the content area transitions
@@ -17,47 +20,55 @@ class JobPostingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      key: const ValueKey('JobPostingSection'),
-      initialRoute: routeList,
-      onGenerateRoute: (RouteSettings settings) {
-        switch (settings.name) {
-          case routeList:
-            return MaterialPageRoute<void>(
-              settings: settings,
-              builder: (_) => const JobPostingView(),
-            );
-          case routeJobView:
-            final args = settings.arguments is Map
-                ? settings.arguments as Map<String, dynamic>?
-                : null;
-            final jobId = args?['id'];
-            return CupertinoPageRoute<void>(
-              settings: settings,
-              builder: (_) => JobViewPage(jobId: jobId),
-            );
-          case routeJobEdit:
-            final args = settings.arguments is Map
-                ? settings.arguments as Map<String, dynamic>?
-                : null;
-            final job = args?['job'] as JobPosting?;
-            if (job == null) {
+    return BlocProvider<JobPostingBloc>(
+      create: (_) =>
+          JobPostingInjection.createBloc()..add(const LoadJobPostingsEvent()),
+      child: Navigator(
+        key: const ValueKey('JobPostingSection'),
+        initialRoute: routeList,
+        onGenerateRoute: (RouteSettings settings) {
+          switch (settings.name) {
+            case routeList:
               return MaterialPageRoute<void>(
                 settings: settings,
                 builder: (_) => const JobPostingView(),
               );
-            }
-            return CupertinoPageRoute<void>(
-              settings: settings,
-              builder: (_) => JobEditingPage(job: job),
-            );
-          default:
-            return MaterialPageRoute<void>(
-              settings: settings,
-              builder: (_) => const JobPostingView(),
-            );
-        }
-      },
+            case routeJobView:
+              final args = settings.arguments is Map
+                  ? settings.arguments as Map<String, dynamic>?
+                  : null;
+              final jobId = args?['id'];
+              return CupertinoPageRoute<void>(
+                settings: settings,
+                builder: (_) => JobViewPage(jobId: jobId),
+              );
+            case routeJobEdit:
+              final args = settings.arguments is Map
+                  ? settings.arguments as Map<String, dynamic>?
+                  : null;
+              final job = args?['job'] as JobPosting?;
+              final onJobUpdated = args?['onJobUpdated'] as VoidCallback?;
+              if (job == null) {
+                return MaterialPageRoute<void>(
+                  settings: settings,
+                  builder: (_) => const JobPostingView(),
+                );
+              }
+              return CupertinoPageRoute<void>(
+                settings: settings,
+                builder: (_) => JobEditingPage(
+                  job: job,
+                  onJobUpdated: onJobUpdated,
+                ),
+              );
+            default:
+              return MaterialPageRoute<void>(
+                settings: settings,
+                builder: (_) => const JobPostingView(),
+              );
+          }
+        },
+      ),
     );
   }
 }

@@ -2,6 +2,8 @@ import 'package:employeeos/core/common/components/popup/popup.dart';
 import 'package:employeeos/core/index.dart'
     show
         AppPallete,
+        CustomAlertDialog,
+        CustomAlertDialogStyle,
         EditPopupItem,
         ViewPopupItem,
         ResponsivePopupItem,
@@ -17,6 +19,8 @@ class JobPostingCardHeader extends StatefulWidget {
   final bool canEditAndDelete;
   final bool isActive;
   final ValueChanged<bool>? onActiveChanged;
+  final VoidCallback? onCloseTap;
+  final VoidCallback? onDeleteTap;
 
   const JobPostingCardHeader({
     super.key,
@@ -26,6 +30,8 @@ class JobPostingCardHeader extends StatefulWidget {
     this.canEditAndDelete = true, //HR only for own jobs, Admin for any.
     this.isActive = true,
     this.onActiveChanged,
+    this.onCloseTap,
+    this.onDeleteTap,
   });
 
   @override
@@ -33,10 +39,62 @@ class JobPostingCardHeader extends StatefulWidget {
 }
 
 class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
+  /// Primary action color for “close posting” confirmation (coral).
+  static const Color _closePostingConfirmColor = Color(0xFFFF5733);
+
   final GlobalKey _popupAnchorKey = GlobalKey();
   final LayerLink _layerLink = LayerLink();
   final ResponsivePopupController _popupController =
       ResponsivePopupController();
+
+  void _showCloseJobConfirmation() {
+    if (widget.onCloseTap == null) return;
+    final theme = Theme.of(context);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => CustomAlertDialog(
+        title: 'Close Job Posting?',
+        content: Text(
+          'Are you sure you want to close this job posting? This will make it '
+          'inactive and no longer visible to applicants.',
+          style: theme.textTheme.bodyMedium,
+        ),
+        cancelLabel: 'Cancel',
+        primaryLabel: 'Yes, Close Posting',
+        primaryColor: _closePostingConfirmColor,
+        onCancel: () => Navigator.of(ctx).pop(),
+        primaryOnTap: () {
+          Navigator.of(ctx).pop();
+          widget.onCloseTap?.call();
+        },
+      ),
+    );
+  }
+
+  void _showDeleteJobConfirmation() {
+    if (widget.onDeleteTap == null) return;
+    final theme = Theme.of(context);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => CustomAlertDialog(
+        style: CustomAlertDialogStyle.danger,
+        title: 'Delete Job Posting?',
+        content: Text(
+          'Are you sure you want to delete this job posting? This action cannot '
+          'be undone.',
+          style: theme.textTheme.bodyMedium,
+        ),
+        cancelLabel: 'Cancel',
+        primaryLabel: 'Yes, Delete Posting',
+        primaryColor: theme.colorScheme.error,
+        onCancel: () => Navigator.of(ctx).pop(),
+        primaryOnTap: () {
+          Navigator.of(ctx).pop();
+          widget.onDeleteTap?.call();
+        },
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -63,7 +121,7 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
                     alpha: brightness == Brightness.dark ? .15 : .3),
           ),
           child: Text(
-            widget.isActive ? 'Active' : 'InActive',
+            widget.isActive ? 'Active' : 'Closed',
             style: widget.theme.textTheme.labelLarge?.copyWith(
               color: widget.isActive
                   ? AppPallete.successMain
@@ -90,7 +148,11 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
             layerLink: _layerLink,
             popupController: _popupController,
             preferredPosition: PopupPreferredPosition.left,
-            arrowOffset: widget.canEditAndDelete ? 0.2 : 0.5,
+            arrowOffset: widget.canEditAndDelete
+                ? widget.isActive
+                    ? 0.2
+                    : 0.3
+                : 0.5,
             manualOffset: const Offset(10, 0),
             arrowColor: widget.theme.brightness == Brightness.dark
                 ? AppPallete.darkBackgroundGradient.colors[1]
@@ -115,17 +177,25 @@ class _JobPostingCardHeaderState extends State<JobPostingCardHeader> {
                     },
                   ),
                 ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0)
-                    .copyWith(top: 10),
-                child: ResponsivePopupItem(
-                  title: 'Close Job',
-                  svgIcon: 'assets/icons/common/solid/ic-solar-lock-bold.svg',
-                  onTap: () {},
-                  color: AppPallete.warningMain,
+              if (widget.isActive)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0)
+                      .copyWith(top: 10),
+                  child: ResponsivePopupItem(
+                    title: 'Close Job',
+                    svgIcon: 'assets/icons/common/solid/ic-solar-lock-bold.svg',
+                    onTap: () {
+                      _popupController.hide();
+                      _showCloseJobConfirmation();
+                    },
+                    color: AppPallete.warningMain,
+                  ),
                 ),
-              ),
-              if (widget.canEditAndDelete) DestructivePopupItem(onTap: () {}),
+              if (widget.canEditAndDelete)
+                DestructivePopupItem(onTap: () {
+                  _popupController.hide();
+                  _showDeleteJobConfirmation();
+                }),
             ])
       ],
     );

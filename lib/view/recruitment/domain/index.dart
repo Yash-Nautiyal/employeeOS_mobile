@@ -1,6 +1,17 @@
 export 'job_posting/entities/job_posting.dart';
+export 'job_posting/entities/job_application_summary.dart';
+export 'job_posting/entities/job_applications_page.dart';
 export 'job_posting/repositories/job_posting_repository.dart';
+export 'job_posting/usecases/add_job.dart';
+export 'job_posting/usecases/delete_job.dart';
+export 'job_posting/usecases/get_all_jobs.dart';
+export 'job_posting/usecases/get_job_application_counts.dart';
+export 'job_posting/usecases/get_job_applications_page.dart';
+export 'job_posting/usecases/get_job_by_id.dart';
 export 'job_posting/usecases/get_job_department.dart';
+export 'job_posting/usecases/toggle_job_status.dart';
+export 'job_posting/usecases/update_job.dart';
+export 'job_posting/usecases/update_applications_status.dart';
 
 export 'interview_scheduling/entities/interview_candidate.dart';
 export 'interview_scheduling/entities/interview_enums.dart';

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:employeeos/core/index.dart'
@@ -7,13 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../data/index.dart';
-import '../../../../domain/index.dart' show GetJobDepartmentUseCase;
+import '../../../../data/index.dart' show JobPostingModel;
+import '../../../utils/quill_description_codec.dart';
+import '../../injection/job_posting_injection.dart';
 import '../components/quill/tool_bar.dart';
 import 'detail_section.dart';
 
 class AddJobPostingPage extends StatefulWidget {
-  const AddJobPostingPage({super.key});
+  const AddJobPostingPage({super.key, this.onPostingSaved});
+
+  /// Called after a successful create (before [Navigator.pop]). Parent refreshes list.
+  final VoidCallback? onPostingSaved;
 
   @override
   State<AddJobPostingPage> createState() => _AddJobPostingPageState();
@@ -53,8 +56,7 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
   }
 
   Future<void> _loadDepartments() async {
-    final repo = JobPostingRepositoryImpl(JobPostingMockDatasource.instance);
-    final departments = await GetJobDepartmentUseCase(repo).call();
+    final departments = await JobPostingInjection.getJobDepartments();
     if (!mounted) return;
     setState(() => _departments = departments);
   }
@@ -85,21 +87,19 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
     return Supabase.instance.client.auth.currentUser?.email ?? '—';
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final department = (_selectedDepartment ?? '').trim();
 
-    // For now, this screen writes into the in-memory datasource.
-    final descriptionJson = jsonEncode(
-      _descriptionController.document.toDelta().toJson(),
-    );
+    final descriptionHtml = QuillDescriptionCodec.encodeDocumentToHtml(
+        _descriptionController.document);
 
     final job = JobPostingModel(
-      id: 'job-mock-${DateTime.now().microsecondsSinceEpoch}',
+      id: '',
       title: _jobTitleController.text.trim(),
       department: department,
-      description: descriptionJson,
+      description: descriptionHtml,
       location: _locationController.text.trim().isEmpty
           ? null
           : _locationController.text.trim(),
@@ -115,8 +115,17 @@ class _AddJobPostingPageState extends State<AddJobPostingPage> {
       createdAt: DateTime.now(),
     );
 
-    JobPostingMockDatasource.instance.add(job);
-    Navigator.of(context).pop(true);
+    try {
+      await JobPostingInjection.addJob(job);
+      if (!mounted) return;
+      widget.onPostingSaved?.call();
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create job: $e')),
+      );
+    }
   }
 
   DateTime? _parseDateFromField(String text) {

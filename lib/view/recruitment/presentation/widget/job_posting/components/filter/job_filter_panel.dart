@@ -1,12 +1,12 @@
 import 'package:employeeos/core/index.dart'
     show CustomDropdown, CustomTextfield;
-import 'package:employeeos/view/recruitment/data/index.dart'
-    show JobPostingMockDatasource, JobPostingModel;
+import '../../../../../domain/index.dart' show JobPosting;
 import 'package:flutter/material.dart';
 
 class JobPostingFilterPanel extends StatefulWidget {
   const JobPostingFilterPanel({
     super.key,
+    required this.jobs,
     required this.initialJobId,
     required this.initialHr,
     required this.initialJoinImmediate,
@@ -17,6 +17,7 @@ class JobPostingFilterPanel extends StatefulWidget {
     required this.onApply,
   });
 
+  final List<JobPosting> jobs;
   final String initialJobId;
   final String initialHr;
   final bool initialJoinImmediate;
@@ -44,14 +45,11 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
   late String _jobType;
   DateTimeRange? _dateRange;
 
-  /// Empty string = all jobs (no Job ID filter).
   late String _selectedJobId;
-  late final Future<List<JobPostingModel>> _jobsFuture;
 
   @override
   void initState() {
     super.initState();
-    _jobsFuture = JobPostingMockDatasource.instance.getAll();
     _selectedJobId = widget.initialJobId.trim();
     _hrController = TextEditingController(text: widget.initialHr);
     _joinImmediate = widget.initialJoinImmediate;
@@ -101,73 +99,55 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
   }
 
   Widget _jobIdDropdown(ThemeData theme) {
-    return FutureBuilder<List<JobPostingModel>>(
-      future: _jobsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const SizedBox(
-            height: 52,
-            child: Center(
-              child: SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          );
-        }
+    final jobs = widget.jobs;
+    final ids = jobs.map((j) => j.id).toSet().toList()..sort();
 
-        final jobs = snapshot.data ?? <JobPostingModel>[];
-        final ids = jobs.map((j) => j.id).toSet().toList()..sort();
-
-        final items = <DropdownMenuItem<String>>[
-          const DropdownMenuItem<String>(
-            value: '',
-            child: Text('All jobs'),
-          ),
-          ...ids.map((id) {
-            final j = jobs.firstWhere((e) => e.id == id);
-            return DropdownMenuItem<String>(
-              value: id,
-              child: Text(
-                '${j.id} — ${j.title}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            );
-          }),
-        ];
-
-        var value = _selectedJobId;
-        if (value.isNotEmpty && !ids.contains(value)) {
-          items.add(
-            DropdownMenuItem<String>(
-              value: value,
-              child: Text(value, maxLines: 1, overflow: TextOverflow.ellipsis),
-            ),
-          );
-        }
-
-        if (!items.any((e) => e.value == value)) {
-          value = '';
-        }
-
-        return SizedBox(
-          height: 52,
-          child: CustomDropdown(
-            value: value,
-            theme: theme,
-            isSearchable: true,
-            onChange: (dynamic v) {
-              if (v == null) return;
-              setState(() => _selectedJobId = v as String);
-              _apply();
-            },
-            label: '',
-            items: items,
+    final items = <DropdownMenuItem<String>>[
+      const DropdownMenuItem<String>(
+        value: '',
+        child: Text('All jobs'),
+      ),
+      ...ids.map((id) {
+        final j = jobs.firstWhere((e) => e.id == id);
+        return DropdownMenuItem<String>(
+          value: id,
+          child: Text(
+            '${j.id} — ${j.title}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         );
-      },
+      }),
+    ];
+
+    var value = _selectedJobId;
+    if (value.isNotEmpty && !ids.contains(value)) {
+      items.add(
+        DropdownMenuItem<String>(
+          value: value,
+          child: Text(value, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+      );
+    }
+
+    if (!items.any((e) => e.value == value)) {
+      value = '';
+    }
+
+    return SizedBox(
+      height: 52,
+      child: CustomDropdown(
+        value: value,
+        theme: theme,
+        isSearchable: true,
+        onChange: (dynamic v) {
+          if (v == null) return;
+          setState(() => _selectedJobId = v as String);
+          _apply();
+        },
+        label: '',
+        items: items,
+      ),
     );
   }
 
@@ -183,8 +163,8 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
             Container(
               decoration: BoxDecoration(
                 border: Border(
-                  bottom:
-                      BorderSide(color: theme.dividerColor.withOpacity(0.4)),
+                  bottom: BorderSide(
+                      color: theme.dividerColor.withValues(alpha: 0.4)),
                 ),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

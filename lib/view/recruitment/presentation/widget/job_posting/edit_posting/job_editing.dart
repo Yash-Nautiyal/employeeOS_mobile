@@ -1,22 +1,27 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
-import 'components/quill/tool_bar.dart';
-import 'add_posting/detail_section.dart';
+import '../components/quill/tool_bar.dart';
+import '../add_posting/detail_section.dart';
 
 import 'package:employeeos/core/index.dart'
     show AppPallete, CustomDropdown, CustomTextButton, CustomTextfield;
-import '../../../data/index.dart'
-    show JobPostingMockDatasource, JobPostingModel, JobPostingRepositoryImpl;
-import '../../../domain/index.dart' show GetJobDepartmentUseCase, JobPosting;
+import '../../../../data/index.dart' show JobPostingModel;
+import '../../../../domain/index.dart' show JobPosting;
+import '../../../utils/quill_description_codec.dart';
+import '../../injection/job_posting_injection.dart';
 
 class JobEditingPage extends StatefulWidget {
   final JobPosting job;
+  final VoidCallback? onJobUpdated;
 
-  const JobEditingPage({super.key, required this.job});
+  const JobEditingPage({
+    super.key,
+    required this.job,
+    this.onJobUpdated,
+  });
 
   @override
   State<JobEditingPage> createState() => _JobEditingPageState();
@@ -59,17 +64,11 @@ class _JobEditingPageState extends State<JobEditingPage> {
     _postedByEmailController.text = j.postedByEmail;
 
     if (j.description != null && j.description!.trim().isNotEmpty) {
-      try {
-        final doc = Document.fromJson(
-          jsonDecode(j.description!) as List,
-        );
-        _descriptionController = QuillController(
-          document: doc,
-          selection: const TextSelection.collapsed(offset: 0),
-        );
-      } catch (_) {
-        _descriptionController = QuillController.basic();
-      }
+      final doc = QuillDescriptionCodec.decodeToDocument(j.description);
+      _descriptionController = QuillController(
+        document: doc,
+        selection: const TextSelection.collapsed(offset: 0),
+      );
     } else {
       _descriptionController = QuillController.basic();
     }
@@ -83,8 +82,7 @@ class _JobEditingPageState extends State<JobEditingPage> {
   }
 
   Future<void> _loadDepartments() async {
-    final repo = JobPostingRepositoryImpl(JobPostingMockDatasource.instance);
-    final departments = await GetJobDepartmentUseCase(repo).call();
+    final departments = await JobPostingInjection.getJobDepartments();
     if (!mounted) return;
     setState(() => _departments = departments);
   }
@@ -104,17 +102,16 @@ class _JobEditingPageState extends State<JobEditingPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final j = widget.job;
-    final descriptionJson = jsonEncode(
-      _descriptionController.document.toDelta().toJson(),
-    );
+    final descriptionHtml = QuillDescriptionCodec.encodeDocumentToHtml(
+        _descriptionController.document);
     final updated = JobPostingModel(
       id: j.id,
       title: _jobTitleController.text.trim(),
       department: (_selectedDepartment ?? '').trim(),
-      description: descriptionJson,
+      description: descriptionHtml,
       location: _locationController.text.trim().isEmpty
           ? null
           : _locationController.text.trim(),
@@ -129,8 +126,17 @@ class _JobEditingPageState extends State<JobEditingPage> {
       postedByEmail: _postedByEmailController.text.trim(),
       createdAt: j.createdAt,
     );
-    JobPostingMockDatasource.instance.update(updated);
-    Navigator.of(context).pop(true);
+    try {
+      await JobPostingInjection.updateJob(updated);
+      if (!mounted) return;
+      widget.onJobUpdated?.call();
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update job: $e')),
+      );
+    }
   }
 
   DateTime? _parseDateFromField(String text) {
@@ -331,7 +337,10 @@ class _JobEditingPageState extends State<JobEditingPage> {
             label: 'Joining Type',
             value: _joiningType,
             items: ['Immediate', 'Notice Period', 'Flexible']
-                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                .map((e) => DropdownMenuItem<String>(
+                    value: e.toLowerCase(),
+                    child:
+                        Text(e.substring(0, 1).toUpperCase() + e.substring(1))))
                 .toList(),
             onChange: (v) => setState(() => _joiningType = v as String),
           ),

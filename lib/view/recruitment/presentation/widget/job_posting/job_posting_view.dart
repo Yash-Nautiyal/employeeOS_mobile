@@ -1,20 +1,21 @@
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
+import 'package:employeeos/core/common/components/custom_toast.dart';
+import 'package:employeeos/core/user/current_user_profile.dart';
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, CustomTextButton, showRightSideTaskDetails;
+import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
+import 'package:employeeos/view/recruitment/presentation/bloc/job_posting/job_posting_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:toastification/toastification.dart';
 
-import '../../../data/index.dart'
-    show
-        JobApplicationMockDatasource,
-        JobPostingMockDatasource,
-        JobPostingModel;
 import '../../pages/job_posting_section.dart';
+import '../../utils/job_posting_filter_logic.dart';
 import 'add_posting/add_job_posting_page.dart';
+import 'components/card/job_posting_card_slot.dart';
 import 'components/filter/job_filter_panel.dart';
 import 'components/filter/recruitment_list_filter_bar.dart';
-import 'components/card/job_posting_card.dart';
 
 class JobPostingView extends StatefulWidget {
   const JobPostingView({super.key});
@@ -25,17 +26,10 @@ class JobPostingView extends StatefulWidget {
 
 class _JobPostingViewState extends State<JobPostingView> {
   final scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
+  final _searchController = TextEditingController();
 
-  final _mockDatasource = JobPostingMockDatasource.instance;
-  late Future<
-      ({
-        List<JobPostingModel> jobs,
-        Map<String, int> applicationCounts,
-      })> _jobsFuture;
   String _sortBy = 'Latest';
 
-  // Filter state
   String _filterJobId = '';
   String _filterHr = '';
   bool _joinImmediate = false;
@@ -43,43 +37,23 @@ class _JobPostingViewState extends State<JobPostingView> {
   String _jobType = 'All';
   DateTimeRange? _dateRange;
 
-  Future<
-      ({
-        List<JobPostingModel> jobs,
-        Map<String, int> applicationCounts,
-      })> _loadJobsAndCounts() async {
-    final jobs = await _mockDatasource.getAll();
-    final apps = await JobApplicationMockDatasource.instance.getApplications();
-    final counts = <String, int>{};
-    for (final a in apps) {
-      counts[a.jobId] = (counts[a.jobId] ?? 0) + 1;
-    }
-    return (jobs: jobs, applicationCounts: counts);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _jobsFuture = _loadJobsAndCounts();
-  }
-
-  void _refreshJobs() {
-    setState(() {
-      _jobsFuture = _loadJobsAndCounts();
-    });
-  }
-
   @override
   void dispose() {
     _searchController.dispose();
-
+    scrollController.dispose();
     super.dispose();
   }
 
+  void _refreshJobPostings() {
+    context.read<JobPostingBloc>().add(const RefreshJobPostingsEvent());
+  }
+
   void _openFilterPanel() {
+    final jobs = _currentJobsFromBloc();
     showRightSideTaskDetails(
       context,
       JobPostingFilterPanel(
+        jobs: jobs,
         initialJobId: _filterJobId,
         initialHr: _filterHr,
         initialJoinImmediate: _joinImmediate,
@@ -119,239 +93,294 @@ class _JobPostingViewState extends State<JobPostingView> {
     );
   }
 
-  List<JobPostingModel> _applyFiltersAndSort(List<JobPostingModel> jobs) {
-    final search = _searchController.text.trim().toLowerCase();
-    var filtered = jobs.where((job) {
-      if (search.isNotEmpty) {
-        final hay = '${job.title} ${job.department} ${job.id}'.toLowerCase();
-        if (!hay.contains(search)) return false;
-      }
+  List<JobPosting> _currentJobsFromBloc() {
+    final s = context.read<JobPostingBloc>().state;
+    if (s is JobPostingLoaded) return s.jobs;
+    return const [];
+  }
 
-      if (_filterJobId.isNotEmpty && job.id != _filterJobId) {
-        return false;
-      }
+  JobPostingFilterCriteria get _filterCriteria {
+    return JobPostingFilterCriteria(
+      searchQuery: _searchController.text,
+      jobId: _filterJobId,
+      hrQuery: _filterHr,
+      joinImmediate: _joinImmediate,
+      joinAfterMonths: _joinAfterMonths,
+      jobType: _jobType,
+      dateRange: _dateRange,
+      sortBy: _sortBy,
+    );
+  }
 
-      if (_filterHr.trim().isNotEmpty) {
-        final hrNeedle = _filterHr.trim().toLowerCase();
-        final hrHay = '${job.postedByName} ${job.postedByEmail}'.toLowerCase();
-        if (!hrHay.contains(hrNeedle)) return false;
-      }
+  Future<void> _onSetJobActive(String jobId, bool isActive) async {
+    context.read<JobPostingBloc>().add(
+          SetJobActiveEvent(jobId: jobId, isActive: isActive),
+        );
+  }
 
-      if (_joinImmediate || _joinAfterMonths) {
-        final isImmediate = job.joiningType.toLowerCase() == 'immediate';
-        final isAfterMonths = job.joiningType.toLowerCase() == 'notice period';
-        final joinMatch = (_joinImmediate && isImmediate) ||
-            (_joinAfterMonths && isAfterMonths);
-        if (!joinMatch) return false;
-      }
+  Future<void> _onCloseJob(String jobId) async {
+    context.read<JobPostingBloc>().add(CloseJobEvent(jobId));
+  }
 
-      if (_jobType != 'All') {
-        if (_jobType == 'Internship' && !job.isInternship) return false;
-        if (_jobType == 'Full-time' && job.isInternship) return false;
-      }
+  Future<void> _onDeleteJob(String jobId) async {
+    context.read<JobPostingBloc>().add(DeleteJobEvent(jobId));
+  }
 
-      if (_dateRange != null) {
-        final d = job.createdAt ?? job.lastDateToApply;
-        if (d == null) return false;
-        final inRange =
-            !d.isBefore(_dateRange!.start) && !d.isAfter(_dateRange!.end);
-        if (!inRange) return false;
-      }
-      return true;
-    }).toList();
+  void _onViewJob(String jobId) {
+    Navigator.of(context).pushNamed(
+      JobPostingSection.routeJobView,
+      arguments: {'id': jobId},
+    );
+  }
 
-    if (_sortBy == 'Latest') {
-      filtered.sort((a, b) {
-        final ad = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final bd = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return bd.compareTo(ad);
-      });
-    } else if (_sortBy == 'Oldest') {
-      filtered.sort((a, b) {
-        final ad = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final bd = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return ad.compareTo(bd);
-      });
-    }
-    return filtered;
+  Future<void> _onEditJob(JobPosting job) async {
+    await Navigator.of(context).pushNamed(
+      JobPostingSection.routeJobEdit,
+      arguments: <String, dynamic>{
+        'job': job,
+        'onJobUpdated': _refreshJobPostings,
+      },
+    );
+  }
+
+  Future<void> _onAddPosting() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => AddJobPostingPage(
+          onPostingSaved: _refreshJobPostings,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final profile = context.watch<AuthBloc>().state.currentProfile;
-    final canManageJobs = profile?.canManageOwnJobs ?? false;
 
-    return SingleChildScrollView(
-      controller: scrollController,
-      padding:
-          EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IntrinsicHeight(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Row(
-                children: [
-                  Flexible(
-                    child: CustomBreadCrumbs(
-                      theme: theme,
-                      heading: 'Job Posting',
-                      routes: const ['Dashboard', 'Job', 'Posting'],
-                    ),
-                  ),
-                  if (canManageJobs)
-                    CustomTextButton(
-                      backgroundColor: theme.colorScheme.tertiary,
-                      padding: 0,
-                      onClick: () async {
-                        final shouldRefresh =
-                            await Navigator.of(context).push<bool>(
-                          MaterialPageRoute<bool>(
-                            builder: (_) => const AddJobPostingPage(),
-                          ),
-                        );
-                        if (!mounted) return;
-                        if (shouldRefresh == true) _refreshJobs();
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/common/solid/ic-solar-case-round-bold.svg',
-                            width: 20,
-                            colorFilter: ColorFilter.mode(
-                              theme.scaffoldBackgroundColor,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Add Posting',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.scaffoldBackgroundColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+    return BlocListener<JobPostingBloc, JobPostingState>(
+      listenWhen: (previous, current) =>
+          current is JobPostingLoaded && current.transientError != null,
+      listener: (context, state) {
+        final loaded = state as JobPostingLoaded;
+        final msg = loaded.transientError;
+        if (msg == null) return;
+        showCustomToast(
+            context: context,
+            type: ToastificationType.error,
+            title: 'Error',
+            description: msg);
+        context.read<JobPostingBloc>().add(const ClearTransientErrorEvent());
+      },
+      child: SingleChildScrollView(
+        controller: scrollController,
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top,
+          bottom: 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: CustomBreadCrumbs(
+                        theme: theme,
+                        heading: 'Job Posting',
+                        routes: const ['Dashboard', 'Job', 'Posting'],
                       ),
                     ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          RecruitmentListFilterBar(
-            searchController: _searchController,
-            onSearchChanged: (_) => setState(() {}),
-            onFiltersTap: _openFilterPanel,
-            sortBy: _sortBy,
-            onSortChanged: (v) => setState(() => _sortBy = v),
-          ),
-          const SizedBox(height: 16),
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: FutureBuilder<
-                  ({
-                    List<JobPostingModel> jobs,
-                    Map<String, int> applicationCounts,
-                  })>(
-                future: _jobsFuture,
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(
-                        child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ));
-                  }
-                  final data = snapshot.data!;
-                  final jobs = _applyFiltersAndSort(data.jobs);
-                  final applicationCounts = data.applicationCounts;
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = constraints.maxWidth;
-                      final useGrid = width >= 720;
-
-                      Widget buildCard(JobPostingModel job) {
-                        final canEditAndDelete = profile != null &&
-                            (profile.canManageAnyJob ||
-                                (profile.canManageOwnJobs &&
-                                    job.postedByEmail == profile.email));
-                        return JobPostingCard(
-                          theme: theme,
-                          job: job,
-                          applicationCount: applicationCounts[job.id] ?? 0,
-                          canEditAndDelete: canEditAndDelete,
-                          onJobActiveChanged: (jobId, isActive) async {
-                            _mockDatasource.setJobActive(jobId, isActive);
-                            if (mounted) _refreshJobs();
-                          },
-                          onViewTap: () {
-                            Navigator.of(context).pushNamed(
-                              JobPostingSection.routeJobView,
-                              arguments: {'id': job.id},
-                            );
-                          },
-                          onEditTap: () async {
-                            await Navigator.of(context).pushNamed(
-                              JobPostingSection.routeJobEdit,
-                              arguments: {'job': job},
-                            );
-                            if (mounted) _refreshJobs();
-                          },
-                        );
-                      }
-
-                      if (!useGrid) {
-                        return ListView.builder(
-                          controller: scrollController,
-                          itemCount: jobs.length,
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context, index) => Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
-                            child: buildCard(jobs[index]),
-                          ),
-                        );
-                      }
-
-                      // Responsive grid across tablet and desktop widths.
-                      final crossAxisCount = (width / 340).floor().clamp(2, 5);
-                      const spacing = 12.0;
-                      final cardWidth =
-                          (width - ((crossAxisCount - 1) * spacing)) /
-                              crossAxisCount;
-                      final aspectRatio =
-                          (cardWidth / 360).clamp(0.75, 1.15).toDouble();
-
-                      return GridView.builder(
-                        controller: scrollController,
-                        itemCount: jobs.length,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          mainAxisSpacing: spacing,
-                          crossAxisSpacing: spacing,
-                          childAspectRatio: aspectRatio,
+                    if (profile?.canManageOwnJobs ?? false)
+                      CustomTextButton(
+                        backgroundColor: theme.colorScheme.tertiary,
+                        padding: 0,
+                        onClick: _onAddPosting,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/common/solid/ic-solar-case-round-bold.svg',
+                              width: 20,
+                              colorFilter: ColorFilter.mode(
+                                theme.scaffoldBackgroundColor,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Add Posting',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.scaffoldBackgroundColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        itemBuilder: (context, index) => buildCard(jobs[index]),
-                      );
-                    },
-                  );
-                },
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            RecruitmentListFilterBar(
+              searchController: _searchController,
+              onSearchChanged: (_) => setState(() {}),
+              onFiltersTap: _openFilterPanel,
+              sortBy: _sortBy,
+              onSortChanged: (v) => setState(() => _sortBy = v),
+            ),
+            const SizedBox(height: 16),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: _JobPostingFeedBody(
+                  theme: theme,
+                  profile: profile,
+                  scrollController: scrollController,
+                  criteria: _filterCriteria,
+                  onSetJobActive: _onSetJobActive,
+                  onCloseJob: _onCloseJob,
+                  onDeleteJob: _onDeleteJob,
+                  onViewJob: _onViewJob,
+                  onEditJob: _onEditJob,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _JobPostingFeedBody extends StatelessWidget {
+  const _JobPostingFeedBody({
+    required this.theme,
+    required this.profile,
+    required this.scrollController,
+    required this.criteria,
+    required this.onSetJobActive,
+    required this.onCloseJob,
+    required this.onDeleteJob,
+    required this.onViewJob,
+    required this.onEditJob,
+  });
+
+  final ThemeData theme;
+  final CurrentUserProfile? profile;
+  final ScrollController scrollController;
+  final JobPostingFilterCriteria criteria;
+
+  final Future<void> Function(String jobId, bool isActive) onSetJobActive;
+  final Future<void> Function(String jobId) onCloseJob;
+  final Future<void> Function(String jobId) onDeleteJob;
+  final void Function(String jobId) onViewJob;
+  final Future<void> Function(JobPosting job) onEditJob;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<JobPostingBloc, JobPostingState, int>(
+      selector: (state) {
+        if (state is JobPostingLoaded) return 2;
+        if (state is JobPostingLoadError) return 1;
+        return 0;
+      },
+      builder: (context, mode) {
+        if (mode == 0) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        if (mode == 1) {
+          return BlocSelector<JobPostingBloc, JobPostingState, String>(
+            selector: (s) => s is JobPostingLoadError ? s.message : '',
+            builder: (context, message) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    message.isEmpty ? 'Failed to load jobs.' : message,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            },
+          );
+        }
+        return BlocSelector<JobPostingBloc, JobPostingState, List<JobPosting>?>(
+          selector: (state) {
+            if (state is! JobPostingLoaded) return null;
+            return state.jobs;
+          },
+          builder: (context, allJobs) {
+            if (allJobs == null) return const SizedBox.shrink();
+            final jobs = applyJobPostingFiltersAndSort(allJobs, criteria);
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final useGrid = width >= 720;
+
+                Widget slotFor(int index) {
+                  final job = jobs[index];
+                  return JobPostingCardSlot(
+                    key: ValueKey<String>(job.id),
+                    jobId: job.id,
+                    theme: theme,
+                    profile: profile,
+                    onViewTap: () => onViewJob(job.id),
+                    onEditTap: () => onEditJob(job),
+                    onJobActiveChanged: onSetJobActive,
+                    onCloseJob: onCloseJob,
+                    onDeleteJob: onDeleteJob,
+                  );
+                }
+
+                if (!useGrid) {
+                  return ListView.builder(
+                    controller: scrollController,
+                    itemCount: jobs.length,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: slotFor(index),
+                    ),
+                  );
+                }
+
+                final crossAxisCount = (width / 340).floor().clamp(2, 5);
+                const spacing = 12.0;
+                final cardWidth =
+                    (width - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+                final aspectRatio =
+                    (cardWidth / 360).clamp(0.75, 1.15).toDouble();
+
+                return GridView.builder(
+                  controller: scrollController,
+                  itemCount: jobs.length,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: spacing,
+                    crossAxisSpacing: spacing,
+                    childAspectRatio: aspectRatio,
+                  ),
+                  itemBuilder: (context, index) => slotFor(index),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

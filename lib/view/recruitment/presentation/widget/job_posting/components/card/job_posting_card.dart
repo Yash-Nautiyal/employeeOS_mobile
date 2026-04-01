@@ -13,12 +13,10 @@ class JobPostingCard extends StatefulWidget {
   final VoidCallback onViewTap;
   final VoidCallback onEditTap;
   final JobPosting? job;
-
-  /// When false, Edit and Delete are hidden (Phase 1: HR only for own jobs, Admin for any).
   final bool canEditAndDelete;
   final Future<void> Function(String jobId, bool isActive)? onJobActiveChanged;
-
-  /// Applications in mock store for this job (see [JobApplicationMockDatasource]).
+  final Future<void> Function(String jobId)? onCloseJob;
+  final Future<void> Function(String jobId)? onDeleteJob;
   final int applicationCount;
 
   const JobPostingCard({
@@ -29,6 +27,8 @@ class JobPostingCard extends StatefulWidget {
     this.job,
     this.canEditAndDelete = true,
     this.onJobActiveChanged,
+    this.onCloseJob,
+    this.onDeleteJob,
     this.applicationCount = 0,
   });
 
@@ -77,14 +77,20 @@ class _JobPostingCardState extends State<JobPostingCard>
                       widget.onJobActiveChanged!(widget.job!.id, value);
                     }
                   : null,
+              onCloseTap: widget.job != null && widget.onCloseJob != null
+                  ? () => widget.onCloseJob!(widget.job!.id)
+                  : null,
+              onDeleteTap: widget.job != null && widget.onDeleteJob != null
+                  ? () => widget.onDeleteJob!(widget.job!.id)
+                  : null,
             ),
           ),
           Text(
-            widget.job?.title ?? 'Cloud Internship - AWS',
+            widget.job?.title ?? '',
             style: widget.theme.textTheme.displaySmall?.copyWith(fontSize: 20),
           ),
           Text(
-            widget.job?.department ?? 'Tech',
+            widget.job?.department ?? '',
             style: widget.theme.textTheme.bodyMedium
                 ?.copyWith(color: widget.theme.disabledColor),
           ),
@@ -106,7 +112,8 @@ class _JobPostingCardState extends State<JobPostingCard>
                   children: [
                     SvgPicture.asset(
                       'assets/icons/common/solid/ic-solar_users-group-rounded-bold.svg',
-                      color: AppPallete.successMain,
+                      colorFilter: const ColorFilter.mode(
+                          AppPallete.successMain, BlendMode.srcIn),
                       width: 20,
                     ),
                     const SizedBox(
@@ -124,7 +131,8 @@ class _JobPostingCardState extends State<JobPostingCard>
                   children: [
                     SvgPicture.asset(
                       'assets/icons/common/solid/ic-file-bold.svg',
-                      color: AppPallete.infoMain,
+                      colorFilter: const ColorFilter.mode(
+                          AppPallete.infoMain, BlendMode.srcIn),
                       width: 20,
                     ),
                     const SizedBox(
@@ -146,14 +154,15 @@ class _JobPostingCardState extends State<JobPostingCard>
             children: [
               SvgPicture.asset(
                 'assets/icons/common/solid/ic-solar_user-id-bold.svg',
-                color: widget.theme.disabledColor,
+                colorFilter: ColorFilter.mode(
+                    widget.theme.disabledColor, BlendMode.srcIn),
                 width: 20,
               ),
               const SizedBox(
                 width: 5,
               ),
               Text(
-                'Posted by: ${widget.job?.postedByName ?? 'Yash Nautiyal'}',
+                'Posted by: ${widget.job?.postedByName ?? ''}',
                 style: widget.theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: widget.theme.dividerColor,
@@ -165,14 +174,15 @@ class _JobPostingCardState extends State<JobPostingCard>
             children: [
               SvgPicture.asset(
                 'assets/icons/common/solid/ic-fluent_mail-24-filled.svg',
-                color: widget.theme.disabledColor,
+                colorFilter: ColorFilter.mode(
+                    widget.theme.disabledColor, BlendMode.srcIn),
                 width: 20,
               ),
               const SizedBox(
                 width: 5,
               ),
               Text(
-                widget.job?.postedByEmail ?? 'nautiyalyash4@gmail.com',
+                widget.job?.postedByEmail ?? '',
                 style: widget.theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: widget.theme.dividerColor,

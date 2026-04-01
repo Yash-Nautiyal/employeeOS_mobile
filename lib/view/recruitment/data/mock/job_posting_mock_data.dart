@@ -1,9 +1,7 @@
 /// Mock job postings for UI development (no database).
 ///
-/// [description] is stored as a **Quill Delta JSON string**: the same format
-/// you get from `jsonEncode(quillController.document.toDelta().toJson())`.
-/// To display it: `Document.fromJson(jsonDecode(description) as List)` then
-/// a read-only QuillController + QuillEditor.
+/// [description] uses **legacy Quill Delta JSON** strings so local mock data
+/// still exercises the Delta decode path; live data uses HTML.
 List<Map<String, dynamic>> get jobPostingMockList => [
       {
         'id': 'job-mock-1',

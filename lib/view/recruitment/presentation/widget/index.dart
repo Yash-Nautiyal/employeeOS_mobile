@@ -1,5 +1,5 @@
 export 'job_posting/add_posting/add_job_posting_page.dart';
-export 'job_posting/job_editing.dart';
+export 'job_posting/edit_posting/job_editing.dart';
 export 'job_posting/view_posting/job_view_page.dart';
 export 'job_posting/add_posting/detail_section.dart';
 export 'job_posting/components/card/job_posting_card.dart';

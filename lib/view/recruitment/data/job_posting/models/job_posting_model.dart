@@ -41,6 +41,30 @@ class JobPostingModel extends JobPosting {
     );
   }
 
+  factory JobPostingModel.fromDbJson(Map<String, dynamic> json) {
+    final positionsRaw = json['positions'];
+    final positions = positionsRaw is num
+        ? positionsRaw.toInt()
+        : int.tryParse(positionsRaw?.toString() ?? '') ?? 1;
+
+    return JobPostingModel(
+      id: (json['job_id'] as String?) ?? (json['id'] as String? ?? ''),
+      title: json['title'] as String? ?? '',
+      department: json['department'] as String? ?? '',
+      description: json['description'] as String?,
+      location: json['location'] as String?,
+      positions: positions,
+      lastDateToApply: _parseDate(json['last_date']),
+      joiningType: json['joining_type'] as String? ?? 'Immediate',
+      isInternship: json['is_internship'] as bool? ?? false,
+      ctcRange: json['expected_ctc_range'] as String?,
+      postedByName: json['posted_by_name'] as String? ?? '',
+      postedByEmail: json['posted_by_email'] as String? ?? '',
+      createdAt: _parseDate(json['created_at']),
+      isActive: json['is_active'] as bool? ?? true,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -56,6 +80,40 @@ class JobPostingModel extends JobPosting {
       'posted_by_name': postedByName,
       'posted_by_email': postedByEmail,
       'created_at': createdAt?.toIso8601String(),
+      'is_active': isActive,
+    };
+  }
+
+  Map<String, dynamic> toDbInsertJson() {
+    return {
+      'title': title,
+      'department': department,
+      'description': description,
+      'location': location,
+      'is_internship': isInternship,
+      'expected_ctc_range': ctcRange,
+      'is_active': isActive,
+      'joining_type': joiningType,
+      'positions': positions.toString(),
+      'last_date': _formatDate(lastDateToApply),
+      'posted_by_name': postedByName,
+      'posted_by_email': postedByEmail,
+    };
+  }
+
+  Map<String, dynamic> toDbUpdateJson() {
+    return {
+      'title': title,
+      'department': department,
+      'description': description,
+      'location': location,
+      'is_internship': isInternship,
+      'expected_ctc_range': ctcRange,
+      'joining_type': joiningType,
+      'positions': positions.toString(),
+      'last_date': _formatDate(lastDateToApply),
+      'posted_by_name': postedByName,
+      'posted_by_email': postedByEmail,
       'is_active': isActive,
     };
   }
@@ -92,5 +150,36 @@ class JobPostingModel extends JobPosting {
       createdAt: createdAt ?? this.createdAt,
       isActive: isActive ?? this.isActive,
     );
+  }
+
+  factory JobPostingModel.toModel(JobPosting job) {
+    if (job is JobPostingModel) return job;
+    return JobPostingModel(
+      id: job.id,
+      title: job.title,
+      department: job.department,
+      description: job.description,
+      location: job.location,
+      positions: job.positions,
+      lastDateToApply: job.lastDateToApply,
+      joiningType: job.joiningType,
+      isInternship: job.isInternship,
+      ctcRange: job.ctcRange,
+      postedByName: job.postedByName,
+      postedByEmail: job.postedByEmail,
+      createdAt: job.createdAt,
+      isActive: job.isActive,
+    );
+  }
+
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    return DateTime.tryParse(value.toString());
+  }
+
+  static String? _formatDate(DateTime? value) {
+    if (value == null) return null;
+    return value.toIso8601String().split('T').first;
   }
 }

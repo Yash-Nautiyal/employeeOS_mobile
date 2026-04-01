@@ -1,4 +1,5 @@
 export 'job_posting/datasources/job_posting_mock_datasource.dart';
+export 'job_posting/datasources/job_posting_remote_datasource.dart';
 export 'job_posting/repositories/job_posting_repository_impl.dart';
 export 'job_posting/models/job_posting_model.dart';
 
