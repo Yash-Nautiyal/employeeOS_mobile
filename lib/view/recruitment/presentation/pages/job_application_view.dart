@@ -1,5 +1,6 @@
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, showRightSideTaskDetails;
+import 'package:employeeos/core/network/remote_data_exception.dart';
 import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
 import '../bloc/job_application/job_application_bloc.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/index.dart'
@@ -58,10 +59,21 @@ class _JobApplicationViewState extends State<JobApplicationView> {
     _scrollController = ScrollController();
     _bloc = JobApplicationInjection.createBloc();
     _bloc.add(const JobApplicationsLoadRequested());
-    JobPostingInjection.getAllJobs().then((jobs) {
+    _loadJobsForFilter();
+  }
+
+  Future<void> _loadJobsForFilter() async {
+    try {
+      final jobs = await JobPostingInjection.getAllJobs();
       if (!mounted) return;
       setState(() => _jobsForFilter = jobs);
-    });
+    } on RemoteDataException {
+      if (!mounted) return;
+      setState(() => _jobsForFilter = []);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _jobsForFilter = []);
+    }
   }
 
   @override

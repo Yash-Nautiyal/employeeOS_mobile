@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'dart:ui';
 import 'package:employeeos/core/auth/auth_error_handler.dart';
+import 'package:employeeos/core/network/remote_data_exception.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
@@ -10,6 +10,7 @@ import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/view/home/presentation/pages/home_view.dart';
 import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -20,13 +21,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-
-    // Global error handler: treat network/retryable auth errors as non-fatal
-    // (do not sign out, do not hang). Only explicit auth failures (401, revoked
-    // token) should lead to sign-out.
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
       if (AuthErrorHandler.handleUnhandledError(error, stack)) {
         return true; // Handled; error is not propagated.
+      }
+      if (error is RemoteDataException) {
+        if (kDebugMode) {
+          debugPrint('[RemoteDataException] ${error.message}');
+        }
+        return true;
       }
       FlutterError.presentError(
         FlutterErrorDetails(exception: error, stack: stack),
@@ -73,6 +76,12 @@ void main() {
   }, (Object error, StackTrace stack) {
     if (AuthErrorHandler.handleUnhandledError(error, stack)) {
       return; // Handled; do not rethrow.
+    }
+    if (error is RemoteDataException) {
+      if (kDebugMode) {
+        debugPrint('[RemoteDataException] ${error.message}');
+      }
+      return;
     }
     FlutterError.presentError(
       FlutterErrorDetails(exception: error, stack: stack),

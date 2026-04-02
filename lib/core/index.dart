@@ -41,4 +41,7 @@ export 'theme/app_pallete.dart';
 export 'common/actions/date_time_actions.dart';
 export 'common/actions/file_actions.dart';
 
+export 'network/remote_data_exception.dart';
+export 'network/run_supabase_remote.dart';
+
 export 'user/user_info_index.dart';
