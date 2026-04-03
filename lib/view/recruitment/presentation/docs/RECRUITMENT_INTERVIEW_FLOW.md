@@ -60,13 +60,13 @@ flowchart TB
     A --> F[Status chip e.g. Shortlisted]
   end
 
-  D -->|Shortlist| G[Persist: shortlisted for this job]
-  E -->|Deny| H[Persist: denied / not proceeding]
+  D -->|Shortlist| G[Supabase: status shortlisted, current_stage telephone]
+  E -->|Deny| H[Supabase: status rejected, current_stage rejected]
 
-  G --> I[Candidate eligible for interview pipeline for this job]
+  G --> I[Also: syncEligibleFromShortlistedApplication → interview local list Telephone / Eligible]
 ```
 
-**Note:** Exact persistence fields (e.g. `application_status`, `shortlisted_at`) will be defined when mapping to the database layer.
+**Implemented persistence:** `applications.status` and `applications.current_stage` (see `application_db_values.dart` and `JobApplicationRemoteDatasource`). The interview scheduling screen still uses an **in-memory** pipeline; shortlist keeps it in sync via `InterviewSchedulingLocalDataSource.syncEligibleFromShortlistedApplication` from `JobApplicationRepositoryImpl`.
 
 ---
 
@@ -79,8 +79,8 @@ flowchart TB
   subgraph top["Top-level round tabs InterviewRound"]
     T1[Telephone]
     T2[Technical]
-    T3[Onboarding]
-    T4[Selected]
+    T3[Selected]
+    T4[Onboarding]
     T5[Rejected]
   end
 
@@ -90,8 +90,8 @@ flowchart TB
   end
 
   subgraph additional["Additional rounds — no Eligible/Scheduled sub-tabs"]
-    T3 --> UI3[Single layout: table / actions as designed]
-    T4 --> UI4[Single layout: Onboard + Reject — no inner tabs]
+    T3 --> UI4[Single layout: Select + Reject — no inner tabs]
+    T4 --> UI3[Single layout: flush button]
     T5 --> UI5[Table + extra column: Round rejected in]
   end
 ```
@@ -194,15 +194,23 @@ The **round** value should be explicit (e.g. `application`, `telephone`, `techni
 
 ---
 
-## 9. Next steps (after you review this doc)
+## 9. Implementation status (vs this doc)
 
-1. Align **data model** (application status, round, scheduled interview records, rejection reason + `rejected_in_round`).
-2. Define **clean architecture** slices: domain entities, repository contracts, data sources (remote/DB), use cases per action (shortlist, deny, schedule, select, reject, onboard).
-3. Map **bloc events/states** for `job_application` and `interview_scheduling` to the flows above.
-4. Refactor **interview_scheduling_view** so `_candidateTabController` (Eligible/Scheduled) is **only** built when `activeRound` is `telephone` or `technical`.
+| Item                                                                    | Status                                                                                                            |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Job applications → Supabase `applications`                              | Done                                                                                                              |
+| Shortlist / reject + `current_stage`                                    | Done                                                                                                              |
+| Eligible \| Scheduled only for telephone & technical                    | Done — `InterviewRound.usesEligibleScheduledTabs` in `interview_enums.dart`; view listens to bloc round/tab state |
+| Interview pipeline mutations (schedule, select, reject, onboard, flush) | Done **in memory** — `InterviewSchedulingLocalDataSource`                                                         |
+| Google Calendar template flow before “mark scheduled”                   | Done — `interview_scheduling_view.dart` + dialogs + `open_google_calendar.dart`                                   |
+| Persist interviews to `interviews` table; drop mock merge               | **Not done** — see `RECRUITMENT_ARCHITECTURE.md` “Planned / follow-up”                                            |
+| `rejected_in_round` as a dedicated DB column                            | Not done; local model uses `rejectedFromRound` on `InterviewCandidate`                                            |
+
+Remaining product/engineering work is mainly **backing the interview UI with `interviews` + server truth** and removing reliance on **`JobApplicationMockDatasource`** inside `InterviewSchedulingRepositoryImpl`’s first-load merge.
 
 ---
 
 ## Document history
 
 - **v1** — Flowcharts from product discussion; UI rules for sub-tabs and rejected round column.
+- **v2** — Synced with code: Supabase applications, shortlist → local interview sync, eligible/scheduled rule implemented, Calendar scheduling path, explicit gaps (`interviews` table, mock merge).

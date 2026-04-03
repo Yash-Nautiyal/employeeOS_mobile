@@ -100,7 +100,7 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.transparent,
+              color: widget.theme.scaffoldBackgroundColor.withOpacity(.9),
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,

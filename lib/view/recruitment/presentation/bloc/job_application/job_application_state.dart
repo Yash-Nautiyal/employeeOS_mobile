@@ -13,15 +13,37 @@ final class JobApplicationLoading extends JobApplicationState {}
 
 final class JobApplicationsLoaded extends JobApplicationState {
   final List<JobApplication> applications;
-  final String? filterJobId;
+  final JobApplicationsListQuery query;
+  final int totalCount;
+  final bool isLoadingPage;
 
   const JobApplicationsLoaded({
     required this.applications,
-    this.filterJobId,
+    required this.query,
+    required this.totalCount,
+    this.isLoadingPage = false,
   });
 
+  int get totalPages => query.pageSize <= 0
+      ? 0
+      : (totalCount + query.pageSize - 1) ~/ query.pageSize;
+
+  JobApplicationsLoaded copyWith({
+    List<JobApplication>? applications,
+    JobApplicationsListQuery? query,
+    int? totalCount,
+    bool? isLoadingPage,
+  }) {
+    return JobApplicationsLoaded(
+      applications: applications ?? this.applications,
+      query: query ?? this.query,
+      totalCount: totalCount ?? this.totalCount,
+      isLoadingPage: isLoadingPage ?? this.isLoadingPage,
+    );
+  }
+
   @override
-  List<Object?> get props => [applications, filterJobId];
+  List<Object?> get props => [applications, query, totalCount, isLoadingPage];
 }
 
 final class JobApplicationError extends JobApplicationState {

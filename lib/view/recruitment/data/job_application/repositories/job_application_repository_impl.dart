@@ -1,6 +1,8 @@
 import 'package:employeeos/view/recruitment/data/job_application/datasources/job_application_remote_datasource.dart';
 import 'package:employeeos/view/recruitment/data/interview_scheduling/datasources/interview_scheduling_local_data_source.dart';
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_application.dart';
+import 'package:employeeos/view/recruitment/domain/job_application/entities/job_applications_list_query.dart';
+import 'package:employeeos/view/recruitment/domain/job_application/entities/job_applications_list_result.dart';
 import 'package:employeeos/view/recruitment/domain/job_application/repositories/job_application_repository.dart';
 
 class JobApplicationRepositoryImpl implements JobApplicationRepository {
@@ -11,6 +13,13 @@ class JobApplicationRepositoryImpl implements JobApplicationRepository {
   @override
   Future<List<JobApplication>> getApplications({String? jobId}) {
     return _remote.getApplications(jobId: jobId);
+  }
+
+  @override
+  Future<JobApplicationsListResult> getApplicationsPage(
+    JobApplicationsListQuery query,
+  ) {
+    return _remote.getApplicationsPage(query);
   }
 
   @override

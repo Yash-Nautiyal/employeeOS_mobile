@@ -7,13 +7,23 @@ sealed class JobApplicationEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-final class JobApplicationsLoadRequested extends JobApplicationEvent {
-  final String? jobId;
+/// Full filter + sort + page (use page `1` when filters/search/sort change).
+final class JobApplicationsListFetchRequested extends JobApplicationEvent {
+  final JobApplicationsListQuery query;
 
-  const JobApplicationsLoadRequested({this.jobId});
+  const JobApplicationsListFetchRequested(this.query);
 
   @override
-  List<Object?> get props => [jobId];
+  List<Object?> get props => [query];
+}
+
+final class JobApplicationsPageSelected extends JobApplicationEvent {
+  final int page;
+
+  const JobApplicationsPageSelected(this.page);
+
+  @override
+  List<Object?> get props => [page];
 }
 
 final class JobApplicationShortlistRequested extends JobApplicationEvent {

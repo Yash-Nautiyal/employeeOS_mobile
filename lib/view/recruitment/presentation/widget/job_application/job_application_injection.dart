@@ -17,7 +17,8 @@ class JobApplicationInjection {
   static JobApplicationBloc createBloc({JobApplicationRepository? repository}) {
     final repo = repository ?? JobApplicationInjection.repository;
     return JobApplicationBloc(
-      getJobApplicationsUseCase: GetJobApplicationsUseCase(repo),
+      getJobApplicationsListPageUseCase:
+          GetJobApplicationsListPageUseCase(repo),
       shortlistJobApplicationUseCase: ShortlistJobApplicationUseCase(repo),
       rejectJobApplicationUseCase: RejectJobApplicationUseCase(repo),
     );

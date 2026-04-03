@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, showRightSideTaskDetails;
 import 'package:employeeos/core/network/remote_data_exception.dart';
@@ -9,9 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../utils/job_application_filter_logic.dart';
+import '../utils/job_applications_list_query_mapper.dart';
 import '../widget/injection/job_posting_injection.dart';
 import '../widget/job_application/job_application_injection.dart'
     show JobApplicationInjection;
+import '../widget/job_application/job_applications_pagination_bar.dart';
 import '../widget/job_posting/components/filter/job_filter_panel.dart';
 import '../widget/job_posting/components/filter/recruitment_list_filter_bar.dart';
 
@@ -40,6 +44,8 @@ class _JobApplicationViewState extends State<JobApplicationView> {
 
   List<JobPosting> _jobsForFilter = const [];
 
+  Timer? _searchDebounce;
+
   JobApplicationFilterCriteria get _filterCriteria =>
       JobApplicationFilterCriteria(
         searchQuery: _searchController.text,
@@ -53,12 +59,20 @@ class _JobApplicationViewState extends State<JobApplicationView> {
         sortBy: _sortBy,
       );
 
+  void _dispatchListFetch({int page = 1}) {
+    _bloc.add(
+      JobApplicationsListFetchRequested(
+        listQueryFromFilterCriteria(_filterCriteria, page: page),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _bloc = JobApplicationInjection.createBloc();
-    _bloc.add(const JobApplicationsLoadRequested());
+    _dispatchListFetch(page: 1);
     _loadJobsForFilter();
   }
 
@@ -78,6 +92,7 @@ class _JobApplicationViewState extends State<JobApplicationView> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _scrollController.dispose();
     _bloc.close();
@@ -107,7 +122,7 @@ class _JobApplicationViewState extends State<JobApplicationView> {
             _filterApplicationStatus = '';
             _dateRange = null;
           });
-          _bloc.add(const JobApplicationsLoadRequested());
+          _dispatchListFetch(page: 1);
         },
         onApply: ({
           required String jobId,
@@ -127,16 +142,21 @@ class _JobApplicationViewState extends State<JobApplicationView> {
             _dateRange = dateRange;
             _filterApplicationStatus = applicationStatus.trim();
           });
-          _bloc.add(
-            JobApplicationsLoadRequested(
-              jobId: jobId.trim().isEmpty ? null : jobId.trim(),
-            ),
-          );
+          _dispatchListFetch(page: 1);
         },
       ),
       widthFactor: 0.8,
       maxWidth: 420,
     );
+  }
+
+  void _onSearchChanged() {
+    setState(() {});
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      _dispatchListFetch(page: 1);
+    });
   }
 
   @override
@@ -145,50 +165,95 @@ class _JobApplicationViewState extends State<JobApplicationView> {
 
     return BlocProvider.value(
       value: _bloc,
-      child: BlocBuilder<JobApplicationBloc, JobApplicationState>(
-        builder: (context, state) {
-          return Scrollbar(
-            controller: _scrollController,
-            thickness: 5,
-            trackVisibility: true,
-            interactive: true,
-            child: CustomScrollView(
+      child: BlocListener<JobApplicationBloc, JobApplicationState>(
+        listenWhen: (prev, curr) {
+          if (curr is! JobApplicationsLoaded) return false;
+          if (prev is! JobApplicationsLoaded) return true;
+          return prev.query.page != curr.query.page && !curr.isLoadingPage;
+        },
+        listener: (context, state) {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+            );
+          }
+        },
+        child: BlocBuilder<JobApplicationBloc, JobApplicationState>(
+          builder: (context, state) {
+            return Scrollbar(
               controller: _scrollController,
-              slivers: [
-                SliverPadding(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top,
-                    bottom: 20,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        CustomBreadCrumbs(
-                          theme: theme,
-                          heading: 'Job Applications',
-                          routes: const ['Dashboard', 'Job', 'Applications'],
-                        ),
-                        const SizedBox(height: 20),
-                        RecruitmentListFilterBar(
-                          searchController: _searchController,
-                          onSearchChanged: (_) => setState(() {}),
-                          onFiltersTap: _openFilterPanel,
-                          sortBy: _sortBy,
-                          onSortChanged: (v) => setState(() => _sortBy = v),
-                        ),
-                      ],
+              thickness: 5,
+              trackVisibility: true,
+              interactive: true,
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top,
+                      bottom: 20,
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          CustomBreadCrumbs(
+                            theme: theme,
+                            heading: 'Job Applications',
+                            routes: const ['Dashboard', 'Job', 'Applications'],
+                          ),
+                          const SizedBox(height: 20),
+                          RecruitmentListFilterBar(
+                            searchController: _searchController,
+                            onSearchChanged: (_) => _onSearchChanged(),
+                            onFiltersTap: _openFilterPanel,
+                            sortBy: _sortBy,
+                            onSortChanged: (v) {
+                              setState(() => _sortBy = v);
+                              _dispatchListFetch(page: 1);
+                            },
+                          ),
+                          // const SizedBox(height: 20),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Total applications:',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                Text(
+                                  switch (state) {
+                                    JobApplicationsLoaded(:final totalCount) =>
+                                      ' $totalCount',
+                                    JobApplicationLoading() ||
+                                    JobApplicationInitial() =>
+                                      ' …',
+                                    JobApplicationError() => ' —',
+                                  },
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: _buildSliverBody(context, theme, state),
-                ),
-              ],
-            ),
-          );
-        },
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: _buildSliverBody(context, theme, state),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -215,84 +280,112 @@ class _JobApplicationViewState extends State<JobApplicationView> {
       );
     }
     if (state is JobApplicationsLoaded) {
-      final filtered = applyJobApplicationFiltersAndSort(
-        state.applications,
-        _filterCriteria,
-        _jobsForFilter,
-      );
-      if (state.applications.isEmpty) {
+      final apps = state.applications;
+      final totalPages = state.totalPages;
+
+      if (state.totalCount == 0) {
+        final hasFilters = _searchController.text.trim().isNotEmpty ||
+            _filterJobId.isNotEmpty ||
+            _filterHr.trim().isNotEmpty ||
+            _joinImmediate ||
+            _joinAfterMonths ||
+            _jobType != 'All' ||
+            _filterApplicationStatus.isNotEmpty ||
+            _dateRange != null;
         return SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              'No applications yet.',
+              hasFilters
+                  ? 'No applications match your search or filters.'
+                  : 'No applications yet.',
               style: theme.textTheme.bodyMedium,
             ),
           ),
         );
       }
-      if (filtered.isEmpty) {
+
+      if (apps.isEmpty && !state.isLoadingPage) {
         return SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              'No applications match your search or filters.',
+              'No applications on this page.',
               style: theme.textTheme.bodyMedium,
             ),
           ),
         );
       }
-      return SliverSafeArea(
-        top: false,
-        sliver: SliverLayoutBuilder(builder: (context, constraints) {
-          final width = MediaQuery.of(context).size.width;
-          final useGrid = width >= 720;
-          final crossAxisCount = (width / 340).floor().clamp(2, 5);
-          if (useGrid) {
-            return SliverGrid.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.3),
-              itemCount: filtered.length,
-              itemBuilder: (context, index) {
-                final app = filtered[index];
-                return JobApplicationCard(
-                  theme: theme,
-                  application: app,
-                  onShortlist: () => context.read<JobApplicationBloc>().add(
-                        JobApplicationShortlistRequested(app.id),
-                      ),
-                  onReject: () => context.read<JobApplicationBloc>().add(
-                        JobApplicationRejectRequested(app.id),
-                      ),
-                );
-              },
-            );
-          }
-          return SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final app = filtered[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 0),
-                  child: JobApplicationCard(
-                    theme: theme,
-                    application: app,
-                    onShortlist: () => context.read<JobApplicationBloc>().add(
-                          JobApplicationShortlistRequested(app.id),
-                        ),
-                    onReject: () => context.read<JobApplicationBloc>().add(
-                          JobApplicationRejectRequested(app.id),
-                        ),
+
+      return SliverMainAxisGroup(
+        slivers: [
+          SliverSafeArea(
+            top: false,
+            sliver: SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final width = MediaQuery.of(context).size.width;
+                final useGrid = width >= 720;
+                final crossAxisCount = (width / 340).floor().clamp(2, 5);
+                if (useGrid) {
+                  return SliverGrid.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.3,
+                    ),
+                    itemCount: apps.length,
+                    itemBuilder: (context, index) {
+                      final app = apps[index];
+                      return JobApplicationCard(
+                        theme: theme,
+                        application: app,
+                        onShortlist: () =>
+                            context.read<JobApplicationBloc>().add(
+                                  JobApplicationShortlistRequested(app.id),
+                                ),
+                        onReject: () => context.read<JobApplicationBloc>().add(
+                              JobApplicationRejectRequested(app.id),
+                            ),
+                      );
+                    },
+                  );
+                }
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final app = apps[index];
+                      return JobApplicationCard(
+                        theme: theme,
+                        application: app,
+                        onShortlist: () =>
+                            context.read<JobApplicationBloc>().add(
+                                  JobApplicationShortlistRequested(app.id),
+                                ),
+                        onReject: () => context.read<JobApplicationBloc>().add(
+                              JobApplicationRejectRequested(app.id),
+                            ),
+                      );
+                    },
+                    childCount: apps.length,
                   ),
                 );
               },
-              childCount: filtered.length,
             ),
-          );
-        }),
+          ),
+          SliverToBoxAdapter(
+            child: JobApplicationsPaginationBar(
+              currentPage: state.query.page,
+              totalPages: totalPages,
+              isLoading: state.isLoadingPage,
+              onPageSelected: (page) {
+                context
+                    .read<JobApplicationBloc>()
+                    .add(JobApplicationsPageSelected(page));
+              },
+            ),
+          ),
+        ],
       );
     }
     return const SliverToBoxAdapter(child: SizedBox.shrink());

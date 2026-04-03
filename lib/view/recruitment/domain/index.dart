@@ -20,7 +20,10 @@ export 'interview_scheduling/usecases/get_interview_candidates_usecase.dart';
 
 export 'job_application/application_db_values.dart';
 export 'job_application/entities/job_application.dart';
+export 'job_application/entities/job_applications_list_query.dart';
+export 'job_application/entities/job_applications_list_result.dart';
 export 'job_application/repositories/job_application_repository.dart';
 export 'job_application/usecases/get_job_applications.dart';
+export 'job_application/usecases/get_job_applications_list_page.dart';
 export 'job_application/usecases/reject_job_application.dart';
 export 'job_application/usecases/shortlist_job_application.dart';
