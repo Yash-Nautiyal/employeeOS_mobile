@@ -21,7 +21,11 @@ export 'interview_scheduling/interview_db_values.dart';
 export 'interview_scheduling/repositories/interview_scheduling_repository.dart';
 export 'interview_scheduling/usecases/get_interview_candidates_usecase.dart';
 
-export 'job_application/application_db_values.dart';
+export 'job_application/application_db_values.dart'
+    show
+        ApplicationDbStatus,
+        ApplicationPipelineStage,
+        ApplicationStatusActions;
 export 'job_application/entities/job_application.dart';
 export 'job_application/entities/job_applications_list_query.dart';
 export 'job_application/entities/job_applications_list_result.dart';

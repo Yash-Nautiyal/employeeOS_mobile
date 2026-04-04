@@ -4,12 +4,15 @@ import 'package:employeeos/core/index.dart' show CustomDropdown;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../bloc/interview_scheduling/interview_scheduling_bloc.dart'
+    show InterviewJobFilterOption, kAllJobs;
+
 class InterviewFilterPanel extends StatefulWidget {
   final String selectedJob;
   final String selectedInterviewer;
   final String selectedStatus;
   final DateTimeRange? selectedDateRange;
-  final List<String> jobOptions;
+  final List<InterviewJobFilterOption> jobFilterOptions;
   final List<String> interviewerOptions;
   final List<String> statusOptions;
   final VoidCallback onReset;
@@ -26,7 +29,7 @@ class InterviewFilterPanel extends StatefulWidget {
     required this.selectedInterviewer,
     required this.selectedStatus,
     required this.selectedDateRange,
-    required this.jobOptions,
+    required this.jobFilterOptions,
     required this.interviewerOptions,
     required this.statusOptions,
     required this.onReset,
@@ -107,7 +110,7 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
                     tooltip: 'Reset',
                     onPressed: () {
                       setState(() {
-                        _job = widget.jobOptions.first;
+                        _job = widget.jobFilterOptions.first.value;
                         _interviewer = widget.interviewerOptions.first;
                         _status = widget.statusOptions.first;
                         _range = null;
@@ -131,16 +134,8 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLabel(theme, 'Job ID'),
-                _buildDropdown(
-                  theme: theme,
-                  value: _job,
-                  items: widget.jobOptions,
-                  onChanged: (v) {
-                    setState(() => _job = v ?? _job);
-                    _apply();
-                  },
-                ),
+                _buildLabel(theme, 'Job'),
+                _buildJobFilterDropdown(theme),
                 const SizedBox(height: 20),
                 _buildLabel(theme, 'Interviewer'),
                 _buildDropdown(
@@ -208,6 +203,58 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
         style: theme.textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+
+  Widget _buildJobFilterDropdown(ThemeData theme) {
+    final opts = widget.jobFilterOptions;
+    final items = <DropdownMenuItem<String>>[
+      ...opts.map(
+        (o) => DropdownMenuItem<String>(
+          value: o.value,
+          child: Text(
+            o.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    ];
+
+    var value = _job;
+    if (value != kAllJobs &&
+        value.isNotEmpty &&
+        !opts.any((o) => o.value == value)) {
+      items.add(
+        DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      );
+    }
+
+    if (!items.any((e) => e.value == value)) {
+      value = kAllJobs;
+    }
+
+    return SizedBox(
+      height: 52,
+      child: CustomDropdown(
+        value: value,
+        theme: theme,
+        isSearchable: true,
+        onChange: (dynamic v) {
+          if (v == null) return;
+          setState(() => _job = v as String);
+          _apply();
+        },
+        label: '',
+        items: items,
       ),
     );
   }

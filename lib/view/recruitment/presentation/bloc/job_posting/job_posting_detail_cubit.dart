@@ -5,6 +5,7 @@ import '../../../domain/index.dart'
     show
         ApplicationPipelineStage,
         ApplicationDbStatus,
+        ApplicationStatusActions,
         GetJobApplicationsPage,
         GetJobById,
         JobApplicationSummary,
@@ -85,23 +86,38 @@ class JobPostingDetailCubit extends Cubit<JobPostingDetailState> {
     final selected = Set<String>.from(state.selectedApplicationIds);
     if (selected.contains(id)) {
       selected.remove(id);
-    } else {
-      selected.add(id);
+      _safeEmit(state.copyWith(selectedApplicationIds: selected));
+      return;
     }
+
+    JobApplicationSummary? app;
+    for (final a in state.applications) {
+      if (a.id == id) {
+        app = a;
+        break;
+      }
+    }
+    if (app == null) return;
+    if (!ApplicationStatusActions.canUpdateStatus(app.status)) return;
+
+    selected.add(id);
     _safeEmit(state.copyWith(selectedApplicationIds: selected));
   }
 
   void toggleSelectAllApplications() {
-    final allSelected = state.applications.isNotEmpty &&
-        state.applications
-            .every((a) => state.selectedApplicationIds.contains(a.id));
-    if (allSelected) {
+    final selectableIds = state.applications
+        .where((a) => ApplicationStatusActions.canUpdateStatus(a.status))
+        .map((a) => a.id)
+        .toSet();
+    if (selectableIds.isEmpty) return;
+
+    final allSelectableSelected =
+        selectableIds.every((id) => state.selectedApplicationIds.contains(id));
+    if (allSelectableSelected) {
       _safeEmit(state.copyWith(selectedApplicationIds: <String>{}));
       return;
     }
-    _safeEmit(state.copyWith(
-      selectedApplicationIds: state.applications.map((e) => e.id).toSet(),
-    ));
+    _safeEmit(state.copyWith(selectedApplicationIds: selectableIds));
   }
 
   Future<void> toggleApplicationsSort() async {

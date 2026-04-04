@@ -455,7 +455,7 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
         selectedInterviewer: state.selectedInterviewer,
         selectedStatus: state.selectedStatus,
         selectedDateRange: state.selectedDateRange,
-        jobOptions: state.jobOptions,
+        jobFilterOptions: state.jobFilterOptions,
         interviewerOptions: state.interviewerOptions,
         statusOptions: state.statusOptions,
         onReset: _onFiltersReset,

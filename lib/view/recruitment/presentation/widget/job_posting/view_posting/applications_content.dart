@@ -1,6 +1,6 @@
 import 'package:employeeos/core/index.dart' show CustomDivider;
 import 'package:employeeos/view/recruitment/domain/index.dart'
-    show JobApplicationSummary;
+    show ApplicationStatusActions, JobApplicationSummary;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
@@ -159,8 +159,10 @@ class _State extends State<ApplicationsContent> {
           'Applications will appear here once candidates apply.');
     }
 
-    final allChecked =
-        rows.isNotEmpty && rows.every((r) => widget.selectedIds.contains(r.id));
+    final selectableRows =
+        rows.where((r) => ApplicationStatusActions.canUpdateStatus(r.status));
+    final allChecked = selectableRows.isNotEmpty &&
+        selectableRows.every((r) => widget.selectedIds.contains(r.id));
     final divColor = _cs.outlineVariant.withValues(alpha: 0.18);
 
     final tableW = MediaQuery.sizeOf(context).width.clamp(

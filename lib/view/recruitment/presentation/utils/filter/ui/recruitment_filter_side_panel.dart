@@ -15,7 +15,8 @@ import '../../../widget/job_posting/components/filter/job_filter_panel.dart';
 // values are turned into [JobApplicationsListQuery] by `listQueryFromFilterCriteria`
 // and sent to Supabase when you Apply or Reset (refetch page 1).
 //
-// Shared UI: [JobPostingFilterPanel]. Extra row: set [showApplicationStatusFilter].
+// Shared UI: [JobPostingFilterPanel] (job + **HR name** dropdowns from [jobs]).
+// Extra row: set [showApplicationStatusFilter].
 // -----------------------------------------------------------------------------
 
 /// Values mirrored by [JobPostingFilterPanel] (apply / reset).

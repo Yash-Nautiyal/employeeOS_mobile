@@ -88,10 +88,29 @@ final class InterviewSchedulingReady extends InterviewSchedulingState {
     );
   }
 
-  List<String> get jobOptions => [
-        kAllJobs,
-        ...candidates.map((c) => c.jobId).where((id) => id.isNotEmpty).toSet()
-      ];
+  /// Filter value is still [selectedJob] / [kAllJobs]; labels show `id — title` for clarity.
+  List<InterviewJobFilterOption> get jobFilterOptions {
+    final idToLabel = <String, String>{};
+    for (final c in candidates) {
+      final id = c.jobId.trim();
+      if (id.isEmpty) continue;
+      idToLabel.putIfAbsent(id, () {
+        final t = c.jobTitle.trim();
+        if (t.isEmpty) return id;
+        return '$id — $t';
+      });
+    }
+    final sorted = idToLabel.entries.toList()
+      ..sort(
+        (a, b) => a.value.toLowerCase().compareTo(b.value.toLowerCase()),
+      );
+    return [
+      const InterviewJobFilterOption(value: kAllJobs, label: kAllJobs),
+      ...sorted.map(
+        (e) => InterviewJobFilterOption(value: e.key, label: e.value),
+      ),
+    ];
+  }
 
   List<String> get interviewerOptions => [
         kAllInterviewers,

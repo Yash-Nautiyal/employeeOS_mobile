@@ -1,4 +1,6 @@
 import 'package:employeeos/core/index.dart';
+import 'package:employeeos/view/recruitment/domain/index.dart'
+    show ApplicationStatusActions;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -33,108 +35,115 @@ class CustomDataRow extends StatelessWidget {
     final phone = row['phone'] as String? ?? '';
     final status = row['status'] as String? ?? '';
     final date = formatDate(DateTime.parse(row['applied_on'] as String));
+    final canSelect = ApplicationStatusActions.canUpdateStatus(status);
 
     final bodyStyle = tt.bodyMedium?.copyWith(color: cs.onSurface);
 
     final mutedStyle = tt.bodyMedium?.copyWith(color: cs.onSurface);
 
+    final rowBody = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        children: [
+          const SizedBox(width: 10),
+
+          // Checkbox (only rows that can be shortlisted/rejected)
+          if (canSelect)
+            CustomCheckbox(
+              checked: selected,
+              onTap: onToggle,
+              colorScheme: cs,
+            )
+          else
+            SizedBox(
+              width: 40,
+              child:
+                  Icon(Icons.check_circle, color: theme.colorScheme.secondary),
+            ),
+          const SizedBox(width: 10),
+
+          // Applicant name — bold
+          SizedBox(
+            width: widths['applicant'],
+            child: Text(
+              name,
+              style: tt.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: cs.onSurface,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 10),
+
+          // Email
+          SizedBox(
+            width: widths['email'],
+            child:
+                Text(email, style: mutedStyle, overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 10),
+
+          // Phone
+          SizedBox(
+            width: widths['phone'],
+            child:
+                Text(phone, style: mutedStyle, overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 10),
+
+          // Status badge
+          SizedBox(
+            width: widths['status'],
+            child: _StatusBadge(status: status, theme: theme),
+          ),
+          const SizedBox(width: 10),
+
+          // Applied on date
+          SizedBox(
+            width: widths['appliedOn'],
+            child: Text(date, style: bodyStyle),
+          ),
+          const SizedBox(width: 10),
+
+          // Resume "View" link
+          SizedBox(
+            width: widths['resume'],
+            child: GestureDetector(
+              onTap: onResume,
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/common/solid/ic-solar_file-text-bold.svg',
+                    width: 15,
+                    colorFilter: ColorFilter.mode(
+                      theme.indicatorColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'View',
+                    style: tt.bodySmall?.copyWith(
+                      color: const Color(0xFF38BDF8),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 20),
+        ],
+      ),
+    );
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       color: backgroundColor,
-      child: InkWell(
-        onTap: onToggle,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Row(
-            children: [
-              const SizedBox(width: 10),
-
-              // Checkbox
-              CustomCheckbox(
-                checked: selected,
-                onTap: onToggle,
-                colorScheme: cs,
-              ),
-              const SizedBox(width: 10),
-
-              // Applicant name — bold
-              SizedBox(
-                width: widths['applicant'],
-                child: Text(
-                  name,
-                  style: tt.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 10),
-
-              // Email
-              SizedBox(
-                width: widths['email'],
-                child: Text(email,
-                    style: mutedStyle, overflow: TextOverflow.ellipsis),
-              ),
-              const SizedBox(width: 10),
-
-              // Phone
-              SizedBox(
-                width: widths['phone'],
-                child: Text(phone,
-                    style: mutedStyle, overflow: TextOverflow.ellipsis),
-              ),
-              const SizedBox(width: 10),
-
-              // Status badge
-              SizedBox(
-                width: widths['status'],
-                child: _StatusBadge(status: status, theme: theme),
-              ),
-              const SizedBox(width: 10),
-
-              // Applied on date
-              SizedBox(
-                width: widths['appliedOn'],
-                child: Text(date, style: bodyStyle),
-              ),
-              const SizedBox(width: 10),
-
-              // Resume "View" link
-              SizedBox(
-                width: widths['resume'],
-                child: GestureDetector(
-                  onTap: onResume,
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/common/solid/ic-solar_file-text-bold.svg',
-                        width: 15,
-                        colorFilter: ColorFilter.mode(
-                          theme.indicatorColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        'View',
-                        style: tt.bodySmall?.copyWith(
-                          color: const Color(0xFF38BDF8),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 20),
-            ],
-          ),
-        ),
-      ),
+      child: canSelect ? InkWell(onTap: onToggle, child: rowBody) : rowBody,
     );
   }
 }

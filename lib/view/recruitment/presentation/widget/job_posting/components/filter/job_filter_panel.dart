@@ -1,6 +1,21 @@
-import 'package:employeeos/core/index.dart'
-    show CustomDropdown, CustomTextfield;
+import 'package:employeeos/core/index.dart' show CustomDropdown;
+import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
 import 'package:flutter/material.dart';
+
+/// Unique HR labels for filter dropdowns (postings + applications share this).
+List<String> distinctRecruitmentHrOptions(Iterable<JobPosting> jobs) {
+  final set = <String>{};
+  for (final j in jobs) {
+    final name = j.postedByName.trim();
+    if (name.isNotEmpty) {
+      set.add(name);
+    } else {
+      final email = j.postedByEmail.trim();
+      if (email.isNotEmpty) set.add(email);
+    }
+  }
+  return (set.toList()..sort());
+}
 
 class JobPostingFilterPanel extends StatefulWidget {
   const JobPostingFilterPanel({
@@ -18,7 +33,7 @@ class JobPostingFilterPanel extends StatefulWidget {
     this.initialApplicationStatus = '',
   });
 
-  final List<dynamic> jobs;
+  final List<JobPosting> jobs;
   final String initialJobId;
   final String initialHr;
   final bool initialJoinImmediate;
@@ -45,7 +60,7 @@ class JobPostingFilterPanel extends StatefulWidget {
 }
 
 class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
-  late final TextEditingController _hrController;
+  late String _selectedHr;
   late bool _joinImmediate;
   late bool _joinAfterMonths;
   late String _jobType;
@@ -58,7 +73,7 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
   void initState() {
     super.initState();
     _selectedJobId = widget.initialJobId.trim();
-    _hrController = TextEditingController(text: widget.initialHr);
+    _selectedHr = widget.initialHr.trim();
     _joinImmediate = widget.initialJoinImmediate;
     _joinAfterMonths = widget.initialJoinAfterMonths;
     _jobType = widget.initialJobType;
@@ -66,16 +81,10 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
     _applicationStatus = widget.initialApplicationStatus.trim();
   }
 
-  @override
-  void dispose() {
-    _hrController.dispose();
-    super.dispose();
-  }
-
   void _apply() {
     widget.onApply(
       jobId: _selectedJobId,
-      hr: _hrController.text,
+      hr: _selectedHr,
       joinImmediate: _joinImmediate,
       joinAfterMonths: _joinAfterMonths,
       jobType: _jobType,
@@ -161,6 +170,61 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
     );
   }
 
+  Widget _hrDropdown(ThemeData theme) {
+    final hrOptions = distinctRecruitmentHrOptions(widget.jobs);
+
+    final items = <DropdownMenuItem<String>>[
+      const DropdownMenuItem<String>(
+        value: '',
+        child: Text('All HR'),
+      ),
+      ...hrOptions.map(
+        (h) => DropdownMenuItem<String>(
+          value: h,
+          child: Text(
+            h,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    ];
+
+    var value = _selectedHr;
+    if (value.isNotEmpty && !hrOptions.contains(value)) {
+      items.add(
+        DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      );
+    }
+
+    if (!items.any((e) => e.value == value)) {
+      value = '';
+    }
+
+    return SizedBox(
+      height: 52,
+      child: CustomDropdown(
+        value: value,
+        theme: theme,
+        isSearchable: true,
+        onChange: (dynamic v) {
+          if (v == null) return;
+          setState(() => _selectedHr = v as String);
+          _apply();
+        },
+        label: '',
+        items: items,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -187,7 +251,7 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
                     onPressed: () {
                       setState(() {
                         _selectedJobId = '';
-                        _hrController.clear();
+                        _selectedHr = '';
                         _joinImmediate = false;
                         _joinAfterMonths = false;
                         _jobType = 'All';
@@ -215,12 +279,8 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
                   _label(theme, 'Job ID'),
                   _jobIdDropdown(theme),
                   const SizedBox(height: 20),
-                  _label(theme, 'HR Filter'),
-                  _field(
-                    theme,
-                    controller: _hrController,
-                    hint: 'Enter name or email...',
-                  ),
+                  _label(theme, 'HR'),
+                  _hrDropdown(theme),
                   const SizedBox(height: 20),
                   _label(theme, 'Joining Type'),
                   CheckboxListTile(
@@ -348,18 +408,4 @@ class _JobPostingFilterPanelState extends State<JobPostingFilterPanel> {
           ),
         ),
       );
-
-  Widget _field(
-    ThemeData theme, {
-    required TextEditingController controller,
-    required String hint,
-  }) {
-    return CustomTextfield(
-      controller: controller,
-      onchange: (_) => _apply(),
-      keyboardType: TextInputType.text,
-      theme: theme,
-      hintText: hint,
-    );
-  }
 }

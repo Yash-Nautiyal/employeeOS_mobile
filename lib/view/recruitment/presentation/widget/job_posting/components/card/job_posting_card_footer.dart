@@ -19,47 +19,18 @@ class JobPostingCardFooter extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/common/solid/ic-chart-bar.svg',
-                    width: 22,
-                    color: theme.dividerColor,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    job?.isInternship == null
-                        ? ''
-                        : job!.isInternship
-                            ? 'Internship'
-                            : 'Full Time',
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  )
-                ],
-              ),
+              _buildFooterItem(
+                  job?.isInternship == null
+                      ? ''
+                      : job!.isInternship
+                          ? 'Internship'
+                          : 'Full Time',
+                  'assets/icons/common/solid/ic-chart-bar.svg'),
               const SizedBox(
                 height: 10,
               ),
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/common/solid/ic-solar_clock-circle-bold.svg',
-                    width: 22,
-                    color: theme.dividerColor,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    job?.joiningType ?? '',
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  )
-                ],
-              ),
+              _buildFooterItem(job?.joiningType ?? '',
+                  'assets/icons/common/solid/ic-solar_clock-circle-bold.svg'),
             ],
           ),
         ),
@@ -67,46 +38,42 @@ class JobPostingCardFooter extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/common/solid/ic-money.svg',
-                    width: 22,
-                    color: theme.dividerColor,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    job?.ctcRange ?? '',
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  )
-                ],
-              ),
+              _buildFooterItem(job?.ctcRange ?? '',
+                  'assets/icons/common/solid/ic-solar-wad-of-money-bold.svg'),
               const SizedBox(
                 height: 10,
               ),
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/common/solid/ic-mingcute_location-fill.svg',
-                    width: 22,
-                    color: theme.dividerColor,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    job?.location ?? '',
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  )
-                ],
-              ),
+              _buildFooterItem(job?.location ?? '',
+                  'assets/icons/common/solid/ic-mingcute_location-fill.svg'),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildFooterItem(String value, String iconPath) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SvgPicture.asset(
+          iconPath,
+          width: 22,
+          color: theme.dividerColor,
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        )
       ],
     );
   }

@@ -16,6 +16,18 @@ const String kAllJobs = 'All Jobs';
 const String kAllInterviewers = 'All Interviewers';
 const String kAllStatus = 'All';
 
+/// Job filter row: [value] is [kAllJobs] or [InterviewCandidate.jobId]; [label] is shown in the UI.
+@immutable
+class InterviewJobFilterOption {
+  const InterviewJobFilterOption({
+    required this.value,
+    required this.label,
+  });
+
+  final String value;
+  final String label;
+}
+
 class InterviewSchedulingBloc
     extends Bloc<InterviewSchedulingEvent, InterviewSchedulingState> {
   final GetInterviewCandidatesUseCase getInterviewCandidatesUseCase;
