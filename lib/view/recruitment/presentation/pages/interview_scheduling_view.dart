@@ -472,7 +472,8 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
           range: range,
         ),
       ),
-      widthFactor: 0.7,
+      widthFactor: 0.8,
+      maxWidth: 420,
     );
   }
 }

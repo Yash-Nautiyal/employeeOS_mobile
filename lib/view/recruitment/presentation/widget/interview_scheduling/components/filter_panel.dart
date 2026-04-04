@@ -88,109 +88,113 @@ class _InterviewFilterPanelState extends State<InterviewFilterPanel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              border: Border(
-                  bottom:
-                      BorderSide(color: theme.dividerColor.withOpacity(0.3))),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border(
+                    bottom:
+                        BorderSide(color: theme.dividerColor.withOpacity(0.3))),
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                child: Row(
+                  children: [
+                    Text(
+                      'Filters',
+                      style: theme.textTheme.displaySmall,
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      tooltip: 'Reset',
+                      onPressed: () {
+                        setState(() {
+                          _job = widget.jobFilterOptions.first.value;
+                          _interviewer = widget.interviewerOptions.first;
+                          _status = widget.statusOptions.first;
+                          _range = null;
+                        });
+                        widget.onReset();
+                      },
+                      icon: const Icon(Icons.refresh),
+                    ),
+                    IconButton(
+                      tooltip: 'Close',
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              child: Row(
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Filters',
-                    style: theme.textTheme.displaySmall,
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    tooltip: 'Reset',
-                    onPressed: () {
-                      setState(() {
-                        _job = widget.jobFilterOptions.first.value;
-                        _interviewer = widget.interviewerOptions.first;
-                        _status = widget.statusOptions.first;
-                        _range = null;
-                      });
-                      widget.onReset();
+                  _buildLabel(theme, 'Job'),
+                  _buildJobFilterDropdown(theme),
+                  const SizedBox(height: 20),
+                  _buildLabel(theme, 'Interviewer'),
+                  _buildDropdown(
+                    theme: theme,
+                    value: _interviewer,
+                    items: widget.interviewerOptions,
+                    onChanged: (v) {
+                      setState(() => _interviewer = v ?? _interviewer);
+                      _apply();
                     },
-                    icon: const Icon(Icons.refresh),
                   ),
-                  IconButton(
-                    tooltip: 'Close',
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close),
+                  const SizedBox(height: 20),
+                  _buildLabel(theme, 'Status'),
+                  _buildDropdown(
+                    theme: theme,
+                    value: _status,
+                    items: widget.statusOptions,
+                    onChanged: (v) {
+                      setState(() => _status = v ?? _status);
+                      _apply();
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  _buildLabel(theme, 'Interview Date'),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: _pickRange,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      height: 52,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: theme.dividerColor),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _formatRange(_range),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.disabledColor,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.calendar_today_outlined, size: 18),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildLabel(theme, 'Job'),
-                _buildJobFilterDropdown(theme),
-                const SizedBox(height: 20),
-                _buildLabel(theme, 'Interviewer'),
-                _buildDropdown(
-                  theme: theme,
-                  value: _interviewer,
-                  items: widget.interviewerOptions,
-                  onChanged: (v) {
-                    setState(() => _interviewer = v ?? _interviewer);
-                    _apply();
-                  },
-                ),
-                const SizedBox(height: 20),
-                _buildLabel(theme, 'Status'),
-                _buildDropdown(
-                  theme: theme,
-                  value: _status,
-                  items: widget.statusOptions,
-                  onChanged: (v) {
-                    setState(() => _status = v ?? _status);
-                    _apply();
-                  },
-                ),
-                const SizedBox(height: 20),
-                _buildLabel(theme, 'Interview Date'),
-                const SizedBox(height: 8),
-                InkWell(
-                  onTap: _pickRange,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    height: 52,
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: theme.dividerColor),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            _formatRange(_range),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.disabledColor,
-                            ),
-                          ),
-                        ),
-                        const Icon(Icons.calendar_today_outlined, size: 18),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
