@@ -4,13 +4,19 @@ import 'package:employeeos/view/recruitment/domain/job_application/entities/job_
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_applications_list_result.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../interview_scheduling/datasources/interview_remote_datasource.dart';
 import '../models/job_application_model.dart';
 
 /// Reads and updates [applications] in Supabase (`job_id` → `jobs.id` uuid).
 class JobApplicationRemoteDatasource {
-  JobApplicationRemoteDatasource() : _client = Supabase.instance.client;
+  JobApplicationRemoteDatasource({
+    SupabaseClient? client,
+    InterviewRemoteDatasource? interviewRemote,
+  })  : _client = client ?? Supabase.instance.client,
+        _interviews = interviewRemote ?? InterviewRemoteDatasource();
 
   final SupabaseClient _client;
+  final InterviewRemoteDatasource _interviews;
 
   static const String _applicationsTable = 'applications';
   static const String _jobsTable = 'jobs';
@@ -171,22 +177,7 @@ $hint($_jobColumns)
 
   Future<JobApplicationModel?> shortlist(String applicationId) =>
       runSupabaseRemote(() async {
-        final current = await _client
-            .from(_applicationsTable)
-            .select('id, status')
-            .eq('id', applicationId)
-            .maybeSingle();
-        if (current == null) return null;
-        if (!ApplicationStatusActions.canUpdateStatus(
-            current['status']?.toString())) {
-          return _fetchById(applicationId);
-        }
-
-        await _client.from(_applicationsTable).update({
-          'status': ApplicationDbStatus.shortlisted,
-          'current_stage': ApplicationPipelineStage.firstInterviewRound,
-        }).eq('id', applicationId);
-
+        await _interviews.shortlistApplicationTransaction(applicationId);
         return _fetchById(applicationId);
       });
 

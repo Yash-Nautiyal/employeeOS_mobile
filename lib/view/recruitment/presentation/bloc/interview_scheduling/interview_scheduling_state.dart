@@ -1,7 +1,40 @@
 part of 'interview_scheduling_bloc.dart';
 
-class InterviewSchedulingState extends Equatable {
-  final bool isLoading;
+sealed class InterviewSchedulingState extends Equatable {
+  const InterviewSchedulingState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+sealed class InterviewSchedulingListenState extends InterviewSchedulingState {
+  const InterviewSchedulingListenState();
+}
+
+final class InterviewSchedulingLoading extends InterviewSchedulingState {
+  const InterviewSchedulingLoading();
+}
+
+final class InterviewSchedulingFetchError extends InterviewSchedulingState {
+  final String message;
+
+  const InterviewSchedulingFetchError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Toast-only: emit then immediately restore [InterviewSchedulingReady].
+final class InterviewSchedulingError extends InterviewSchedulingListenState {
+  final String message;
+
+  const InterviewSchedulingError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+final class InterviewSchedulingReady extends InterviewSchedulingState {
   final List<InterviewCandidate> candidates;
   final List<InterviewCandidate> filteredCandidates;
   final String searchQuery;
@@ -12,10 +45,8 @@ class InterviewSchedulingState extends Equatable {
   final InterviewCandidateTab activeTab;
   final InterviewRound activeRound;
   final Set<String> selectedIds;
-  final String? errorMessage;
 
-  const InterviewSchedulingState({
-    required this.isLoading,
+  const InterviewSchedulingReady({
     required this.candidates,
     required this.filteredCandidates,
     required this.searchQuery,
@@ -26,28 +57,9 @@ class InterviewSchedulingState extends Equatable {
     required this.activeTab,
     required this.activeRound,
     required this.selectedIds,
-    required this.errorMessage,
   });
 
-  factory InterviewSchedulingState.initial() {
-    return const InterviewSchedulingState(
-      isLoading: false,
-      candidates: [],
-      filteredCandidates: [],
-      searchQuery: '',
-      selectedJob: kAllJobs,
-      selectedInterviewer: kAllInterviewers,
-      selectedStatus: kAllStatus,
-      selectedDateRange: null,
-      activeTab: InterviewCandidateTab.eligible,
-      activeRound: InterviewRound.telephone,
-      selectedIds: {},
-      errorMessage: null,
-    );
-  }
-
-  InterviewSchedulingState copyWith({
-    bool? isLoading,
+  InterviewSchedulingReady copyWith({
     List<InterviewCandidate>? candidates,
     List<InterviewCandidate>? filteredCandidates,
     String? searchQuery,
@@ -59,10 +71,8 @@ class InterviewSchedulingState extends Equatable {
     InterviewCandidateTab? activeTab,
     InterviewRound? activeRound,
     Set<String>? selectedIds,
-    String? errorMessage,
   }) {
-    return InterviewSchedulingState(
-      isLoading: isLoading ?? this.isLoading,
+    return InterviewSchedulingReady(
       candidates: candidates ?? this.candidates,
       filteredCandidates: filteredCandidates ?? this.filteredCandidates,
       searchQuery: searchQuery ?? this.searchQuery,
@@ -75,7 +85,6 @@ class InterviewSchedulingState extends Equatable {
       activeTab: activeTab ?? this.activeTab,
       activeRound: activeRound ?? this.activeRound,
       selectedIds: selectedIds ?? this.selectedIds,
-      errorMessage: errorMessage,
     );
   }
 
@@ -99,7 +108,6 @@ class InterviewSchedulingState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
         candidates,
         filteredCandidates,
         searchQuery,
@@ -110,6 +118,5 @@ class InterviewSchedulingState extends Equatable {
         activeTab,
         activeRound,
         selectedIds,
-        errorMessage,
       ];
 }

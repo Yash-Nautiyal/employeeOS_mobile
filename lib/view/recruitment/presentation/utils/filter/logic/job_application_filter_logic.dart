@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/index.dart' show JobApplication, JobPosting;
-import '../../domain/job_application/application_db_values.dart'
+import '../../../../domain/index.dart' show JobApplication, JobPosting;
+import '../../../../domain/job_application/application_db_values.dart'
     show ApplicationDbStatus, ApplicationStatusActions;
 
 /// Filter + sort state for the job applications list (kept out of the page widget).

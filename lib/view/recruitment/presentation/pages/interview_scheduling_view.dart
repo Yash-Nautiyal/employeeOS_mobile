@@ -1,3 +1,4 @@
+import 'package:employeeos/core/common/components/custom_toast.dart';
 import 'package:employeeos/core/common/components/empty_content.dart';
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, UserInfoService, showRightSideTaskDetails;
@@ -5,11 +6,10 @@ import 'package:employeeos/core/user/user_info_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:toastification/toastification.dart';
 
-import '../../data/index.dart'
-    show InterviewSchedulingLocalDataSource, InterviewSchedulingRepositoryImpl;
-import '../../domain/index.dart' show GetInterviewCandidatesUseCase;
 import '../../domain/interview_scheduling/entities/interview_enums.dart';
+import '../../domain/interview_scheduling/entities/interview_schedule_details.dart';
 import '../bloc/interview_scheduling/interview_scheduling_bloc.dart';
 import '../widget/index.dart'
     show
@@ -19,8 +19,9 @@ import '../widget/index.dart'
         InterviewFilterPanel,
         InterviewRoundsTab;
 import '../utils/interview_calendar_event_copy.dart';
-import '../utils/open_google_calendar.dart';
+import '../utils/calendar/open_google_calendar.dart';
 import '../widget/interview_scheduling/dialogs/schedule_interview_dialogs.dart';
+import '../widget/interview_scheduling/interview_scheduling_injection.dart';
 import '../widget/interview_scheduling/table/interview_table_action_tools.dart';
 
 class InterviewSchedulingView extends StatefulWidget {
@@ -41,13 +42,7 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
   @override
   void initState() {
     super.initState();
-    final repository = InterviewSchedulingRepositoryImpl(
-      InterviewSchedulingLocalDataSource.instance,
-    );
-    _bloc = InterviewSchedulingBloc(
-      getInterviewCandidatesUseCase: GetInterviewCandidatesUseCase(repository),
-      repository: repository,
-    );
+    _bloc = InterviewSchedulingInjection.createBloc();
 
     _roundTabController = TabController(
       length: InterviewRound.values.length,
@@ -90,6 +85,50 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
     super.dispose();
   }
 
+  void _onSearchQueryChanged(String value) {
+    _bloc.add(InterviewSearchChanged(value));
+  }
+
+  void _onFiltersReset() {
+    _bloc.add(InterviewFiltersReset());
+  }
+
+  void _onFiltersApplied({
+    required String job,
+    required String interviewer,
+    required String status,
+    required DateTimeRange? range,
+  }) {
+    _bloc.add(
+      InterviewFiltersApplied(
+        job: job,
+        interviewer: interviewer,
+        status: status,
+        range: range,
+      ),
+    );
+  }
+
+  void _onSelectionChanged(Set<String> ids) {
+    _bloc.add(InterviewSelectionChanged(ids));
+  }
+
+  void _onOnboardPressed(Set<String> ids) {
+    _bloc.add(InterviewOnboardSubmitted(ids));
+  }
+
+  void _onRejectPressed(Set<String> ids) {
+    _bloc.add(InterviewRejectSubmitted(ids));
+  }
+
+  void _onSelectPressed(Set<String> ids) {
+    _bloc.add(InterviewSelectSubmitted(ids));
+  }
+
+  void _onFlushPressed(Set<String> ids) {
+    _bloc.add(InterviewFlushSubmitted(ids));
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -99,187 +138,203 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
 
     return BlocProvider.value(
       value: _bloc,
-      child: BlocConsumer<InterviewSchedulingBloc, InterviewSchedulingState>(
+      child: BlocListener<InterviewSchedulingBloc, InterviewSchedulingState>(
         listenWhen: (previous, current) =>
-            previous.activeTab != current.activeTab ||
-            previous.activeRound != current.activeRound,
+            current is InterviewSchedulingListenState,
         listener: (context, state) {
-          if (state.activeRound.usesEligibleScheduledTabs &&
-              _candidateTabController.index != state.activeTab.index) {
-            _candidateTabController.animateTo(state.activeTab.index);
-          }
-          if (_roundTabController.index != state.activeRound.index) {
-            _roundTabController.animateTo(state.activeRound.index);
-          }
-        },
-        builder: (context, state) {
-          final theme = Theme.of(context);
-
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state.errorMessage != null) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Text(
-                  state.errorMessage!,
-                  style: theme.textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-              ),
+          if (state is InterviewSchedulingError) {
+            showCustomToast(
+              context: context,
+              type: ToastificationType.error,
+              title: 'Error',
+              description: state.message,
             );
           }
+        },
+        child: BlocConsumer<InterviewSchedulingBloc, InterviewSchedulingState>(
+          listenWhen: (previous, current) {
+            final cr = current is InterviewSchedulingReady ? current : null;
+            final pr = previous is InterviewSchedulingReady ? previous : null;
+            if (cr == null) return false;
+            return pr?.activeTab != cr.activeTab ||
+                pr?.activeRound != cr.activeRound;
+          },
+          listener: (context, state) {
+            if (state is! InterviewSchedulingReady) return;
+            if (state.activeRound.usesEligibleScheduledTabs &&
+                _candidateTabController.index != state.activeTab.index) {
+              _candidateTabController.animateTo(state.activeTab.index);
+            }
+            if (_roundTabController.index != state.activeRound.index) {
+              _roundTabController.animateTo(state.activeRound.index);
+            }
+          },
+          buildWhen: (previous, current) =>
+              current is! InterviewSchedulingListenState,
+          builder: (context, state) {
+            final theme = Theme.of(context);
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top,
-              bottom: 20,
-            ),
-            child: Column(
-              children: [
-                CustomBreadCrumbs(
-                  theme: theme,
-                  heading: 'Interview Scheduling',
-                  routes: const [
-                    'Dashboard',
-                    'Recruitment',
-                    'Interview Scheduling'
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ActionHeader(
-                        theme: theme,
-                        isWideScreen: isWideScreen,
-                        searchController: _searchController,
-                        onFilterTap: () =>
-                            _openFilterPanel(context, theme, state),
-                        onSearchChanged: (value) => _bloc.add(
-                          InterviewSearchChanged(value),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      InterviewRoundsTab(
-                        theme: theme,
-                        isWideScreen: isWideScreen,
-                        controller: _roundTabController,
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: theme.cardColor,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: theme.shadowColor),
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.shadowColor,
-                              spreadRadius: 1,
-                              blurRadius: 3,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            if (state.activeRound.usesEligibleScheduledTabs)
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: CandidateTabs(
-                                      theme: theme,
-                                      controller: _candidateTabController,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              child: state.filteredCandidates.isNotEmpty
-                                  ? ClipRRect(
-                                      key: const ValueKey('table'),
-                                      borderRadius: state.activeRound
-                                              .usesEligibleScheduledTabs
-                                          ? BorderRadius.zero
-                                          : BorderRadius.circular(12),
-                                      child: CandidatesTable(
-                                        screenWidth: screenWidth,
-                                        candidates: state.filteredCandidates,
-                                        selectedIds: state.selectedIds,
-                                        showRejectedRoundColumn:
-                                            state.activeRound ==
-                                                InterviewRound.rejected,
-                                        showResumeColumn: state.activeRound !=
-                                                InterviewRound.selected &&
-                                            state.activeRound !=
-                                                InterviewRound.onboarding &&
-                                            state.activeRound !=
-                                                InterviewRound.rejected,
-                                        actionToolbar:
-                                            InterviewTableActionTools(
-                                          theme: theme,
-                                          state: state,
-                                          onOnboard: () => _bloc.add(
-                                            InterviewOnboardSubmitted(
-                                                state.selectedIds),
-                                          ),
-                                          onReject: () => _bloc.add(
-                                            InterviewRejectSubmitted(
-                                                state.selectedIds),
-                                          ),
-                                          onSchedule: () =>
-                                              _openGoogleCalendarForScheduling(
-                                            context,
-                                            state,
-                                          ),
-                                          onSelect: () => _bloc.add(
-                                            InterviewSelectSubmitted(
-                                                state.selectedIds),
-                                          ),
-                                          onFlush: () => _bloc.add(
-                                            InterviewFlushSubmitted(
-                                                state.selectedIds),
-                                          ),
-                                        ),
-                                        onSelectedIdsChanged: (ids) =>
-                                            _bloc.add(
-                                                InterviewSelectionChanged(ids)),
-                                      ),
-                                    )
-                                  : const Center(
-                                      key: ValueKey('empty'),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(40.0),
-                                        child: EmptyContent(
-                                          icon:
-                                              'assets/icons/empty/ic-folder-empty.svg',
-                                          title: 'No candidates',
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+            if (state is InterviewSchedulingLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state is InterviewSchedulingFetchError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Text(
+                    state.message,
+                    style: theme.textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ],
-            ),
-          );
-        },
+              );
+            }
+
+            if (state is! InterviewSchedulingReady) {
+              return const SizedBox.shrink();
+            }
+
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top,
+                bottom: 20,
+              ),
+              child: Column(
+                children: [
+                  CustomBreadCrumbs(
+                    theme: theme,
+                    heading: 'Interview Scheduling',
+                    routes: const [
+                      'Dashboard',
+                      'Recruitment',
+                      'Interview Scheduling'
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ActionHeader(
+                          theme: theme,
+                          isWideScreen: isWideScreen,
+                          searchController: _searchController,
+                          onFilterTap: () =>
+                              _openFilterPanel(context, theme, state),
+                          onSearchChanged: _onSearchQueryChanged,
+                        ),
+                        const SizedBox(height: 20),
+                        InterviewRoundsTab(
+                          theme: theme,
+                          isWideScreen: isWideScreen,
+                          controller: _roundTabController,
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: theme.shadowColor),
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.shadowColor,
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              if (state.activeRound.usesEligibleScheduledTabs)
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CandidateTabs(
+                                        theme: theme,
+                                        controller: _candidateTabController,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                child: state.filteredCandidates.isNotEmpty
+                                    ? ClipRRect(
+                                        key: const ValueKey('table'),
+                                        borderRadius: state.activeRound
+                                                .usesEligibleScheduledTabs
+                                            ? BorderRadius.zero
+                                            : BorderRadius.circular(12),
+                                        child: CandidatesTable(
+                                          screenWidth: screenWidth,
+                                          candidates: state.filteredCandidates,
+                                          selectedIds: state.selectedIds,
+                                          showRejectedRoundColumn:
+                                              state.activeRound ==
+                                                  InterviewRound.rejected,
+                                          showResumeColumn: state.activeRound !=
+                                                  InterviewRound.selected &&
+                                              state.activeRound !=
+                                                  InterviewRound.onboarding &&
+                                              state.activeRound !=
+                                                  InterviewRound.rejected,
+                                          actionToolbar:
+                                              InterviewTableActionTools(
+                                            theme: theme,
+                                            state: state,
+                                            onOnboard: () => _onOnboardPressed(
+                                              state.selectedIds,
+                                            ),
+                                            onReject: () => _onRejectPressed(
+                                              state.selectedIds,
+                                            ),
+                                            onSchedule: () =>
+                                                _openGoogleCalendarForScheduling(
+                                              state,
+                                            ),
+                                            onSelect: () => _onSelectPressed(
+                                              state.selectedIds,
+                                            ),
+                                            onFlush: () => _onFlushPressed(
+                                              state.selectedIds,
+                                            ),
+                                          ),
+                                          onSelectedIdsChanged:
+                                              _onSelectionChanged,
+                                        ),
+                                      )
+                                    : const Center(
+                                        key: ValueKey('empty'),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(40.0),
+                                          child: EmptyContent(
+                                            icon:
+                                                'assets/icons/empty/ic-folder-empty.svg',
+                                            title: 'No candidates',
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
   /// Form → Google Calendar (TEMPLATE) → confirmation → optional pipeline update.
   Future<void> _openGoogleCalendarForScheduling(
-    BuildContext context,
-    InterviewSchedulingState state,
+    InterviewSchedulingReady state,
   ) async {
     if (state.selectedIds.isEmpty) return;
     if (!state.activeRound.usesEligibleScheduledTabs ||
@@ -287,18 +342,22 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
       return;
     }
 
+    // Snapshot before awaits — [state] from build can be stale after dialogs / resume.
+    final applicationIds = Set<String>.from(state.selectedIds);
+    final activeRound = state.activeRound;
+
     final userInfoService = context.read<UserInfoService>();
     final form = await showScheduleInterviewFormDialog(
       context: context,
       theme: Theme.of(context),
       userInfoService: userInfoService,
-      round: state.activeRound,
+      round: activeRound,
     );
 
-    if (!context.mounted || form == null) return;
+    if (!mounted || form == null) return;
 
     final selectedCandidates = state.candidates
-        .where((candidate) => state.selectedIds.contains(candidate.id))
+        .where((candidate) => applicationIds.contains(candidate.id))
         .toList();
     final applicantEmails = selectedCandidates
         .map((candidate) => candidate.email.trim())
@@ -316,12 +375,12 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
         .where((n) => n.isNotEmpty)
         .join(', ');
 
-    final title = buildCalendarEventTitle(state.activeRound);
+    final title = buildCalendarEventTitle(activeRound);
     final details = buildCalendarEventDetails(
-      round: state.activeRound,
+      round: activeRound,
       interviewerName: interviewerName,
       assignedByName: assignedByName,
-      selectedCount: state.selectedIds.length,
+      selectedCount: applicationIds.length,
       candidateNamesSummary: candidateNamesSummary,
     );
 
@@ -342,7 +401,7 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
       guests: guests,
     );
 
-    if (!context.mounted) return;
+    if (!mounted) return;
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not open Google Calendar')),
@@ -355,9 +414,18 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
       theme: Theme.of(context),
     );
 
-    if (!context.mounted) return;
+    if (!mounted) return;
     if (confirmed) {
-      _bloc.add(InterviewScheduleSubmitted(state.selectedIds));
+      _bloc.add(
+        InterviewScheduleSubmitted(
+          applicationIds,
+          InterviewScheduleDetails(
+            scheduleStart: form.startLocal.toUtc(),
+            interviewerLabel: _hrDisplayName(form.interviewer),
+            assignedByLabel: _hrDisplayName(form.assignedBy),
+          ),
+        ),
+      );
     }
   }
 
@@ -378,7 +446,7 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
   void _openFilterPanel(
     BuildContext context,
     ThemeData theme,
-    InterviewSchedulingState state,
+    InterviewSchedulingReady state,
   ) {
     showRightSideTaskDetails(
       context,
@@ -390,20 +458,18 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
         jobOptions: state.jobOptions,
         interviewerOptions: state.interviewerOptions,
         statusOptions: state.statusOptions,
-        onReset: () => _bloc.add(InterviewFiltersReset()),
+        onReset: _onFiltersReset,
         onApply: ({
           required String job,
           required String interviewer,
           required String status,
           required DateTimeRange? range,
         }) =>
-            _bloc.add(
-          InterviewFiltersApplied(
-            job: job,
-            interviewer: interviewer,
-            status: status,
-            range: range,
-          ),
+            _onFiltersApplied(
+          job: job,
+          interviewer: interviewer,
+          status: status,
+          range: range,
         ),
       ),
       widthFactor: 0.7,

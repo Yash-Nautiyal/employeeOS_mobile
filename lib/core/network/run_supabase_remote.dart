@@ -16,10 +16,19 @@ Future<T> runSupabaseRemote<T>(
   try {
     return await operation().timeout(timeout);
   } on TimeoutException {
+    if (kDebugMode) {
+      debugPrint('[runSupabaseRemote] TimeoutException');
+    }
     throw RemoteDataException.timeout();
   } on SocketException {
+    if (kDebugMode) {
+      debugPrint('[runSupabaseRemote] SocketException');
+    }
     throw RemoteDataException.offline();
   } on PostgrestException catch (e) {
+    if (kDebugMode) {
+      debugPrint('[runSupabaseRemote] $e');
+    }
     throw RemoteDataException.fromPostgrest(e);
   } catch (e, st) {
     if (kDebugMode) {
@@ -35,7 +44,7 @@ Future<T> runSupabaseRemote<T>(
     }
     throw RemoteDataException(
       kind: RemoteDataFailureKind.unknown,
-      message: 'Something went wrong. Please try again.',
+      message: RemoteDataUserMessages.genericUnknown,
       cause: e,
     );
   }

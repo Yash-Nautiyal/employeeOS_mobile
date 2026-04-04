@@ -2,7 +2,7 @@ import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/core/common/components/custom_toast.dart';
 import 'package:employeeos/core/user/current_user_profile.dart';
 import 'package:employeeos/core/index.dart'
-    show CustomBreadCrumbs, CustomTextButton, showRightSideTaskDetails;
+    show CustomBreadCrumbs, CustomTextButton;
 import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
 import 'package:employeeos/view/recruitment/presentation/bloc/job_posting/job_posting_bloc.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +11,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../pages/job_posting_section.dart';
-import '../../utils/job_posting_filter_logic.dart';
+import '../../utils/filter/logic/job_posting_filter_logic.dart';
+import '../../utils/filter/ui/recruitment_filter_side_panel.dart';
 import 'add_posting/add_job_posting_page.dart';
 import 'components/card/job_posting_card_slot.dart';
-import 'components/filter/job_filter_panel.dart';
 import 'components/filter/recruitment_list_filter_bar.dart';
 
 class JobPostingView extends StatefulWidget {
@@ -49,48 +49,38 @@ class _JobPostingViewState extends State<JobPostingView> {
   }
 
   void _openFilterPanel() {
-    final jobs = _currentJobsFromBloc();
-    showRightSideTaskDetails(
-      context,
-      JobPostingFilterPanel(
-        jobs: jobs,
-        initialJobId: _filterJobId,
-        initialHr: _filterHr,
-        initialJoinImmediate: _joinImmediate,
-        initialJoinAfterMonths: _joinAfterMonths,
-        initialJobType: _jobType,
-        initialDateRange: _dateRange,
-        onReset: () {
-          setState(() {
-            _filterJobId = '';
-            _filterHr = '';
-            _joinImmediate = false;
-            _joinAfterMonths = false;
-            _jobType = 'All';
-            _dateRange = null;
-          });
-        },
-        onApply: ({
-          required String jobId,
-          required String hr,
-          required bool joinImmediate,
-          required bool joinAfterMonths,
-          required String jobType,
-          required DateTimeRange? dateRange,
-          String applicationStatus = '',
-        }) {
-          setState(() {
-            _filterJobId = jobId;
-            _filterHr = hr;
-            _joinImmediate = joinImmediate;
-            _joinAfterMonths = joinAfterMonths;
-            _jobType = jobType;
-            _dateRange = dateRange;
-          });
-        },
+    openRecruitmentFilterSidePanel(
+      context: context,
+      jobs: _currentJobsFromBloc(),
+      initial: RecruitmentFilterSelection(
+        jobId: _filterJobId,
+        hrQuery: _filterHr,
+        joinImmediate: _joinImmediate,
+        joinAfterMonths: _joinAfterMonths,
+        jobType: _jobType,
+        dateRange: _dateRange,
       ),
-      widthFactor: 0.8,
-      maxWidth: 420,
+      showApplicationStatusFilter: false,
+      onReset: () {
+        setState(() {
+          _filterJobId = '';
+          _filterHr = '';
+          _joinImmediate = false;
+          _joinAfterMonths = false;
+          _jobType = 'All';
+          _dateRange = null;
+        });
+      },
+      onApply: (s) {
+        setState(() {
+          _filterJobId = s.jobId;
+          _filterHr = s.hrQuery;
+          _joinImmediate = s.joinImmediate;
+          _joinAfterMonths = s.joinAfterMonths;
+          _jobType = s.jobType;
+          _dateRange = s.dateRange;
+        });
+      },
     );
   }
 

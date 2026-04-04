@@ -16,6 +16,7 @@ class JobPostingModel extends JobPosting {
     required super.postedByEmail,
     super.createdAt,
     super.isActive,
+    super.applicationLink,
   });
 
   factory JobPostingModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +39,7 @@ class JobPostingModel extends JobPosting {
           ? DateTime.tryParse(json['created_at'] as String)
           : null,
       isActive: json['is_active'] as bool? ?? true,
+      applicationLink: json['application_link'] as String?,
     );
   }
 
@@ -62,6 +64,7 @@ class JobPostingModel extends JobPosting {
       postedByEmail: json['posted_by_email'] as String? ?? '',
       createdAt: _parseDate(json['created_at']),
       isActive: json['is_active'] as bool? ?? true,
+      applicationLink: json['application_link'] as String?,
     );
   }
 
@@ -81,6 +84,7 @@ class JobPostingModel extends JobPosting {
       'posted_by_email': postedByEmail,
       'created_at': createdAt?.toIso8601String(),
       'is_active': isActive,
+      'application_link': applicationLink,
     };
   }
 
@@ -98,6 +102,7 @@ class JobPostingModel extends JobPosting {
       'last_date': _formatDate(lastDateToApply),
       'posted_by_name': postedByName,
       'posted_by_email': postedByEmail,
+      'application_link': applicationLink,
     };
   }
 
@@ -115,6 +120,7 @@ class JobPostingModel extends JobPosting {
       'posted_by_name': postedByName,
       'posted_by_email': postedByEmail,
       'is_active': isActive,
+      'application_link': applicationLink,
     };
   }
 
@@ -133,6 +139,7 @@ class JobPostingModel extends JobPosting {
     String? postedByEmail,
     DateTime? createdAt,
     bool? isActive,
+    String? applicationLink,
   }) {
     return JobPostingModel(
       id: id ?? this.id,
@@ -149,6 +156,7 @@ class JobPostingModel extends JobPosting {
       postedByEmail: postedByEmail ?? this.postedByEmail,
       createdAt: createdAt ?? this.createdAt,
       isActive: isActive ?? this.isActive,
+      applicationLink: applicationLink ?? this.applicationLink,
     );
   }
 
@@ -169,6 +177,7 @@ class JobPostingModel extends JobPosting {
       postedByEmail: job.postedByEmail,
       createdAt: job.createdAt,
       isActive: job.isActive,
+      applicationLink: job.applicationLink,
     );
   }
 

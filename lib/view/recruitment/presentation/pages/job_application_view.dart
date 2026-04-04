@@ -1,22 +1,25 @@
 import 'dart:async';
 
+import 'package:employeeos/core/common/components/custom_toast.dart';
+import 'package:employeeos/core/common/components/empty_content.dart';
 import 'package:employeeos/core/index.dart'
-    show CustomBreadCrumbs, showRightSideTaskDetails;
+    show CustomBreadCrumbs, CustomTextButton;
 import 'package:employeeos/core/network/remote_data_exception.dart';
 import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
+import 'package:toastification/toastification.dart';
 import '../bloc/job_application/job_application_bloc.dart';
 import 'package:employeeos/view/recruitment/presentation/widget/index.dart'
     show JobApplicationCard;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../utils/job_application_filter_logic.dart';
+import '../utils/filter/logic/job_application_filter_logic.dart';
 import '../utils/job_applications_list_query_mapper.dart';
+import '../utils/filter/ui/recruitment_filter_side_panel.dart';
 import '../widget/injection/job_posting_injection.dart';
 import '../widget/job_application/job_application_injection.dart'
     show JobApplicationInjection;
 import '../widget/job_application/job_applications_pagination_bar.dart';
-import '../widget/job_posting/components/filter/job_filter_panel.dart';
 import '../widget/job_posting/components/filter/recruitment_list_filter_bar.dart';
 
 class JobApplicationView extends StatefulWidget {
@@ -100,53 +103,43 @@ class _JobApplicationViewState extends State<JobApplicationView> {
   }
 
   void _openFilterPanel() {
-    showRightSideTaskDetails(
-      context,
-      JobPostingFilterPanel(
-        jobs: _jobsForFilter,
-        initialJobId: _filterJobId,
-        initialHr: _filterHr,
-        initialJoinImmediate: _joinImmediate,
-        initialJoinAfterMonths: _joinAfterMonths,
-        initialJobType: _jobType,
-        initialDateRange: _dateRange,
-        showApplicationStatusFilter: true,
-        initialApplicationStatus: _filterApplicationStatus,
-        onReset: () {
-          setState(() {
-            _filterJobId = '';
-            _filterHr = '';
-            _joinImmediate = false;
-            _joinAfterMonths = false;
-            _jobType = 'All';
-            _filterApplicationStatus = '';
-            _dateRange = null;
-          });
-          _dispatchListFetch(page: 1);
-        },
-        onApply: ({
-          required String jobId,
-          required String hr,
-          required bool joinImmediate,
-          required bool joinAfterMonths,
-          required String jobType,
-          required DateTimeRange? dateRange,
-          String applicationStatus = '',
-        }) {
-          setState(() {
-            _filterJobId = jobId;
-            _filterHr = hr;
-            _joinImmediate = joinImmediate;
-            _joinAfterMonths = joinAfterMonths;
-            _jobType = jobType;
-            _dateRange = dateRange;
-            _filterApplicationStatus = applicationStatus.trim();
-          });
-          _dispatchListFetch(page: 1);
-        },
+    openRecruitmentFilterSidePanel(
+      context: context,
+      jobs: _jobsForFilter,
+      initial: RecruitmentFilterSelection(
+        jobId: _filterJobId,
+        hrQuery: _filterHr,
+        joinImmediate: _joinImmediate,
+        joinAfterMonths: _joinAfterMonths,
+        jobType: _jobType,
+        dateRange: _dateRange,
+        applicationStatus: _filterApplicationStatus,
       ),
-      widthFactor: 0.8,
-      maxWidth: 420,
+      showApplicationStatusFilter: true,
+      onReset: () {
+        setState(() {
+          _filterJobId = '';
+          _filterHr = '';
+          _joinImmediate = false;
+          _joinAfterMonths = false;
+          _jobType = 'All';
+          _filterApplicationStatus = '';
+          _dateRange = null;
+        });
+        _dispatchListFetch(page: 1);
+      },
+      onApply: (s) {
+        setState(() {
+          _filterJobId = s.jobId;
+          _filterHr = s.hrQuery;
+          _joinImmediate = s.joinImmediate;
+          _joinAfterMonths = s.joinAfterMonths;
+          _jobType = s.jobType;
+          _dateRange = s.dateRange;
+          _filterApplicationStatus = s.applicationStatus;
+        });
+        _dispatchListFetch(page: 1);
+      },
     );
   }
 
@@ -166,93 +159,115 @@ class _JobApplicationViewState extends State<JobApplicationView> {
     return BlocProvider.value(
       value: _bloc,
       child: BlocListener<JobApplicationBloc, JobApplicationState>(
-        listenWhen: (prev, curr) {
-          if (curr is! JobApplicationsLoaded) return false;
-          if (prev is! JobApplicationsLoaded) return true;
-          return prev.query.page != curr.query.page && !curr.isLoadingPage;
-        },
+        listenWhen: (prev, curr) => curr is JobApplicationListenState,
         listener: (context, state) {
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              0,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOut,
+          if (state is JobApplicationError) {
+            showCustomToast(
+              context: context,
+              type: ToastificationType.error,
+              title: 'Error',
+              description: state.message,
             );
           }
         },
-        child: BlocBuilder<JobApplicationBloc, JobApplicationState>(
-          builder: (context, state) {
-            return Scrollbar(
-              controller: _scrollController,
-              thickness: 5,
-              trackVisibility: true,
-              interactive: true,
-              child: CustomScrollView(
+        child: BlocListener<JobApplicationBloc, JobApplicationState>(
+          listenWhen: (prev, curr) {
+            if (curr is! JobApplicationsLoaded) return false;
+            if (prev is! JobApplicationsLoaded) return true;
+            return prev.query.page != curr.query.page && !curr.isLoadingPage;
+          },
+          listener: (context, state) {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+              );
+            }
+          },
+          child: BlocBuilder<JobApplicationBloc, JobApplicationState>(
+            buildWhen: (previous, current) =>
+                current is! JobApplicationListenState,
+            builder: (context, state) {
+              return Scrollbar(
                 controller: _scrollController,
-                slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top,
-                      bottom: 20,
-                    ),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          CustomBreadCrumbs(
-                            theme: theme,
-                            heading: 'Job Applications',
-                            routes: const ['Dashboard', 'Job', 'Applications'],
-                          ),
-                          const SizedBox(height: 20),
-                          RecruitmentListFilterBar(
-                            searchController: _searchController,
-                            onSearchChanged: (_) => _onSearchChanged(),
-                            onFiltersTap: _openFilterPanel,
-                            sortBy: _sortBy,
-                            onSortChanged: (v) {
-                              setState(() => _sortBy = v);
-                              _dispatchListFetch(page: 1);
-                            },
-                          ),
-                          // const SizedBox(height: 20),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Total applications:',
-                                  style: theme.textTheme.bodyMedium,
-                                ),
-                                Text(
-                                  switch (state) {
-                                    JobApplicationsLoaded(:final totalCount) =>
-                                      ' $totalCount',
-                                    JobApplicationLoading() ||
-                                    JobApplicationInitial() =>
-                                      ' …',
-                                    JobApplicationError() => ' —',
-                                  },
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                thickness: 5,
+                trackVisibility: true,
+                interactive: true,
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top,
+                        bottom: 20,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            CustomBreadCrumbs(
+                              theme: theme,
+                              heading: 'Job Applications',
+                              routes: const [
+                                'Dashboard',
+                                'Job',
+                                'Applications'
                               ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 20),
+                            RecruitmentListFilterBar(
+                              searchController: _searchController,
+                              onSearchChanged: (_) => _onSearchChanged(),
+                              onFiltersTap: _openFilterPanel,
+                              sortBy: _sortBy,
+                              onSortChanged: (v) {
+                                setState(() => _sortBy = v);
+                                _dispatchListFetch(page: 1);
+                              },
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Total applications:',
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                  Text(
+                                    switch (state) {
+                                      JobApplicationsLoaded(
+                                        :final totalCount
+                                      ) =>
+                                        ' $totalCount',
+                                      JobApplicationLoading() ||
+                                      JobApplicationInitial() =>
+                                        ' …',
+                                      JobApplicationFetchError() => ' —',
+                                      JobApplicationError() => ' …',
+                                    },
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: _buildSliverBody(context, theme, state),
-                  ),
-                ],
-              ),
-            );
-          },
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: _buildSliverBody(context, theme, state),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -271,11 +286,27 @@ class _JobApplicationViewState extends State<JobApplicationView> {
         ),
       );
     }
-    if (state is JobApplicationError) {
+    if (state is JobApplicationFetchError) {
       return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(state.message),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const EmptyContent(
+              icon: 'assets/icons/empty/ic-folder-empty.svg',
+              title: 'Failed to load applications',
+            ),
+            const SizedBox(height: 12),
+            CustomTextButton(
+              onClick: () => _dispatchListFetch(page: 1),
+              backgroundColor: theme.colorScheme.tertiary,
+              padding: 1,
+              child: Text('Retry',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.scaffoldBackgroundColor,
+                  )),
+            ),
+          ],
         ),
       );
     }

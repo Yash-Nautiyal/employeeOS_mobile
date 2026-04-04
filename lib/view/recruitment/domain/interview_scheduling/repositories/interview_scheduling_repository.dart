@@ -1,16 +1,30 @@
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_batch_mutation_result.dart';
 import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
 import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_enums.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_schedule_details.dart';
 
 abstract class InterviewSchedulingRepository {
   Future<List<InterviewCandidate>> fetchCandidates();
 
-  Future<void> scheduleInterviews(Set<String> ids, InterviewRound round);
+  Future<InterviewBatchMutationResult> scheduleInterviews(
+    Set<String> applicationIds,
+    InterviewRound round,
+    InterviewScheduleDetails details,
+  );
 
-  Future<void> selectAfterInterview(Set<String> ids, InterviewRound round);
+  Future<InterviewBatchMutationResult> selectAfterInterview(
+    Set<String> ids,
+    InterviewRound round,
+  );
 
-  Future<void> rejectInterviews(Set<String> ids, InterviewRound fromRound);
+  Future<InterviewBatchMutationResult> rejectInterviews(
+    Set<String> ids,
+    InterviewRound fromRound,
+  );
 
-  Future<void> onboardFromSelected(Set<String> ids);
+  Future<InterviewBatchMutationResult> onboardFromSelected(Set<String> ids);
 
-  Future<void> flushOnboardingToEmployees(Set<String> ids);
+  Future<InterviewBatchMutationResult> flushOnboardingToEmployees(
+    Set<String> ids,
+  );
 }

@@ -198,7 +198,7 @@ class _JobPostingCardState extends State<JobPostingCard>
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
-            child: JobPostingCardFooter(theme: widget.theme),
+            child: JobPostingCardFooter(theme: widget.theme, job: widget.job),
           ),
         ],
       ),

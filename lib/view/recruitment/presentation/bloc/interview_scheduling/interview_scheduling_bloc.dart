@@ -1,6 +1,9 @@
 import 'package:bloc/bloc.dart';
+import 'package:employeeos/core/network/remote_data_exception.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_batch_mutation_result.dart';
 import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_candidate.dart';
 import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_enums.dart';
+import 'package:employeeos/view/recruitment/domain/interview_scheduling/entities/interview_schedule_details.dart';
 import 'package:employeeos/view/recruitment/domain/interview_scheduling/repositories/interview_scheduling_repository.dart';
 import 'package:employeeos/view/recruitment/domain/interview_scheduling/usecases/get_interview_candidates_usecase.dart';
 import 'package:equatable/equatable.dart';
@@ -21,7 +24,7 @@ class InterviewSchedulingBloc
   InterviewSchedulingBloc({
     required this.getInterviewCandidatesUseCase,
     required this.repository,
-  }) : super(InterviewSchedulingState.initial()) {
+  }) : super(const InterviewSchedulingLoading()) {
     on<InterviewSchedulingStarted>(_onStarted);
     on<InterviewSearchChanged>(_onSearchChanged);
     on<InterviewFiltersApplied>(_onFiltersApplied);
@@ -36,44 +39,65 @@ class InterviewSchedulingBloc
     on<InterviewFlushSubmitted>(_onFlushSubmitted);
   }
 
+  InterviewSchedulingReady? _readyOrNull(InterviewSchedulingState s) =>
+      s is InterviewSchedulingReady ? s : null;
+
   Future<void> _onStarted(
     InterviewSchedulingStarted event,
     Emitter<InterviewSchedulingState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
+    emit(const InterviewSchedulingLoading());
     try {
       final candidates = await getInterviewCandidatesUseCase.call();
-      emit(
-        _applyFilters(
-          state.copyWith(
-            isLoading: false,
-            candidates: candidates,
-            filteredCandidates: candidates,
-            selectedIds: const {},
-          ),
-        ),
+      final ready = InterviewSchedulingReady(
+        candidates: candidates,
+        filteredCandidates: candidates,
+        searchQuery: '',
+        selectedJob: kAllJobs,
+        selectedInterviewer: kAllInterviewers,
+        selectedStatus: kAllStatus,
+        selectedDateRange: null,
+        activeTab: InterviewCandidateTab.eligible,
+        activeRound: InterviewRound.telephone,
+        selectedIds: const {},
       );
+      emit(_applyFilters(ready));
     } catch (e) {
-      emit(
-        state.copyWith(
-          isLoading: false,
-          errorMessage: 'Failed to load candidates: $e',
-        ),
-      );
+      emit(InterviewSchedulingFetchError(
+        'Failed to load candidates: ${_errorMessage(e)}',
+      ));
     }
   }
 
-  Future<void> _reloadAfterMutation(
-      Emitter<InterviewSchedulingState> emit) async {
-    final candidates = await getInterviewCandidatesUseCase.call();
-    emit(
-      _applyFilters(
-        state.copyWith(
+  Future<void> _emitAfterMutation({
+    required Emitter<InterviewSchedulingState> emit,
+    required InterviewSchedulingReady snapshot,
+    required InterviewBatchMutationResult batch,
+    required String actionPhrase,
+    InterviewCandidateTab? forceActiveTab,
+  }) async {
+    try {
+      final candidates = await getInterviewCandidatesUseCase.call();
+      final tab = forceActiveTab ?? snapshot.activeTab;
+      final next = _applyFilters(
+        snapshot.copyWith(
           candidates: candidates,
           selectedIds: const {},
+          activeTab: tab,
         ),
-      ),
-    );
+      );
+      if (batch.hasFailures) {
+        emit(InterviewSchedulingError(
+          _batchMutationToast(batch, actionPhrase),
+        ));
+      }
+      emit(next);
+    } catch (e) {
+      emit(InterviewSchedulingError(
+        'Could not refresh candidates: ${_errorMessage(e)}',
+      ));
+      emit(snapshot);
+    }
   }
 
   Future<void> _onScheduleSubmitted(
@@ -81,17 +105,25 @@ class InterviewSchedulingBloc
     Emitter<InterviewSchedulingState> emit,
   ) async {
     if (event.candidateIds.isEmpty) return;
-    if (!state.activeRound.usesEligibleScheduledTabs ||
-        state.activeTab != InterviewCandidateTab.eligible) {
-      return;
-    }
-    try {
-      await repository.scheduleInterviews(
-          event.candidateIds, state.activeRound);
-      await _reloadAfterMutation(emit);
-    } catch (e) {
-      emit(state.copyWith(errorMessage: e.toString()));
-    }
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    if (!ready.activeRound.usesEligibleScheduledTabs) return;
+
+    final batch = await repository.scheduleInterviews(
+      event.candidateIds,
+      ready.activeRound,
+      event.details,
+    );
+
+    await _emitAfterMutation(
+      emit: emit,
+      snapshot: ready,
+      batch: batch,
+      actionPhrase: 'scheduled',
+      forceActiveTab: batch.hasSuccesses
+          ? InterviewCandidateTab.scheduled
+          : ready.activeTab,
+    );
   }
 
   Future<void> _onSelectSubmitted(
@@ -99,17 +131,24 @@ class InterviewSchedulingBloc
     Emitter<InterviewSchedulingState> emit,
   ) async {
     if (event.candidateIds.isEmpty) return;
-    if (!state.activeRound.usesEligibleScheduledTabs ||
-        state.activeTab != InterviewCandidateTab.scheduled) {
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    if (!ready.activeRound.usesEligibleScheduledTabs ||
+        ready.activeTab != InterviewCandidateTab.scheduled) {
       return;
     }
-    try {
-      await repository.selectAfterInterview(
-          event.candidateIds, state.activeRound);
-      await _reloadAfterMutation(emit);
-    } catch (e) {
-      emit(state.copyWith(errorMessage: e.toString()));
-    }
+
+    final batch = await repository.selectAfterInterview(
+      event.candidateIds,
+      ready.activeRound,
+    );
+
+    await _emitAfterMutation(
+      emit: emit,
+      snapshot: ready,
+      batch: batch,
+      actionPhrase: 'moved to the next stage',
+    );
   }
 
   Future<void> _onRejectSubmitted(
@@ -117,14 +156,19 @@ class InterviewSchedulingBloc
     Emitter<InterviewSchedulingState> emit,
   ) async {
     if (event.candidateIds.isEmpty) return;
-    final from = state.activeRound;
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    final from = ready.activeRound;
     if (from == InterviewRound.rejected) return;
-    try {
-      await repository.rejectInterviews(event.candidateIds, from);
-      await _reloadAfterMutation(emit);
-    } catch (e) {
-      emit(state.copyWith(errorMessage: e.toString()));
-    }
+
+    final batch = await repository.rejectInterviews(event.candidateIds, from);
+
+    await _emitAfterMutation(
+      emit: emit,
+      snapshot: ready,
+      batch: batch,
+      actionPhrase: 'rejected',
+    );
   }
 
   Future<void> _onOnboardSubmitted(
@@ -132,13 +176,18 @@ class InterviewSchedulingBloc
     Emitter<InterviewSchedulingState> emit,
   ) async {
     if (event.candidateIds.isEmpty) return;
-    if (state.activeRound != InterviewRound.selected) return;
-    try {
-      await repository.onboardFromSelected(event.candidateIds);
-      await _reloadAfterMutation(emit);
-    } catch (e) {
-      emit(state.copyWith(errorMessage: e.toString()));
-    }
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    if (ready.activeRound != InterviewRound.selected) return;
+
+    final batch = await repository.onboardFromSelected(event.candidateIds);
+
+    await _emitAfterMutation(
+      emit: emit,
+      snapshot: ready,
+      batch: batch,
+      actionPhrase: 'moved to onboarding',
+    );
   }
 
   Future<void> _onFlushSubmitted(
@@ -146,29 +195,39 @@ class InterviewSchedulingBloc
     Emitter<InterviewSchedulingState> emit,
   ) async {
     if (event.candidateIds.isEmpty) return;
-    if (state.activeRound != InterviewRound.onboarding) return;
-    try {
-      await repository.flushOnboardingToEmployees(event.candidateIds);
-      await _reloadAfterMutation(emit);
-    } catch (e) {
-      emit(state.copyWith(errorMessage: e.toString()));
-    }
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    if (ready.activeRound != InterviewRound.onboarding) return;
+
+    final batch =
+        await repository.flushOnboardingToEmployees(event.candidateIds);
+
+    await _emitAfterMutation(
+      emit: emit,
+      snapshot: ready,
+      batch: batch,
+      actionPhrase: 'removed from pipeline',
+    );
   }
 
   void _onSearchChanged(
     InterviewSearchChanged event,
     Emitter<InterviewSchedulingState> emit,
   ) {
-    emit(_applyFilters(state.copyWith(searchQuery: event.query)));
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    emit(_applyFilters(ready.copyWith(searchQuery: event.query)));
   }
 
   void _onFiltersApplied(
     InterviewFiltersApplied event,
     Emitter<InterviewSchedulingState> emit,
   ) {
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
     emit(
       _applyFilters(
-        state.copyWith(
+        ready.copyWith(
           selectedJob: event.job,
           selectedInterviewer: event.interviewer,
           selectedStatus: event.status,
@@ -183,9 +242,11 @@ class InterviewSchedulingBloc
     InterviewFiltersReset event,
     Emitter<InterviewSchedulingState> emit,
   ) {
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
     emit(
       _applyFilters(
-        state.copyWith(
+        ready.copyWith(
           selectedJob: kAllJobs,
           selectedInterviewer: kAllInterviewers,
           selectedStatus: kAllStatus,
@@ -201,25 +262,52 @@ class InterviewSchedulingBloc
     InterviewTabChanged event,
     Emitter<InterviewSchedulingState> emit,
   ) {
-    emit(_applyFilters(state.copyWith(activeTab: event.tab)));
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    emit(_applyFilters(ready.copyWith(activeTab: event.tab)));
   }
 
   void _onRoundChanged(
     InterviewRoundChanged event,
     Emitter<InterviewSchedulingState> emit,
   ) {
-    emit(_applyFilters(state.copyWith(activeRound: event.round)));
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    emit(_applyFilters(ready.copyWith(activeRound: event.round)));
   }
 
   void _onSelectionChanged(
     InterviewSelectionChanged event,
     Emitter<InterviewSchedulingState> emit,
   ) {
-    emit(state.copyWith(selectedIds: event.selectedIds));
+    final ready = _readyOrNull(state);
+    if (ready == null) return;
+    emit(ready.copyWith(selectedIds: event.selectedIds));
   }
 
-  InterviewSchedulingState _applyFilters(
-    InterviewSchedulingState targetState,
+  String _errorMessage(Object e) {
+    if (e is RemoteDataException) return e.message;
+    return e.toString();
+  }
+
+  String _batchMutationToast(
+    InterviewBatchMutationResult r,
+    String actionPhrase,
+  ) {
+    if (!r.hasFailures) return '';
+    final failCount = r.failures.length;
+    final okCount = r.succeededApplicationIds.length;
+    final first = r.failures.first.message;
+    if (okCount == 0) {
+      return failCount == 1
+          ? first
+          : 'None could be $actionPhrase ($failCount failed). $first';
+    }
+    return '$okCount succeeded, $failCount could not be $actionPhrase. $first';
+  }
+
+  InterviewSchedulingReady _applyFilters(
+    InterviewSchedulingReady targetState,
   ) {
     final search = targetState.searchQuery.toLowerCase().trim();
     final filtered = targetState.candidates.where((candidate) {
@@ -275,7 +363,6 @@ class InterviewSchedulingBloc
     return targetState.copyWith(
       filteredCandidates: filtered,
       selectedIds: selectedIds,
-      errorMessage: null,
     );
   }
 }

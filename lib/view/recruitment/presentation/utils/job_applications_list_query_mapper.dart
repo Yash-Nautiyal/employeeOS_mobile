@@ -1,6 +1,6 @@
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_applications_list_query.dart';
 
-import 'job_application_filter_logic.dart';
+import 'filter/logic/job_application_filter_logic.dart';
 
 /// Page size for job applications list (server + UI).
 const int kJobApplicationsPageSize = 10;

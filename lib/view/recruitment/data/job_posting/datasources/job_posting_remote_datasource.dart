@@ -1,8 +1,11 @@
 import 'package:employeeos/core/network/run_supabase_remote.dart';
+import 'package:employeeos/view/recruitment/domain/job_application/application_db_values.dart'
+    show ApplicationDbStatus, ApplicationPipelineStage;
 import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_application_summary.dart';
 import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_applications_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../interview_scheduling/datasources/interview_remote_datasource.dart';
 import '../models/job_posting_model.dart';
 
 class JobPostingRemoteDatasource {
@@ -170,6 +173,14 @@ class JobPostingRemoteDatasource {
   }) =>
       runSupabaseRemote(() async {
         if (applicationIds.isEmpty) return;
+
+        if (status == ApplicationDbStatus.shortlisted &&
+            currentStage == ApplicationPipelineStage.firstInterviewRound) {
+          final interviews = InterviewRemoteDatasource(client: _client);
+          await interviews.shortlistApplicationsTransaction(applicationIds);
+          return;
+        }
+
         final payload = <String, dynamic>{'status': status};
         if (currentStage != null) {
           payload['current_stage'] = currentStage;

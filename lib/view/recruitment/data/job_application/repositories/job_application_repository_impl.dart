@@ -1,5 +1,4 @@
 import 'package:employeeos/view/recruitment/data/job_application/datasources/job_application_remote_datasource.dart';
-import 'package:employeeos/view/recruitment/data/interview_scheduling/datasources/interview_scheduling_local_data_source.dart';
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_application.dart';
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_applications_list_query.dart';
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_applications_list_result.dart';
@@ -24,19 +23,7 @@ class JobApplicationRepositoryImpl implements JobApplicationRepository {
 
   @override
   Future<JobApplication?> shortlist(String applicationId) async {
-    final updated = await _remote.shortlist(applicationId);
-    if (updated != null) {
-      await InterviewSchedulingLocalDataSource.instance
-          .syncEligibleFromShortlistedApplication(
-        applicationId: updated.id,
-        fullName: updated.fullName,
-        email: updated.email,
-        jobTitle: updated.jobTitle,
-        appliedOn: updated.appliedOn,
-        jobId: updated.jobId,
-      );
-    }
-    return updated;
+    return _remote.shortlist(applicationId);
   }
 
   @override

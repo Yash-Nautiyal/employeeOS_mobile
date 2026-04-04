@@ -1,9 +1,11 @@
 import 'package:bloc/bloc.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/entities/job_application.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/entities/job_applications_list_query.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/usecases/get_job_applications_list_page.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/usecases/reject_job_application.dart';
-import 'package:employeeos/view/recruitment/domain/job_application/usecases/shortlist_job_application.dart';
+import '../../../domain/index.dart'
+    show
+        GetJobApplicationsListPageUseCase,
+        JobApplication,
+        JobApplicationsListQuery,
+        RejectJobApplicationUseCase,
+        ShortlistJobApplicationUseCase;
 import 'package:equatable/equatable.dart';
 
 part 'job_application_event.dart';
@@ -63,19 +65,27 @@ class JobApplicationBloc
     if (base == null) return;
     final q = base.copyWith(page: event.page, pageSize: base.pageSize);
     final current = state;
+    JobApplicationsLoaded? restoreOnFailure;
     if (current is JobApplicationsLoaded) {
+      restoreOnFailure = current;
       final cached = _sameFilterBase(q) && _pageCache.containsKey(q.page);
       if (!cached) {
         emit(current.copyWith(isLoadingPage: true));
       }
     }
-    await _fetchPage(emit, q, showFullLoader: false);
+    await _fetchPage(
+      emit,
+      q,
+      showFullLoader: false,
+      restoreOnListFailure: restoreOnFailure,
+    );
   }
 
   Future<void> _fetchPage(
     Emitter<JobApplicationState> emit,
     JobApplicationsListQuery q, {
     required bool showFullLoader,
+    JobApplicationsLoaded? restoreOnListFailure,
   }) async {
     if (_sameFilterBase(q) && _pageCache.containsKey(q.page)) {
       emit(JobApplicationsLoaded(
@@ -102,7 +112,13 @@ class JobApplicationBloc
         isLoadingPage: false,
       ));
     } catch (e) {
-      emit(JobApplicationError(e.toString()));
+      if (restoreOnListFailure != null) {
+        emit(JobApplicationError(e.toString()));
+        emit(restoreOnListFailure.copyWith(isLoadingPage: false));
+      } else {
+        emit(JobApplicationError(e.toString()));
+        emit(JobApplicationFetchError(e.toString()));
+      }
     }
   }
 
@@ -125,10 +141,20 @@ class JobApplicationBloc
         } else {
           emit(JobApplicationLoading());
         }
-        await _fetchPage(emit, q, showFullLoader: false);
+        await _fetchPage(
+          emit,
+          q,
+          showFullLoader: false,
+          restoreOnListFailure: loaded,
+        );
       }
     } catch (e) {
-      emit(JobApplicationError(e.toString()));
+      if (loaded != null) {
+        emit(JobApplicationError(e.toString()));
+        emit(loaded.copyWith(isLoadingPage: false));
+      } else {
+        emit(JobApplicationFetchError(e.toString()));
+      }
     }
   }
 
@@ -149,10 +175,20 @@ class JobApplicationBloc
         } else {
           emit(JobApplicationLoading());
         }
-        await _fetchPage(emit, q, showFullLoader: false);
+        await _fetchPage(
+          emit,
+          q,
+          showFullLoader: false,
+          restoreOnListFailure: loaded,
+        );
       }
     } catch (e) {
-      emit(JobApplicationError(e.toString()));
+      if (loaded != null) {
+        emit(JobApplicationError(e.toString()));
+        emit(loaded.copyWith(isLoadingPage: false));
+      } else {
+        emit(JobApplicationFetchError(e.toString()));
+      }
     }
   }
 

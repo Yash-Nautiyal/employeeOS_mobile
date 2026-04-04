@@ -7,7 +7,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../data/index.dart' show JobPostingModel;
-import '../../../utils/quill_description_codec.dart';
+import '../../../utils/quill/quill_description_codec.dart';
 import '../../injection/job_posting_injection.dart';
 import '../components/quill/tool_bar.dart';
 import 'detail_section.dart';

@@ -41,9 +41,7 @@ class JobPostingCardSlot extends StatelessWidget {
       builder: (context, vm) {
         if (vm == null) return const SizedBox.shrink();
         final canEditAndDelete = profile != null &&
-            (profile!.canManageAnyJob ||
-                (profile!.canManageOwnJobs &&
-                    vm.job.postedByEmail == profile!.email));
+            (profile!.canManageAnyJob || (profile!.canManageOwnJobs));
         return JobPostingCard(
           theme: theme,
           job: vm.job,

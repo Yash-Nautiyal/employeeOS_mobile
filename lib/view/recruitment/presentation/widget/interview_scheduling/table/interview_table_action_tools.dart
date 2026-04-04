@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import '../../../../domain/index.dart'
     show InterviewCandidateTab, InterviewRound, InterviewRoundLabel;
 import '../../../bloc/interview_scheduling/interview_scheduling_bloc.dart'
-    show InterviewSchedulingState;
+    show InterviewSchedulingReady;
 import '../components/schedule_button.dart';
 
 class InterviewTableActionTools extends StatelessWidget {
   final ThemeData theme;
-  final InterviewSchedulingState state;
+  final InterviewSchedulingReady state;
   final VoidCallback onOnboard;
   final VoidCallback onReject;
   final VoidCallback onSchedule;

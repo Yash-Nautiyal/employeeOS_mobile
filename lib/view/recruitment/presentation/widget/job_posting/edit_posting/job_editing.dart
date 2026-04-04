@@ -10,7 +10,7 @@ import 'package:employeeos/core/index.dart'
     show AppPallete, CustomDropdown, CustomTextButton, CustomTextfield;
 import '../../../../data/index.dart' show JobPostingModel;
 import '../../../../domain/index.dart' show JobPosting;
-import '../../../utils/quill_description_codec.dart';
+import '../../../utils/quill/quill_description_codec.dart';
 import '../../injection/job_posting_injection.dart';
 
 class JobEditingPage extends StatefulWidget {

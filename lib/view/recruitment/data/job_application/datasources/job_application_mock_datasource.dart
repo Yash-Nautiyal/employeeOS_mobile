@@ -1,4 +1,3 @@
-import '../../index.dart' show InterviewSchedulingLocalDataSource;
 import '../../mock/job_application_mock_data.dart';
 import '../models/job_application_model.dart';
 
@@ -29,15 +28,6 @@ class JobApplicationMockDatasource {
     if (current.status != 'Applied') return current;
     final updated = current.copyWith(status: 'Shortlisted');
     _applications[i] = updated;
-    await InterviewSchedulingLocalDataSource.instance
-        .syncEligibleFromShortlistedApplication(
-      applicationId: updated.id,
-      fullName: updated.fullName,
-      email: updated.email,
-      jobTitle: updated.jobTitle,
-      appliedOn: updated.appliedOn,
-      jobId: updated.jobId,
-    );
     return updated;
   }
 

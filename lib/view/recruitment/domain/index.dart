@@ -13,8 +13,11 @@ export 'job_posting/usecases/toggle_job_status.dart';
 export 'job_posting/usecases/update_job.dart';
 export 'job_posting/usecases/update_applications_status.dart';
 
+export 'interview_scheduling/entities/interview_batch_mutation_result.dart';
 export 'interview_scheduling/entities/interview_candidate.dart';
 export 'interview_scheduling/entities/interview_enums.dart';
+export 'interview_scheduling/entities/interview_schedule_details.dart';
+export 'interview_scheduling/interview_db_values.dart';
 export 'interview_scheduling/repositories/interview_scheduling_repository.dart';
 export 'interview_scheduling/usecases/get_interview_candidates_usecase.dart';
 

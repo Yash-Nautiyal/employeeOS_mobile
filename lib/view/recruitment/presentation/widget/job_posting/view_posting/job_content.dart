@@ -75,7 +75,7 @@ class JobContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'https://www.google.com',
+                            job.applicationLink ?? '',
                             style: theme.textTheme.bodySmall,
                           ),
                           const SizedBox(height: 6),

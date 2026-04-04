@@ -1,59 +1,58 @@
-import '../../../domain/index.dart'
-    show InterviewCandidate, InterviewRound, InterviewSchedulingRepository;
-import '../../job_application/datasources/job_application_mock_datasource.dart';
-import '../datasources/interview_scheduling_local_data_source.dart';
+import 'package:employeeos/view/recruitment/domain/index.dart'
+    show
+        InterviewBatchMutationResult,
+        InterviewCandidate,
+        InterviewRound,
+        InterviewScheduleDetails,
+        InterviewSchedulingRepository;
+
+import '../datasources/interview_scheduling_remote_datasource.dart';
 
 class InterviewSchedulingRepositoryImpl
     implements InterviewSchedulingRepository {
-  final InterviewSchedulingLocalDataSource localDataSource;
+  InterviewSchedulingRepositoryImpl(this._remote);
 
-  const InterviewSchedulingRepositoryImpl(this.localDataSource);
-
-  static bool _mergedShortlistedFromApplications = false;
+  final InterviewSchedulingRemoteDatasource _remote;
 
   @override
-  Future<List<InterviewCandidate>> fetchCandidates() async {
-    if (!_mergedShortlistedFromApplications) {
-      _mergedShortlistedFromApplications = true;
-      final apps =
-          await JobApplicationMockDatasource.instance.getApplications();
-      for (final a in apps) {
-        if (a.status != 'Shortlisted') continue;
-        await localDataSource.syncEligibleFromShortlistedApplication(
-          applicationId: a.id,
-          fullName: a.fullName,
-          email: a.email,
-          jobTitle: a.jobTitle,
-          appliedOn: a.appliedOn,
-          jobId: a.jobId,
-        );
-      }
-    }
-    return localDataSource.fetchCandidates();
+  Future<List<InterviewCandidate>> fetchCandidates() {
+    return _remote.fetchPipelineRows();
   }
 
   @override
-  Future<void> scheduleInterviews(Set<String> ids, InterviewRound round) {
-    return localDataSource.scheduleInterviews(ids, round);
+  Future<InterviewBatchMutationResult> scheduleInterviews(
+    Set<String> applicationIds,
+    InterviewRound round,
+    InterviewScheduleDetails details,
+  ) {
+    return _remote.scheduleApplications(applicationIds, round, details);
   }
 
   @override
-  Future<void> selectAfterInterview(Set<String> ids, InterviewRound round) {
-    return localDataSource.selectAfterInterview(ids, round);
+  Future<InterviewBatchMutationResult> selectAfterInterview(
+    Set<String> ids,
+    InterviewRound round,
+  ) {
+    return _remote.advanceAfterInterview(ids, round);
   }
 
   @override
-  Future<void> rejectInterviews(Set<String> ids, InterviewRound fromRound) {
-    return localDataSource.rejectInterviews(ids, fromRound);
+  Future<InterviewBatchMutationResult> rejectInterviews(
+    Set<String> ids,
+    InterviewRound fromRound,
+  ) {
+    return _remote.rejectApplications(ids, fromRound);
   }
 
   @override
-  Future<void> onboardFromSelected(Set<String> ids) {
-    return localDataSource.onboardFromSelected(ids);
+  Future<InterviewBatchMutationResult> onboardFromSelected(Set<String> ids) {
+    return _remote.onboardApplications(ids);
   }
 
   @override
-  Future<void> flushOnboardingToEmployees(Set<String> ids) {
-    return localDataSource.flushOnboardingToEmployees(ids);
+  Future<InterviewBatchMutationResult> flushOnboardingToEmployees(
+    Set<String> ids,
+  ) {
+    return _remote.flushOnboarding(ids);
   }
 }

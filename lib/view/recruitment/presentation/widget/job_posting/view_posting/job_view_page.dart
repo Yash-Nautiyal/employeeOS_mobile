@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain/index.dart' show JobPosting;
 import '../../../bloc/job_posting/job_posting_detail_cubit.dart';
-import '../../../utils/quill_description_codec.dart';
+import '../../../utils/quill/quill_description_codec.dart';
 import '../../injection/job_posting_injection.dart';
 import '../../index.dart' show ApplicationsContent, JobContent;
 

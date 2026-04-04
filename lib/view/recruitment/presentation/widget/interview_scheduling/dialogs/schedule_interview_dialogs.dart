@@ -72,13 +72,15 @@ Future<bool> showMeetingScheduledConfirmationDialog({
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   CustomTextButton(
-                    onClick: () => Navigator.of(ctx).pop(false),
+                    onClick: () =>
+                        Navigator.of(ctx, rootNavigator: true).pop(false),
                     child: Text('Cancel', style: theme.textTheme.labelLarge),
                   ),
                   const SizedBox(width: 8),
                   CustomTextButton(
                     backgroundColor: theme.colorScheme.tertiary,
-                    onClick: () => Navigator.of(ctx).pop(true),
+                    onClick: () =>
+                        Navigator.of(ctx, rootNavigator: true).pop(true),
                     child: Text(
                       'Yes, meeting scheduled',
                       style: theme.textTheme.labelLarge?.copyWith(

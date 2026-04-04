@@ -7,9 +7,22 @@ sealed class JobApplicationState extends Equatable {
   List<Object?> get props => [];
 }
 
+sealed class JobApplicationListenState extends JobApplicationState {
+  const JobApplicationListenState();
+}
+
 final class JobApplicationInitial extends JobApplicationState {}
 
 final class JobApplicationLoading extends JobApplicationState {}
+
+final class JobApplicationFetchError extends JobApplicationState {
+  final String message;
+
+  const JobApplicationFetchError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
 
 final class JobApplicationsLoaded extends JobApplicationState {
   final List<JobApplication> applications;
@@ -46,7 +59,8 @@ final class JobApplicationsLoaded extends JobApplicationState {
   List<Object?> get props => [applications, query, totalCount, isLoadingPage];
 }
 
-final class JobApplicationError extends JobApplicationState {
+/// Toast-only: emit then immediately restore [JobApplicationsLoaded] from the bloc.
+final class JobApplicationError extends JobApplicationListenState {
   final String message;
 
   const JobApplicationError(this.message);
