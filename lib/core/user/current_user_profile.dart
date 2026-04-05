@@ -15,6 +15,7 @@ class CurrentUserProfile extends Equatable {
   final bool phoneVerified;
   final String? status;
   final Map<String, dynamic>? metadata;
+  final Map<String, dynamic>? appMetadata;
 
   const CurrentUserProfile({
     required this.id,
@@ -27,11 +28,13 @@ class CurrentUserProfile extends Equatable {
     this.phoneVerified = false,
     this.status,
     this.metadata,
+    this.appMetadata,
   });
 
   factory CurrentUserProfile.fromUserInfo(
     UserInfoEntity entity, {
     Map<String, dynamic>? metadata,
+    Map<String, dynamic>? appMetadata,
   }) {
     return CurrentUserProfile(
       id: entity.id,
@@ -44,6 +47,7 @@ class CurrentUserProfile extends Equatable {
       phoneVerified: entity.phoneVerified,
       status: entity.status,
       metadata: metadata,
+      appMetadata: appMetadata,
     );
   }
 
@@ -66,5 +70,6 @@ class CurrentUserProfile extends Equatable {
         phoneVerified,
         status,
         metadata,
+        appMetadata,
       ];
 }

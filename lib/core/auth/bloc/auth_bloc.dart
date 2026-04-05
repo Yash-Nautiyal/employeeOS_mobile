@@ -23,6 +23,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignUpRequested>(_onSignUpRequested);
     on<AuthSignOutRequested>(_onSignOutRequested);
     on<AuthResetPasswordRequested>(_onResetPasswordRequested);
+    on<AuthRefreshProfileRequested>(_onRefreshProfileRequested);
 
     _authSubscription = _client.auth.onAuthStateChange.listen((event) {
       final session = _client.auth.currentSession;
@@ -54,14 +55,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (entity == null) return null;
       final supabaseUser = _client.auth.currentUser;
       Map<String, dynamic>? metadata;
+      Map<String, dynamic>? appMetadata;
       if (supabaseUser != null) {
-        final meta = <String, dynamic>{
-          ...?supabaseUser.userMetadata,
-          ...supabaseUser.appMetadata,
-        };
-        metadata = meta.isEmpty ? null : meta;
+        metadata = supabaseUser.userMetadata;
+        appMetadata = supabaseUser.appMetadata;
       }
-      return CurrentUserProfile.fromUserInfo(entity, metadata: metadata);
+      return CurrentUserProfile.fromUserInfo(entity,
+          metadata: metadata, appMetadata: appMetadata);
     } catch (_) {
       return null;
     }
@@ -92,6 +92,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _onAuthLoggedOut(AuthLoggedOut event, Emitter<AuthState> emit) {
     emit(Unauthenticated());
+  }
+
+  Future<void> _onRefreshProfileRequested(
+    AuthRefreshProfileRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    final session = _client.auth.currentSession;
+    if (session == null) {
+      emit(Unauthenticated());
+      return;
+    }
+    try {
+      final res = await _client.auth.getUser();
+      final user = res.user;
+      if (user == null) {
+        emit(Unauthenticated());
+        return;
+      }
+      final profile = await _loadProfile(user.id);
+      emit(Authenticated(user, profile));
+    } catch (_) {
+      final user = _client.auth.currentUser;
+      if (user != null) {
+        final profile = await _loadProfile(user.id);
+        emit(Authenticated(user, profile));
+      }
+    }
   }
 
   @override

@@ -98,6 +98,78 @@ class AuthRepository {
     }
   }
 
+  /// Verifies [currentPassword], then sets the account password to [newPassword].
+  Future<void> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
+    if (newPassword.length < 6) {
+      throw AuthFailure('New password must be at least 6 characters.');
+    }
+    try {
+      await _client.auth
+          .signInWithPassword(email: email, password: currentPassword)
+          .timeout(timeout);
+    } on TimeoutException {
+      throw AuthFailure(
+        'Request timed out. Please check your connection and try again.',
+      );
+    } on AuthException catch (e) {
+      final msg = e.message.toLowerCase();
+      if (msg.contains('invalid') ||
+          msg.contains('credential') ||
+          msg.contains('password')) {
+        throw AuthFailure('Current password is incorrect.');
+      }
+      throw AuthFailure(e.message);
+    } catch (_) {
+      throw AuthFailure('Could not verify your current password.');
+    }
+
+    try {
+      await _client.auth
+          .updateUser(UserAttributes(password: newPassword))
+          .timeout(timeout);
+    } on TimeoutException {
+      throw AuthFailure(
+        'Update timed out. Please check your connection and try again.',
+      );
+    } on AuthException catch (e) {
+      throw AuthFailure(e.message);
+    } catch (_) {
+      throw AuthFailure('Could not update password. Please try again.');
+    }
+  }
+
+  /// Merges [patch] into the current user's [User.userMetadata] via Supabase.
+  Future<void> mergeUserMetadata(
+    Map<String, dynamic> patch, {
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
+    final user = _client.auth.currentUser;
+    if (user == null) {
+      throw AuthFailure('Not signed in.');
+    }
+    if (patch.isEmpty) return;
+    try {
+      final merged = Map<String, dynamic>.from(user.userMetadata ?? {});
+      merged.addAll(patch);
+      await _client.auth
+          .updateUser(UserAttributes(data: merged))
+          .timeout(timeout);
+    } on TimeoutException {
+      throw AuthFailure(
+        'Profile update timed out. Please check your connection and try again.',
+      );
+    } on AuthException catch (e) {
+      throw AuthFailure(e.message);
+    } catch (_) {
+      throw AuthFailure('Could not update profile. Please try again.');
+    }
+  }
+
   /// Sign out the current user.
   Future<void> signOut({
     Duration timeout = const Duration(seconds: 15),

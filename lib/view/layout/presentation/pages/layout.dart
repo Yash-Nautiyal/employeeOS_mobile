@@ -43,7 +43,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     'Job Application',
     'Interview Scheduling'
   };
-  String _selectedItem = 'Job Posting';
+  String _selectedItem = 'User';
   DateTime? _currentBackPressTime;
   bool _showExitToast = false;
 

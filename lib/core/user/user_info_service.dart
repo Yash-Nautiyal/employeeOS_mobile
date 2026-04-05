@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'user_info_entity.dart';
@@ -11,6 +13,10 @@ class UserInfoService {
   final SupabaseClient _client;
 
   static const String _table = 'user_info';
+  static const String _avatarsBucket = 'avatars';
+
+  /// Max avatar file size (matches UI copy ~3.1 MB).
+  static const int maxAvatarBytes = 3250586;
 
   /// HR and Admin users from [user_info] (recruitment scheduling pickers).
   /// Falls back to filtering [fetchAllUsers] if the role filter returns empty.
@@ -96,5 +102,74 @@ class UserInfoService {
     if (v is DateTime) return v;
     if (v is String) return DateTime.tryParse(v);
     return null;
+  }
+
+  /// Updates the signed-in user's row in [user_info]. Only non-null fields are sent.
+  Future<void> updateOwnProfileRow({
+    String? fullName,
+    String? phoneNumber,
+    DateTime? dateOfBirth,
+    String? avatarUrl,
+  }) async {
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null || uid.isEmpty) {
+      throw StateError('Not signed in');
+    }
+    final data = <String, dynamic>{};
+    if (fullName != null) {
+      data['full_name'] = fullName.trim();
+    }
+    if (phoneNumber != null) {
+      data['phone_number'] = phoneNumber.trim();
+    }
+    if (dateOfBirth != null) {
+      data['date_of_birth'] = dateOfBirth.toIso8601String().split('T').first;
+    }
+    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+      data['avatar_url'] = avatarUrl;
+    }
+    if (data.isEmpty) return;
+    await _client.from(_table).update(data).eq('id', uid);
+  }
+
+  /// Uploads image bytes to the [avatars] bucket and returns the public URL.
+  Future<String> uploadAvatarAndGetPublicUrl({
+    required List<int> bytes,
+    required String contentType,
+  }) async {
+    if (bytes.length > maxAvatarBytes) {
+      throw ArgumentError('Image must be at most 3.1 MB.');
+    }
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null || uid.isEmpty) {
+      throw StateError('Not signed in');
+    }
+    final ext = _extensionForContentType(contentType);
+    final path = '$uid/${DateTime.now().millisecondsSinceEpoch}$ext';
+    await _client.storage.from(_avatarsBucket).uploadBinary(
+          path,
+          Uint8List.fromList(bytes),
+          fileOptions: FileOptions(
+            contentType: contentType,
+            upsert: true,
+          ),
+        );
+    return _client.storage.from(_avatarsBucket).getPublicUrl(path);
+  }
+
+  static String _extensionForContentType(String contentType) {
+    switch (contentType.toLowerCase()) {
+      case 'image/jpeg':
+      case 'image/jpg':
+        return '.jpg';
+      case 'image/png':
+        return '.png';
+      case 'image/gif':
+        return '.gif';
+      case 'image/webp':
+        return '.webp';
+      default:
+        return '.jpg';
+    }
   }
 }

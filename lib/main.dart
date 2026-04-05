@@ -4,6 +4,7 @@ import 'package:employeeos/core/auth/auth_error_handler.dart';
 import 'package:employeeos/core/network/remote_data_exception.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
+import 'package:employeeos/core/user/user_account_sync_service.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
 import 'package:employeeos/core/auth/data/auth_repository.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
@@ -23,7 +24,7 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
       if (AuthErrorHandler.handleUnhandledError(error, stack)) {
-        return true; // Handled; error is not propagated.
+        return true;
       }
       if (error is RemoteDataException) {
         if (kDebugMode) {
@@ -34,7 +35,6 @@ void main() {
       FlutterError.presentError(
         FlutterErrorDetails(exception: error, stack: stack),
       );
-      // We reported it; prevent default handler from double-reporting.
       return true;
     };
 
@@ -58,6 +58,12 @@ void main() {
           RepositoryProvider<UserInfoService>(
             create: (_) => UserInfoService(),
           ),
+          RepositoryProvider<UserAccountSyncService>(
+            create: (context) => UserAccountSyncService(
+              context.read<AuthRepository>(),
+              context.read<UserInfoService>(),
+            ),
+          ),
         ],
         child: MultiBlocProvider(
           providers: [
@@ -75,7 +81,7 @@ void main() {
     );
   }, (Object error, StackTrace stack) {
     if (AuthErrorHandler.handleUnhandledError(error, stack)) {
-      return; // Handled; do not rethrow.
+      return;
     }
     if (error is RemoteDataException) {
       if (kDebugMode) {
@@ -97,7 +103,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(

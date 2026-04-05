@@ -49,3 +49,6 @@ class AuthSignUpRequested extends AuthEvent {
 }
 
 class AuthSignOutRequested extends AuthEvent {}
+
+/// Reload profile and auth user from the server (e.g. after profile edits).
+class AuthRefreshProfileRequested extends AuthEvent {}

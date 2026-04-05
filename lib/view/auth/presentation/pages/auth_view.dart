@@ -67,17 +67,20 @@ class _AuthViewState extends State<AuthView> {
                 },
               ),
               extendBody: true,
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15)
-                      .copyWith(top: 25),
-                  child: Column(
-                    children: [
-                      AuthPage(
-                        emailController: _emailController,
-                        passwordController: _passwordController,
-                      ),
-                    ],
+              body: ScrollConfiguration(
+                behavior: const _NoStretchScrollBehavior(),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15)
+                        .copyWith(top: 25),
+                    child: Column(
+                      children: [
+                        AuthPage(
+                          emailController: _emailController,
+                          passwordController: _passwordController,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -86,5 +89,21 @@ class _AuthViewState extends State<AuthView> {
         },
       ),
     );
+  }
+}
+
+/// Avoids Material's stretching overscroll indicator: its animation can call
+/// [setState] while layout is running (e.g. keyboard or parent rebuild), which
+/// triggers "Build scheduled during frame" and can freeze the UI.
+class _NoStretchScrollBehavior extends MaterialScrollBehavior {
+  const _NoStretchScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
   }
 }

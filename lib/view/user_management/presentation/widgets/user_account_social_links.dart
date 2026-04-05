@@ -9,13 +9,21 @@ class UserAccountSocialLinks extends StatelessWidget {
   final TextEditingController instagramController;
   final TextEditingController xController;
   final TextEditingController linkedinController;
-  const UserAccountSocialLinks(
-      {super.key,
-      required this.theme,
-      required this.facebookController,
-      required this.instagramController,
-      required this.xController,
-      required this.linkedinController});
+  final bool saveEnabled;
+  final bool isSaving;
+  final Future<void> Function() onSave;
+
+  const UserAccountSocialLinks({
+    super.key,
+    required this.theme,
+    required this.facebookController,
+    required this.instagramController,
+    required this.xController,
+    required this.linkedinController,
+    required this.saveEnabled,
+    required this.isSaving,
+    required this.onSave,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -107,13 +115,19 @@ class UserAccountSocialLinks extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                CustomTextButton(
-                  onClick: () {},
-                  backgroundColor: theme.colorScheme.tertiary,
-                  child: Text(
-                    "Save Changes",
-                    style: theme.textTheme.labelLarge
-                        ?.copyWith(color: theme.scaffoldBackgroundColor),
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomTextButton(
+                    enabled: saveEnabled && !isSaving,
+                    onClick: () {
+                      onSave();
+                    },
+                    backgroundColor: theme.colorScheme.tertiary,
+                    child: Text(
+                      isSaving ? 'Saving…' : 'Save Changes',
+                      style: theme.textTheme.labelLarge
+                          ?.copyWith(color: theme.scaffoldBackgroundColor),
+                    ),
                   ),
                 ),
               ],
