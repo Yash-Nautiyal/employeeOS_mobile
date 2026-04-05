@@ -111,3 +111,53 @@ String formatDateRange(DateTimeRange range) {
   // Different years, show full dates
   return '${formatDate(start)} - ${formatDate(end)}';
 }
+
+String getMonthName(int month) {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  return months[month - 1];
+}
+
+/// Parses DOB from ISO or `d/m/y` (same as account date picker / metadata).
+DateTime? tryParseDobString(String raw) {
+  final s = raw.trim();
+  if (s.isEmpty) return null;
+  final iso = DateTime.tryParse(s);
+  if (iso != null) return DateTime(iso.year, iso.month, iso.day);
+  final parts = s.split(RegExp(r'[/.\-]'));
+  if (parts.length == 3) {
+    final d = int.tryParse(parts[0].trim());
+    final m = int.tryParse(parts[1].trim());
+    final y = int.tryParse(parts[2].trim());
+    if (d != null && m != null && y != null && y > 31) {
+      return DateTime(y, m, d);
+    }
+  }
+  return null;
+}
+
+/// Full years lived as of [reference] (defaults to today). Null if [birthDate] is in the future.
+int? ageInYears(DateTime birthDate, [DateTime? reference]) {
+  final today = reference ?? DateTime.now();
+  final birth = DateTime(birthDate.year, birthDate.month, birthDate.day);
+  final refDay = DateTime(today.year, today.month, today.day);
+  if (birth.isAfter(refDay)) return null;
+  var age = refDay.year - birth.year;
+  final birthdayThisYear = DateTime(refDay.year, birth.month, birth.day);
+  if (refDay.isBefore(birthdayThisYear)) {
+    age--;
+  }
+  return age;
+}

@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 
 class UserProfileContacts extends StatelessWidget {
   final ThemeData theme;
-  const UserProfileContacts({super.key, required this.theme});
+  final String phoneNumber;
+  const UserProfileContacts(
+      {super.key, required this.theme, required this.phoneNumber});
 
   @override
   Widget build(BuildContext context) {
+    final countryCode =
+        phoneNumber.startsWith('+') ? phoneNumber.substring(0, 3) : '';
     return Container(
       padding: const EdgeInsets.all(16),
       width: double.maxFinite,
@@ -45,13 +49,17 @@ class UserProfileContacts extends StatelessWidget {
               Flexible(
                 child: Wrap(
                   children: [
-                    Text(
-                      "+91 ",
-                      style: theme.textTheme.bodyLarge
-                          ?.copyWith(color: theme.disabledColor),
+                    if (countryCode.isNotEmpty || countryCode != '')
+                      Text(
+                        countryCode,
+                        style: theme.textTheme.bodyLarge
+                            ?.copyWith(color: theme.disabledColor),
+                      ),
+                    const SizedBox(
+                      width: 4,
                     ),
                     Text(
-                      "9650804655",
+                      phoneNumber.substring(countryCode.length),
                       style: theme.textTheme.bodyLarge,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,

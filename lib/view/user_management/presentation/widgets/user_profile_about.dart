@@ -1,15 +1,24 @@
 import 'dart:math' show pi;
 
-import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
+import 'package:employeeos/core/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class UserProfileAbout extends StatelessWidget {
   final ThemeData theme;
-  const UserProfileAbout({super.key, required this.theme});
+  final String dateOfBirth;
+  const UserProfileAbout(
+      {super.key, required this.theme, required this.dateOfBirth});
 
   @override
   Widget build(BuildContext context) {
+    final dob = tryParseDobString(dateOfBirth);
+    final month = dob != null ? getMonthName(dob.month) : '—';
+    final year = dob?.year ?? '—';
+    final day = dob?.day ?? '—';
+    final age = dob != null ? ageInYears(dob) : null;
+    final ageLabel = age != null ? '$age years' : '—';
+
     return Container(
       width: double.maxFinite,
       padding: const EdgeInsets.all(16),
@@ -58,7 +67,7 @@ class UserProfileAbout extends StatelessWidget {
                     width: double.maxFinite,
                     color: AppPallete.successDark,
                     child: Text(
-                      "Month",
+                      month,
                       style: theme.textTheme.titleLarge
                           ?.copyWith(color: Colors.white),
                     ),
@@ -74,14 +83,14 @@ class UserProfileAbout extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              "01",
+                              '$day',
                               style: theme.textTheme.displayLarge,
                             ),
                             const SizedBox(
                               height: 5,
                             ),
                             Text(
-                              "2004",
+                              '$year',
                               style: theme.textTheme.displaySmall
                                   ?.copyWith(color: theme.disabledColor),
                             ),
@@ -110,7 +119,7 @@ class UserProfileAbout extends StatelessWidget {
             height: 10,
           ),
           Text(
-            "21 years",
+            ageLabel,
             style: theme.textTheme.bodyMedium,
           )
         ],

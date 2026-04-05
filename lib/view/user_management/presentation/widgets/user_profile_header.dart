@@ -1,3 +1,4 @@
+import 'package:employeeos/core/common/actions/user_actions.dart';
 import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_tab.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +6,16 @@ import 'package:flutter/material.dart';
 class UserProfileHeader extends StatelessWidget {
   final ThemeData theme;
   final TabController tabController;
+  final String fullName;
+  final String designation;
+  final String avatarUrl;
   const UserProfileHeader(
-      {super.key, required this.theme, required this.tabController});
+      {super.key,
+      required this.theme,
+      required this.tabController,
+      required this.fullName,
+      required this.designation,
+      required this.avatarUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -52,19 +61,29 @@ class UserProfileHeader extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 35,
+                          backgroundImage: avatarUrl.isNotEmpty
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                          child: avatarUrl.isEmpty
+                              ? Text(
+                                  getInitials(fullName),
+                                  style: theme.textTheme.displaySmall
+                                      ?.copyWith(color: Colors.white),
+                                )
+                              : null,
                         ),
                         const SizedBox(
                           height: 5,
                         ),
                         Text(
-                          'Yash Nautiyal',
+                          fullName,
                           style: theme.textTheme.displaySmall
                               ?.copyWith(color: Colors.white),
                         ),
                         Text(
-                          "Software Developer",
+                          designation,
                           style: theme.textTheme.titleSmall
                               ?.copyWith(color: Colors.white),
                         )
