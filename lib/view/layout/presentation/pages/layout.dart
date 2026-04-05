@@ -37,6 +37,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     'Account': const UserAccount(),
     'Profile': const UserProfile(),
     'Card': const UserCards(),
+    'Create User': const CreateUserPage(),
   };
   static const _recruitmentItemKeys = {
     'Job Posting',

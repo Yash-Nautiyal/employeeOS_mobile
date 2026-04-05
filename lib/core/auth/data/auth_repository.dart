@@ -80,6 +80,70 @@ class AuthRepository {
     }
   }
 
+  /// Creates a new auth user and returns their id. If sign-up switches the local
+  /// session to the new user, restores the previous session via [setSession].
+  Future<String> signUpNewUserKeepCurrentSession({
+    required String email,
+    required String password,
+    String? firstname,
+    String? lastname,
+    Map<String, dynamic>? additionalUserData,
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
+    final sessionBefore = _client.auth.currentSession;
+    final adminRefresh = sessionBefore?.refreshToken;
+    final adminUserId = _client.auth.currentUser?.id;
+    if (adminRefresh == null || adminRefresh.isEmpty) {
+      throw AuthFailure('You must be signed in to create users.');
+    }
+    try {
+      final data = <String, dynamic>{
+        if (firstname != null) 'first_name': firstname,
+        if (lastname != null) 'last_name': lastname,
+        if (firstname != null && lastname != null)
+          'display_name': '$firstname $lastname',
+        if (additionalUserData != null) ...additionalUserData,
+      };
+      final response = await _client.auth
+          .signUp(
+            email: email.trim(),
+            password: password,
+            data: data,
+          )
+          .timeout(timeout);
+
+      final newUser = response.user;
+      if (newUser == null) {
+        throw AuthFailure(
+          'Sign-up failed. Please check the details and try again.',
+        );
+      }
+      final newId = newUser.id;
+
+      final currentAfter = _client.auth.currentUser?.id;
+      if (adminUserId != null &&
+          currentAfter != null &&
+          currentAfter != adminUserId &&
+          currentAfter == newId) {
+        try {
+          await _client.auth.setSession(adminRefresh).timeout(timeout);
+        } catch (_) {
+          // Refresh token may have rotated; admin may need to sign in again.
+        }
+      }
+
+      return newId;
+    } on TimeoutException {
+      throw AuthFailure(
+        'Sign-up timed out. Please check your connection and try again.',
+      );
+    } on AuthException catch (e) {
+      throw AuthFailure(e.message);
+    } catch (_) {
+      throw AuthFailure('Sign-up failed. Please try again.');
+    }
+  }
+
   /// Request a password reset email for the given address.
   Future<void> resetPasswordForEmail({
     required String email,

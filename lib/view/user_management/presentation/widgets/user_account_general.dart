@@ -1,10 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:employeeos/core/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class UserAccountGeneral extends StatelessWidget {
+class UserAccountGeneral extends StatefulWidget {
   final ThemeData theme;
   final String? avatarUrl;
+  final Uint8List? localAvatarBytes;
   final TextEditingController roleController;
   final TextEditingController firstNameController;
   final TextEditingController lastNameController;
@@ -20,10 +23,20 @@ class UserAccountGeneral extends StatelessWidget {
   final Future<void> Function() onSave;
   final Future<void> Function() onAvatarTap;
 
+  final bool isCreateUserFlow;
+  final String primaryButtonLabel;
+  final String primaryButtonLoadingLabel;
+  final String avatarActionLabel;
+  final TextEditingController? passwordController;
+  final TextEditingController? confirmPasswordController;
+  final String? roleDropdownValue;
+  final ValueChanged<dynamic>? onRoleChanged;
+
   const UserAccountGeneral({
     super.key,
     required this.theme,
     required this.avatarUrl,
+    this.localAvatarBytes,
     required this.roleController,
     required this.firstNameController,
     required this.lastNameController,
@@ -38,10 +51,33 @@ class UserAccountGeneral extends StatelessWidget {
     required this.isUploadingAvatar,
     required this.onSave,
     required this.onAvatarTap,
+    this.isCreateUserFlow = false,
+    this.primaryButtonLabel = 'Save Changes',
+    this.primaryButtonLoadingLabel = 'Saving…',
+    this.avatarActionLabel = 'Update photo',
+    this.passwordController,
+    this.confirmPasswordController,
+    this.roleDropdownValue,
+    this.onRoleChanged,
   });
 
   @override
+  State<UserAccountGeneral> createState() => _UserAccountGeneralState();
+}
+
+class _UserAccountGeneralState extends State<UserAccountGeneral> {
+  bool _pwVisible = false;
+  bool _pwConfirmVisible = false;
+
+  @override
   Widget build(BuildContext context) {
+    final w = widget;
+    final theme = w.theme;
+    final hasLocalAvatar =
+        w.localAvatarBytes != null && w.localAvatarBytes!.isNotEmpty;
+    final hasRemoteAvatar =
+        w.avatarUrl != null && w.avatarUrl!.isNotEmpty;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
@@ -72,14 +108,15 @@ class UserAccountGeneral extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 60,
-                        backgroundImage:
-                            avatarUrl != null && avatarUrl!.isNotEmpty
-                                ? NetworkImage(avatarUrl!)
-                                : null,
-                        child: avatarUrl == null || avatarUrl!.isEmpty
+                        backgroundImage: hasLocalAvatar
+                            ? MemoryImage(w.localAvatarBytes!)
+                            : (hasRemoteAvatar
+                                ? NetworkImage(w.avatarUrl!)
+                                : null),
+                        child: !hasLocalAvatar && !hasRemoteAvatar
                             ? Text(
                                 getInitials(
-                                    "${firstNameController.text} ${lastNameController.text}"),
+                                    "${w.firstNameController.text} ${w.lastNameController.text}"),
                                 style: theme.textTheme.displaySmall?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: theme.colorScheme.primary,
@@ -88,15 +125,15 @@ class UserAccountGeneral extends StatelessWidget {
                             : null,
                       ),
                       GestureDetector(
-                        onTap: isUploadingAvatar
+                        onTap: w.isUploadingAvatar
                             ? null
                             : () {
-                                onAvatarTap();
+                                w.onAvatarTap();
                               },
                         child: CircleAvatar(
                           radius: 60,
                           backgroundColor: theme.shadowColor.withOpacity(.3),
-                          child: isUploadingAvatar
+                          child: w.isUploadingAvatar
                               ? const SizedBox(
                                   width: 36,
                                   height: 36,
@@ -115,12 +152,13 @@ class UserAccountGeneral extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Update photo',
+                                      w.avatarActionLabel,
                                       style:
                                           theme.textTheme.titleSmall?.copyWith(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
                                       ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ],
                                 ),
@@ -158,38 +196,73 @@ class UserAccountGeneral extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildTextField('First Name', firstNameController, theme),
+                _buildTextField('First Name', w.firstNameController, theme),
                 const SizedBox(height: 25),
-                _buildTextField('Last Name', lastNameController, theme),
+                _buildTextField('Last Name', w.lastNameController, theme),
                 const SizedBox(height: 25),
-                _buildTextField('Email', emailController, theme,
-                    isReadOnly: true),
+                _buildTextField('Email', w.emailController, theme,
+                    isReadOnly: !w.isCreateUserFlow),
+                if (w.isCreateUserFlow &&
+                    w.passwordController != null &&
+                    w.confirmPasswordController != null) ...[
+                  const SizedBox(height: 25),
+                  CustomTextfield(
+                    controller: w.passwordController!,
+                    keyboardType: TextInputType.visiblePassword,
+                    theme: theme,
+                    hintText: 'Temporary password (min 6 characters)',
+                    labelText: 'Password',
+                    onchange: (_) {},
+                    isPasswordVisible: _pwVisible,
+                    onClickPasswordVisisble: () {
+                      setState(() => _pwVisible = !_pwVisible);
+                    },
+                  ),
+                  const SizedBox(height: 25),
+                  CustomTextfield(
+                    controller: w.confirmPasswordController!,
+                    keyboardType: TextInputType.visiblePassword,
+                    theme: theme,
+                    hintText: 'Confirm password',
+                    labelText: 'Confirm password',
+                    onchange: (_) {},
+                    isPasswordVisible: _pwConfirmVisible,
+                    onClickPasswordVisisble: () {
+                      setState(() => _pwConfirmVisible = !_pwConfirmVisible);
+                    },
+                  ),
+                ],
                 const SizedBox(height: 25),
-                _buildTextField('Phone number', phoneController, theme),
+                _buildTextField('Phone number', w.phoneController, theme),
                 const SizedBox(height: 25),
-                _buildTextField('Role', roleController, theme,
-                    isReadOnly: true),
+                if (w.isCreateUserFlow && w.onRoleChanged != null)
+                  _buildRoleDropdown(theme, w)
+                else
+                  _buildTextField('Role', w.roleController, theme,
+                      isReadOnly: true),
                 const SizedBox(height: 25),
-                _buildTextField('Date of Birth', dateOfBirthController, theme),
+                _buildTextField('Date of Birth', w.dateOfBirthController, theme),
                 const SizedBox(height: 25),
-                _buildTextField('Designation', designationController, theme),
+                _buildTextField('Designation', w.designationController, theme),
                 const SizedBox(height: 25),
                 _buildTextField(
-                    'Date of Joining', dateOfJoiningController, theme),
+                    'Date of Joining', w.dateOfJoiningController, theme),
                 const SizedBox(height: 25),
                 _buildTextField(
-                    'Date of Relieving', dateofRelievingController, theme),
+                    'Date of Relieving', w.dateofRelievingController, theme),
                 const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
                   child: CustomTextButton(
-                    enabled: saveEnabled && !isSaving,
+                    enabled: w.saveEnabled && !w.isSaving,
                     onClick: () {
-                      onSave();
+                      w.onSave();
                     },
                     backgroundColor: theme.colorScheme.tertiary,
                     child: Text(
-                      isSaving ? 'Saving…' : 'Save Changes',
+                      w.isSaving
+                          ? w.primaryButtonLoadingLabel
+                          : w.primaryButtonLabel,
                       style: theme.textTheme.labelLarge?.copyWith(
                         color: theme.scaffoldBackgroundColor,
                       ),
@@ -202,6 +275,45 @@ class UserAccountGeneral extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildRoleDropdown(ThemeData theme, UserAccountGeneral w) {
+    final raw = w.roleDropdownValue?.trim() ?? '';
+    final dropdownValue =
+        raw.isEmpty ? null : UserRole.fromString(raw).name;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomDropdown(
+          theme: theme,
+          value: dropdownValue,
+          onChange: (value) {
+            w.onRoleChanged?.call(value);
+          },
+          label: 'Role',
+          items: UserRole.values
+              .map(
+                (e) => DropdownMenuItem(
+                  value: e.name,
+                  child: Text(_roleMenuLabel(e)),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+
+  static String _roleMenuLabel(UserRole r) {
+    switch (r) {
+      case UserRole.hr:
+        return 'HR';
+      case UserRole.admin:
+        return 'Admin';
+      case UserRole.employee:
+        return 'Employee';
+    }
   }
 
   Widget _buildTextField(

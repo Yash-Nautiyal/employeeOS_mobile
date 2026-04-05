@@ -195,7 +195,12 @@ class _MenuDrawerState extends State<MenuDrawer> {
                     });
                     Navigator.pop(context); // Close the drawer
                   },
-                  submenuItems: const ['Account', 'Profile', 'Card'],
+                  submenuItems: [
+                    'Account',
+                    'Profile',
+                    'Card',
+                    if (profile != null && !profile.isEmployee) 'Create',
+                  ],
                 ),
               ],
             ),

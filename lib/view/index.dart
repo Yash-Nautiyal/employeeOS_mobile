@@ -25,5 +25,6 @@ export 'package:employeeos/view/recruitment/presentation/pages/interview_schedul
 
 // User Management
 export 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
+export 'package:employeeos/view/user_management/presentation/pages/create_user_page.dart';
 export 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
 export 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';

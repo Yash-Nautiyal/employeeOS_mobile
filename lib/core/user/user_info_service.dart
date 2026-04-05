@@ -132,15 +132,46 @@ class UserInfoService {
     await _client.from(_table).update(data).eq('id', uid);
   }
 
+  /// Inserts a row into [user_info] (e.g. after auth sign-up). Requires RLS insert policy.
+  Future<void> insertUserInfoRow({
+    required String id,
+    required String email,
+    required String fullName,
+    required String role,
+    String? phoneNumber,
+    DateTime? dateOfBirth,
+    String? avatarUrl,
+  }) async {
+    final row = <String, dynamic>{
+      'id': id,
+      'email': email.trim(),
+      'full_name': fullName.trim(),
+      'role': role.trim().toLowerCase(),
+      'email_verified': false,
+      'phone_verified': false,
+    };
+    if (phoneNumber != null && phoneNumber.trim().isNotEmpty) {
+      row['phone_number'] = phoneNumber.trim();
+    }
+    if (dateOfBirth != null) {
+      row['date_of_birth'] = dateOfBirth.toIso8601String().split('T').first;
+    }
+    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+      row['avatar_url'] = avatarUrl;
+    }
+    await _client.from(_table).upsert(row, onConflict: 'id');
+  }
+
   /// Uploads image bytes to the [avatars] bucket and returns the public URL.
   Future<String> uploadAvatarAndGetPublicUrl({
     required List<int> bytes,
     required String contentType,
+    String? forUserId,
   }) async {
     if (bytes.length > maxAvatarBytes) {
       throw ArgumentError('Image must be at most 3.1 MB.');
     }
-    final uid = _client.auth.currentUser?.id;
+    final uid = forUserId ?? _client.auth.currentUser?.id;
     if (uid == null || uid.isEmpty) {
       throw StateError('Not signed in');
     }

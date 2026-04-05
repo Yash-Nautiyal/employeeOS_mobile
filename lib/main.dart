@@ -5,6 +5,7 @@ import 'package:employeeos/core/network/remote_data_exception.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
 import 'package:employeeos/core/user/user_account_sync_service.dart';
+import 'package:employeeos/core/user/user_creation_service.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
 import 'package:employeeos/core/auth/data/auth_repository.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
@@ -60,6 +61,12 @@ void main() {
           ),
           RepositoryProvider<UserAccountSyncService>(
             create: (context) => UserAccountSyncService(
+              context.read<AuthRepository>(),
+              context.read<UserInfoService>(),
+            ),
+          ),
+          RepositoryProvider<UserCreationService>(
+            create: (context) => UserCreationService(
               context.read<AuthRepository>(),
               context.read<UserInfoService>(),
             ),
