@@ -78,19 +78,19 @@ class _MenuDrawerState extends State<MenuDrawer> {
                     Navigator.pop(context); // Close the drawer
                   },
                 ),
-
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-dashboard.svg',
-                  title: 'Hirings',
-                  theme: theme,
-                  selectedItem: widget.selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      widget.onSelected(item);
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
+                if (showRecruitment)
+                  MenuItem(
+                    icon: 'assets/icons/nav/ic-dashboard.svg',
+                    title: 'Hirings',
+                    theme: theme,
+                    selectedItem: widget.selectedItem,
+                    onSelected: (item) {
+                      setState(() {
+                        widget.onSelected(item);
+                      });
+                      Navigator.pop(context); // Close the drawer
+                    },
+                  ),
 
                 // User Management Section
                 Padding(
@@ -117,18 +117,18 @@ class _MenuDrawerState extends State<MenuDrawer> {
                     Navigator.pop(context); // Close the drawer
                   },
                 ),
-                MenuItem(
-                  icon: 'assets/icons/nav/ic-chat.svg',
-                  title: 'Chat',
-                  theme: theme,
-                  selectedItem: widget.selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      widget.onSelected(item);
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                ),
+                // MenuItem(
+                //   icon: 'assets/icons/nav/ic-chat.svg',
+                //   title: 'Chat',
+                //   theme: theme,
+                //   selectedItem: widget.selectedItem,
+                //   onSelected: (item) {
+                //     setState(() {
+                //       widget.onSelected(item);
+                //     });
+                //     Navigator.pop(context); // Close the drawer
+                //   },
+                // ),
                 MenuItem(
                   icon: 'assets/icons/nav/ic-folder.svg',
                   title: 'File Manager',
