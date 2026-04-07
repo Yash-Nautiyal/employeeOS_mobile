@@ -7,14 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+class _DonutSegment {
+  final String label;
+  final int value;
+  final Color color;
+
+  const _DonutSegment({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+}
+
 class HiringJobChart extends StatefulWidget {
   final ThemeData theme;
-  final List<HiringData>? customData;
+  final List<JobPositionData> data;
 
   const HiringJobChart({
     super.key,
     required this.theme,
-    this.customData,
+    this.data = const [],
   });
 
   @override
@@ -25,6 +37,31 @@ class _HiringJobChartState extends State<HiringJobChart>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+
+  static const List<Color> _segmentColors = [
+    AppPallete.primaryLighter,
+    AppPallete.primaryLight,
+    AppPallete.primaryMain,
+    AppPallete.primaryDark,
+    AppPallete.primaryDarker,
+  ];
+
+  List<_DonutSegment> get _segments {
+    print(widget.data);
+    return widget.data.asMap().entries.map((e) {
+      final i = e.key;
+      final row = e.value;
+      return _DonutSegment(
+        label: row.jobTitle,
+        value: row.positions,
+        color: _segmentColors[i % _segmentColors.length],
+      );
+    }).toList();
+  }
+
+  int get _totalPositions {
+    return widget.data.fold(0, (sum, item) => sum + item.positions);
+  }
 
   @override
   void initState() {
@@ -49,38 +86,9 @@ class _HiringJobChartState extends State<HiringJobChart>
     super.dispose();
   }
 
-  List<HiringData> get _chartData {
-    return widget.customData ??
-        [
-          HiringData(
-            jobTitle: JobTitle.socialMediaManager,
-            count: 15,
-            color: AppPallete.primaryLighter, // Blue
-          ),
-          HiringData(
-            jobTitle: JobTitle.awsCloudIntern,
-            count: 8,
-            color: AppPallete.primaryLight, // Green
-          ),
-          HiringData(
-            jobTitle: JobTitle.englishContentWriter,
-            count: 5,
-            color: AppPallete.primaryDark, // Orange
-          ),
-          HiringData(
-            jobTitle: JobTitle.videoEditor,
-            count: 12,
-            color: AppPallete.primaryDarker, // Purple
-          ),
-        ];
-  }
-
-  int get _totalPositions {
-    return _chartData.fold(0, (sum, item) => sum + item.count);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final segments = _segments;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
@@ -92,14 +100,12 @@ class _HiringJobChartState extends State<HiringJobChart>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             CustomTitleHeader(
               theme: widget.theme,
               title: 'Positions by Job',
               subtitle: 'Distribution of open positions',
             ),
             const SizedBox(height: 10),
-            // Chart
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -126,7 +132,8 @@ class _HiringJobChartState extends State<HiringJobChart>
                     ),
                     legendItemBuilder:
                         (legendText, series, point, seriesIndex) {
-                      final data = _chartData[seriesIndex];
+                      final data = segments[seriesIndex];
+                      print(data);
                       return Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 4, vertical: 2),
@@ -143,7 +150,7 @@ class _HiringJobChartState extends State<HiringJobChart>
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              data.jobTitle.displayName,
+                              data.label,
                               style: widget.theme.textTheme.bodySmall?.copyWith(
                                 color: widget.theme.disabledColor,
                                 fontWeight: FontWeight.w600,
@@ -192,14 +199,14 @@ class _HiringJobChartState extends State<HiringJobChart>
                     ),
                   ],
                   series: <CircularSeries>[
-                    DoughnutSeries<HiringData, String>(
+                    DoughnutSeries<_DonutSegment, String>(
                       radius: "80%",
-                      dataSource: _chartData,
-                      xValueMapper: (HiringData data, _) =>
-                          data.jobTitle.displayName,
-                      yValueMapper: (HiringData data, _) => data.count,
-                      pointColorMapper: (HiringData data, _) => data.color,
-                      dataLabelMapper: (HiringData data, _) => '${data.count}',
+                      dataSource: segments,
+                      xValueMapper: (_DonutSegment data, _) => data.label,
+                      yValueMapper: (_DonutSegment data, _) => data.value,
+                      pointColorMapper: (_DonutSegment data, _) => data.color,
+                      dataLabelMapper: (_DonutSegment data, _) =>
+                          '${data.value}',
                       innerRadius: '65%',
                       animationDuration: 700,
                       dataLabelSettings: DataLabelSettings(

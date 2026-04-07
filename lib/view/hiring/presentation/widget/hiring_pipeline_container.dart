@@ -1,30 +1,30 @@
 import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/view/hiring/domain/entities/hiring_model.dart';
 import 'package:employeeos/view/hiring/presentation/widget/hiring_pipeline_metric.dart';
 import 'package:flutter/material.dart';
 
+double _safeProgress(int numerator, int denominator) {
+  if (denominator <= 0) return 0;
+  return numerator / denominator;
+}
+
 class HiringPipelineContainer extends StatelessWidget {
   final ThemeData theme;
-  final String? shortlistedValue;
-  final String? technicalValue;
-  final String? pendingValue;
-  final String? telephonicRound;
-  final String? onboardingRound;
-  final String? rejectedRound;
   final bool big;
+  final PipelineOverview data;
+
   const HiringPipelineContainer({
     super.key,
     required this.theme,
-    this.shortlistedValue,
-    this.technicalValue,
-    this.pendingValue,
-    this.telephonicRound,
-    this.onboardingRound,
-    this.rejectedRound,
-    this.big = false,
+    required this.big,
+    required this.data,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ap = data.applicationProgress;
+    final ip = data.interviewProgress;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -44,7 +44,6 @@ class HiringPipelineContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Headers with proper spacing
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
@@ -70,20 +69,20 @@ class HiringPipelineContainer extends StatelessWidget {
               ],
             ),
           ),
-          // Metrics in a flexible layout that uses full height
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Row 1
                 Expanded(
                   child: Row(
                     children: [
                       Expanded(
                         child: HiringPipelineMetric(
                           title: 'Shortlisted',
-                          value: shortlistedValue ?? '10',
+                          value: '${ap.shortlisted}',
+                          subtitle: 'of ${ap.total}',
+                          progress: ap.total > 0 ? ap.shortlisted / ap.total : 0,
                           showCircle: true,
                           circleColor: AppPallete.successMain,
                           theme: theme,
@@ -93,26 +92,31 @@ class HiringPipelineContainer extends StatelessWidget {
                       Expanded(
                         child: HiringPipelineMetric(
                           title: 'Telephonic',
-                          value: telephonicRound ?? '10',
+                          value: '${ip.telephonic.active}',
+                          subtitle:
+                              'scheduled/completed out of ${ip.telephonic.eligible} eligible',
+                          progress: _safeProgress(
+                            ip.telephonic.active,
+                            ip.telephonic.active + ip.telephonic.eligible,
+                          ),
                           showCircle: true,
                           circleColor: AppPallete.infoMain,
                           theme: theme,
-                          subtitle: 'scheduled/completed out of 0 eligible',
                           big: big,
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // Row 2
                 Expanded(
                   child: Row(
                     children: [
                       Expanded(
                         child: HiringPipelineMetric(
-                          title: 'Technical',
-                          value: technicalValue ?? '10',
+                          title: 'Pending',
+                          value: '${ap.pending}',
+                          subtitle: 'of ${ap.total}',
+                          progress: ap.total > 0 ? ap.pending / ap.total : 0,
                           showCircle: true,
                           circleColor: AppPallete.warningMain,
                           theme: theme,
@@ -121,41 +125,51 @@ class HiringPipelineContainer extends StatelessWidget {
                       ),
                       Expanded(
                         child: HiringPipelineMetric(
-                          title: 'Onboarding',
-                          value: onboardingRound ?? '10',
+                          title: 'Technical',
+                          value: '${ip.technical.active}',
+                          subtitle:
+                              'scheduled/completed out of ${ip.technical.eligible} eligible',
+                          progress: _safeProgress(
+                            ip.technical.active,
+                            ip.technical.active + ip.technical.eligible,
+                          ),
                           showCircle: true,
                           circleColor: AppPallete.secondaryMain,
                           theme: theme,
-                          subtitle: 'scheduled/completed out of 0 eligible',
                           big: big,
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // Row 3
                 Expanded(
                   child: Row(
                     children: [
                       Expanded(
                         child: HiringPipelineMetric(
-                          title: 'Pending',
-                          value: pendingValue ?? '10',
+                          title: 'Rejected',
+                          value: '${ap.rejected}',
+                          subtitle: 'of ${ap.total}',
+                          progress: ap.total > 0 ? ap.rejected / ap.total : 0,
                           showCircle: true,
-                          circleColor: AppPallete.secondaryLight,
+                          circleColor: AppPallete.errorMain,
                           theme: theme,
                           big: big,
                         ),
                       ),
                       Expanded(
                         child: HiringPipelineMetric(
-                          title: 'Rejected',
-                          value: rejectedRound ?? '10',
+                          title: 'Onboarding',
+                          value: '${ip.onboarding.active}',
+                          subtitle:
+                              'in progress out of ${ip.onboarding.eligible} eligible',
+                          progress: _safeProgress(
+                            ip.onboarding.active,
+                            ip.onboarding.active + ip.onboarding.eligible,
+                          ),
                           showCircle: true,
-                          circleColor: AppPallete.errorMain,
+                          circleColor: AppPallete.primaryMain,
                           theme: theme,
-                          subtitle: 'in progress out of 0 eligible',
                           big: big,
                         ),
                       ),

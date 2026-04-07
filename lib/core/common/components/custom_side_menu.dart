@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:flutter/material.dart';
 
@@ -8,7 +10,6 @@ Future<void> showRightSideTaskDetails(
   double maxWidth = 400,
 }) {
   final screenHeight = MediaQuery.of(context).size.height;
-  final theme = Theme.of(context);
   final wideScreen = MediaQuery.of(context).size.width > 700;
   final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
   final isWideScreen = !isPortrait || wideScreen;
@@ -27,38 +28,35 @@ Future<void> showRightSideTaskDetails(
         alignment: Alignment.centerRight,
         child: Material(
           color: Colors.transparent,
-          child: Container(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              width: dialogWidth,
-              height: double.infinity,
-              child: ClipRRect(
-                child: Container(
-                    height: screenHeight,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 62, 36, 35)
-                              : AppPallete.errorLighter,
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 14, 16, 19)
-                              : const Color.fromARGB(255, 251, 251, 251),
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 16, 18, 22)
-                              : const Color.fromARGB(255, 251, 251, 251),
-                          theme.brightness == Brightness.dark
-                              ? const Color.fromARGB(255, 38, 55, 66)
-                              : const Color.fromARGB(255, 212, 251, 251),
-                        ],
-                        stops: theme.brightness == Brightness.dark
-                            ? [0.0, .17, .84, .98]
-                            : [0.05, 0.3, .7, 0.99],
-                        begin: const Alignment(-1.7, 1),
-                        end: const Alignment(1.2, -1),
-                      ),
-                    ),
-                    child: child),
-              )),
+          child: ClipRRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                  constraints: BoxConstraints(maxWidth: maxWidth),
+                  width: dialogWidth,
+                  height: double.infinity,
+                  child: ClipRRect(
+                    child: Container(
+                        height: screenHeight,
+                        decoration: BoxDecoration(
+                            gradient:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? const LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(102, 46, 43, 0.85),
+                                          Color.fromRGBO(26, 26, 32, 0.851),
+                                          Color.fromRGBO(32, 39, 46, 0.851),
+                                          Color.fromRGBO(33, 71, 91, 0.85)
+                                        ],
+                                        stops: [0.0, .26, .83, 1],
+                                        begin: Alignment(-1.8, 1),
+                                        end: Alignment(1.2, -1),
+                                      )
+                                    : AppPallete.lightBackgroundGradient),
+                        child: child),
+                  )),
+            ),
+          ),
         ),
       );
     },

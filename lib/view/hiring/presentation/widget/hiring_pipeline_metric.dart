@@ -9,6 +9,10 @@ class HiringPipelineMetric extends StatelessWidget {
   final bool? showCircle;
   final ThemeData theme;
   final bool big;
+
+  /// Arc fill 0.0–1.0 (ignored when [showCircle] is false).
+  final double progress;
+
   const HiringPipelineMetric({
     super.key,
     this.circleColor,
@@ -18,11 +22,18 @@ class HiringPipelineMetric extends StatelessWidget {
     required this.title,
     required this.value,
     required this.theme,
+    this.progress = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final pointerValue =
+        (progress * 100).clamp(0.0, 100.0).toDouble();
+    final subtitleText = (subtitle != null && subtitle!.trim().isNotEmpty)
+        ? ' ${subtitle!.trim()}'
+        : '';
+
     return Row(
       children: [
         if (showCircle!) ...[
@@ -45,7 +56,7 @@ class HiringPipelineMetric extends StatelessWidget {
                     ),
                     pointers: <GaugePointer>[
                       RangePointer(
-                        value: 86.6,
+                        value: pointerValue,
                         width: big ? 5.5 : 4,
                         cornerStyle: CornerStyle.bothCurve,
                         pointerOffset: big ? -.8 : -.5,
@@ -59,7 +70,7 @@ class HiringPipelineMetric extends StatelessWidget {
           ),
           const SizedBox(width: 5),
         ] else ...[
-          const SizedBox(width: 30), // Space for alignment when no circle
+          const SizedBox(width: 30),
         ],
         Expanded(
           flex: 2,
@@ -79,7 +90,7 @@ class HiringPipelineMetric extends StatelessWidget {
                           ?.copyWith(color: theme.disabledColor, fontSize: 13),
                     ),
                     TextSpan(
-                      text: subtitle != null ? ' $subtitle' : ' of 18',
+                      text: subtitleText,
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         fontSize: 11.5,

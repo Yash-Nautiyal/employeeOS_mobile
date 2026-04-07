@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:employeeos/core/common/components/connectivity_banner.dart';
 import 'package:employeeos/core/common/components/home_nav.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
+import 'package:employeeos/view/hiring/presentation/pages/hiring_page.dart';
 import 'package:employeeos/view/index.dart';
 import 'package:employeeos/view/layout/presentation/widgets/exit_toast.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_drawer.dart';
@@ -25,7 +26,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
   Orientation? _previousOrientation;
   final Map<String, Widget> _pages = {
     'User': const UserDashboardView(),
-    'Hirings': const HiringView(),
+    'Hirings': const HiringPage(),
     'Kanban': const KanbanView(),
     'Chat': const ChatView(),
     'File Manager': const FilemanagerView(),

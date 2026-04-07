@@ -3,17 +3,55 @@
 import 'package:employeeos/core/common/components/custom_dropdown.dart';
 import 'package:employeeos/core/common/components/custom_textbutton.dart';
 import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/view/hiring/domain/entities/hiring_model.dart';
+import 'package:employeeos/view/hiring/presentation/bloc/hiring_bloc.dart';
+import 'package:employeeos/view/hiring/presentation/bloc/hiring_event.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+
+DateTime? _parsePostingDate(String raw, {bool endOfDay = false}) {
+  final t = raw.trim();
+  if (t.isEmpty) return null;
+  final parts = t.split('/');
+  if (parts.length != 3) return null;
+  final d = int.tryParse(parts[0].trim());
+  final m = int.tryParse(parts[1].trim());
+  final y = int.tryParse(parts[2].trim());
+  if (d == null || m == null || y == null) return null;
+  try {
+    if (endOfDay) {
+      return DateTime(y, m, d, 23, 59, 59, 999);
+    }
+    return DateTime(y, m, d);
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Normalizes [CustomTextfield] date `d/m/y` to `DD/MM/YYYY` for the RPC.
+String? _normalizeDeadlineForRpc(String raw) {
+  final t = raw.trim();
+  if (t.isEmpty) return null;
+  final parts = t.split('/');
+  if (parts.length != 3) return null;
+  final d = int.tryParse(parts[0].trim());
+  final m = int.tryParse(parts[1].trim());
+  final y = int.tryParse(parts[2].trim());
+  if (d == null || m == null || y == null) return null;
+  return '${d.toString().padLeft(2, '0')}/${m.toString().padLeft(2, '0')}/$y';
+}
 
 class HiringFilters extends StatefulWidget {
   final ThemeData theme;
-  final String? selectedJob;
-  final String? selectedHR;
   final TextEditingController postingDateFromController;
   final TextEditingController postingDateToController;
   final TextEditingController lastDateFromController;
   final TextEditingController lastDateToController;
+  final HiringFilterParams appliedFilters;
+  final List<JobOption> jobOptions;
+  final List<HrOption> hrOptions;
+  final bool showHrFilter;
   final bool initiallyExpanded;
 
   const HiringFilters({
@@ -23,8 +61,10 @@ class HiringFilters extends StatefulWidget {
     required this.postingDateToController,
     required this.lastDateFromController,
     required this.lastDateToController,
-    this.selectedJob,
-    this.selectedHR,
+    required this.appliedFilters,
+    required this.jobOptions,
+    required this.hrOptions,
+    this.showHrFilter = false,
     this.initiallyExpanded = false,
   });
 
@@ -34,8 +74,6 @@ class HiringFilters extends StatefulWidget {
 
 class _HiringFiltersState extends State<HiringFilters>
     with SingleTickerProviderStateMixin {
-  late String? selectedJob;
-  String? selectedHR;
   late TextEditingController _postingDateFromController;
   late TextEditingController _postingDateToController;
   late TextEditingController _lastDateFromController;
@@ -49,27 +87,22 @@ class _HiringFiltersState extends State<HiringFilters>
   @override
   void initState() {
     super.initState();
-    selectedJob = widget.selectedJob;
-    selectedHR = widget.selectedHR;
     _postingDateFromController = widget.postingDateFromController;
     _postingDateToController = widget.postingDateToController;
     _lastDateFromController = widget.lastDateFromController;
     _lastDateToController = widget.lastDateToController;
     _isExpanded = widget.initiallyExpanded;
 
-    // Initialize animation controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 
-    // Create expand animation
     _expandAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     );
 
-    // Create icon rotation animation
     _iconRotationAnimation = Tween<double>(
       begin: 0.0,
       end: 0.5,
@@ -78,7 +111,6 @@ class _HiringFiltersState extends State<HiringFilters>
       curve: Curves.easeInOut,
     ));
 
-    // Set initial state
     if (_isExpanded) {
       _animationController.value = 1.0;
     }
@@ -101,15 +133,99 @@ class _HiringFiltersState extends State<HiringFilters>
     });
   }
 
+  HiringFilterParams _collectParams({
+    String? jobId,
+    String? hrManagerId,
+  }) {
+    final hr = widget.showHrFilter ? hrManagerId : null;
+    return HiringFilterParams(
+      jobId: jobId,
+      hrManagerId: hr,
+      postingFrom: _parsePostingDate(_postingDateFromController.text),
+      postingTo:
+          _parsePostingDate(_postingDateToController.text, endOfDay: true),
+      deadlineFrom: _normalizeDeadlineForRpc(_lastDateFromController.text),
+      deadlineTo: _normalizeDeadlineForRpc(_lastDateToController.text),
+    );
+  }
+
+  void _applyWithCurrentSelections() {
+    context.read<HiringBloc>().add(
+          HiringFiltersChanged(
+            _collectParams(
+              jobId: widget.appliedFilters.jobId,
+              hrManagerId: widget.appliedFilters.hrManagerId,
+            ),
+          ),
+        );
+  }
+
+  void _onJobChanged(String? value) {
+    context.read<HiringBloc>().add(
+          HiringFiltersChanged(
+            _collectParams(
+              jobId: value,
+              hrManagerId: widget.appliedFilters.hrManagerId,
+            ),
+          ),
+        );
+  }
+
+  void _onHrChanged(String? value) {
+    context.read<HiringBloc>().add(
+          HiringFiltersChanged(
+            _collectParams(
+              jobId: widget.appliedFilters.jobId,
+              hrManagerId: value,
+            ),
+          ),
+        );
+  }
+
   void _clearFilters() {
-    setState(() {
-      selectedJob = null;
-      selectedHR = null;
-      _postingDateFromController.clear();
-      _postingDateToController.clear();
-      _lastDateFromController.clear();
-      _lastDateToController.clear();
-    });
+    _postingDateFromController.clear();
+    _postingDateToController.clear();
+    _lastDateFromController.clear();
+    _lastDateToController.clear();
+    context.read<HiringBloc>().add(const HiringFiltersClearRequested());
+  }
+
+  List<DropdownMenuItem<String?>> _jobItems() {
+    final style = widget.theme.textTheme.bodyMedium
+        ?.copyWith(fontWeight: FontWeight.w500);
+    return [
+      DropdownMenuItem<String?>(
+        value: null,
+        child: Text('All Jobs', style: style),
+      ),
+      ...widget.jobOptions.map((job) {
+        final id = job.id;
+        final title = job.title;
+        return DropdownMenuItem<String?>(
+          value: id.isEmpty ? null : id,
+          child: Text(title, style: style),
+        );
+      }),
+    ];
+  }
+
+  List<DropdownMenuItem<String?>> _hrItems() {
+    final style = widget.theme.textTheme.bodyMedium
+        ?.copyWith(fontWeight: FontWeight.w500);
+    return [
+      DropdownMenuItem<String?>(
+        value: null,
+        child: Text('All', style: style),
+      ),
+      ...widget.hrOptions.map((row) {
+        final id = row.id;
+        final label = row.displayName;
+        return DropdownMenuItem<String?>(
+          value: id.isEmpty ? null : id,
+          child: Text(label, style: style),
+        );
+      }),
+    ];
   }
 
   @override
@@ -132,7 +248,6 @@ class _HiringFiltersState extends State<HiringFilters>
       ),
       child: Column(
         children: [
-          // Header with toggle button
           InkWell(
             onTap: _toggleExpanded,
             borderRadius: BorderRadius.circular(16),
@@ -162,7 +277,6 @@ class _HiringFiltersState extends State<HiringFilters>
                     ),
                   ),
                   const Spacer(),
-                  // Active filters indicator
                   if (_hasActiveFilters())
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -198,7 +312,6 @@ class _HiringFiltersState extends State<HiringFilters>
                       ),
                     ),
                   const SizedBox(width: 12),
-                  // Animated chevron icon
                   AnimatedBuilder(
                     animation: _iconRotationAnimation,
                     builder: (context, child) {
@@ -217,7 +330,6 @@ class _HiringFiltersState extends State<HiringFilters>
               ),
             ),
           ),
-          // Animated divider
           AnimatedBuilder(
             animation: _expandAnimation,
             builder: (context, child) {
@@ -227,7 +339,6 @@ class _HiringFiltersState extends State<HiringFilters>
               );
             },
           ),
-          // Expandable content
           SizeTransition(
             sizeFactor: _expandAnimation,
             child: Container(
@@ -235,7 +346,6 @@ class _HiringFiltersState extends State<HiringFilters>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Job Position & HR Section
                   _buildFilterSection(
                     title: 'Job Information',
                     children: [
@@ -243,70 +353,30 @@ class _HiringFiltersState extends State<HiringFilters>
                         children: [
                           Expanded(
                             child: CustomDropdown(
-                              items: [
-                                'Developer',
-                                'Designer',
-                                'Manager',
-                                'Analyst'
-                              ]
-                                  .map((job) => DropdownMenuItem(
-                                        value: job,
-                                        child: Text(
-                                          job,
-                                          style: widget
-                                              .theme.textTheme.bodyMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                              onChange: (value) {
-                                setState(() {
-                                  selectedJob = value;
-                                });
-                              },
-                              value: selectedJob,
+                              items: _jobItems(),
+                              onChange: _onJobChanged,
+                              value: widget.appliedFilters.jobId,
                               label: 'Job Position',
                               theme: widget.theme,
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: CustomDropdown(
-                              label: 'HR Manager',
-                              items: [
-                                'HR Manager 1',
-                                'HR Manager 2',
-                                'HR Manager 3'
-                              ]
-                                  .map((hr) => DropdownMenuItem(
-                                        value: hr,
-                                        child: Text(
-                                          hr,
-                                          style: widget
-                                              .theme.textTheme.bodyMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                              theme: widget.theme,
-                              value: selectedHR,
-                              onChange: (value) {
-                                setState(() {
-                                  selectedHR = value;
-                                });
-                              },
+                          if (widget.showHrFilter) ...[
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: CustomDropdown(
+                                label: 'HR Manager',
+                                items: _hrItems(),
+                                theme: widget.theme,
+                                value: widget.appliedFilters.hrManagerId,
+                                onChange: _onHrChanged,
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Posting Date Section
                   _buildFilterSection(
                     title: 'Posting Date Range',
                     children: [
@@ -317,9 +387,7 @@ class _HiringFiltersState extends State<HiringFilters>
                               controller: _postingDateFromController,
                               keyboardType: TextInputType.datetime,
                               theme: widget.theme,
-                              onchange: (value) {
-                                // Handle date change
-                              },
+                              onchange: (_) => _applyWithCurrentSelections(),
                               hintText: 'Select start date',
                               labelText: 'From Date',
                               firstDate: DateTime(2020),
@@ -332,9 +400,7 @@ class _HiringFiltersState extends State<HiringFilters>
                               controller: _postingDateToController,
                               keyboardType: TextInputType.datetime,
                               theme: widget.theme,
-                              onchange: (value) {
-                                // Handle date change
-                              },
+                              onchange: (_) => _applyWithCurrentSelections(),
                               hintText: 'Select end date',
                               labelText: 'To Date',
                               firstDate: DateTime(2020),
@@ -346,7 +412,6 @@ class _HiringFiltersState extends State<HiringFilters>
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Application Deadline Section
                   _buildFilterSection(
                     title: 'Application Deadline',
                     children: [
@@ -357,12 +422,10 @@ class _HiringFiltersState extends State<HiringFilters>
                               controller: _lastDateFromController,
                               keyboardType: TextInputType.datetime,
                               theme: widget.theme,
-                              onchange: (value) {
-                                // Handle date change
-                              },
+                              onchange: (_) => _applyWithCurrentSelections(),
                               hintText: 'Select start date',
                               labelText: 'From Date',
-                              firstDate: DateTime.now(),
+                              firstDate: DateTime(2020),
                               lastDate: DateTime(2030),
                             ),
                           ),
@@ -372,12 +435,10 @@ class _HiringFiltersState extends State<HiringFilters>
                               controller: _lastDateToController,
                               keyboardType: TextInputType.datetime,
                               theme: widget.theme,
-                              onchange: (value) {
-                                // Handle date change
-                              },
+                              onchange: (_) => _applyWithCurrentSelections(),
                               hintText: 'Select end date',
                               labelText: 'To Date',
-                              firstDate: DateTime.now(),
+                              firstDate: DateTime(2020),
                               lastDate: DateTime(2030),
                             ),
                           ),
@@ -386,14 +447,13 @@ class _HiringFiltersState extends State<HiringFilters>
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Action Buttons
                   Row(
                     children: [
                       Expanded(
                         child: CustomTextButton(
                           backgroundColor:
                               widget.theme.colorScheme.error.withOpacity(0.2),
-                          onClick: () => _clearFilters(),
+                          onClick: _clearFilters,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
@@ -448,8 +508,9 @@ class _HiringFiltersState extends State<HiringFilters>
   }
 
   bool _hasActiveFilters() {
-    return selectedJob != null ||
-        selectedHR != null ||
+    final f = widget.appliedFilters;
+    return f.jobId != null ||
+        (widget.showHrFilter && f.hrManagerId != null) ||
         _postingDateFromController.text.isNotEmpty ||
         _postingDateToController.text.isNotEmpty ||
         _lastDateFromController.text.isNotEmpty ||
@@ -458,8 +519,9 @@ class _HiringFiltersState extends State<HiringFilters>
 
   int _getActiveFiltersCount() {
     int count = 0;
-    if (selectedJob != null) count++;
-    if (selectedHR != null) count++;
+    final f = widget.appliedFilters;
+    if (f.jobId != null) count++;
+    if (widget.showHrFilter && f.hrManagerId != null) count++;
     if (_postingDateFromController.text.isNotEmpty) count++;
     if (_postingDateToController.text.isNotEmpty) count++;
     if (_lastDateFromController.text.isNotEmpty) count++;
