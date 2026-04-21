@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:employeeos/core/common/components/custom_toast.dart';
-import 'package:employeeos/core/common/components/empty_content.dart';
+import 'package:employeeos/core/common/components/ui/custom_toast.dart';
+import 'package:employeeos/core/common/components/empty/empty_content.dart';
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, CustomTextButton;
 import 'package:employeeos/core/network/remote_data_exception.dart';

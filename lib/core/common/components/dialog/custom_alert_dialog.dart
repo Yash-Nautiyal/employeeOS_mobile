@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../custom_textbutton.dart';
+import '../ui/custom_textbutton.dart';
 
 enum CustomAlertDialogStyle { normal, danger }
 

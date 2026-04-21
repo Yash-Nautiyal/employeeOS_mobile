@@ -1,8 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:employeeos/core/common/components/custom_dropdown.dart';
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/core/common/components/dropdown/custom_dropdown.dart';
+import 'package:employeeos/core/common/components/ui/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/ui/custom_textfield.dart';
 import 'package:employeeos/view/hiring/domain/entities/hiring_model.dart';
 import 'package:employeeos/view/hiring/presentation/bloc/hiring_bloc.dart';
 import 'package:employeeos/view/hiring/presentation/bloc/hiring_event.dart';

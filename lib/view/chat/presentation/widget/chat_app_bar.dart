@@ -1,6 +1,6 @@
 import 'package:avatar_stack/animated_avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
-import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/core/common/components/ui/custom_textfield.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart';
 import 'package:flutter/material.dart';

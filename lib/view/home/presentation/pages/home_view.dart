@@ -1,9 +1,8 @@
-import 'package:employeeos/core/common/components/home_nav.dart';
+import 'package:employeeos/core/common/components/appBar/home_nav.dart';
+import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:employeeos/view/home/presentation/widgets/home_hero.dart';
 import 'package:employeeos/view/home/presentation/widgets/home_minimal.dart';
 import 'package:flutter/material.dart';
-
-import '../../../auth/presentation/pages/auth_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -55,10 +54,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         theme: theme,
         signinPage: true,
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AuthView()),
-          );
+          const AuthRoute().push(context);
         },
       ),
       extendBodyBehindAppBar: true,

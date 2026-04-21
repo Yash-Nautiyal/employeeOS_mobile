@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  go_router: ^14.8.1
   flutter_bloc:
   bloc:
   # The following adds the Cupertino Icons font to your application.
@@ -85,6 +86,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: ^2.4.15
+  go_router_builder: 2.7.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

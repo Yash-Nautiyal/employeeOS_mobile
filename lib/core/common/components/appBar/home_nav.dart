@@ -1,10 +1,12 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:ui';
 
-import 'package:employeeos/core/common/components/custom_bagde.dart';
-import 'package:employeeos/core/common/components/header/profile.dart';
+import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
+import 'package:employeeos/core/common/components/ui/custom_bagde.dart';
+import 'package:employeeos/core/common/components/header/profile/profile.dart';
 import 'package:employeeos/core/common/components/header/settings/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomeNav extends StatefulWidget implements PreferredSizeWidget {
@@ -60,6 +62,16 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final profile = context.select((AuthBloc bloc) => bloc.state.currentProfile);
+    final displayName = profile?.fullName.trim().isNotEmpty == true
+        ? profile!.fullName.trim()
+        : profile?.email;
+    final avatarUrl = profile?.avatarUrl?.trim();
+    final hasAvatar = avatarUrl != null && avatarUrl.isNotEmpty;
+    final initials = _buildInitials(displayName);
+    final shouldShowBackButton =
+        (ModalRoute.of(context)?.isFirst == false) && !widget.dashboardPage;
+
     return AppBar(
       surfaceTintColor: Colors.transparent,
       leading: widget.dashboardPage
@@ -74,7 +86,7 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
                 ),
               ),
             )
-          : Navigator.canPop(context)
+          : shouldShowBackButton
               ? IconButton(
                   icon: Opacity(
                     opacity: widget.backDisabled ? 0.5 : 1,
@@ -188,7 +200,20 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
                   padding: const EdgeInsets.all(2),
                   child: CircleAvatar(
                     backgroundColor: widget.theme.scaffoldBackgroundColor,
-                    child: const CircleAvatar(radius: 14),
+                    child: CircleAvatar(
+                      radius: 14,
+                      backgroundColor: widget.theme.colorScheme.surfaceVariant,
+                      backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
+                      child: hasAvatar
+                          ? null
+                          : Text(
+                              initials,
+                              style: widget.theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: widget.theme.colorScheme.primary,
+                              ),
+                            ),
+                    ),
                   ),
                 ),
               ),
@@ -207,5 +232,17 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
           )
       ],
     );
+  }
+
+  String _buildInitials(String? value) {
+    final text = value?.trim();
+    if (text == null || text.isEmpty) return 'U';
+    final parts = text.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return 'U';
+    if (parts.length == 1) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'
+        .toUpperCase();
   }
 }

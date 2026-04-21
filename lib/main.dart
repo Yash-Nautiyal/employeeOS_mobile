@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:employeeos/core/auth/auth_error_handler.dart';
 import 'package:employeeos/core/network/remote_data_exception.dart';
+import 'package:employeeos/core/routing/app_router.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
 import 'package:employeeos/core/theme/bloc/theme_bloc.dart';
 import 'package:employeeos/core/user/user_account_sync_service.dart';
@@ -9,8 +10,6 @@ import 'package:employeeos/core/user/user_creation_service.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
 import 'package:employeeos/core/auth/data/auth_repository.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
-import 'package:employeeos/view/home/presentation/pages/home_view.dart';
-import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +18,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runZonedGuarded(() async {
@@ -110,6 +110,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = AppRouterFactory.create(context.read<AuthBloc>());
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(
@@ -119,27 +133,17 @@ class _MyAppState extends State<MyApp> {
           brightness: state.brightness,
         ),
         duration: const Duration(milliseconds: 100),
-        child: MaterialApp(
+        child: MaterialApp.router(
           title: 'EmployeeOS',
           debugShowCheckedModeBanner: false,
           theme: state.themeData,
+          routerConfig: _router,
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             FlutterQuillLocalizations.delegate,
           ],
-          home: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, authState) {
-              if (authState is Unauthenticated) {
-                return const HomeView();
-              }
-              if (authState is Authenticated) {
-                return const Layout();
-              }
-              return const Layout();
-            },
-          ),
         ),
       ),
     );

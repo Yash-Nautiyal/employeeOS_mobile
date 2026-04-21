@@ -1,5 +1,5 @@
-import 'package:employeeos/core/common/components/custom_toast.dart';
-import 'package:employeeos/core/common/components/home_nav.dart';
+import 'package:employeeos/core/common/components/ui/custom_toast.dart';
+import 'package:employeeos/core/common/components/appBar/home_nav.dart';
 import 'package:employeeos/core/auth/data/auth_repository.dart';
 import 'package:employeeos/view/auth/presentation/cubit/sign_in_cubit.dart';
 import 'package:employeeos/view/auth/presentation/widgets/auth_page.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 
-import '../../index.dart' show AppPallete;
+import '../../../index.dart' show AppPallete;
 
 class CustomTagsField extends StatelessWidget {
   final ThemeData theme;

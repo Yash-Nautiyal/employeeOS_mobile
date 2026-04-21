@@ -1,19 +1,22 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:employeeos/core/common/components/connectivity_banner.dart';
-import 'package:employeeos/core/common/components/home_nav.dart';
-import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
-import 'package:employeeos/view/hiring/presentation/pages/hiring_page.dart';
-import 'package:employeeos/view/index.dart';
+import 'package:employeeos/core/common/components/ui/connectivity_banner.dart';
+import 'package:employeeos/core/common/components/appBar/home_nav.dart';
 import 'package:employeeos/view/layout/presentation/widgets/exit_toast.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Layout extends StatefulWidget {
-  const Layout({super.key});
+  final String selectedItem;
+  final Widget child;
+
+  const Layout({
+    super.key,
+    this.selectedItem = 'User',
+    required this.child,
+  });
 
   @override
   State<Layout> createState() => _LayoutState();
@@ -24,28 +27,6 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
   late Animation<Offset> _appBarAnimation;
   Timer? _hideTimer;
   Orientation? _previousOrientation;
-  final Map<String, Widget> _pages = {
-    'User': const UserDashboardView(),
-    'Hirings': const HiringPage(),
-    'Kanban': const KanbanView(),
-    'Chat': const ChatView(),
-    'File Manager': const FilemanagerView(),
-    // 'Calendar': const Center(child: Text('Calendar Page')),
-    // 'Mail': const Center(child: Text('Mail Page')),
-    'Job Posting': const JobPostingSection(),
-    'Job Application': const JobApplicationView(),
-    'Interview Scheduling': const InterviewSchedulingView(),
-    'Account': const UserAccount(),
-    'Profile': const UserProfile(),
-    'Card': const UserCards(),
-    'Create User': const CreateUserPage(),
-  };
-  static const _recruitmentItemKeys = {
-    'Job Posting',
-    'Job Application',
-    'Interview Scheduling'
-  };
-  String _selectedItem = 'User';
   DateTime? _currentBackPressTime;
   bool _showExitToast = false;
 
@@ -119,15 +100,8 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
     final isLandscape = !isPortrait;
     final theme = Theme.of(context);
 
-    // Phase 1 role permission: if user is Employee and a recruitment page is selected, redirect to User
-    final profile = context.watch<AuthBloc>().state.currentProfile;
-    if (profile != null &&
-        profile.isEmployee &&
-        _recruitmentItemKeys.contains(_selectedItem)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() => _selectedItem = 'User');
-      });
-    }
+    final selectedItem = widget.selectedItem;
+    final selectedPage = widget.child;
 
     // Detect orientation change
     if (_previousOrientation != currentOrientation) {
@@ -179,7 +153,6 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         resizeToAvoidBottomInset: false,
-        // Show appbar normally in portrait, hide in landscape (will be added as overlay)
         appBar: isPortrait
             ? HomeNav(
                 theme: theme,
@@ -188,12 +161,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
             : null,
         drawerScrimColor: Colors.black54,
         drawer: MenuDrawer(
-          selectedItem: _selectedItem,
-          onSelected: (p0) {
-            setState(() {
-              _selectedItem = p0;
-            });
-          },
+          selectedItem: selectedItem,
         ),
         body: Stack(
           children: [
@@ -202,21 +170,6 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
               onNotification: (notification) {
                 // Only detect scroll updates in landscape mode
                 if (!isLandscape) return false;
-
-                // if (notification is ScrollUpdateNotification) {
-                //   // Check if this is a VERTICAL scroll (ignore horizontal PageViews, etc.)
-                //   final isVerticalScroll =
-                //       notification.metrics.axisDirection == AxisDirection.down ||
-                //           notification.metrics.axisDirection == AxisDirection.up;
-
-                //   // Only respond to vertical scrolling downward
-                //   if (isVerticalScroll &&
-                //       notification.scrollDelta != null &&
-                //       notification.scrollDelta! < -10) {
-                //     // Threshold of -10 to avoid accidental triggers
-                //     _showAppBar();
-                //   }
-                // }
                 if (notification is OverscrollNotification) {
                   if (notification.overscroll < -10) {
                     _showAppBar();
@@ -234,19 +187,15 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
                   }
                 },
                 behavior: HitTestBehavior.translucent,
-                child: _selectedItem == 'Kanban'
+                child: selectedItem == 'Kanban'
                     ? Padding(
                         padding: EdgeInsets.only(
                             top: MediaQuery.of(context).padding.top +
                                 (isPortrait ? kToolbarHeight : 10),
                             bottom: 10),
-                        child: _pages[_selectedItem] ??
-                            const Center(child: Text('Page not found')),
+                        child: selectedPage,
                       )
-                    : _pages[_selectedItem] ??
-                        const Center(
-                          child: Text('Page not found'),
-                        ),
+                    : selectedPage,
               ),
             ),
 

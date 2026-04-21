@@ -1,5 +1,5 @@
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/core/common/components/ui/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/ui/custom_textfield.dart';
 import 'package:employeeos/view/auth/presentation/widgets/confirm_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

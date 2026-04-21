@@ -2,11 +2,11 @@
 
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/core/auth/data/auth_repository.dart';
-import 'package:employeeos/core/common/components/custom_toast.dart';
+import 'package:employeeos/core/common/components/ui/custom_toast.dart';
 import 'package:employeeos/core/user/current_user_profile.dart';
 import 'package:employeeos/core/user/user_account_sync_service.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
-import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
+import 'package:employeeos/core/common/components/ui/custom_bread_crumbs.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_general.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_security.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_social_links.dart';

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/ui/custom_textbutton.dart';
 import 'package:employeeos/core/index.dart' show CustomTextfield;
 import 'package:employeeos/view/kanban/domain/index.dart' show KanbanAssignee;
 import 'package:flutter/material.dart';

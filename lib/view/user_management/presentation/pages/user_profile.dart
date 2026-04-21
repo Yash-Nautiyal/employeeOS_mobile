@@ -1,4 +1,4 @@
-import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
+import 'package:employeeos/core/common/components/ui/custom_bread_crumbs.dart';
 import 'package:employeeos/core/user/current_user_profile.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_profile_about.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_profile_contacts.dart';

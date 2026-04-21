@@ -1,4 +1,5 @@
-import 'package:employeeos/core/common/components/custom_toast.dart';
+import 'package:employeeos/core/common/components/ui/custom_toast.dart';
+import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
@@ -102,7 +103,13 @@ class _JobViewPageState extends State<JobViewPage> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: InkWell(
-        onTap: () => Navigator.of(context).pop(),
+        onTap: () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+            return;
+          }
+          const AppRecruitmentJobPostingRoute().go(context);
+        },
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),

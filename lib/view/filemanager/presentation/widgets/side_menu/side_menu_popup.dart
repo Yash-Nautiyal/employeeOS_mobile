@@ -1,5 +1,5 @@
 import 'package:employeeos/core/common/actions/file_actions.dart';
-import 'package:employeeos/core/common/components/custom_divider.dart';
+import 'package:employeeos/core/common/components/ui/custom_divider.dart';
 import 'package:employeeos/core/common/components/custom_popup.dart'
     show CustomPopup;
 import 'package:employeeos/core/common/components/custom_popup_menu_item.dart';

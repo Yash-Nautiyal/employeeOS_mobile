@@ -1,5 +1,6 @@
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
-import 'package:employeeos/core/common/components/custom_toast.dart';
+import 'package:employeeos/core/common/components/ui/custom_toast.dart';
+import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:employeeos/core/user/current_user_profile.dart';
 import 'package:employeeos/core/index.dart'
     show CustomBreadCrumbs, CustomTextButton;
@@ -10,10 +11,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:toastification/toastification.dart';
 
-import '../../pages/job_posting_section.dart';
 import '../../utils/filter/logic/job_posting_filter_logic.dart';
 import '../../utils/filter/ui/recruitment_filter_side_panel.dart';
-import 'add_posting/add_job_posting_page.dart';
 import 'components/card/job_posting_card_slot.dart';
 import 'components/filter/recruitment_list_filter_bar.dart';
 
@@ -118,30 +117,25 @@ class _JobPostingViewState extends State<JobPostingView> {
   }
 
   void _onViewJob(String jobId) {
-    Navigator.of(context).pushNamed(
-      JobPostingSection.routeJobView,
-      arguments: {'id': jobId},
-    );
+    AppRecruitmentJobPostingDetailRoute(jobId: jobId).push(context);
   }
 
   Future<void> _onEditJob(JobPosting job) async {
-    await Navigator.of(context).pushNamed(
-      JobPostingSection.routeJobEdit,
-      arguments: <String, dynamic>{
-        'job': job,
-        'onJobUpdated': _refreshJobPostings,
-      },
-    );
+    final updated = await AppRecruitmentJobPostingEditRoute(
+      jobId: job.id,
+      $extra: job,
+    ).push<bool>(context);
+    if (updated == true) {
+      _refreshJobPostings();
+    }
   }
 
   Future<void> _onAddPosting() async {
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => AddJobPostingPage(
-          onPostingSaved: _refreshJobPostings,
-        ),
-      ),
-    );
+    final created =
+        await const AppRecruitmentJobPostingAddRoute().push<bool>(context);
+    if (created == true) {
+      _refreshJobPostings();
+    }
   }
 
   @override

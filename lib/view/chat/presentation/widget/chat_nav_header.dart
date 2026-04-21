@@ -1,4 +1,4 @@
-import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/core/common/components/ui/custom_textfield.dart';
 import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;

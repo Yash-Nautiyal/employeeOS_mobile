@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:employeeos/core/common/components/custom_title_header.dart';
+import 'package:employeeos/core/common/components/ui/custom_title_header.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/hiring/domain/entities/hiring_model.dart';
 import 'package:flutter/material.dart';

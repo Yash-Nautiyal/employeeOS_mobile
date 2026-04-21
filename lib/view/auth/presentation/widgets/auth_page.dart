@@ -1,9 +1,9 @@
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
-import 'package:employeeos/core/common/components/custom_textfield.dart';
-import 'package:employeeos/core/common/components/custom_toast.dart';
+import 'package:employeeos/core/common/components/ui/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/ui/custom_textfield.dart';
+import 'package:employeeos/core/common/components/ui/custom_toast.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:employeeos/view/auth/presentation/cubit/sign_in_cubit.dart';
-import 'package:employeeos/view/layout/presentation/pages/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,10 +45,7 @@ class _AuthPageState extends State<AuthPage> {
         if (state.status == SignInStatus.success) {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             if (!context.mounted) return;
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const Layout()),
-              (route) => false,
-            );
+            const AppUserRoute().go(context);
             showCustomToast(
               context: context,
               type: ToastificationType.success,

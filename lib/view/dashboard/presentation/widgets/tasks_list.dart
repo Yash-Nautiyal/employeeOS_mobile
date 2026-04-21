@@ -1,5 +1,5 @@
-import 'package:employeeos/core/common/components/custom_divider.dart';
-import 'package:employeeos/core/common/components/empty_content.dart';
+import 'package:employeeos/core/common/components/ui/custom_divider.dart';
+import 'package:employeeos/core/common/components/empty/empty_content.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 

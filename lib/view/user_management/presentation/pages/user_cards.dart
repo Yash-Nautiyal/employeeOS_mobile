@@ -1,4 +1,4 @@
-import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
+import 'package:employeeos/core/common/components/ui/custom_bread_crumbs.dart';
 import 'package:employeeos/core/user/user_info_entity.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_cards_grid_card.dart';

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:employeeos/core/common/components/custom_textfield.dart';
+import 'package:employeeos/core/common/components/ui/custom_textfield.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

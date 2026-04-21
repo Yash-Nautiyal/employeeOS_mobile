@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/core/auth/data/auth_repository.dart';
-import 'package:employeeos/core/common/components/custom_bread_crumbs.dart';
-import 'package:employeeos/core/common/components/custom_toast.dart';
+import 'package:employeeos/core/common/components/ui/custom_bread_crumbs.dart';
+import 'package:employeeos/core/common/components/ui/custom_toast.dart';
 import 'package:employeeos/core/user/user_creation_service.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
 import 'package:employeeos/core/user/user_role.dart';

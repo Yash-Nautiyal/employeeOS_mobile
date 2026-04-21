@@ -1,6 +1,6 @@
 import 'package:employeeos/core/common/actions/file_actions.dart'
     show formatUserPermission;
-import 'package:employeeos/core/common/components/custom_textbutton.dart';
+import 'package:employeeos/core/common/components/ui/custom_textbutton.dart';
 import 'package:employeeos/core/index.dart' show CustomDropdown;
 import 'package:employeeos/view/filemanager/domain/entities/files_models.dart';
 import 'package:flutter/material.dart';

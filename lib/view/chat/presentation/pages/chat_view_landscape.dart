@@ -1,6 +1,6 @@
 import 'package:employeeos/core/common/actions/date_time_actions.dart'
     show formatRelativeTime;
-import 'package:employeeos/core/common/components/custom_divider.dart';
+import 'package:employeeos/core/common/components/ui/custom_divider.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart'
     show TextMessage;
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'

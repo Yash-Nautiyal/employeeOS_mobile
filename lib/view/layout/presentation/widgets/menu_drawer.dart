@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/view/layout/presentation/widgets/menu_item.dart';
@@ -8,9 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MenuDrawer extends StatefulWidget {
   final String selectedItem;
-  final Function(String) onSelected;
-  const MenuDrawer(
-      {super.key, required this.selectedItem, required this.onSelected});
+  const MenuDrawer({super.key, required this.selectedItem});
 
   @override
   State<MenuDrawer> createState() => _MenuDrawerState();
@@ -71,10 +70,8 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   title: 'User',
                   theme: theme,
                   selectedItem: widget.selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      widget.onSelected(item);
-                    });
+                  onSelected: (_) {
+                    const AppUserRoute().go(context);
                     Navigator.pop(context); // Close the drawer
                   },
                 ),
@@ -84,10 +81,8 @@ class _MenuDrawerState extends State<MenuDrawer> {
                     title: 'Hirings',
                     theme: theme,
                     selectedItem: widget.selectedItem,
-                    onSelected: (item) {
-                      setState(() {
-                        widget.onSelected(item);
-                      });
+                    onSelected: (_) {
+                      const AppHiringRoute().go(context);
                       Navigator.pop(context); // Close the drawer
                     },
                   ),
@@ -110,34 +105,28 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   title: 'Kanban',
                   theme: theme,
                   selectedItem: widget.selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      widget.onSelected(item);
-                    });
+                  onSelected: (_) {
+                    const AppKanbanRoute().go(context);
                     Navigator.pop(context); // Close the drawer
                   },
                 ),
-                // MenuItem(
-                //   icon: 'assets/icons/nav/ic-chat.svg',
-                //   title: 'Chat',
-                //   theme: theme,
-                //   selectedItem: widget.selectedItem,
-                //   onSelected: (item) {
-                //     setState(() {
-                //       widget.onSelected(item);
-                //     });
-                //     Navigator.pop(context); // Close the drawer
-                //   },
-                // ),
+                MenuItem(
+                  icon: 'assets/icons/nav/ic-chat.svg',
+                  title: 'Chat',
+                  theme: theme,
+                  selectedItem: widget.selectedItem,
+                  onSelected: (_) {
+                    const AppChatRoute().go(context);
+                    Navigator.pop(context); // Close the drawer
+                  },
+                ),
                 MenuItem(
                   icon: 'assets/icons/nav/ic-folder.svg',
                   title: 'File Manager',
                   theme: theme,
                   selectedItem: widget.selectedItem,
-                  onSelected: (item) {
-                    setState(() {
-                      widget.onSelected(item);
-                    });
+                  onSelected: (_) {
+                    const AppFileManagerRoute().go(context);
                     Navigator.pop(context); // Close the drawer
                   },
                 ),
@@ -173,9 +162,18 @@ class _MenuDrawerState extends State<MenuDrawer> {
                     theme: theme,
                     selectedItem: widget.selectedItem,
                     onSelected: (item) {
-                      setState(() {
-                        widget.onSelected(item);
-                      });
+                      switch (item) {
+                        case 'Job Posting':
+                          const AppRecruitmentJobPostingRoute().go(context);
+                          break;
+                        case 'Job Application':
+                          const AppRecruitmentJobApplicationRoute().go(context);
+                          break;
+                        case 'Interview Scheduling':
+                          const AppRecruitmentInterviewSchedulingRoute()
+                              .go(context);
+                          break;
+                      }
                       Navigator.pop(context); // Close the drawer
                     },
                     submenuItems: const [
@@ -190,9 +188,21 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   theme: theme,
                   selectedItem: widget.selectedItem,
                   onSelected: (item) {
-                    setState(() {
-                      widget.onSelected(item);
-                    });
+                    switch (item) {
+                      case 'Account':
+                        const AppUserAccountRoute().go(context);
+                        break;
+                      case 'Profile':
+                        const AppUserProfileRoute().go(context);
+                        break;
+                      case 'Card':
+                        const AppUserCardsRoute().go(context);
+                        break;
+                      case 'Create':
+                      case 'Create User':
+                        const AppCreateUserRoute().go(context);
+                        break;
+                    }
                     Navigator.pop(context); // Close the drawer
                   },
                   submenuItems: [
