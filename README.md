@@ -32,19 +32,19 @@ The app helps teams access core work modules quickly, stay aligned, and manage o
 
 Mobile app screenshots:
 
-<p align="center">
+<p align="start">
   <img src="docs/media/welcome.jpg" alt="Welcome Screen" width="220" />
   <img src="docs/media/home.jpg" alt="Home Screen" width="220" />
   <img src="docs/media/hiring.jpg" alt="Hiring Screen" width="220" />
 </p>
 
-<p align="center">
+<p align="start">
   <img src="docs/media/posting.jpg" alt="Job Posting Screen" width="220" />
   <img src="docs/media/interview.jpg" alt="Interview Screen" width="220" />
   <img src="docs/media/kanban.jpg" alt="Kanban Screen" width="220" />
 </p>
 
-<p align="center">
+<p align="start">
   <img src="docs/media/filemanager.jpg" alt="File Manager Screen" width="220" />
 </p>
 
