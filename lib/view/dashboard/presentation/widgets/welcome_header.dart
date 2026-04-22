@@ -69,7 +69,7 @@ class WelcomeHeader extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 30.0),
                           child: Text(
                             textAlign: TextAlign.center,
-                            "If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything.",
+                            'Track tasks, messages, and team activity in one place to stay focused and move work forward.',
                             style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15,

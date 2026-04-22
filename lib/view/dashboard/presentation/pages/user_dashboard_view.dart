@@ -28,15 +28,16 @@ class UserDashboardView extends StatelessWidget {
           valueColor: AppPallete.secondaryDarker,
           icon: 'assets/icons/glass/ic-glass-users.svg',
           title: 'New Users',
-          value: '86.6K'),
+          value: '30'),
       AnalyticsContainer(
           theme: theme,
+          iconColor: AppPallete.successDark,
           color: AppPallete.successLighter,
           titleColor: AppPallete.successDark,
           valueColor: AppPallete.successDarker,
-          icon: 'assets/icons/glass/ic-glass-bag.svg',
-          title: 'Weekly Sales',
-          value: '2.6K'),
+          icon: 'assets/icons/common/solid/ic-solar-clipboard.svg',
+          title: 'Tasks',
+          value: '5'),
       AnalyticsContainer(
           theme: theme,
           color: AppPallete.errorLighter,
@@ -47,12 +48,13 @@ class UserDashboardView extends StatelessWidget {
           value: '123'),
       AnalyticsContainer(
           theme: theme,
+          iconColor: AppPallete.warningDark,
           color: AppPallete.warningLighter,
           titleColor: AppPallete.warningDark,
           valueColor: AppPallete.warningDarker,
-          icon: 'assets/icons/glass/ic-glass-buy.svg',
-          title: 'Purchase Order',
-          value: '2K')
+          icon: 'assets/icons/ic-bell.svg',
+          title: 'Notifications',
+          value: '15')
     ];
 
     return SingleChildScrollView(

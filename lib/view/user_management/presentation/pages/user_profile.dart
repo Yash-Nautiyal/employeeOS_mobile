@@ -41,8 +41,8 @@ class _UserProfileState extends State<UserProfile>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final socialLinks = _profile?.metadata?['social_links'] ?? {};
-    print(socialLinks);
+    final socialLinks =
+        _profile?.metadata?['social_links'] as Map<String, dynamic>? ?? {};
     return SingleChildScrollView(
       padding:
           EdgeInsets.only(top: MediaQuery.of(context).padding.top, bottom: 16),

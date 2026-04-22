@@ -2,6 +2,16 @@ import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+class _BirthdayEntry {
+  final String name;
+  final DateTime birthday;
+
+  const _BirthdayEntry({
+    required this.name,
+    required this.birthday,
+  });
+}
+
 class BirthdayContainer extends StatelessWidget {
   final ThemeData theme;
   final double maxHeight;
@@ -14,6 +24,25 @@ class BirthdayContainer extends StatelessWidget {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final isWideScreen = !isPortrait || wideScreen;
+    final birthdays = <_BirthdayEntry>[
+      _BirthdayEntry(
+        name: 'Priya Sharma',
+        birthday: DateTime(2026, 4, 24),
+      ),
+      _BirthdayEntry(
+        name: 'Neha Verma',
+        birthday: DateTime(2026, 4, 29),
+      ),
+      _BirthdayEntry(
+        name: 'Rohan Kapoor',
+        birthday: DateTime(2026, 5, 2),
+      ),
+      _BirthdayEntry(
+        name: 'Aisha Khan',
+        birthday: DateTime(2026, 5, 5),
+      ),
+    ];
+
     return Card(
       elevation: 10,
       shadowColor: theme.shadowColor,
@@ -38,6 +67,7 @@ class BirthdayContainer extends StatelessWidget {
           padding: const EdgeInsets.only(right: 0, left: 20),
           constraints: BoxConstraints(maxHeight: maxHeight),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
@@ -60,48 +90,69 @@ class BirthdayContainer extends StatelessWidget {
               Flexible(
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: 5,
+                  itemCount: birthdays.length,
                   padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) => Container(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: isWideScreen ? 25 : 22,
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Alex Balding',
-                              style: theme.textTheme.labelLarge
-                                  ?.copyWith(color: AppPallete.white),
+                  itemBuilder: (context, index) {
+                    final entry = birthdays[index];
+                    final initials = entry.name
+                        .split(' ')
+                        .where((part) => part.isNotEmpty)
+                        .take(2)
+                        .map((part) => part[0])
+                        .join()
+                        .toUpperCase();
+                    final birthdayDate =
+                        '${entry.birthday.day}/${entry.birthday.month}/${entry.birthday.year}';
+
+                    return Container(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: isWideScreen ? 25 : 22,
+                            backgroundColor: AppPallete.white.withOpacity(.2),
+                            child: Text(
+                              initials,
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: AppPallete.white,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  'assets/icons/ic-calender.svg',
-                                  color: AppPallete.grey200,
-                                  width: isWideScreen ? 15 : 20,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  '${DateTime.now().add(const Duration(days: 10)).day}/${DateTime.now().add(const Duration(days: 10)).month}/${DateTime.now().add(const Duration(days: 10)).year}',
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                      fontSize: 15, color: AppPallete.white),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                entry.name,
+                                style: theme.textTheme.labelLarge
+                                    ?.copyWith(color: AppPallete.white),
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/ic-calender.svg',
+                                    color: AppPallete.grey200,
+                                    width: isWideScreen ? 15 : 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    birthdayDate,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                        fontSize: 15, color: AppPallete.white),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  },
                 ),
               )
             ],

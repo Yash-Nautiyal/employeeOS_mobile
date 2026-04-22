@@ -9,6 +9,7 @@ class AnalyticsContainer extends StatelessWidget {
   final String icon;
   final String title;
   final String value;
+  final Color? iconColor;
   const AnalyticsContainer(
       {super.key,
       required this.theme,
@@ -17,7 +18,8 @@ class AnalyticsContainer extends StatelessWidget {
       required this.valueColor,
       required this.icon,
       required this.title,
-      required this.value});
+      required this.value,
+      this.iconColor});
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +58,8 @@ class AnalyticsContainer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SvgPicture.asset(width: isWideScreen ? 60 : 40, icon),
+          SvgPicture.asset(
+              width: isWideScreen ? 60 : 40, icon, color: iconColor),
           const SizedBox(
             height: 15,
           ),
