@@ -2,8 +2,6 @@
 
 EmployeeOS Mobile is a Flutter app that centralizes internal workflows such as communication, recruitment, and productivity into one mobile experience.
 
-**Live Demo:** Coming soon
-
 ## Table of Contents
 
 - [About the Project](#about-the-project)
@@ -32,26 +30,31 @@ The app helps teams access core work modules quickly, stay aligned, and manage o
 
 ## Screenshots and Media
 
-> Add screenshots, GIFs, or short demo videos in this section.
+Mobile app screenshots:
 
-### App Preview Images
+<p align="center">
+  <img src="docs/media/welcome.jpg" alt="Welcome Screen" width="220" />
+  <img src="docs/media/home.jpg" alt="Home Screen" width="220" />
+  <img src="docs/media/hiring.jpg" alt="Hiring Screen" width="220" />
+</p>
 
-- `docs/media/home-screen.png` (add screenshot here)
-- `docs/media/chat-screen.png` (add screenshot here)
-- `docs/media/recruitment-screen.png` (add screenshot here)
+<p align="center">
+  <img src="docs/media/posting.jpg" alt="Job Posting Screen" width="220" />
+  <img src="docs/media/interview.jpg" alt="Interview Screen" width="220" />
+  <img src="docs/media/kanban.jpg" alt="Kanban Screen" width="220" />
+</p>
 
-### Demo GIF / Video
+<p align="center">
+  <img src="docs/media/filemanager.jpg" alt="File Manager Screen" width="220" />
+</p>
 
-
-
-`Coming soon`
 
 ## Technologies Used
 
 - Flutter
 - Dart
 - Feature-based modular architecture
-- Centralized route management
+- Centralized route management (go_router: ^14.8.1)
 
 ## Setup and Installation
 
@@ -84,4 +87,3 @@ UI direction inspired by MUI Minimal Dashboard: [Minimal - Client and Admin Dash
 ## License
 
 This project is currently private/internal.  
-Add a license here if/when you open-source it (for example, MIT).
