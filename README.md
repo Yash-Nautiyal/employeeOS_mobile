@@ -30,24 +30,35 @@ The app helps teams access core work modules quickly, stay aligned, and manage o
 
 ## Screenshots and Media
 
-Mobile app screenshots:
+### Mobile app screenshots:
+
+### UI & Dashboard
 
 <p align="center">
   <img src="docs/media/welcome.jpg" alt="Welcome Screen" width="220" />
+  <img src="docs/media/welcome_dark.jpg" alt="Welcome Dark Screen" width="220" />
   <img src="docs/media/home.jpg" alt="Home Screen" width="220" />
   <img src="docs/media/hiring.jpg" alt="Hiring Screen" width="220" />
+  <img src="docs/media/settings.jpg" alt="Settings Screen" width="220" />
+
 </p>
+
+### Hiring Pipeline
 
 <p align="center">
   <img src="docs/media/posting.jpg" alt="Job Posting Screen" width="220" />
+  <img src="docs/media/posting2.jpg" alt="Job Posting2 Screen" width="220" />
+  <img src="docs/media/posting3.jpg" alt="Job Posting3 Screen" width="220" />
   <img src="docs/media/interview.jpg" alt="Interview Screen" width="220" />
-  <img src="docs/media/kanban.jpg" alt="Kanban Screen" width="220" />
 </p>
+
+### Other Services
 
 <p align="center">
   <img src="docs/media/filemanager.jpg" alt="File Manager Screen" width="220" />
+  <img src="docs/media/kanban.jpg" alt="Kanban Screen" width="220" />
+  <img src="docs/media/user1.jpg" alt="User Screen" width="220" />
 </p>
-
 
 ## Technologies Used
 
@@ -86,4 +97,4 @@ UI direction inspired by MUI Minimal Dashboard: [Minimal - Client and Admin Dash
 
 ## License
 
-This project is currently private/internal.  
+This project is currently private/internal.

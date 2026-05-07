@@ -3,8 +3,8 @@ import 'package:employeeos/view/auth/presentation/pages/auth_view.dart';
 import 'package:employeeos/view/chat/data/test_data.dart';
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
     show Conversation;
-import 'package:employeeos/view/chat/presentation/pages/chat_view.dart';
-import 'package:employeeos/view/chat/presentation/pages/thread_page.dart';
+import 'package:employeeos/view/chat/presentation/pages/potrait/chat_view.dart';
+import 'package:employeeos/view/chat/presentation/pages/potrait/thread_page.dart';
 import 'package:employeeos/view/dashboard/presentation/pages/user_dashboard_view.dart';
 import 'package:employeeos/view/filemanager/presentation/pages/filemanager_view.dart';
 import 'package:employeeos/view/hiring/presentation/pages/hiring_page.dart';

@@ -2,7 +2,7 @@ import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_models.dart';
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
     show Conversation;
-import 'package:employeeos/view/chat/presentation/pages/chat_view_landscape.dart';
+import 'package:employeeos/view/chat/presentation/pages/landscape/chat_view_landscape.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_app_bar.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_input.dart';
 import 'package:employeeos/view/chat/presentation/widget/chat_media_preview.dart';

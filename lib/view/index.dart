@@ -1,6 +1,6 @@
 // Chat
-export 'package:employeeos/view/chat/presentation/pages/chat_view.dart';
-export 'package:employeeos/view/chat/presentation/pages/thread_page.dart';
+export 'package:employeeos/view/chat/presentation/pages/potrait/chat_view.dart';
+export 'package:employeeos/view/chat/presentation/pages/potrait/thread_page.dart';
 
 // Dashboard
 export 'package:employeeos/view/dashboard/presentation/pages/user_dashboard_view.dart';

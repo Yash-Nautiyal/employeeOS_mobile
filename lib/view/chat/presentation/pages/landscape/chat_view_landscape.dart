@@ -5,7 +5,7 @@ import 'package:employeeos/view/chat/domain/entities/chat_models.dart'
     show TextMessage;
 import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
     show Conversation;
-import 'package:employeeos/view/chat/presentation/pages/thread_page.dart';
+import 'package:employeeos/view/chat/presentation/pages/potrait/thread_page.dart';
 import 'package:employeeos/view/chat/presentation/widget/landscape/chat_nav_appbar_landscape.dart';
 import 'package:employeeos/view/chat/presentation/widget/landscape/chat_nav_item_landscape.dart';
 import 'package:flutter/material.dart';
