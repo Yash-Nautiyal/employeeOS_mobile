@@ -45,7 +45,7 @@ The app helps teams access core work modules quickly, stay aligned, and manage o
 
 ### Hiring Pipeline
 
-<p align="center">
+<p align="start">
   <img src="docs/media/posting.jpg" alt="Job Posting Screen" width="220" />
   <img src="docs/media/posting2.jpg" alt="Job Posting2 Screen" width="220" />
   <img src="docs/media/posting3.jpg" alt="Job Posting3 Screen" width="220" />
@@ -54,7 +54,7 @@ The app helps teams access core work modules quickly, stay aligned, and manage o
 
 ### Other Services
 
-<p align="center">
+<p align="start">
   <img src="docs/media/filemanager.jpg" alt="File Manager Screen" width="220" />
   <img src="docs/media/kanban.jpg" alt="Kanban Screen" width="220" />
   <img src="docs/media/user1.jpg" alt="User Screen" width="220" />
