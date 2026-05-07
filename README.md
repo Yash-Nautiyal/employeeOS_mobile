@@ -34,7 +34,7 @@ The app helps teams access core work modules quickly, stay aligned, and manage o
 
 ### UI & Dashboard
 
-<p align="center">
+<p align="start">
   <img src="docs/media/welcome.jpg" alt="Welcome Screen" width="220" />
   <img src="docs/media/welcome_dark.jpg" alt="Welcome Dark Screen" width="220" />
   <img src="docs/media/home.jpg" alt="Home Screen" width="220" />
@@ -97,4 +97,4 @@ UI direction inspired by MUI Minimal Dashboard: [Minimal - Client and Admin Dash
 
 ## License
 
-This project is currently private/internal.
+This project is currently private/internal.  
