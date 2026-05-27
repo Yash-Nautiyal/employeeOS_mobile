@@ -64,6 +64,7 @@ The app helps teams access core work modules quickly, stay aligned, and manage o
 
 - Flutter
 - Dart
+- BLoC State Management 
 - Feature-based modular architecture
 - Centralized route management (go_router: ^14.8.1)
 
