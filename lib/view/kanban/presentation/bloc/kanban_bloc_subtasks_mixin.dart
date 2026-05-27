@@ -25,6 +25,7 @@ extension KanbanSubtaskHandlers on KanbanBloc {
           event.taskId,
           (t) => t.copyWith(subtasks: [...t.subtasks, st]),
         );
+        print(next.columns.first.createdByMe.first.subtasks.last.name);
         emit(next);
       } else {
         emit(current.copyWith(isActionLoading: false));

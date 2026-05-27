@@ -51,6 +51,61 @@ class ResponsivePopupItem extends StatelessWidget {
   }
 }
 
+class SelectivePopupItem extends StatelessWidget {
+  final String title;
+  final IconData? icon;
+  final String? svgIcon;
+  final VoidCallback onTap;
+  final Color? color;
+  final bool isSelected;
+  const SelectivePopupItem({
+    super.key,
+    required this.title,
+    required this.onTap,
+    this.icon,
+    this.color,
+    this.svgIcon,
+    this.isSelected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.dividerColor.withOpacity(.15)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            if (svgIcon != null) ...[
+              SvgPicture.asset(svgIcon!,
+                  width: 20,
+                  color: color ?? Theme.of(context).colorScheme.tertiary),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: Text(
+                title,
+                style: Theme.of(context)
+                    .textTheme
+                    .labelLarge
+                    ?.copyWith(color: color),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class DestructivePopupItem extends StatelessWidget {
   final VoidCallback onTap;
   final String title;

@@ -121,111 +121,116 @@ class KanbanDraggableTask extends StatelessWidget {
                       break;
                     }
                   }
-                  return KanbanSideMenu(
-                    task: displayTask,
-                    group: group,
-                    allColumns: allColumns,
-                    onMoveColumn: (toColumnId) {
-                      if (toColumnId == currentColumnId) return;
-                      onMoveToColumn(
-                          task, currentColumnId, fromSection, toColumnId);
-                      currentColumnId = toColumnId;
-                    },
-                    onPriorityChanged: onPriorityChanged,
-                    onDueDateChanged:
-                        (dueStart, dueEnd, columnId, section, taskId) =>
-                            bloc.add(KanbanTaskDueDateUpdated(
-                      columnId: columnId,
-                      section: section,
-                      taskId: taskId,
-                      dueStart: dueStart,
-                      dueEnd: dueEnd,
-                    )),
-                    onAssigneesChanged: onAssigneesChanged,
-                    onSubtaskAdded: (name) => bloc
-                        .add(KanbanSubtaskAdded(taskId: task.id, name: name)),
-                    onSubtaskToggled: (subtaskId, completed) => bloc.add(
-                        KanbanSubtaskToggled(
-                            taskId: task.id,
-                            subtaskId: subtaskId,
-                            completed: completed)),
-                    onSubtaskRenamed: (subtaskId, name) => bloc.add(
-                        KanbanSubtaskRenamed(
-                            taskId: task.id, subtaskId: subtaskId, name: name)),
-                    onSubtaskDeleted: (subtaskId) => bloc.add(
-                        KanbanSubtaskDeleted(
-                            taskId: task.id, subtaskId: subtaskId)),
-                    onSaveDescription:
-                        (description, columnId, section, taskId) => bloc.add(
-                            KanbanTaskDescriptionUpdated(
-                                columnId: columnId,
-                                section: section,
-                                taskId: taskId,
-                                description: description)),
-                    onOpenAssigneePicker:
-                        (pickerContext, currentAssignees, onDone) {
-                      bloc.add(const KanbanUsersForAssigneesRequested());
-                      showDialog<void>(
-                        context: pickerContext,
-                        builder: (ctx) => BlocProvider.value(
-                          value: bloc,
-                          child: BlocBuilder<KanbanBloc, KanbanState>(
-                            bloc: bloc,
-                            buildWhen: (p, c) =>
-                                c is KanbanLoaded &&
-                                (p is! KanbanLoaded ||
-                                    (p).usersForAssignees !=
-                                        (c).usersForAssignees ||
-                                    (p).isLoadingUsersForAssignees !=
-                                        (c).isLoadingUsersForAssignees),
-                            builder: (ctx, s) {
-                              if (s is! KanbanLoaded) {
-                                return const Center(
-                                    child: Padding(
-                                  padding: EdgeInsets.all(24.0),
-                                  child: CircularProgressIndicator(),
-                                ));
-                              }
-                              if (s.isLoadingUsersForAssignees &&
-                                  s.usersForAssignees == null) {
-                                return const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(24.0),
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                );
-                              }
-                              final users = s.usersForAssignees ?? [];
-                              return _AssigneePickerDialog(
-                                users: users,
-                                currentAssignees: currentAssignees,
-                                onDone: onDone,
-                                onClose: () => Navigator.of(ctx).pop(),
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                    onAttachmentUpload: (taskId, files) {
-                      return taskDetailCubit.uploadAttachments(
-                        taskId: taskId,
-                        files: files,
-                      );
-                    },
-                    onAttachmentDelete: (taskId, attachmentId) {
-                      return taskDetailCubit.deleteAttachment(
-                        taskId: taskId,
-                        attachmentId: attachmentId,
-                      );
-                    },
-                    onDeleteTask: (columnId, section, taskId) async {
-                      bloc.add(KanbanTaskDeleted(
+                  return BlocProvider.value(
+                    value: bloc,
+                    child: KanbanSideMenu(
+                      task: displayTask,
+                      group: group,
+                      allColumns: allColumns,
+                      onMoveColumn: (toColumnId) {
+                        if (toColumnId == currentColumnId) return;
+                        onMoveToColumn(
+                            task, currentColumnId, fromSection, toColumnId);
+                        currentColumnId = toColumnId;
+                      },
+                      onPriorityChanged: onPriorityChanged,
+                      onDueDateChanged:
+                          (dueStart, dueEnd, columnId, section, taskId) =>
+                              bloc.add(KanbanTaskDueDateUpdated(
                         columnId: columnId,
                         section: section,
                         taskId: taskId,
-                      ));
-                    },
+                        dueStart: dueStart,
+                        dueEnd: dueEnd,
+                      )),
+                      onAssigneesChanged: onAssigneesChanged,
+                      onSubtaskAdded: (name) => bloc
+                          .add(KanbanSubtaskAdded(taskId: task.id, name: name)),
+                      onSubtaskToggled: (subtaskId, completed) => bloc.add(
+                          KanbanSubtaskToggled(
+                              taskId: task.id,
+                              subtaskId: subtaskId,
+                              completed: completed)),
+                      onSubtaskRenamed: (subtaskId, name) => bloc.add(
+                          KanbanSubtaskRenamed(
+                              taskId: task.id,
+                              subtaskId: subtaskId,
+                              name: name)),
+                      onSubtaskDeleted: (subtaskId) => bloc.add(
+                          KanbanSubtaskDeleted(
+                              taskId: task.id, subtaskId: subtaskId)),
+                      onSaveDescription:
+                          (description, columnId, section, taskId) => bloc.add(
+                              KanbanTaskDescriptionUpdated(
+                                  columnId: columnId,
+                                  section: section,
+                                  taskId: taskId,
+                                  description: description)),
+                      onOpenAssigneePicker:
+                          (pickerContext, currentAssignees, onDone) {
+                        bloc.add(const KanbanUsersForAssigneesRequested());
+                        showDialog<void>(
+                          context: pickerContext,
+                          builder: (ctx) => BlocProvider.value(
+                            value: bloc,
+                            child: BlocBuilder<KanbanBloc, KanbanState>(
+                              bloc: bloc,
+                              buildWhen: (p, c) =>
+                                  c is KanbanLoaded &&
+                                  (p is! KanbanLoaded ||
+                                      (p).usersForAssignees !=
+                                          (c).usersForAssignees ||
+                                      (p).isLoadingUsersForAssignees !=
+                                          (c).isLoadingUsersForAssignees),
+                              builder: (ctx, s) {
+                                if (s is! KanbanLoaded) {
+                                  return const Center(
+                                      child: Padding(
+                                    padding: EdgeInsets.all(24.0),
+                                    child: CircularProgressIndicator(),
+                                  ));
+                                }
+                                if (s.isLoadingUsersForAssignees &&
+                                    s.usersForAssignees == null) {
+                                  return const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(24.0),
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                                final users = s.usersForAssignees ?? [];
+                                return _AssigneePickerDialog(
+                                  users: users,
+                                  currentAssignees: currentAssignees,
+                                  onDone: onDone,
+                                  onClose: () => Navigator.of(ctx).pop(),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      onAttachmentUpload: (taskId, files) {
+                        return taskDetailCubit.uploadAttachments(
+                          taskId: taskId,
+                          files: files,
+                        );
+                      },
+                      onAttachmentDelete: (taskId, attachmentId) {
+                        return taskDetailCubit.deleteAttachment(
+                          taskId: taskId,
+                          attachmentId: attachmentId,
+                        );
+                      },
+                      onDeleteTask: (columnId, section, taskId) async {
+                        bloc.add(KanbanTaskDeleted(
+                          columnId: columnId,
+                          section: section,
+                          taskId: taskId,
+                        ));
+                      },
+                    ),
                   );
                 },
               ),

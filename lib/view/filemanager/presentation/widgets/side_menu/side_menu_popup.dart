@@ -1,8 +1,12 @@
 import 'package:employeeos/core/common/actions/file_actions.dart';
+import 'package:employeeos/core/common/components/popup/popup.dart';
 import 'package:employeeos/core/common/components/ui/custom_divider.dart';
-import 'package:employeeos/core/common/components/custom_popup.dart'
-    show CustomPopup;
-import 'package:employeeos/core/common/components/custom_popup_menu_item.dart';
+import 'package:employeeos/core/index.dart'
+    show
+        PopupPreferredPosition,
+        ResponsivePopupController,
+        ResponsivePopupItem,
+        SelectivePopupItem;
 import 'package:employeeos/view/filemanager/domain/entities/files_models.dart'
     show SharedUser, UserPermission;
 import 'package:flutter/material.dart';
@@ -50,47 +54,62 @@ class _SideMenuPopupState extends State<SideMenuPopup> {
     final user = widget.user;
     final effective = _effectivePermission;
 
-    return CustomPopup(
-      content: Container(
-        constraints: const BoxConstraints(
-          maxWidth: 140,
-          minWidth: 100,
+    final GlobalKey popupAnchorKey = GlobalKey();
+    final LayerLink layerLink = LayerLink();
+    final ResponsivePopupController popupController =
+        ResponsivePopupController();
+
+    return Popup(
+      popupAnchorKey: popupAnchorKey,
+      layerLink: layerLink,
+      popupController: popupController,
+      preferredPosition: PopupPreferredPosition.top,
+      manualOffset: const Offset(-10, -50),
+      items: [
+        SelectivePopupItem(
+          title: 'Can view',
+          onTap: () => _onPermissionTap(context, UserPermission.view),
+          svgIcon: 'assets/icons/common/solid/ic-solar_eye-bold.svg',
+          isSelected: effective == UserPermission.view,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PermissionMenuItem(
-              text: 'Can view',
-              onTap: () => _onPermissionTap(context, UserPermission.view),
-              svgIcon: 'assets/icons/common/solid/ic-solar_eye-bold.svg',
-              isSelected: effective == UserPermission.view,
-            ),
-            PermissionMenuItem(
-              text: 'Can edit',
-              onTap: () => _onPermissionTap(context, UserPermission.edit),
-              svgIcon: 'assets/icons/common/solid/ic-solar_pen-bold.svg',
-              isSelected: effective == UserPermission.edit,
-            ),
-            CustomDivider(
-              color: theme.dividerColor,
-            ),
-            DestructiveMenuItem(
-                text: 'Remove',
-                onTap: () {
-                  widget.handleRemoveUser(user);
-                  if (mounted && context.mounted) Navigator.of(context).pop();
-                }),
-          ],
+        SelectivePopupItem(
+          title: 'Can edit',
+          onTap: () => _onPermissionTap(context, UserPermission.edit),
+          svgIcon: 'assets/icons/common/solid/ic-solar_pen-bold.svg',
+          isSelected: effective == UserPermission.edit,
         ),
-      ),
-      child: Row(
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: CustomDivider(
+            color: theme.dividerColor.withAlpha(100),
+            dashWidth: 2.3,
+          ),
+        ),
+        Padding(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 10.0).copyWith(top: 10),
+          child: ResponsivePopupItem(
+              title: 'Remove',
+              color: theme.colorScheme.error,
+              svgIcon:
+                  'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+              onTap: () {
+                widget.handleRemoveUser(user);
+                if (mounted && context.mounted) Navigator.of(context).pop();
+              }),
+        ),
+      ],
+      isTextButton: true,
+      icon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Can ${formatUserPermission(effective).toLowerCase()}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: theme.colorScheme.tertiary,
+          Flexible(
+            child: Text(
+              'Can ${formatUserPermission(effective).toLowerCase()}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.tertiary,
+              ),
             ),
           ),
           const SizedBox(width: 4),

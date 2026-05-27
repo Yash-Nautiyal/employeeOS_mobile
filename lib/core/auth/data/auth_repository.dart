@@ -138,6 +138,7 @@ class AuthRepository {
         'Sign-up timed out. Please check your connection and try again.',
       );
     } on AuthException catch (e) {
+      print('AuthException: ${e.message}');
       throw AuthFailure(e.message);
     } catch (_) {
       throw AuthFailure('Sign-up failed. Please try again.');

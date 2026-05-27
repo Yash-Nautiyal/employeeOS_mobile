@@ -26,7 +26,10 @@ String formatDate(DateTime date) {
 }
 
 String formatRelativeTime(DateTime time) {
-  final diff = DateTime.now().difference(time);
+  // Convert both times to UTC for accurate comparison
+  final now = DateTime.now().toUtc();
+  final timeUtc = time.toUtc();
+  final diff = now.difference(timeUtc);
   if (diff.inSeconds < 60) return 'a few seconds ago';
   if (diff.inMinutes < 60) return '${diff.inMinutes} min';
   if (diff.inHours < 24) return '${diff.inHours} hr';

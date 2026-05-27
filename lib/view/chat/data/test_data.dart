@@ -1,9 +1,9 @@
-import 'package:employeeos/view/chat/domain/entities/chat_models.dart'
+import 'package:employeeos/view/chat/domain/entities/chat_message.dart'
     show TextMessage;
-import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
+import 'package:employeeos/view/chat/domain/entities/conversation.dart'
     show Conversation, ConversationType;
-import 'package:employeeos/view/chat/domain/entities/participant_model.dart';
-import 'package:employeeos/view/chat/domain/entities/reaction_model.dart';
+import 'package:employeeos/view/chat/domain/entities/participant.dart';
+import 'package:employeeos/view/chat/domain/entities/reaction.dart';
 
 const String _currentUserId = 'user-123'; // replace with real user ID
 final now = DateTime.now();
@@ -13,13 +13,13 @@ final testConversations = [
     id: '11',
     type: ConversationType.oneToOne,
     participants: [
-      ParticipantModel(
+      Participant(
         id: 'user_2',
         name: 'Jane Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/30',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: _currentUserId,
         name: 'John Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/9',
@@ -41,8 +41,8 @@ final testConversations = [
           id: '3',
           authorId: _currentUserId,
           reactions: [
-            ReactionModel(emoji: '❤️', userId: 'user_2'),
-            ReactionModel(emoji: '😂', userId: _currentUserId),
+            Reaction(emoji: '❤️', userId: 'user_2'),
+            Reaction(emoji: '😂', userId: _currentUserId),
           ],
           createdAt: now.subtract(const Duration(minutes: 2)),
           text: 'I am fine, thanks!'),
@@ -52,25 +52,25 @@ final testConversations = [
     id: '10',
     type: ConversationType.group,
     participants: [
-      ParticipantModel(
+      Participant(
         id: 'user_1',
         name: 'Alex Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/10',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: 'user_2',
         name: 'Jane Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/30',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: 'user_3',
         name: 'Mia Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/70',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: _currentUserId,
         name: 'John Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/9',
@@ -99,13 +99,13 @@ final testConversations = [
     id: '12',
     type: ConversationType.oneToOne,
     participants: [
-      ParticipantModel(
+      Participant(
         id: 'user_2',
         name: 'Jane Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/30',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: _currentUserId,
         name: 'John Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/9',
@@ -127,8 +127,8 @@ final testConversations = [
           id: '3',
           authorId: _currentUserId,
           reactions: [
-            ReactionModel(emoji: '❤️', userId: 'user_2'),
-            ReactionModel(emoji: '😂', userId: _currentUserId),
+            Reaction(emoji: '❤️', userId: 'user_2'),
+            Reaction(emoji: '😂', userId: _currentUserId),
           ],
           createdAt: now.subtract(const Duration(minutes: 2)),
           text: 'I am fine, thanks!'),
@@ -138,19 +138,19 @@ final testConversations = [
     id: '13',
     type: ConversationType.group,
     participants: [
-      ParticipantModel(
+      Participant(
         id: 'user_2',
         name: 'Jane Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/30',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: 'user_3',
         name: 'Mia Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/70',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: _currentUserId,
         name: 'John Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/9',
@@ -179,13 +179,13 @@ final testConversations = [
     id: '14',
     type: ConversationType.oneToOne,
     participants: [
-      ParticipantModel(
+      Participant(
         id: 'user_2',
         name: 'Jane Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/30',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: _currentUserId,
         name: 'John Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/9',
@@ -207,8 +207,8 @@ final testConversations = [
           id: '3',
           authorId: _currentUserId,
           reactions: [
-            ReactionModel(emoji: '❤️', userId: 'user_2'),
-            ReactionModel(emoji: '😂', userId: _currentUserId),
+            Reaction(emoji: '❤️', userId: 'user_2'),
+            Reaction(emoji: '😂', userId: _currentUserId),
           ],
           createdAt: now.subtract(const Duration(minutes: 2)),
           text: 'I am fine, thanks!'),
@@ -218,13 +218,13 @@ final testConversations = [
     id: '14',
     type: ConversationType.oneToOne,
     participants: [
-      ParticipantModel(
+      Participant(
         id: 'user_2',
         name: 'Jane Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/30',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: _currentUserId,
         name: 'John Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/9',
@@ -246,8 +246,8 @@ final testConversations = [
           id: '3',
           authorId: _currentUserId,
           reactions: [
-            ReactionModel(emoji: '❤️', userId: 'user_2'),
-            ReactionModel(emoji: '😂', userId: _currentUserId),
+            Reaction(emoji: '❤️', userId: 'user_2'),
+            Reaction(emoji: '😂', userId: _currentUserId),
           ],
           createdAt: now.subtract(const Duration(minutes: 2)),
           text: 'I am fine, thanks!'),
@@ -257,19 +257,19 @@ final testConversations = [
     id: '18',
     type: ConversationType.group,
     participants: [
-      ParticipantModel(
+      Participant(
         id: 'user_2',
         name: 'Jane Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/30',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: 'user_3',
         name: 'Mia Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/70',
         status: ParticipantStatus.online,
       ),
-      ParticipantModel(
+      Participant(
         id: _currentUserId,
         name: 'John Doe',
         avatarUrl: 'https://avatar.iran.liara.run/public/9',

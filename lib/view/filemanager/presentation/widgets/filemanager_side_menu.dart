@@ -87,9 +87,7 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
         return Column(
           children: [
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0)
-                      .copyWith(top: MediaQuery.of(context).padding.top + 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 children: [
                   Text(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:employeeos/core/auth/auth_error_handler.dart';
+import 'package:employeeos/core/di/dependency_injection.dart';
 import 'package:employeeos/core/network/remote_data_exception.dart';
 import 'package:employeeos/core/routing/app_router.dart';
 import 'package:employeeos/core/theme/app_theme.dart';
@@ -10,7 +11,6 @@ import 'package:employeeos/core/user/user_creation_service.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
 import 'package:employeeos/core/auth/data/auth_repository.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,10 +46,7 @@ void main() {
       anonKey: dotenv.env['VITE_SUPABASE_ANON_KEY'] ?? '',
     );
     final themeBloc = await ThemeBloc.create();
-    await FastCachedImageConfig.init(
-      clearCacheAfter: const Duration(days: 7),
-      subDir: 'employeeos',
-    );
+    await initDependencies();
     runApp(
       MultiRepositoryProvider(
         providers: [

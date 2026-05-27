@@ -159,7 +159,13 @@ class UserInfoService {
     if (avatarUrl != null && avatarUrl.isNotEmpty) {
       row['avatar_url'] = avatarUrl;
     }
-    await _client.from(_table).upsert(row, onConflict: 'id');
+
+    try {
+      await _client.from(_table).upsert(row, onConflict: 'id');
+    } catch (e) {
+      print('Error inserting user info row: $e');
+      rethrow;
+    }
   }
 
   /// Uploads image bytes to the [avatars] bucket and returns the public URL.
@@ -177,14 +183,22 @@ class UserInfoService {
     }
     final ext = _extensionForContentType(contentType);
     final path = '$uid/${DateTime.now().millisecondsSinceEpoch}$ext';
-    await _client.storage.from(_avatarsBucket).uploadBinary(
-          path,
-          Uint8List.fromList(bytes),
-          fileOptions: FileOptions(
-            contentType: contentType,
-            upsert: true,
-          ),
-        );
+    print('Current user: ${_client.auth.currentUser?.id}');
+    print('Current user role: ${_client.auth.currentUser?.role}');
+    try {
+      await _client.storage.from(_avatarsBucket).uploadBinary(
+            path,
+            Uint8List.fromList(bytes),
+            fileOptions: FileOptions(
+              contentType: contentType,
+              upsert: true,
+            ),
+          );
+    } catch (e) {
+      print('Error uploading avatar: $e');
+      rethrow;
+    }
+
     return _client.storage.from(_avatarsBucket).getPublicUrl(path);
   }
 

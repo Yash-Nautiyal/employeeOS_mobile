@@ -15,6 +15,7 @@ List<RouteBase> get $appRoutes => [
       $appHiringRoute,
       $appKanbanRoute,
       $appChatRoute,
+      $appChatNewRoute,
       $appChatThreadRoute,
       $appFileManagerRoute,
       $appRecruitmentJobPostingRoute,
@@ -208,6 +209,32 @@ extension $AppChatRouteExtension on AppChatRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $appChatNewRoute => GoRouteData.$route(
+      path: '/app/chat/new',
+      factory: $AppChatNewRouteExtension._fromState,
+    );
+
+extension $AppChatNewRouteExtension on AppChatNewRoute {
+  static AppChatNewRoute _fromState(GoRouterState state) => AppChatNewRoute(
+        $extra: state.extra as ChatThreadRouteExtra,
+      );
+
+  String get location => GoRouteData.$location(
+        '/app/chat/new',
+      );
+
+  void go(BuildContext context) => context.go(location, extra: $extra);
+
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: $extra);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location, extra: $extra);
+
+  void replace(BuildContext context) =>
+      context.replace(location, extra: $extra);
+}
+
 RouteBase get $appChatThreadRoute => GoRouteData.$route(
       path: '/app/chat/thread/:conversationId',
       factory: $AppChatThreadRouteExtension._fromState,
@@ -217,7 +244,7 @@ extension $AppChatThreadRouteExtension on AppChatThreadRoute {
   static AppChatThreadRoute _fromState(GoRouterState state) =>
       AppChatThreadRoute(
         conversationId: state.pathParameters['conversationId']!,
-        $extra: state.extra as ChatThreadRouteExtra?,
+        $extra: state.extra as ChatThreadRouteExtra,
       );
 
   String get location => GoRouteData.$location(

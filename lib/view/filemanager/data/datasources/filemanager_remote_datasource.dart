@@ -480,13 +480,7 @@ class FilemanagerRemoteDatasource {
     bool currentlyFavorited,
   ) async {
     _requireUser();
-    try {
-      await toggleFavorite(fileId, false, currentlyFavorited);
-    } catch (e) {
-      print(e);
-      throw Exception(
-          'Failed to ${currentlyFavorited ? 'remove' : 'add'} favorite');
-    }
+    await toggleFavorite(fileId, false, currentlyFavorited);
   }
 
   Future<void> addShareParticipant(String fileId, SharedUser user) async {
@@ -501,8 +495,6 @@ class FilemanagerRemoteDatasource {
       },
       onConflict: 'file_id,shared_with',
     );
-
-    throw Exception('File not found after share');
   }
 
   Future<void> updateSharePermission(
@@ -515,8 +507,6 @@ class FilemanagerRemoteDatasource {
         })
         .eq('file_id', fileId)
         .eq('shared_with', sharedWithUserId);
-
-    throw Exception('File not found after update permission');
   }
 
   Future<void> removeShareParticipant(String fileId, String userId) async {
@@ -526,8 +516,6 @@ class FilemanagerRemoteDatasource {
         .delete()
         .eq('file_id', fileId)
         .eq('shared_with', userId);
-
-    throw Exception('File not found after remove share');
   }
 
   /// Creates a folder (parent_id = null for root). Optionally moves [fileIds] into it via user_file_folders.

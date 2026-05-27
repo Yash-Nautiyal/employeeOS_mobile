@@ -328,16 +328,16 @@ class _KanbanViewState extends State<KanbanView> {
               children: [
                 Text("Kanban", style: theme.textTheme.displaySmall),
                 const Spacer(),
-                Text("Fixed column", style: theme.textTheme.bodySmall),
-                Transform.scale(
-                  scale: 0.65,
-                  child: Switch(
-                    activeTrackColor: theme.colorScheme.primary,
-                    activeColor: Colors.white,
-                    value: _fixedColumns,
-                    onChanged: (value) => setState(() => _fixedColumns = value),
-                  ),
-                ),
+                // Text("Fixed column", style: theme.textTheme.bodySmall),
+                // Transform.scale(
+                //   scale: 0.65,
+                //   child: Switch(
+                //     activeTrackColor: theme.colorScheme.primary,
+                //     activeColor: Colors.white,
+                //     value: _fixedColumns,
+                //     onChanged: (value) => setState(() => _fixedColumns = value),
+                //   ),
+                // ),
               ],
             ),
             Expanded(

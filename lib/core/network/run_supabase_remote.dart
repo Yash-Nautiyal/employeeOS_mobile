@@ -35,7 +35,7 @@ Future<T> runSupabaseRemote<T>(
       debugPrint('[runSupabaseRemote] $e\n$st');
     }
     final str = e.toString().toLowerCase();
-    if (str.contains('socketexception') ||
+    if (str.contains('socket exception') ||
         str.contains('failed host lookup') ||
         str.contains('network is unreachable') ||
         str.contains('connection reset') ||

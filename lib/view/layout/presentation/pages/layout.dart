@@ -150,86 +150,89 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
         // If pressed within 2 seconds, exit the app securely
         SystemNavigator.pop();
       },
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        resizeToAvoidBottomInset: false,
-        appBar: isPortrait
-            ? HomeNav(
-                theme: theme,
-                dashboardPage: true,
-              )
-            : null,
-        drawerScrimColor: Colors.black54,
-        drawer: MenuDrawer(
-          selectedItem: selectedItem,
-        ),
-        body: Stack(
-          children: [
-            // Main content with scroll detection for nested scrollables
-            NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                // Only detect scroll updates in landscape mode
-                if (!isLandscape) return false;
-                if (notification is OverscrollNotification) {
-                  if (notification.overscroll < -10) {
-                    _showAppBar();
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          resizeToAvoidBottomInset: false,
+          appBar: isPortrait
+              ? HomeNav(
+                  theme: theme,
+                  dashboardPage: true,
+                )
+              : null,
+          drawerScrimColor: Colors.black54,
+          drawer: MenuDrawer(
+            selectedItem: selectedItem,
+          ),
+          body: Stack(
+            children: [
+              // Main content with scroll detection for nested scrollables
+              NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  // Only detect scroll updates in landscape mode
+                  if (!isLandscape) return false;
+                  if (notification is OverscrollNotification) {
+                    if (notification.overscroll < -10) {
+                      _showAppBar();
+                    }
                   }
-                }
-                return false;
-              },
-              child: GestureDetector(
-                // Detect vertical drag down for non-scrollable areas
-                onVerticalDragUpdate: (details) {
-                  if (!isLandscape) return;
-                  // Only show appbar when dragging downward (threshold of 5px)
-                  if (details.delta.dy > 5) {
-                    _showAppBar();
-                  }
+                  return false;
                 },
-                behavior: HitTestBehavior.translucent,
-                child: selectedItem == 'Kanban'
-                    ? Padding(
-                        padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top +
-                                (isPortrait ? kToolbarHeight : 10),
-                            bottom: 10),
-                        child: selectedPage,
-                      )
-                    : selectedPage,
+                child: GestureDetector(
+                  // Detect vertical drag down for non-scrollable areas
+                  onVerticalDragUpdate: (details) {
+                    if (!isLandscape) return;
+                    // Only show appbar when dragging downward (threshold of 5px)
+                    if (details.delta.dy > 5) {
+                      _showAppBar();
+                    }
+                  },
+                  behavior: HitTestBehavior.translucent,
+                  child: selectedItem == 'Kanban'
+                      ? Padding(
+                          padding: EdgeInsets.only(
+                              top: MediaQuery.of(context).padding.top +
+                                  (isPortrait ? kToolbarHeight : 10),
+                              bottom: 10),
+                          child: selectedPage,
+                        )
+                      : selectedPage,
+                ),
               ),
-            ),
 
-            // Animated overlay appbar for landscape mode with frosted glass effect
-            if (isLandscape)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: SlideTransition(
-                  position: _appBarAnimation,
-                  child: ClipRRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: HomeNav(
-                        theme: theme,
-                        dashboardPage: true,
+              // Animated overlay appbar for landscape mode with frosted glass effect
+              if (isLandscape)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: SlideTransition(
+                    position: _appBarAnimation,
+                    child: ClipRRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: HomeNav(
+                          theme: theme,
+                          dashboardPage: true,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-            // Global "No internet connection" banner shown above the nav bar.
-            const ConnectivityBanner(),
+              // Global "No internet connection" banner shown above the nav bar.
+              const ConnectivityBanner(),
 
-            // "Press back again to exit" toast with enter + exit animation
-            if (_showExitToast)
-              ExitToast(
-                message: 'Press back again to exit',
-                displayDuration: const Duration(seconds: 2),
-                onDismissed: () => setState(() => _showExitToast = false),
-              ),
-          ],
+              // "Press back again to exit" toast with enter + exit animation
+              if (_showExitToast)
+                ExitToast(
+                  message: 'Press back again to exit',
+                  displayDuration: const Duration(seconds: 2),
+                  onDismissed: () => setState(() => _showExitToast = false),
+                ),
+            ],
+          ),
         ),
       ),
     );

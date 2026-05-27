@@ -1,0 +1,396 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:employeeos/core/common/actions/file_actions.dart'
+    show formatFileSize, getFileIcon;
+import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:employeeos/view/chat/domain/entities/chat_message.dart';
+import 'package:employeeos/view/chat/presentation/widget/preview/chat_image_show.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:shimmer/shimmer.dart';
+
+class ChatMessages extends StatelessWidget {
+  final ChatMessage message;
+  final bool isMe;
+  final Color bgColor;
+  final Map<String, String> imageUrlsandFileName;
+  final List<ImageMessage>?
+      batch; // Add this if you want to handle batch messages
+
+  const ChatMessages({
+    super.key,
+    required this.message,
+    required this.isMe,
+    required this.bgColor,
+    this.imageUrlsandFileName = const {},
+    this.batch,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final theme = Theme.of(context);
+    if (batch != null && batch!.length > 2) {
+      // Handle batch images
+      final count = batch!.length;
+      final maxWidth = isMe
+          ? isLandscape
+              ? MediaQuery.of(context).size.width * 0.5
+              : MediaQuery.of(context).size.width * 0.7
+          : MediaQuery.of(context).size.width * 0.6;
+      // 3-image special layout
+      if (count == 3) {
+        return Align(
+          alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+          child: Container(
+            height: 200,
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: Row(
+              children: [
+                // FIRST IMAGE (2/3 width)
+                Expanded(
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: () =>
+                        Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                        builder: (context) => ChatImageShow(
+                          imageUrl: batch![0].url,
+                          fileName: batch![0].name,
+                          imageUrlsandFileName: imageUrlsandFileName,
+                          index: imageUrlsandFileName.keys
+                              .toList()
+                              .indexOf(batch![0].url),
+                        ),
+                      ),
+                    ),
+                    child: SizedBox(
+                      height: double.infinity,
+                      width: double.infinity,
+                      child: _buildGridImage(batch![0], context,
+                          fillMode: BoxFit.cover),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                // SECOND COLUMN (1/3 width)
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      // Top half
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () =>
+                              Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(
+                              builder: (context) => ChatImageShow(
+                                imageUrl: batch![1].url,
+                                fileName: batch![1].name,
+                                imageUrlsandFileName: imageUrlsandFileName,
+                                index: imageUrlsandFileName.keys
+                                    .toList()
+                                    .indexOf(batch![1].url),
+                              ),
+                            ),
+                          ),
+                          child: SizedBox(
+                            height: double.infinity,
+                            width: double.infinity,
+                            child: _buildGridImage(batch![1], context,
+                                fillMode: BoxFit.cover),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      // Bottom half
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () =>
+                              Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(
+                              builder: (context) => ChatImageShow(
+                                imageUrl: batch![2].url,
+                                fileName: batch![2].name,
+                                imageUrlsandFileName: imageUrlsandFileName,
+                                index: imageUrlsandFileName.keys
+                                    .toList()
+                                    .indexOf(batch![2].url),
+                              ),
+                            ),
+                          ),
+                          child: SizedBox(
+                            height: double.infinity,
+                            width: double.infinity,
+                            child: _buildGridImage(batch![2], context,
+                                fillMode: BoxFit.cover),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+      final display = batch!.take(4).toList();
+      return Align(
+        alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: GridView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+            ),
+            itemCount: display.length,
+            itemBuilder: (_, idx) {
+              final img = display[idx];
+              Widget tile = _buildGridImage(img, context);
+              if (idx == 3 && count > 4) {
+                // overlay +N
+                tile = Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    tile,
+                    Container(
+                      color: Colors.black45,
+                      alignment: Alignment.center,
+                      child: Text(
+                        '+${count - 3}',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppPallete.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return tile;
+            },
+          ),
+        ),
+      );
+    }
+
+    switch (message.type) {
+      case MessageType.text:
+        final m = message as TextMessage;
+        return ChatBubble(
+          clipper: ChatBubbleClipper5(
+              type: isMe ? BubbleType.sendBubble : BubbleType.receiverBubble),
+          backGroundColor: bgColor,
+          alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+          elevation: 0,
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: isMe
+                  ? MediaQuery.of(context).size.width * 0.7
+                  : MediaQuery.of(context).size.width * 0.6,
+            ),
+            child: Text(
+              m.text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: isMe ? AppPallete.grey900 : theme.colorScheme.tertiary,
+              ),
+            ),
+          ),
+        );
+      case MessageType.image:
+        final m = message as ImageMessage;
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute(
+                builder: (context) => ChatImageShow(
+                  imageUrl: m.url,
+                  fileName: m.name,
+                  imageUrlsandFileName: imageUrlsandFileName,
+                  index: imageUrlsandFileName.keys.toList().indexOf(m.url),
+                ),
+              ),
+            );
+          },
+          child: Align(
+            alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                width: isMe
+                    ? MediaQuery.sizeOf(context).width * 0.7
+                    : MediaQuery.sizeOf(context).width * 0.65,
+                constraints:
+                    BoxConstraints(maxWidth: isMe ? 300 : 260, maxHeight: 200),
+                child: m.url.startsWith('http')
+                    ? CachedNetworkImage(
+                        imageUrl: m.url,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.error,
+                            color: AppPallete.errorMain,
+                            size: 50,
+                          );
+                        },
+                        placeholder: (context, url) {
+                          return Shimmer.fromColors(
+                            enabled: true,
+                            baseColor: AppPallete.grey400.withOpacity(0.5),
+                            highlightColor: AppPallete.grey400.withOpacity(0.2),
+                            child: Container(
+                              width: isMe
+                                  ? MediaQuery.sizeOf(context).width * 0.7
+                                  : MediaQuery.sizeOf(context).width * .65,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: AppPallete.grey400.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Image.file(File(m.url)),
+              ),
+            ),
+          ),
+        );
+      case MessageType.file:
+        final m = message as FileMessage;
+        final iconPath = getFileIcon(m.fileType);
+        final fileSize = formatFileSize(m.size);
+        return GestureDetector(
+          onTap: () {
+            // TODO: implement file open/download
+          },
+          child: Align(
+            alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: isMe
+                    ? MediaQuery.sizeOf(context).width * 0.7
+                    : MediaQuery.sizeOf(context).width * 0.6,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: SvgPicture.asset(iconPath, width: 24, height: 24),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          m.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(fileSize, style: theme.textTheme.bodySmall),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      case MessageType.system:
+        final m = message as SystemMessage;
+        return Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              m.text,
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+        );
+      default:
+        return ChatBubble(
+          clipper: ChatBubbleClipper5(
+              type: isMe ? BubbleType.sendBubble : BubbleType.receiverBubble),
+          backGroundColor: bgColor,
+          alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+          elevation: 0,
+          child: Text(
+            'Unsupported message',
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: AppPallete.errorMain),
+          ),
+        );
+    }
+  }
+
+  Widget _buildGridImage(ImageMessage img, BuildContext context,
+      {BoxFit fillMode = BoxFit.cover}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (context) => ChatImageShow(
+                imageUrl: img.url,
+                fileName: img.name,
+                imageUrlsandFileName: imageUrlsandFileName,
+                index: imageUrlsandFileName.keys.toList().indexOf(img.url),
+              ),
+            ),
+          );
+        },
+        child: img.url.startsWith('http')
+            ? CachedNetworkImage(
+                imageUrl: img.url,
+                fit: fillMode,
+                errorWidget: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.error,
+                    color: AppPallete.errorMain,
+                    size: 50,
+                  );
+                },
+                placeholder: (context, progress) {
+                  return Shimmer.fromColors(
+                    enabled: true,
+                    baseColor: AppPallete.grey400.withOpacity(0.5),
+                    highlightColor: AppPallete.grey400.withOpacity(0.2),
+                    child: Container(
+                      width: 100,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppPallete.grey400.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  );
+                },
+              )
+            : Image.file(File(img.url), fit: BoxFit.cover),
+      ),
+    );
+  }
+}

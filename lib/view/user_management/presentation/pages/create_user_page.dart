@@ -140,7 +140,8 @@ class _CreateUserPageState extends State<CreateUserPage> {
         context: context,
         type: ToastificationType.success,
         title: 'User created',
-        description: 'The new user can sign in with the email and password you set.',
+        description:
+            'The new user can sign in with the email and password you set.',
       );
     } on AuthFailure catch (e) {
       if (!mounted) return;
@@ -185,34 +186,34 @@ class _CreateUserPageState extends State<CreateUserPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final profile = context.watch<AuthBloc>().state.currentProfile;
-    final allowed = profile != null && !profile.isEmployee;
+    // final allowed = profile != null && !profile.isEmployee;
 
-    if (!allowed) {
-      return Padding(
-        padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomBreadCrumbs(
-              theme: theme,
-              routes: const ['Dashboard', 'User', 'Create User'],
-              heading: 'Create User',
-            ),
-            const Expanded(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Text(
-                    'You do not have permission to create users.',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    // if (!allowed) {
+    //   return Padding(
+    //     padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+    //     child: Column(
+    //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       children: [
+    //         CustomBreadCrumbs(
+    //           theme: theme,
+    //           routes: const ['Dashboard', 'User', 'Create User'],
+    //           heading: 'Create User',
+    //         ),
+    //         const Expanded(
+    //           child: Center(
+    //             child: Padding(
+    //               padding: EdgeInsets.all(24),
+    //               child: Text(
+    //                 'You do not have permission to create users.',
+    //                 textAlign: TextAlign.center,
+    //               ),
+    //             ),
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    // }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,

@@ -1,6 +1,9 @@
 import 'package:employeeos/core/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:toastification/toastification.dart';
+
+import '../../../../core/common/components/popup/popup.dart';
 
 class KanbanHeader extends StatelessWidget {
   const KanbanHeader({
@@ -24,6 +27,11 @@ class KanbanHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey _popupAnchorKey = GlobalKey();
+    final LayerLink _layerLink = LayerLink();
+    final ResponsivePopupController _popupController =
+        ResponsivePopupController();
+
     return Padding(
       padding: const EdgeInsets.only(top: 4, left: 4),
       child: Row(
@@ -57,43 +65,53 @@ class KanbanHeader extends StatelessWidget {
               color: theme.disabledColor,
             ),
           ),
-          CustomPopup(
-            contentPadding: EdgeInsets.zero,
-            content: Container(
-              constraints: const BoxConstraints(
-                maxWidth: 140,
-                minWidth: 100,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PermissionMenuItem(
-                    text: 'Rename',
-                    onTap: () => onRename(),
+
+          Popup(
+              popupAnchorKey: _popupAnchorKey,
+              layerLink: _layerLink,
+              popupController: _popupController,
+              preferredPosition: PopupPreferredPosition.bottom,
+              arrowOffset: 0.5,
+              arrowColor: theme.brightness == Brightness.dark
+                  ? AppPallete.darkBackgroundGradient.colors[1]
+                  : AppPallete.lightBackgroundGradient.colors[1],
+              icon: const Icon(Icons.more_vert_rounded),
+              items: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: ResponsivePopupItem(
+                    title: 'Rename',
                     svgIcon: 'assets/icons/common/solid/ic-solar_pen-bold.svg',
-                    isSelected: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 10)
-                        .copyWith(top: 10),
+                    onTap: () {
+                      _popupController.hide();
+                      onRename();
+                    },
                   ),
-                  PermissionMenuItem(
-                    text: 'Clear tasks',
-                    onTap: () => onClear(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0)
+                      .copyWith(top: 10),
+                  child: ResponsivePopupItem(
+                    title: 'Clear tasks',
                     svgIcon:
                         'assets/icons/common/solid/ic-solar-eraser-bold.svg',
-                    isSelected: false,
+                    onTap: () {
+                      _popupController.hide();
+                      onClear();
+                    },
                   ),
-                  CustomDivider(
-                    color: theme.dividerColor,
-                  ),
-                  DestructiveMenuItem(
-                    text: 'Remove',
-                    onTap: () => onDelete(),
-                  ),
-                ],
-              ),
-            ),
-            child: Icon(Icons.more_horiz, color: theme.colorScheme.tertiary),
-          ),
+                ),
+                DestructivePopupItem(
+                    title: 'Remove',
+                    onTap: () {
+                      _popupController.hide();
+                      showCustomToast(
+                          context: context,
+                          type: ToastificationType.info,
+                          title: 'Feature not accessible in demo mode');
+                      // onDelete();
+                    }),
+              ])
           // PopupMenuButton<String>(
           //   icon: Icon(Icons.more_horiz, color: theme.colorScheme.tertiary),
           //   onSelected: (val) {

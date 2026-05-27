@@ -1,28 +1,15 @@
-import 'package:employeeos/core/routing/routing_splash_page.dart';
-import 'package:employeeos/view/auth/presentation/pages/auth_view.dart';
-import 'package:employeeos/view/chat/data/test_data.dart';
-import 'package:employeeos/view/chat/domain/entities/conversation_models.dart'
-    show Conversation;
-import 'package:employeeos/view/chat/presentation/pages/potrait/chat_view.dart';
-import 'package:employeeos/view/chat/presentation/pages/potrait/thread_page.dart';
-import 'package:employeeos/view/dashboard/presentation/pages/user_dashboard_view.dart';
-import 'package:employeeos/view/filemanager/presentation/pages/filemanager_view.dart';
-import 'package:employeeos/view/hiring/presentation/pages/hiring_page.dart';
-import 'package:employeeos/view/home/presentation/pages/home_view.dart';
-import 'package:employeeos/view/kanban/presentation/pages/kanban_view.dart';
-import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
-import 'package:employeeos/view/recruitment/presentation/pages/interview_scheduling_view.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_posting_page.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/add_job_posting_page.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/edit_posting/job_editing.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/view_posting/job_view_page.dart';
-import 'package:employeeos/view/user_management/presentation/pages/create_user_page.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';
+import 'package:employeeos/core/di/service_locator.dart';
+
+import 'routing_splash_page.dart';
+
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../view/index.dart';
+import '../../view/chat/presentation/bloc/chat_bloc.dart';
+import '../../view/recruitment/domain/index.dart' show JobPosting;
+import '../../view/chat/domain/entities/conversation.dart' show Conversation;
 
 part 'app_routes.g.dart';
 
@@ -95,42 +82,65 @@ class AppChatRoute extends GoRouteData {
 
 class ChatThreadRouteExtra {
   const ChatThreadRouteExtra({
-    required this.conversation,
-    required this.conversations,
+    this.conversation,
+    this.conversations,
     required this.currentUserId,
   });
 
-  final Conversation conversation;
-  final List<Conversation> conversations;
+  final Conversation? conversation;
+  final List<Conversation>? conversations;
   final String currentUserId;
+}
+
+@TypedGoRoute<AppChatNewRoute>(path: '/app/chat/new')
+class AppChatNewRoute extends GoRouteData {
+  const AppChatNewRoute({required this.$extra});
+
+  final ChatThreadRouteExtra $extra;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return BlocProvider.value(
+      value: sl<ChatBloc>(),
+      child: ThreadPage(
+        selectedConversation: null,
+        conversations: $extra.conversations,
+        currentUserId: $extra.currentUserId,
+        onConversationTap: (_) {},
+      ),
+    );
+  }
 }
 
 @TypedGoRoute<AppChatThreadRoute>(path: '/app/chat/thread/:conversationId')
 class AppChatThreadRoute extends GoRouteData {
   const AppChatThreadRoute({
     required this.conversationId,
-    this.$extra,
+    required this.$extra,
   });
 
   final String conversationId;
-  final ChatThreadRouteExtra? $extra;
+  final ChatThreadRouteExtra $extra;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final fallbackConversations = testConversations;
-    final fallbackSelected = fallbackConversations
-        .where((c) => c.id == conversationId)
-        .cast<Conversation?>()
-        .firstWhere((c) => c != null, orElse: () => null);
-    final selectedConversation = $extra?.conversation ?? fallbackSelected;
-    final conversations = $extra?.conversations ?? fallbackConversations;
-    final currentUserId = $extra?.currentUserId ?? 'user-123';
+    // final fallbackConversations = testConversations;
+    // final fallbackSelected = fallbackConversations
+    //     .where((c) => c.id == conversationId)
+    //     .cast<Conversation?>()
+    //     .firstWhere((c) => c != null, orElse: () => null);
+    final selectedConversation = $extra.conversation;
+    final conversations = $extra.conversations;
+    final currentUserId = $extra.currentUserId;
 
-    return ThreadPage(
-      selectedConversation: selectedConversation,
-      conversations: conversations,
-      currentUserId: currentUserId,
-      onConversationTap: (_) {},
+    return BlocProvider.value(
+      value: sl<ChatBloc>(),
+      child: ThreadPage(
+        selectedConversation: selectedConversation,
+        conversations: conversations,
+        currentUserId: currentUserId,
+        onConversationTap: (_) {},
+      ),
     );
   }
 }

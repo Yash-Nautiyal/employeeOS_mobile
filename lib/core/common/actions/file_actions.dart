@@ -6,6 +6,9 @@ String getFileIcon(String fileType) {
 
   switch (extension) {
     case 'txt':
+    case 'text':
+    case 'markdown':
+    case 'md':
       return 'assets/icons/file/ic-txt.svg';
     case 'zip':
     case 'rar':
@@ -70,5 +73,38 @@ String formatUserPermission(UserPermission permission) {
       return 'View';
     case UserPermission.edit:
       return 'Edit';
+  }
+}
+
+String getExtensionFromMime(String mimeType) {
+  switch (mimeType) {
+    // Word Documents
+    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    case 'application/msword':
+      return 'docx';
+      
+    // Text/Markdown
+    case 'text/markdown':
+      return 'md';
+      
+    // PDFs
+    case 'application/pdf':
+      return 'pdf';
+      
+    // Images
+    case 'image/jpeg':
+    case 'image/jpg':
+      return 'jpg';
+    case 'image/png':
+      return 'png';
+      
+    // Fallback for unknown types (uses your split logic)
+    default:
+      final parts = mimeType.split('/');
+      if (parts.length > 1) {
+        final subType = parts.last;
+        return subType.split('.').last;
+      }
+      return 'unknown';
   }
 }

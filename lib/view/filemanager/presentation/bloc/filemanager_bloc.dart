@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../domain/index.dart';
 
@@ -202,6 +203,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await addShareParticipantUsecase.call(event.fileId, event.user);
     } catch (e) {
+      debugPrint(e.toString());
       emit(FilemanagerErrorActionState('Failed to add share participant'));
       emit(currentState.copyWith(items: previousItems));
     }
@@ -244,8 +246,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
       if (item is FileItem && item.file.id == event.fileId) {
         final sharedWith = item.file.sharedWith ?? [];
         final updated = sharedWith.where((u) => u.id != event.userId).toList();
-        return FileItem(
-            item.file.copyWith(sharedWith: updated.isEmpty ? null : updated));
+        return FileItem(item.file.copyWith(sharedWith: updated));
       }
       return item;
     }).toList();
@@ -253,6 +254,7 @@ class FilemanagerBloc extends Bloc<FilemanagerEvent, FilemanagerState> {
     try {
       await removeShareParticipantUsecase.call(event.fileId, event.userId);
     } catch (e) {
+      debugPrint(e.toString());
       emit(FilemanagerErrorActionState('Failed to remove share participant'));
       emit(currentState.copyWith(items: previousItems));
     }

@@ -1,5 +1,6 @@
-import 'package:employeeos/view/kanban/presentation/index.dart' show ActionButton, AttachmentOwnerAvatar;
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:employeeos/view/kanban/presentation/index.dart'
+    show ActionButton, AttachmentOwnerAvatar;
 import 'package:flutter/material.dart';
 import 'package:employeeos/core/index.dart'
     show CustomExpansionTile, showCustomImageViewer;
@@ -77,9 +78,16 @@ class KanbanImageAttachmentsTile extends StatelessWidget {
                           ),
                           child: Container(
                             color: theme.colorScheme.surface,
-                            child: FastCachedImage(
-                              url: attachment.fileUrl,
+                            child: CachedNetworkImage(
+                              imageUrl: attachment.fileUrl,
                               fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => const Icon(
+                                Icons.error,
+                              ),
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      CircularProgressIndicator(
+                                          value: downloadProgress.progress),
                             ),
                           ),
                         ),

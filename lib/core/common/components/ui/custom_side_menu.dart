@@ -53,7 +53,7 @@ Future<void> showRightSideTaskDetails(
                                         end: Alignment(1.2, -1),
                                       )
                                     : AppPallete.lightBackgroundGradient),
-                        child: child),
+                        child: SafeArea(child: child)),
                   )),
             ),
           ),

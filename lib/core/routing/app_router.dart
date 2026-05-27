@@ -1,33 +1,18 @@
-import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
-import 'package:employeeos/core/routing/app_redirects.dart';
-import 'package:employeeos/core/routing/app_route_observer.dart';
-import 'package:employeeos/core/routing/app_routes.dart';
-import 'package:employeeos/core/routing/auth_router_refresh_notifier.dart';
-import 'package:employeeos/core/routing/routing_splash_page.dart';
-import 'package:employeeos/view/auth/presentation/pages/auth_view.dart';
-import 'package:employeeos/view/chat/data/test_data.dart';
-import 'package:employeeos/view/chat/domain/entities/conversation_models.dart';
-import 'package:employeeos/view/chat/presentation/pages/potrait/chat_view.dart';
-import 'package:employeeos/view/chat/presentation/pages/potrait/thread_page.dart';
-import 'package:employeeos/view/dashboard/presentation/pages/user_dashboard_view.dart';
-import 'package:employeeos/view/filemanager/presentation/pages/filemanager_view.dart';
-import 'package:employeeos/view/hiring/presentation/pages/hiring_page.dart';
-import 'package:employeeos/view/home/presentation/pages/home_view.dart';
-import 'package:employeeos/view/kanban/presentation/pages/kanban_view.dart';
-import 'package:employeeos/view/layout/presentation/pages/layout.dart';
-import 'package:employeeos/view/recruitment/domain/job_posting/entities/job_posting.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/interview_scheduling_view.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_application_view.dart';
-import 'package:employeeos/view/recruitment/presentation/pages/job_posting_page.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/add_posting/add_job_posting_page.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/edit_posting/job_editing.dart';
-import 'package:employeeos/view/recruitment/presentation/widget/job_posting/view_posting/job_view_page.dart';
-import 'package:employeeos/view/user_management/presentation/pages/create_user_page.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_account.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_cards.dart';
-import 'package:employeeos/view/user_management/presentation/pages/user_profile.dart';
+import '../../view/index.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'app_redirects.dart';
+import 'app_route_observer.dart';
+import 'app_routes.dart';
+import 'auth_router_refresh_notifier.dart';
+import 'routing_splash_page.dart';
+
+import '../../view/chat/presentation/bloc/chat_bloc.dart';
+import '../../view/recruitment/domain/index.dart' show JobPosting;
+import '../../core/auth/bloc/auth_bloc.dart';
+import 'package:employeeos/core/di/service_locator.dart';
 
 class AppRouterFactory {
   AppRouterFactory._();
@@ -77,20 +62,40 @@ class AppRouterFactory {
             GoRoute(
               path: '/app/chat/thread/:conversationId',
               builder: (context, state) {
-                final conversationId = state.pathParameters['conversationId'];
+                // final conversationId = state.pathParameters['conversationId'];
                 final extra = state.extra is ChatThreadRouteExtra
                     ? state.extra as ChatThreadRouteExtra
-                    : null;
-                final fallbackConversations = testConversations;
-                final fallbackSelected = fallbackConversations
-                    .where((c) => c.id == conversationId)
-                    .cast<Conversation?>()
-                    .firstWhere((c) => c != null, orElse: () => null);
-                return ThreadPage(
-                  selectedConversation: extra?.conversation ?? fallbackSelected,
-                  conversations: extra?.conversations ?? fallbackConversations,
-                  currentUserId: extra?.currentUserId ?? 'user-123',
-                  onConversationTap: (_) {},
+                    : const ChatThreadRouteExtra(
+                        currentUserId: '',
+                      );
+
+                return BlocProvider.value(
+                  value: sl<ChatBloc>(),
+                  child: ThreadPage(
+                    selectedConversation: extra.conversation,
+                    conversations: extra.conversations,
+                    currentUserId: extra.currentUserId,
+                    onConversationTap: (_) {},
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: '/app/chat/new',
+              builder: (context, state) {
+                // final conversationId = state.pathParameters['conversationId'];
+                final extra = state.extra is ChatThreadRouteExtra
+                    ? state.extra as ChatThreadRouteExtra
+                    : const ChatThreadRouteExtra(currentUserId: '');
+
+                return BlocProvider.value(
+                  value: sl<ChatBloc>(),
+                  child: ThreadPage(
+                    selectedConversation: null,
+                    conversations: extra.conversations,
+                    currentUserId: extra.currentUserId,
+                    onConversationTap: (_) {},
+                  ),
                 );
               },
             ),

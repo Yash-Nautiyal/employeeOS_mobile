@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_popup/flutter_popup.dart' show CustomPopupState;
 
 import '../../../index.dart'
     show
@@ -42,7 +41,7 @@ class FileManagerFilterSection extends StatefulWidget {
 }
 
 class _FileManagerFilterSectionState extends State<FileManagerFilterSection> {
-  final _fileTypeFilterAnchorKey = GlobalKey<CustomPopupState>();
+  final _fileTypeFilterAnchorKey = GlobalKey();
 
   @override
   void initState() {

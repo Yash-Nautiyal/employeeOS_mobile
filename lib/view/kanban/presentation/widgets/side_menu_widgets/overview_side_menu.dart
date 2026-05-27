@@ -15,7 +15,6 @@ class OverviewSideMenu extends StatelessWidget {
   final ScrollController sideMenuScrollController;
   final TextEditingController descriptionController;
   final Function(String) onPriorityChange;
-  final Function(String) onDescriptionChange;
   final void Function(DateTime? dueStart, DateTime? dueEnd) onDueDateChange;
   final VoidCallback? onSaveDescription;
   final Future<void> Function(List<KanbanUploadFile> files) onAttachmentChange;
@@ -33,6 +32,7 @@ class OverviewSideMenu extends StatelessWidget {
   final bool isAttachmentUploading;
   final List<KanbanAssignee> assignees;
   final VoidCallback onAddAssignees;
+
   const OverviewSideMenu({
     super.key,
     required this.task,
@@ -40,7 +40,6 @@ class OverviewSideMenu extends StatelessWidget {
     required this.sideMenuScrollController,
     required this.descriptionController,
     required this.onPriorityChange,
-    required this.onDescriptionChange,
     required this.onDueDateChange,
     this.onSaveDescription,
     required this.onAttachmentChange,
@@ -350,7 +349,7 @@ class OverviewSideMenu extends StatelessWidget {
                 hintText: 'Add discription here',
                 keyboardType: TextInputType.text,
                 maxLines: 3,
-                onchange: onDescriptionChange,
+                onchange: (value) {},
               ),
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: descriptionController,
@@ -378,7 +377,6 @@ class OverviewSideMenu extends StatelessWidget {
                                 ],
                               ),
                               onClick: () {
-                                onDescriptionChange(value.text);
                                 onSaveDescription?.call();
                               }),
                         )

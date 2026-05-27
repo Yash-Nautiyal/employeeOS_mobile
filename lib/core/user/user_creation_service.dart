@@ -24,6 +24,7 @@ class UserCreationService {
     List<int>? avatarBytes,
     String? avatarContentType,
   }) async {
+    
     final fn = firstName.trim();
     final ln = lastName.trim();
     final display = '$fn $ln'.trim();
@@ -34,6 +35,7 @@ class UserCreationService {
       if (dateOfJoining.trim().isNotEmpty) 'date_of_joining': dateOfJoining.trim(),
       if (dateOfRelieving.trim().isNotEmpty)
         'date_of_relieving': dateOfRelieving.trim(),
+      'role': role,
     };
 
     final userId = await _auth.signUpNewUserKeepCurrentSession(

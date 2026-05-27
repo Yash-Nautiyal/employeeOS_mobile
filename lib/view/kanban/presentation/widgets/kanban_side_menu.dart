@@ -6,9 +6,11 @@ import 'package:employeeos/core/index.dart'
         CustomToggleButton,
         showCustomToast;
 import 'package:employeeos/view/kanban/domain/modals/kanban_modal.dart';
+import 'package:employeeos/view/kanban/presentation/bloc/kanban_bloc.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/overview_side_menu.dart';
 import 'package:employeeos/view/kanban/presentation/widgets/side_menu_widgets/subtasks_side_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
@@ -286,9 +288,6 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
                     setState(() => _priority = value);
                     widget.onPriorityChanged(value);
                   },
-                  onDescriptionChange: (value) {
-                    setState(() => _descriptionController.text = value);
-                  },
                   dueStart: _dueStart,
                   dueEnd: _dueEnd,
                   onDueDateChange: (start, end) {
@@ -417,41 +416,48 @@ class _KanbanSideMenuState extends State<KanbanSideMenu> {
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0)
                       .copyWith(bottom: 10),
-                  child: SubtasksSideMenu(
-                    taskId: widget.task.id,
-                    initialSubtasks: _subtasks,
-                    onSubtaskAdded: (name) {
-                      setState(() {});
-                      widget.onSubtaskAdded(name);
-                    },
-                    onSubtaskToggled: (subtaskId, completed) {
-                      setState(() {
-                        final i =
-                            _subtasks.indexWhere((s) => s.id == subtaskId);
-                        if (i != -1) {
-                          _subtasks = List.from(_subtasks)
-                            ..[i] = _subtasks[i].copyWith(completed: completed);
-                        }
-                      });
-                      widget.onSubtaskToggled(subtaskId, completed);
-                    },
-                    onSubtaskRenamed: (subtaskId, name) {
-                      setState(() {
-                        final i =
-                            _subtasks.indexWhere((s) => s.id == subtaskId);
-                        if (i != -1) {
-                          _subtasks = List.from(_subtasks)
-                            ..[i] = _subtasks[i].copyWith(name: name);
-                        }
-                      });
-                      widget.onSubtaskRenamed(subtaskId, name);
-                    },
-                    onSubtaskDeleted: (subtaskId) {
-                      setState(() {
-                        _subtasks =
-                            _subtasks.where((s) => s.id != subtaskId).toList();
-                      });
-                      widget.onSubtaskDeleted(subtaskId);
+                  child: BlocBuilder<KanbanBloc, KanbanState>(
+                    builder: (context, state) {
+                      return BlocProvider.value(
+                        value: context.read<KanbanBloc>(),
+                        child: SubtasksSideMenu(
+                          taskId: widget.task.id,
+                          onSubtaskAdded: (name) {
+                            widget.onSubtaskAdded(name);
+                          },
+                          onSubtaskToggled: (subtaskId, completed) {
+                            setState(() {
+                              final i = _subtasks
+                                  .indexWhere((s) => s.id == subtaskId);
+                              if (i != -1) {
+                                _subtasks = List.from(_subtasks)
+                                  ..[i] = _subtasks[i]
+                                      .copyWith(completed: completed);
+                              }
+                            });
+                            widget.onSubtaskToggled(subtaskId, completed);
+                          },
+                          onSubtaskRenamed: (subtaskId, name) {
+                            setState(() {
+                              final i = _subtasks
+                                  .indexWhere((s) => s.id == subtaskId);
+                              if (i != -1) {
+                                _subtasks = List.from(_subtasks)
+                                  ..[i] = _subtasks[i].copyWith(name: name);
+                              }
+                            });
+                            widget.onSubtaskRenamed(subtaskId, name);
+                          },
+                          onSubtaskDeleted: (subtaskId) {
+                            setState(() {
+                              _subtasks = _subtasks
+                                  .where((s) => s.id != subtaskId)
+                                  .toList();
+                            });
+                            widget.onSubtaskDeleted(subtaskId);
+                          },
+                        ),
+                      );
                     },
                   ),
                 ),

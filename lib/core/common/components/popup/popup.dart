@@ -12,6 +12,7 @@ class Popup extends StatefulWidget {
   final Offset manualOffset;
   final double? arrowOffset;
   final double width;
+  final bool isTextButton;
 
   /// If set, uses this color for the arrow; otherwise uses [ThemeData.cardColor].
   final Color? arrowColor;
@@ -27,6 +28,7 @@ class Popup extends StatefulWidget {
     this.manualOffset = const Offset(0, 8),
     this.arrowOffset,
     this.width = 130,
+    this.isTextButton = false,
     this.arrowColor,
   });
 
@@ -40,34 +42,63 @@ class _PopupState extends State<Popup> {
     return CompositedTransformTarget(
       key: widget.popupAnchorKey,
       link: widget.layerLink,
-      child: IconButton(
-        icon: widget.icon,
-        onPressed: () {
-          widget.popupController.show(
-            context: context,
-            link: widget.layerLink,
-            anchorKey: widget.popupAnchorKey,
-            preferredPosition: widget.preferredPosition,
-            manualOffset: widget.manualOffset,
-            popupWidth: widget.width,
-            childBuilder: (placement) => ResponsivePopupContainer(
-              width: widget.width,
-              arrowSide: placement.arrowSide,
-              arrowOffset: widget.arrowOffset ?? placement.arrowOffset,
-              arrowColor: widget.arrowColor,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ...widget.items,
-                  ],
-                ),
-              ),
+      child: widget.isTextButton
+          ? TextButton(
+              child: widget.icon,
+              onPressed: () {
+                widget.popupController.show(
+                  context: context,
+                  link: widget.layerLink,
+                  anchorKey: widget.popupAnchorKey,
+                  preferredPosition: widget.preferredPosition,
+                  manualOffset: widget.manualOffset,
+                  popupWidth: widget.width,
+                  childBuilder: (placement) => ResponsivePopupContainer(
+                    width: widget.width,
+                    arrowSide: placement.arrowSide,
+                    arrowOffset: widget.arrowOffset ?? placement.arrowOffset,
+                    arrowColor: widget.arrowColor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ...widget.items,
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )
+          : IconButton(
+              icon: widget.icon,
+              onPressed: () {
+                widget.popupController.show(
+                  context: context,
+                  link: widget.layerLink,
+                  anchorKey: widget.popupAnchorKey,
+                  preferredPosition: widget.preferredPosition,
+                  manualOffset: widget.manualOffset,
+                  popupWidth: widget.width,
+                  childBuilder: (placement) => ResponsivePopupContainer(
+                    width: widget.width,
+                    arrowSide: placement.arrowSide,
+                    arrowOffset: widget.arrowOffset ?? placement.arrowOffset,
+                    arrowColor: widget.arrowColor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ...widget.items,
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }
