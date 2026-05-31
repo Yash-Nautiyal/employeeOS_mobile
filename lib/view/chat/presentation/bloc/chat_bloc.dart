@@ -2,17 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
-import 'package:employeeos/view/chat/domain/entities/participant.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/error/failures.dart';
+import '../../domain/entities/participant.dart';
 import '../../domain/entities/conversation.dart';
 import '../../domain/usecases/add_reaction.dart';
 import '../../domain/usecases/create_conversation.dart';
 import '../../domain/usecases/get_available_users.dart';
 import '../../domain/usecases/listen_to_conversations.dart';
 import '../../domain/usecases/listen_to_messages.dart';
+import '../../domain/usecases/mark_conversation_as_read.dart';
 import '../../domain/usecases/send_message.dart';
 
 part 'chat_event.dart';
@@ -25,6 +26,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final AddReactionUseCase addReaction;
   final CreateConversationUseCase createConversation;
   final GetAvailableUsersUseCase getAvailableUsers;
+  final MarkConversationAsReadUseCase markConversationAsRead;
 
   StreamSubscription? _inboxSubscription;
   StreamSubscription? _threadSubscription;
@@ -36,6 +38,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.addReaction,
     required this.createConversation,
     required this.getAvailableUsers,
+    required this.markConversationAsRead,
   }) : super(const ChatState()) {
     on<StartListeningConversationsEvent>(_onStartListeningConversations);
     on<_ConversationsUpdatedEvent>(_onConversationsUpdated);
@@ -107,6 +110,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     SelectConversationEvent event,
     Emitter<ChatState> emit,
   ) {
+    if (event.conversationId.isEmpty) return;
+
     final index =
         state.conversations.indexWhere((c) => c.id == event.conversationId);
     if (index == -1) return;
@@ -120,6 +125,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _threadSubscription = listenToMessages(event.conversationId).listen(
       (result) => add(_ThreadUpdatedEvent(result)),
     );
+
+    markConversationAsRead(
+        conversationId: event.conversationId, userId: event.currentUserId);
   }
 
   void _onThreadUpdated(
@@ -132,10 +140,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         lastAction:
             ChatUIAction(type: UIActionType.error, message: failure.message),
       )),
-      (conversation) => emit(state.copyWith(
-        selectedConversation: conversation,
-        status: ChatStatus.loaded,
-      )),
+      (conversation) {
+        final updatedConversations = state.conversations.map((c) {
+          return c.id == conversation.id ? conversation : c;
+        }).toList();
+        emit(state.copyWith(
+          conversations: updatedConversations,
+          selectedConversation: conversation,
+          status: ChatStatus.loaded,
+        ));
+      },
     );
   }
 

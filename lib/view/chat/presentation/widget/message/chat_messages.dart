@@ -36,17 +36,23 @@ class ChatMessages extends StatelessWidget {
     if (batch != null && batch!.length > 2) {
       // Handle batch images
       final count = batch!.length;
-      final maxWidth = isMe
+      final width = isMe
           ? isLandscape
               ? MediaQuery.of(context).size.width * 0.5
               : MediaQuery.of(context).size.width * 0.7
           : MediaQuery.of(context).size.width * 0.6;
+      final maxWidth = isMe
+          ? isLandscape
+              ? 300.0
+              : 250.0
+          : MediaQuery.of(context).size.width * 0.65;
       // 3-image special layout
       if (count == 3) {
         return Align(
           alignment: isMe ? Alignment.topRight : Alignment.topLeft,
           child: Container(
             height: 200,
+            width: width,
             constraints: BoxConstraints(maxWidth: maxWidth),
             child: Row(
               children: [

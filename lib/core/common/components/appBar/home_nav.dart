@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/core/common/components/ui/custom_bagde.dart';
 import 'package:employeeos/core/common/components/header/profile/profile.dart';
@@ -203,7 +204,7 @@ class _HomeNavState extends State<HomeNav> with TickerProviderStateMixin {
                     child: CircleAvatar(
                       radius: 14,
                       backgroundColor: widget.theme.colorScheme.surfaceVariant,
-                      backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
+                      backgroundImage: hasAvatar ? CachedNetworkImageProvider(avatarUrl) : null,
                       child: hasAvatar
                           ? null
                           : Text(

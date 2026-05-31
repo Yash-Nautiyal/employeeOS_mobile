@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/common/components/dialog/slide_dialog.dart';
 import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
@@ -69,7 +70,7 @@ class ProfileDialog extends StatelessWidget {
                     CircleAvatar(
                       radius: 30,
                       backgroundImage:
-                          hasAvatar ? NetworkImage(avatarUrl) : null,
+                          hasAvatar ? CachedNetworkImageProvider(avatarUrl) : null,
                       child: !hasAvatar
                           ? Text(
                               initials,

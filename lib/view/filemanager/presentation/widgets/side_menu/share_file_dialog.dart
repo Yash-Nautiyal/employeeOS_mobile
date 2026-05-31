@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/common/actions/file_actions.dart'
     show formatUserPermission;
 import 'package:employeeos/core/common/components/ui/custom_textbutton.dart';
@@ -83,7 +84,7 @@ class ShareFileDialog extends StatelessWidget {
                           CircleAvatar(
                             radius: 14,
                             backgroundImage: user.avatarUrl.isNotEmpty
-                                ? NetworkImage(user.avatarUrl)
+                                ? CachedNetworkImageProvider(user.avatarUrl)
                                 : null,
                             child: user.avatarUrl.isEmpty
                                 ? Text(

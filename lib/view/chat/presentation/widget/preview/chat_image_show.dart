@@ -49,7 +49,7 @@ class _ChatImageShowState extends State<ChatImageShow>
     super.didChangeDependencies();
     // now it's safe to depend on InheritedWidgets like MediaQuery, Theme, etc.
     for (var url in widget.imageUrlsandFileName.keys) {
-      precacheImage(NetworkImage(url), context);
+      precacheImage(CachedNetworkImageProvider(url), context);
     }
   }
 

@@ -116,7 +116,7 @@ class _ChatMessageReactionsOverlayState
     final theme = Theme.of(context);
     final isMe = widget.isMe;
 
-    final Offset lift = Offset(isMe ? -50 : 10, -5); // gentle outward lift
+    const Offset lift = Offset(0, -2); // gentle outward lift
 
     return AnimatedBuilder(
       animation: _t,
@@ -138,7 +138,9 @@ class _ChatMessageReactionsOverlayState
               ),
             ),
 
-            // Elevated bubble, anchored (hero out/in)
+            // ----------------------------------------------------
+            // FIX 1: THE ELEVATED BUBBLE (Prevents text clipping)
+            // ----------------------------------------------------
             CompositedTransformFollower(
               link: widget.anchor,
               showWhenUnlinked: false,
@@ -146,67 +148,80 @@ class _ChatMessageReactionsOverlayState
               child: Opacity(
                 opacity: v,
                 child: Transform.scale(
-                  scale: 1 + 0.06 * v,
-                  child: widget.bubble,
+                  scale: 1 + 0.03 * v,
+                  // Scale from the correct edge so it expands inward, not outward!
+                  alignment:
+                      isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  child: SizedBox(
+                    // Lock the overlay bubble to its original exact pixel width!
+                    width: widget.bubbleWidth,
+                    child: widget.bubble,
+                  ),
                 ),
               ),
             ),
 
-            // Reactions bar, aligned to absolute RIGHT (me) or LEFT (others)
+            // ----------------------------------------------------
+            // FIX 2: THE EMOJI BAR (Prevents yellow/black overflow)
+            // ----------------------------------------------------
             CompositedTransformFollower(
               link: widget.anchor,
               showWhenUnlinked: false,
-              offset: const Offset(0, -88), // above the bubble
-              child: SizedBox(
-                width: widget.bubbleWidth, // align within bubble width
-                child: Align(
-                  alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-                  child: Transform.translate(
-                    offset: Offset(0, 12 * (1 - v)),
-                    child: Transform.scale(
-                      scale: 0.9 + 0.1 * v,
-                      child: Opacity(
-                        opacity: v,
-                        child: Material(
-                          elevation: 8,
-                          borderRadius: BorderRadius.circular(30),
-                          color: theme.colorScheme.surface,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 6),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                '👍',
-                                '❤️',
-                                '😂',
-                                '😮',
-                                '😢',
-                                '😠',
-                                '➕',
-                              ]
-                                  .map((e) => InkWell(
-                                        borderRadius: BorderRadius.circular(20),
-                                        onTap: () {
-                                          if (e == '➕') {
-                                            showEmojiBottomSheet(
-                                              theme: theme,
-                                            );
-                                          } else {
-                                            widget.onPick(e);
-                                          }
-                                          _close();
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 6),
-                                          child: Text(e,
-                                              style: const TextStyle(
-                                                  fontSize: 22)),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
+              // Anchor perfectly to the edge of the bubble
+              offset: Offset(isMe ? widget.bubbleWidth : 0, -70),
+
+              child: FractionalTranslation(
+                // Pull the bar backward by 100% of its own intrinsic width
+                translation: Offset(isMe ? -1 : 0, 0),
+
+                child: Transform.translate(
+                  offset: Offset(0, 12 * (1 - v)),
+                  child: Transform.scale(
+                    scale: 0.9 + 0.1 * v,
+                    alignment:
+                        isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                    child: Opacity(
+                      opacity: v,
+                      child: Material(
+                        elevation: 8,
+                        borderRadius: BorderRadius.circular(30),
+                        color: theme.colorScheme.surface,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 6),
+                          child: Row(
+                            mainAxisSize:
+                                MainAxisSize.min, // Allows natural width
+                            children: const [
+                              '👍',
+                              '❤️',
+                              '😂',
+                              '😮',
+                              '😢',
+                              '😠',
+                              '➕',
+                            ]
+                                .map((e) => InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: () {
+                                        if (e == '➕') {
+                                          showEmojiBottomSheet(
+                                            theme: theme,
+                                          );
+                                        } else {
+                                          widget.onPick(e);
+                                        }
+                                        _close();
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6),
+                                        child: Text(e,
+                                            style:
+                                                const TextStyle(fontSize: 22)),
+                                      ),
+                                    ))
+                                .toList(),
                           ),
                         ),
                       ),

@@ -209,7 +209,6 @@ class _MenuDrawerState extends State<MenuDrawer> {
                     'Account',
                     'Profile',
                     'Card',
-                    'Create User',
                     if (profile != null && !profile.isEmployee) 'Create',
                   ],
                 ),

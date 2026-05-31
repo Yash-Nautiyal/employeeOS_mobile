@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_message.dart';
 import 'package:employeeos/view/chat/domain/entities/participant.dart';
@@ -16,7 +17,7 @@ class ChatMessageItem extends StatefulWidget {
   final ChatMessage? repliedMessage;
   final Function(ChatMessage message) onSwipeMessage;
   final Map<String, String> imageUrlsandFileName;
-  final Function(String reaction, String messageId) handleReaction;
+  final Function(String reaction, ChatMessage messageId) handleReaction;
   final List<ImageMessage>? batch; // Add batch for image messages
 
   const ChatMessageItem({
@@ -114,9 +115,11 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             padding: const EdgeInsets.only(right: 8.0),
             child: CircleAvatar(
               radius: 17,
-              backgroundImage: NetworkImage(widget.participants
-                  .firstWhere((p) => p.id == widget.message.authorId)
-                  .avatarUrl),
+              backgroundImage: CachedNetworkImageProvider(
+                widget.participants
+                    .firstWhere((p) => p.id == widget.message.authorId)
+                    .avatarUrl,
+              ),
             ),
           ),
         if (!widget.showTimestamp) const SizedBox(width: 37),
@@ -144,6 +147,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                       repliedMessage: widget.repliedMessage!,
                       currentUserId: widget.currentUserId,
                       theme: theme,
+                      participants: widget.participants,
                     ),
                   if (widget.batch != null && widget.batch!.isNotEmpty)
                     ChatMessages(
@@ -169,7 +173,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                           : null,
                       iconColor: AppPallete.grey600,
                       swipeSensitivity: 5,
-                      offsetDx: .15,
+                      offsetDx: .2,
                       iconSize: 24,
                       child: GestureDetector(
                         onLongPress: () {
@@ -215,8 +219,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                                 imageUrlsandFileName:
                                     widget.imageUrlsandFileName,
                               ),
-                              onPick: (emoji) => widget.handleReaction(
-                                  emoji, widget.message.id),
+                              onPick: (emoji) =>
+                                  widget.handleReaction(emoji, widget.message),
                               onProgress: (v) =>
                                   _liftT.value = v, // << sync ghosting progress
                               onRequestClose: requestClose,

@@ -1,6 +1,7 @@
 import 'package:avatar_stack/animated_avatar_stack.dart'
     show AnimatedAvatarStack;
 import 'package:avatar_stack/positions.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/common/actions/date_time_actions.dart'
     show formatRelativeTime;
 import 'package:employeeos/core/theme/app_pallete.dart';
@@ -8,6 +9,7 @@ import 'package:employeeos/view/chat/domain/entities/chat_message.dart'
     show TextMessage;
 import 'package:employeeos/view/chat/domain/entities/conversation.dart'
     show Conversation, ConversationType;
+import 'package:employeeos/view/chat/domain/entities/participant.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -81,19 +83,19 @@ class ChatNavItem extends StatelessWidget {
                               avatars: [
                                 for (var participant in conv.participants)
                                   if (participant.id != currentUserId)
-                                    NetworkImage(participant.avatarUrl),
+                                    CachedNetworkImageProvider(
+                                        participant.avatarUrl),
                               ],
                             ),
                           )
                         : badges.Badge(
                             badgeContent: CircleAvatar(
-                              radius: 7,
-                              backgroundColor: theme.scaffoldBackgroundColor,
-                              child: const CircleAvatar(
-                                radius: 5,
-                                backgroundColor: AppPallete.successMain,
-                              ),
-                            ),
+                                radius: 7,
+                                backgroundColor: theme.scaffoldBackgroundColor,
+                                child: conv.participants
+                                    .firstWhere((p) => p.id != currentUserId)
+                                    .status
+                                    .statusBadge(theme)),
                             badgeStyle: const badges.BadgeStyle(
                                 badgeColor: Colors.transparent),
                             position: badges.BadgePosition.bottomEnd(
@@ -145,14 +147,19 @@ class ChatNavItem extends StatelessWidget {
                                   maxLines: 1,
                                 ),
                               ),
-                              // Badge(
-                              //   backgroundColor: AppPallete.successMain,
-                              //   label: Text(
-                              //     '2',
-                              //     style: theme.textTheme.labelLarge
-                              //         ?.copyWith(color: AppPallete.white),
-                              //   ),
-                              // )
+                              if (conv.unreadCount > 0)
+                                badges.Badge(
+                                  badgeStyle: const badges.BadgeStyle(
+                                    badgeColor: AppPallete.successMain,
+                                    padding: EdgeInsets.all(5),
+                                  ),
+                                  badgeContent: Text(
+                                    '${conv.unreadCount}',
+                                    style: theme.textTheme.labelLarge?.copyWith(
+                                      color: AppPallete.white,
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ],

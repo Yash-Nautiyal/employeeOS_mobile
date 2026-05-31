@@ -154,7 +154,16 @@ class _ThreadPageLandscapeState extends State<ThreadPageLandscape>
                               ),
                             ),
                             itemBuilder: (context, index) {
-                              final conv = widget.conversations[index];
+                              final items =
+                                  List<Conversation>.from(widget.conversations)
+                                    ..sort((a, b) {
+                                      final aTime =
+                                          a.messages.last.createdAt.toLocal();
+                                      final bTime =
+                                          b.messages.last.createdAt.toLocal();
+                                      return bTime.compareTo(aTime);
+                                    });
+                              final conv = items[index];
                               if (conv.messages.isEmpty) {
                                 return const SizedBox.shrink();
                               }

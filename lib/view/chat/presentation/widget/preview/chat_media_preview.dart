@@ -40,7 +40,7 @@ class MediaPreviewItem {
 class ChatMediaPreview extends StatefulWidget {
   final List<MediaPreviewItem> mediaItems;
   final VoidCallback onCancel;
-  final void Function(List<MediaPreviewItem>) onSend;
+  final void Function(List<MediaPreviewItem> items, String caption) onSend;
   final ThemeData theme;
 
   const ChatMediaPreview({
@@ -92,11 +92,6 @@ class _ChatMediaPreviewState extends State<ChatMediaPreview> {
   }
 
   void _onPageChanged(int index) {
-    // Save current caption before switching
-    if (_currentIndex < items.length) {
-      items[_currentIndex].caption = _captionController.text;
-    }
-
     setState(() {
       _currentIndex = index;
       _captionController.text = items[index].caption;
@@ -104,11 +99,7 @@ class _ChatMediaPreviewState extends State<ChatMediaPreview> {
   }
 
   void _handleSend() {
-    // Save the current caption before sending
-    if (_currentIndex < items.length) {
-      items[_currentIndex].caption = _captionController.text;
-    }
-    widget.onSend(items);
+    widget.onSend(items, _captionController.text.trim());
   }
 
   @override
@@ -264,11 +255,7 @@ class _ChatMediaPreviewState extends State<ChatMediaPreview> {
                         controller: _captionController,
                         keyboardType: TextInputType.multiline,
                         theme: theme,
-                        onchange: (value) {
-                          setState(() {
-                            _captionController.text = value;
-                          });
-                        },
+                        onchange: (value) {},
                         hintText: 'Add a caption...',
                         maxLines: 3,
                         labelText: "Caption",
@@ -329,46 +316,46 @@ class _ChatMediaPreviewState extends State<ChatMediaPreview> {
     return _buildFileIcon(item);
   }
 
-  Widget _buildPDFPreview(MediaPreviewItem item) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.15),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.picture_as_pdf,
-              size: 100,
-              color: Colors.red,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Text(
-              item.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            item.sizeString,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildPDFPreview(MediaPreviewItem item) {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Container(
+  //           padding: const EdgeInsets.all(32),
+  //           decoration: BoxDecoration(
+  //             color: Colors.red.withOpacity(0.15),
+  //             shape: BoxShape.circle,
+  //           ),
+  //           child: const Icon(
+  //             Icons.picture_as_pdf,
+  //             size: 100,
+  //             color: Colors.red,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 24),
+  //         Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 32),
+  //           child: Text(
+  //             item.name,
+  //             style: Theme.of(context)
+  //                 .textTheme
+  //                 .titleMedium
+  //                 ?.copyWith(fontWeight: FontWeight.bold),
+  //             textAlign: TextAlign.center,
+  //             maxLines: 2,
+  //             overflow: TextOverflow.ellipsis,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 8),
+  //         Text(
+  //           item.sizeString,
+  //           style: Theme.of(context).textTheme.bodyMedium,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildVideoPreview(MediaPreviewItem item) {
     return Center(

@@ -1,19 +1,18 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:employeeos/core/index.dart';
-import 'package:employeeos/view/chat/domain/entities/chat_message.dart';
-import 'package:employeeos/view/chat/domain/entities/conversation.dart'
+import 'package:employeeos/view/chat/data/models/chat_message_model.dart';
+import '../../domain/entities/chat_message.dart';
+import '../../domain/entities/conversation.dart'
     show Conversation, ConversationType;
-import 'package:employeeos/view/chat/presentation/bloc/chat_bloc.dart';
-import 'package:employeeos/view/chat/presentation/widget/appbar/chat_app_bar.dart';
-import 'package:employeeos/view/chat/presentation/pages/chat_message_list.dart';
-import 'package:employeeos/view/chat/presentation/widget/input/chat_input.dart';
-import 'package:employeeos/view/chat/presentation/widget/preview/chat_media_preview.dart';
+import '../bloc/chat_bloc.dart';
+import '../widget/appbar/chat_app_bar.dart';
+import '../widget/input/chat_input.dart';
+import '../widget/preview/chat_media_preview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'chat_message_list.dart';
 
 import '../../../../core/routing/app_routes.dart';
 import '../../domain/entities/participant.dart';
@@ -48,13 +47,13 @@ class _ThreadPageState extends State<ThreadPage> {
     super.initState();
     _currentUserId = widget.currentUserId;
 
-    final isNewChat = widget.selectedConversation == null ||
-        widget.selectedConversation?.id == 'new';
-    if (isNewChat) {
-      context
-          .read<ChatBloc>()
-          .add(LoadAvailableUsersEvent(currentUserId: _currentUserId));
-    }
+    // final isNewChat = widget.selectedConversation == null ||
+    //     widget.selectedConversation?.id == 'new';
+    // if (isNewChat) {
+    //   context
+    //       .read<ChatBloc>()
+    //       .add(LoadAvailableUsersEvent(currentUserId: _currentUserId));
+    // }
   }
 
   void handleSwipeMessage(ChatMessage message) {
@@ -76,7 +75,7 @@ class _ThreadPageState extends State<ThreadPage> {
             conversationId: widget.selectedConversation!.id,
             authorId: _currentUserId,
             text: text,
-            replyTo: replyMessage?.id,
+            replyTo: replyMessage?.dbId,
           ));
     }
     // If no conversation exists yet, create one!
@@ -142,25 +141,25 @@ class _ThreadPageState extends State<ThreadPage> {
         mediaItems: mediaItems,
         theme: Theme.of(context),
         onCancel: () => Navigator.of(context, rootNavigator: true).pop(),
-        onSend: (items) {
+        onSend: (items, caption) {
           Navigator.of(context, rootNavigator: true).pop();
-          _handleMediaSend(items);
+          _handleMediaSend(items, caption);
         },
       ),
     );
   }
 
-  void _handleMediaSend(List<MediaPreviewItem> items) {
-    // Convert preview items directly to dart:io File objects
+  void _handleMediaSend(List<MediaPreviewItem> items, String caption) {
     final files = items.map((item) => File(item.path)).toList();
-
+    final textToSend = caption.isNotEmpty ? caption : null;
     // SCENARIO A: The conversation already exists
     if (widget.selectedConversation != null) {
       context.read<ChatBloc>().add(SendMessageEvent(
             conversationId: widget.selectedConversation!.id,
             authorId: _currentUserId,
             attachments: files,
-            replyTo: replyMessage?.id,
+            replyTo: replyMessage?.dbId,
+            text: textToSend,
           ));
     }
     // SCENARIO B: Brand new conversation, initiated by an attachment!
@@ -168,7 +167,7 @@ class _ThreadPageState extends State<ThreadPage> {
       context.read<ChatBloc>().add(CreateConversationEvent(
             participantIds: [_selectedNewParticipant!.id],
             authorId: _currentUserId,
-            firstMessageText: null, // No text, just the files!
+            firstMessageText: textToSend, // No text, just the files!
             attachments: files,
           ));
     }
@@ -187,7 +186,6 @@ class _ThreadPageState extends State<ThreadPage> {
     // --- AUTO-POP LOGIC ---
     if (!widget.isEmbedded && !isPortrait) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        print("Popping to layout for landscape");
         if (mounted && Navigator.canPop(context)) {
           Navigator.of(context).pop();
         }
@@ -274,10 +272,10 @@ class _ThreadPageState extends State<ThreadPage> {
                 Expanded(
                   child: liveConversation == null
                       ? const EmptyContent(
-                          icon: 'assets/icons/empty/ic-folder-empty.svg',
-                          title: 'No conversation selected',
+                          icon: 'assets/icons/empty/ic-chat-active.svg',
+                          title: 'No Messages',
                           description:
-                              'Select a user or make group to start chatting',
+                              'Type your first message to start chatting',
                         )
                       : ChatMessageList(
                           conversationId: liveConversation.id,
@@ -301,6 +299,14 @@ class _ThreadPageState extends State<ThreadPage> {
                     onCancelReply: _cancelReply,
                     replyMessage: replyMessage,
                     currentUserId: _currentUserId,
+                    participants: liveConversation?.participants ?? [],
+                  ),
+                ),
+              ] else ...[
+                const Expanded(
+                  child: EmptyContent(
+                    icon: 'assets/icons/empty/ic-folder-empty.svg',
+                    title: 'No conversation selected',
                   ),
                 ),
               ]

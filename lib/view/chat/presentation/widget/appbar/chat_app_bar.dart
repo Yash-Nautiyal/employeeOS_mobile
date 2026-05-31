@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:avatar_stack/animated_avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/view/chat/domain/entities/conversation.dart';
 import 'package:employeeos/view/chat/presentation/widget/appbar/appbar_seach_field.dart';
 import 'package:flutter/material.dart';
@@ -137,7 +137,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                         for (var participant
                             in widget.conversation!.participants)
                           if (participant.id != widget.currentUserId)
-                            NetworkImage(participant.avatarUrl),
+                            CachedNetworkImageProvider(participant.avatarUrl),
                       ],
                     ),
                   )
@@ -199,41 +199,41 @@ class _ChatAppBarState extends State<ChatAppBar> {
               },
               theme: widget.theme,
             ),
-          if (!showSearchbar) ...[
-            IconButton(
-              constraints: const BoxConstraints(
-                maxWidth: 32,
-                maxHeight: 32,
-              ),
-              onPressed: () {
-                setState(() {
-                  sidebar = !sidebar;
-                });
-              },
-              icon: SvgPicture.asset(
-                sidebar
-                    ? 'assets/icons/common/solid/ic-ri_sidebar-unfold-fill.svg'
-                    : 'assets/icons/common/solid/ic-ri_sidebar-fold-fill.svg',
-                color: AppPallete.grey600,
-              ),
-            ),
-            IconButton(
-              constraints: const BoxConstraints(
-                maxWidth: 32,
-                maxHeight: 32,
-              ),
-              onPressed: () {
-                // TODO: Implement more options menu
-              },
-              icon: SvgPicture.asset(
-                'assets/icons/common/solid/ic-eva_more-vertical-fill.svg',
-                colorFilter: const ColorFilter.mode(
-                  AppPallete.grey600,
-                  BlendMode.srcIn,
-                ),
-              ),
-            )
-          ]
+          // if (!showSearchbar) ...[
+          //   IconButton(
+          //     constraints: const BoxConstraints(
+          //       maxWidth: 32,
+          //       maxHeight: 32,
+          //     ),
+          //     onPressed: () {
+          //       setState(() {
+          //         sidebar = !sidebar;
+          //       });
+          //     },
+          //     icon: SvgPicture.asset(
+          //       sidebar
+          //           ? 'assets/icons/common/solid/ic-ri_sidebar-unfold-fill.svg'
+          //           : 'assets/icons/common/solid/ic-ri_sidebar-fold-fill.svg',
+          //       color: AppPallete.grey600,
+          //     ),
+          //   ),
+          //   IconButton(
+          //     constraints: const BoxConstraints(
+          //       maxWidth: 32,
+          //       maxHeight: 32,
+          //     ),
+          //     onPressed: () {
+          //       // TODO: Implement more options menu
+          //     },
+          //     icon: SvgPicture.asset(
+          //       'assets/icons/common/solid/ic-eva_more-vertical-fill.svg',
+          //       colorFilter: const ColorFilter.mode(
+          //         AppPallete.grey600,
+          //         BlendMode.srcIn,
+          //       ),
+          //     ),
+          //   )
+          // ]
         ],
       ),
     );

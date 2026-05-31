@@ -48,4 +48,10 @@ abstract class ChatRepository {
     required String emoji,
     required String userId,
   });
+
+  /// Marks a conversation as read by updating the user's last_read_at timestamp
+  Future<Either<Failure, void>> markConversationAsRead({
+    required String conversationId,
+    required String userId,
+  });
 }

@@ -8,18 +8,21 @@ import 'package:shimmer/shimmer.dart';
 import 'package:employeeos/core/theme/app_pallete.dart';
 import 'package:employeeos/view/chat/domain/entities/chat_message.dart';
 
+import '../../../domain/entities/participant.dart';
+
 class ChatReply extends StatelessWidget {
   final ChatMessage repliedMessage;
   final String currentUserId;
   final bool preview;
   final ThemeData theme;
-
+  final List<Participant> participants;
   const ChatReply({
     super.key,
     required this.repliedMessage,
     required this.currentUserId,
     required this.theme,
     this.preview = false,
+    required this.participants,
   });
 
   @override
@@ -47,18 +50,21 @@ class ChatReply extends StatelessWidget {
       ),
       child: !preview
           ? IntrinsicWidth(
-              child: content(theme, repliedMessage, currentUserId, preview))
+              child: content(
+                  theme, repliedMessage, currentUserId, preview, participants))
           : repliedMessage is ImageMessage
               ? IntrinsicWidth(
-                  child: content(theme, repliedMessage, currentUserId, preview),
+                  child: content(theme, repliedMessage, currentUserId, preview,
+                      participants),
                 )
-              : content(theme, repliedMessage, currentUserId, preview),
+              : content(
+                  theme, repliedMessage, currentUserId, preview, participants),
     );
   }
 }
 
 Widget content(ThemeData theme, ChatMessage repliedMessage,
-    String currentUserId, bool preview) {
+    String currentUserId, bool preview, List<Participant> participants) {
   return Row(
     children: [
       Expanded(
@@ -68,13 +74,13 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
             Text(
               repliedMessage.authorId == currentUserId
                   ? 'You'
-                  : repliedMessage.authorId,
+                  : participants
+                      .firstWhere((p) => p.id == repliedMessage.authorId)
+                      .name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: theme.colorScheme.tertiary,
-                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 5),
@@ -83,11 +89,7 @@ Widget content(ThemeData theme, ChatMessage repliedMessage,
                 (repliedMessage).text,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: theme.disabledColor,
-                  fontSize: 14,
-                ),
+                style: theme.textTheme.bodySmall,
               )
             else if (repliedMessage is ImageMessage)
               CachedNetworkImage(

@@ -22,19 +22,7 @@ class ChatMessageMapper {
             .toList() ??
         [];
 
-    // 1. If there is actual text, extract it as its own message
-    if (bodyText.isNotEmpty) {
-      result.add(TextMessage(
-        id: '$id-text', // Ensure unique ID
-        authorId: authorId,
-        createdAt: createdAt,
-        text: bodyText,
-        replyTo: replyTo,
-        reactions: reactions,
-      ));
-    }
-
-    // 2. Loop through ALL attachments (No more .first!)
+    // --- 1. ATTACHMENTS FIRST (Draws them on top) ---
     final List<dynamic>? attachments = json['attachments'];
 
     if (attachments != null && attachments.isNotEmpty) {
@@ -49,9 +37,9 @@ class ChatMessageMapper {
 
         if (isImage) {
           result.add(ImageMessage(
-            id: '$id-att-$i', // Unique ID for each image
+            id: '$id-att-$i',
             authorId: authorId,
-            createdAt: createdAt, // Shared timestamp groups them in the UI!
+            createdAt: createdAt,
             url: url,
             name: name,
             size: size,
@@ -74,7 +62,18 @@ class ChatMessageMapper {
       }
     }
 
-    // 3. Fallback for completely empty messages
+    // --- 2. TEXT SECOND (Snaps the caption to the bottom) ---
+    if (bodyText.isNotEmpty) {
+      result.add(TextMessage(
+        id: '$id-text',
+        authorId: authorId,
+        createdAt: createdAt,
+        text: bodyText,
+        replyTo: replyTo,
+        reactions: reactions,
+      ));
+    }
+
     if (result.isEmpty) {
       result.add(TextMessage(
         id: id,
@@ -110,5 +109,12 @@ class ChatMessageMapper {
             ]
           : [],
     };
+  }
+}
+
+extension ChatMessageIdBridge on ChatMessage {
+  /// Automatically strips UI suffixes (-text, -att-0) to return the pure Database UUID
+  String get dbId {
+    return id.replaceAll(RegExp(r'(-text|-att-\d+)$'), '');
   }
 }

@@ -40,6 +40,8 @@ abstract class ChatRemoteDataSource {
     required String emoji,
     required String userId,
   });
+
+  Future<void> markConversationAsRead(String conversationId, String userId);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -136,6 +138,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     RealtimeChannel? channel;
 
     Future<void> fetchAndEmit() async {
+      print('Fetching conversation $conversationId due to change ');
       try {
         final conversation = await getConversationById(conversationId);
         if (!controller.isClosed) {
@@ -166,7 +169,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
             event: PostgresChangeEvent.all,
             schema: 'public',
             table: 'message_reactions',
-            callback: (payload) => fetchAndEmit(), // Emits on reaction changes
+            callback: (payload) {
+              print('Got reaction change: $payload');
+              fetchAndEmit();
+            }, // Emits on reaction changes
           )
           ..onPostgresChanges(
             event: PostgresChangeEvent.all,
@@ -344,5 +350,15 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       'p_user_id': userId,
       'p_emoji': emoji,
     });
+  }
+
+  @override
+  Future<void> markConversationAsRead(
+      String conversationId, String userId) async {
+    await supabase
+        .from('conversation_participants')
+        .update({'last_read_at': DateTime.now().toUtc().toIso8601String()})
+        .eq('conversation_id', conversationId)
+        .eq('participant_id', userId);
   }
 }

@@ -1,8 +1,10 @@
 import 'package:avatar_stack/animated_avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:employeeos/view/chat/domain/entities/conversation.dart'
     show Conversation, ConversationType;
+import 'package:employeeos/view/chat/domain/entities/participant.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -56,7 +58,7 @@ class ChatNavItemLandscape extends StatelessWidget {
                       avatars: [
                         for (var participant in conv.participants)
                           if (participant.id != currentUserId)
-                            NetworkImage(participant.avatarUrl),
+                            CachedNetworkImageProvider(participant.avatarUrl),
                       ],
                     )
                   : Padding(
@@ -65,10 +67,10 @@ class ChatNavItemLandscape extends StatelessWidget {
                         badgeContent: CircleAvatar(
                           radius: 7,
                           backgroundColor: theme.scaffoldBackgroundColor,
-                          child: const CircleAvatar(
-                            radius: 5,
-                            backgroundColor: AppPallete.successMain,
-                          ),
+                          child: conv.participants
+                              .firstWhere((p) => p.id != currentUserId)
+                              .status
+                              .statusBadge(theme),
                         ),
                         badgeStyle: const badges.BadgeStyle(
                             badgeColor: Colors.transparent),
@@ -76,7 +78,8 @@ class ChatNavItemLandscape extends StatelessWidget {
                             end: -4.5, bottom: 0),
                         child: CircleAvatar(
                           radius: 27,
-                          backgroundImage: NetworkImage(conv.participants
+                          backgroundImage: CachedNetworkImageProvider(conv
+                              .participants
                               .firstWhere((p) => p.id != currentUserId)
                               .avatarUrl),
                         ),
@@ -90,7 +93,7 @@ class ChatNavItemLandscape extends StatelessWidget {
                   child: IgnorePointer(
                     ignoring: !isExpanded,
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 5.0),
+                      padding: const EdgeInsets.only(left: 2.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -107,9 +110,8 @@ class ChatNavItemLandscape extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w700,
                                     color: theme.colorScheme.tertiary,
-                                    fontSize: 15,
                                   ),
                                 ),
                               ),
@@ -128,21 +130,22 @@ class ChatNavItemLandscape extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   snippet,
-                                  style: theme.textTheme.bodySmall,
+                                  style: theme.textTheme.bodyMedium,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
                               ),
-                              // Badge(
-                              //   padding: const EdgeInsets.all(2),
-                              //   backgroundColor: AppPallete.successMain,
-                              //   label: Text(
-                              //     '2',
-                              //     style: theme.textTheme.bodySmall?.copyWith(
-                              //         color: AppPallete.white,
-                              //         fontWeight: FontWeight.w700),
-                              //   ),
-                              // )
+                              if (conv.unreadCount > 0)
+                                Badge(
+                                  padding: const EdgeInsets.all(2),
+                                  backgroundColor: AppPallete.successMain,
+                                  label: Text(
+                                    "${conv.unreadCount}",
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                        color: AppPallete.white,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                )
                             ],
                           ),
                         ],

@@ -24,7 +24,7 @@ final class _ConversationsUpdatedEvent extends ChatEvent {
 
 final class ResetChatEvent extends ChatEvent {
   const ResetChatEvent();
-  
+
   @override
   List<Object?> get props => [];
 }
@@ -40,10 +40,12 @@ final class ClearSelectedConversationEvent extends ChatEvent {
 
 final class SelectConversationEvent extends ChatEvent {
   final String conversationId;
-  const SelectConversationEvent({required this.conversationId});
+  final String currentUserId;
+  const SelectConversationEvent(
+      {required this.conversationId, required this.currentUserId});
 
   @override
-  List<Object> get props => [conversationId];
+  List<Object> get props => [conversationId, currentUserId];
 }
 
 final class _ThreadUpdatedEvent extends ChatEvent {
@@ -71,7 +73,7 @@ final class CreateConversationEvent extends ChatEvent {
   const CreateConversationEvent({
     required this.participantIds,
     required this.authorId,
-     this.firstMessageText,
+    this.firstMessageText,
     this.attachments,
   });
 

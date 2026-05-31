@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -89,7 +90,7 @@ class SharePropertyRow extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: theme.dividerColor,
-            backgroundImage: hasUrl ? NetworkImage(user.avatarUrl) : null,
+            backgroundImage: hasUrl ? CachedNetworkImageProvider(user.avatarUrl) : null,
             child: !hasUrl
                 ? Text(
                     initials,

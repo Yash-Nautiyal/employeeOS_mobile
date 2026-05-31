@@ -1,7 +1,7 @@
 import 'package:employeeos/core/index.dart';
-import 'package:employeeos/core/theme/app_pallete.dart';
-import 'package:employeeos/view/chat/domain/entities/chat_message.dart';
-import 'package:employeeos/view/chat/presentation/widget/message/chat_reply.dart';
+import 'package:employeeos/view/chat/domain/entities/participant.dart';
+import '../../../domain/entities/chat_message.dart' show ChatMessage;
+import '../message/chat_reply.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:toastification/toastification.dart';
@@ -14,6 +14,7 @@ class ChatInput extends StatefulWidget {
   final VoidCallback onPickFile;
   final ChatMessage? replyMessage;
   final VoidCallback onCancelReply;
+  final List<Participant> participants;
 
   const ChatInput({
     super.key,
@@ -24,6 +25,7 @@ class ChatInput extends StatefulWidget {
     required this.currentUserId,
     this.replyMessage,
     required this.onCancelReply,
+    required this.participants,
   });
 
   @override
@@ -81,6 +83,7 @@ class _ChatInputState extends State<ChatInput> {
                   repliedMessage: widget.replyMessage!,
                   theme: widget.theme,
                   preview: true,
+                  participants: widget.participants,
                 ),
               ),
             ),
@@ -110,11 +113,7 @@ class _ChatInputState extends State<ChatInput> {
               Expanded(
                 child: TextField(
                   controller: controller,
-                  onChanged: (value) {
-                    setState(() {
-                      controller.text = value;
-                    });
-                  },
+                  onChanged: (value) {},
                   onTapOutside: (event) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                   minLines: 1,
@@ -191,7 +190,13 @@ class _ChatInputState extends State<ChatInput> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  // TODO: Implement audio recording
+                  showCustomToast(
+                      context: context,
+                      type: ToastificationType.info,
+                      title: 'Feature coming soon');
+                },
                 constraints: const BoxConstraints(
                   minWidth: 32,
                   minHeight: 32,

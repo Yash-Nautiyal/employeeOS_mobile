@@ -1,7 +1,5 @@
-import 'package:employeeos/core/theme/app_pallete.dart' show AppPallete;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:badges/badges.dart' as badges;
 
 class ChatNavAppbarLandscape extends StatelessWidget {
   final ThemeData theme;
@@ -19,11 +17,12 @@ class ChatNavAppbarLandscape extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.all(5).copyWith(bottom: 10),
       alignment: Alignment.center,
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(isExpanded ? 10 : 6),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(50),
@@ -48,37 +47,32 @@ class ChatNavAppbarLandscape extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (isExpanded)
-                            SizedBox(
-                              width: 45,
-                              child: badges.Badge(
-                                badgeContent: CircleAvatar(
-                                  radius: 7,
-                                  backgroundColor:
-                                      theme.scaffoldBackgroundColor,
-                                  child: const CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor: AppPallete.successMain,
+                          if (isExpanded) ...[
+                            const SizedBox(width: 5),
+                            SvgPicture.asset(
+                              'assets/icons/ic-eva_search-fill.svg',
+                            ),
+                            Expanded(
+                              child: SizedBox(
+                                height: 45,
+                                child: TextField(
+                                  controller: controller,
+                                  keyboardType: TextInputType.text,
+                                  onChanged: (value) {},
+                                  decoration: InputDecoration(
+                                    hintText: "Search Conversation",
+                                    hintStyle: theme.textTheme.bodyMedium,
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                            horizontal: 10)
+                                        .copyWith(bottom: 3),
+                                    // focusedBorder: InputBorder.none,
                                   ),
                                 ),
-                                badgeStyle: const badges.BadgeStyle(
-                                    badgeColor: Colors.transparent),
-                                position: badges.BadgePosition.bottomEnd(
-                                    end: -4.5, bottom: 0),
-                                child: const CircleAvatar(),
                               ),
-                            ),
-                          if (isExpanded) const SizedBox(width: 5),
-                          if (isExpanded)
-                            Flexible(
-                              child: Text(
-                                // TODO: Replace with actual conversation name
-                                'Yash (You) Yash (You)',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                            ),
+                            )
+                          ]
                         ],
                       ),
                     ),
@@ -108,11 +102,11 @@ class ChatNavAppbarLandscape extends StatelessWidget {
           //   ),
           Align(
             alignment: Alignment.centerRight,
-            child: InkWell(
-              onTap: () {
+            child: IconButton(
+              onPressed: () {
                 onClickExpand.call();
               },
-              child: AnimatedRotation(
+              icon: AnimatedRotation(
                 turns: isExpanded
                     ? 0.5
                     : 0.0, // 180deg when expanded, 0deg when collapsed

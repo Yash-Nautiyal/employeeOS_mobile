@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/index.dart' show CustomDropdown;
 import 'package:flutter/material.dart';
 
@@ -64,7 +65,7 @@ class AppBarSeachField extends StatelessWidget {
                             CircleAvatar(
                               radius: 14,
                               backgroundImage: user.avatarUrl.isNotEmpty
-                                  ? NetworkImage(user.avatarUrl)
+                                  ? CachedNetworkImageProvider(user.avatarUrl)
                                   : null,
                               child: user.avatarUrl.isEmpty
                                   ? Text(

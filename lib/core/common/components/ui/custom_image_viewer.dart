@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -79,7 +80,7 @@ class _CustomImageViewerState extends State<CustomImageViewer> {
               backgroundDecoration: const BoxDecoration(color: Colors.black),
               builder: (context, index) {
                 return PhotoViewGalleryPageOptions(
-                  imageProvider: NetworkImage(widget.imageUrls[index]),
+                  imageProvider: CachedNetworkImageProvider(widget.imageUrls[index]),
                   minScale: PhotoViewComputedScale.contained,
                   maxScale: PhotoViewComputedScale.covered * 3,
                 );

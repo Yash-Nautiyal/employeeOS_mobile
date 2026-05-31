@@ -12,6 +12,7 @@ import '../../view/chat/domain/usecases/add_reaction.dart';
 import '../../view/chat/domain/usecases/listen_to_conversations.dart';
 import '../../view/chat/domain/usecases/listen_to_messages.dart';
 import '../../view/chat/domain/usecases/send_message.dart';
+import '../../view/chat/domain/usecases/mark_conversation_as_read.dart';
 
 import '../../view/chat/presentation/bloc/chat_bloc.dart';
 
@@ -55,6 +56,9 @@ Future<void> initDependencies() async {
   ServiceLocator.registerSingleton<GetAvailableUsersUseCase>(
     GetAvailableUsersUseCase(sl<ChatRepository>()),
   );
+  ServiceLocator.registerSingleton<MarkConversationAsReadUseCase>(
+    MarkConversationAsReadUseCase(sl<ChatRepository>()),
+  );
 
   // BLoC (Registered as a SINGLETON)
   // We use a Singleton so the Portrait router and Landscape split-view share the exact same state.
@@ -67,6 +71,7 @@ Future<void> initDependencies() async {
       sendMessage: sl<SendMessageUseCase>(),
       addReaction: sl<AddReactionUseCase>(),
       getAvailableUsers: sl<GetAvailableUsersUseCase>(),
+      markConversationAsRead: sl<MarkConversationAsReadUseCase>(),
     ),
   );
 }

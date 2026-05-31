@@ -6,11 +6,14 @@ import 'package:employeeos/view/chat/presentation/widget/nav/chat_nav_online.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../domain/entities/participant.dart' show Participant;
+
 class ChatNav extends StatefulWidget {
   final ThemeData theme;
   final String currentUserId;
   final List<Conversation> conversations;
   final VoidCallback onNewChatLandscape;
+  final List<Participant> onlineParticipants;
 
   final void Function(Conversation) onConversationTap;
   const ChatNav({
@@ -20,6 +23,7 @@ class ChatNav extends StatefulWidget {
     required this.onConversationTap,
     required this.currentUserId,
     required this.onNewChatLandscape,
+    required this.onlineParticipants,
   });
 
   @override
@@ -78,8 +82,8 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final items = List<Conversation>.from(widget.conversations)
       ..sort((a, b) {
-        final aTime = a.messages.first.createdAt;
-        final bTime = b.messages.first.createdAt;
+        final aTime = a.messages.last.createdAt.toLocal();
+        final bTime = b.messages.last.createdAt.toLocal();
         return bTime.compareTo(aTime);
       });
     return Column(
@@ -114,7 +118,10 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
                   elevation: 0,
                   pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
-                      background: ChatNavOnline(theme: widget.theme)),
+                      background: ChatNavOnline(
+                          theme: widget.theme,
+                          onlineParticipants: widget
+                              .onlineParticipants)), // Pass online participants here
                 ),
                 SliverPersistentHeader(
                   floating: true,
@@ -232,14 +239,14 @@ class _ChatNavState extends State<ChatNav> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Container(
-                    color: widget.theme.brightness == Brightness.dark
-                        ? AppPallete.grey800
-                        : const Color(0xFFEEECEA),
-                  ),
-                ),
+                // SliverFillRemaining(
+                //   hasScrollBody: false,
+                //   child: Container(
+                //     color: widget.theme.brightness == Brightness.dark
+                //         ? AppPallete.grey800
+                //         : const Color(0xFFEEECEA),
+                //   ),
+                // ),
               ],
             ),
           ),

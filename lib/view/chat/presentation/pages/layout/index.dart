@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/conversation.dart' show Conversation;
+import '../../../domain/entities/participant.dart' show Participant;
 import '../../bloc/chat_bloc.dart';
 import '../../widget/nav/chat_nav.dart';
 import '../thread_page_landscape.dart';
@@ -12,12 +13,14 @@ class Layout extends StatefulWidget {
   final String currentUserId;
   final List<Conversation> conversations;
   final Function onConversationTap;
+  final List<Participant> onlineParticipants;
   const Layout(
       {super.key,
       required this.selectedConversation,
       required this.currentUserId,
       required this.conversations,
-      required this.onConversationTap});
+      required this.onConversationTap,
+      required this.onlineParticipants});
 
   @override
   State<Layout> createState() => _LayoutState();
@@ -94,11 +97,13 @@ class _LayoutState extends State<Layout> {
                   ).push(context).then((_) {
                     if (mounted) {
                       _isTransitioningToPortraitThread = false;
-                      context.read<ChatBloc>().add(
-                          const SelectConversationEvent(conversationId: ''));
+                      context.read<ChatBloc>().add(SelectConversationEvent(
+                          conversationId: '',
+                          currentUserId: widget.currentUserId));
                     }
                   });
                 },
+                onlineParticipants: widget.onlineParticipants,
               ),
             ),
           ],

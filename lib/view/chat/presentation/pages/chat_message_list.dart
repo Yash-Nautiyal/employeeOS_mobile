@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:employeeos/core/common/actions/date_time_actions.dart'
     show formatDate, isSameDay, isSameMinute;
+import 'package:employeeos/view/chat/data/models/chat_message_model.dart';
 import 'package:employeeos/view/chat/domain/entities/participant.dart';
 import 'package:employeeos/view/chat/presentation/bloc/chat_bloc.dart';
 import 'package:flutter/material.dart';
@@ -46,13 +47,13 @@ class _ChatMessageListState extends State<ChatMessageList> {
   }
 
   void addReaction({
-    required String messageId,
+    required ChatMessage message,
     required String reaction,
   }) {
     // Dispatch to BLoC. Database will update, stream will trigger UI redraw.
     context.read<ChatBloc>().add(AddReactionEvent(
           conversationId: widget.conversationId,
-          messageId: messageId,
+          messageId: message.dbId,
           emoji: reaction,
           userId: widget.currentUserId,
         ));
@@ -113,13 +114,25 @@ class _ChatMessageListState extends State<ChatMessageList> {
                             widget.messages[i + 1].createdAt,
                           );
                   final bool showTimestamp = i == widget.messages.length - 1 ||
+                      widget.messages[i].authorId !=
+                          widget.messages[i + 1]
+                              .authorId || // Check if the sender changed!
                       !isSameMinute(
                         widget.messages[i].createdAt,
                         widget.messages[i + 1].createdAt,
                       );
-                  final repliedMessage = msg.replyTo != null
-                      ? widget.messages.firstWhere((m) => m.id == msg.replyTo)
-                      : null;
+
+                  ChatMessage? repliedMessage;
+                  if (msg.replyTo != null) {
+                    final targetIndex = widget.messages.indexWhere(
+                      (m) =>
+                          m.dbId ==
+                          msg.replyTo, // Compares pure UUID to pure UUID!
+                    );
+                    if (targetIndex != -1) {
+                      repliedMessage = widget.messages[targetIndex];
+                    }
+                  }
 
                   // 2. Batch logic
                   if (msg is ImageMessage &&
@@ -145,24 +158,99 @@ class _ChatMessageListState extends State<ChatMessageList> {
                       j++;
                     }
                     if (batch.length > 2) {
-                      i = j - 1; // skip them
+                      // --- FIX START: Recalculate divider for the batch boundary ---
+                      final int lastBatchIndex = j - 1;
+
+                      // 1. Calculate the Date Divider (Checks if the DAY changed)
+                      final bool batchShowDateDivider =
+                          lastBatchIndex == widget.messages.length - 1 ||
+                              !isSameDay(
+                                widget.messages[lastBatchIndex].createdAt,
+                                widget.messages[lastBatchIndex + 1].createdAt,
+                              );
+
+                      final bool batchShowTimestamp = lastBatchIndex ==
+                              widget.messages.length - 1 ||
+                          widget.messages[lastBatchIndex].authorId !=
+                              widget.messages[lastBatchIndex + 1].authorId ||
+                          !isSameMinute(
+                            widget.messages[lastBatchIndex].createdAt,
+                            widget.messages[lastBatchIndex + 1].createdAt,
+                          );
+
+                      i = lastBatchIndex; // skip themskip them
 
                       return Column(
                         children: [
-                          if (showDateDivider)
+                          if (batchShowDateDivider)
                             Padding(
-                              padding: const EdgeInsets.only(top: 20),
+                              padding: const EdgeInsets.only(top: 30),
                               child: Center(
-                                child: Text(
-                                  formatDate(msg.createdAt),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color:
-                                            widget.theme.colorScheme.tertiary,
-                                        fontWeight: FontWeight.w600,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        height: 1,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              widget.theme.dividerColor
+                                                  .withAlpha(0),
+                                              widget.theme.dividerColor
+                                                  .withAlpha(100),
+                                            ],
+                                          ),
+                                        ),
                                       ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: widget
+                                            .theme.colorScheme.surfaceContainer,
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: widget.theme.shadowColor
+                                                .withOpacity(0.05),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Text(
+                                        formatDate(widget
+                                            .messages[lastBatchIndex]
+                                            .createdAt),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: widget
+                                                  .theme.colorScheme.tertiary,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        height: 1,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              widget.theme.dividerColor
+                                                  .withAlpha(100),
+                                              widget.theme.dividerColor
+                                                  .withAlpha(0),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -176,14 +264,14 @@ class _ChatMessageListState extends State<ChatMessageList> {
                               message: batch.first,
                               isMe: isMe,
                               currentUserId: widget.currentUserId,
-                              showTimestamp: true,
+                              showTimestamp: batchShowTimestamp,
                               repliedMessage: repliedMessage,
                               batch: batch,
                               onSwipeMessage: widget.onSwipeMessage,
                               imageUrlsandFileName: _imagesUrlsandFileName,
-                              handleReaction: (reaction, messageId) =>
+                              handleReaction: (reaction, message) =>
                                   addReaction(
-                                      messageId: messageId, reaction: reaction),
+                                      message: message, reaction: reaction),
                             ),
                           ),
                         ],
@@ -278,8 +366,8 @@ class _ChatMessageListState extends State<ChatMessageList> {
                           repliedMessage: repliedMessage,
                           onSwipeMessage: widget.onSwipeMessage,
                           imageUrlsandFileName: _imagesUrlsandFileName,
-                          handleReaction: (reaction, messageId) => addReaction(
-                              messageId: messageId, reaction: reaction),
+                          handleReaction: (reaction, message) =>
+                              addReaction(message: message, reaction: reaction),
                         ),
                       ),
                     ],

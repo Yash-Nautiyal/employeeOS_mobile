@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../domain/entities/participant.dart' show ParticipantStatus;
 import 'layout/index.dart';
 
 class ChatView extends StatefulWidget {
@@ -26,6 +27,7 @@ class _ChatViewState extends State<ChatView> {
 
     sl<ChatBloc>()
         .add(StartListeningConversationsEvent(userId: _currentUserId));
+    sl<ChatBloc>().add(LoadAvailableUsersEvent(currentUserId: _currentUserId));
   }
 
   @override
@@ -56,6 +58,7 @@ class _ChatViewState extends State<ChatView> {
               );
             } else if (action.type == UIActionType.error &&
                 action.message != null) {
+              debugPrint("Error action received: ${action.message}");
               showCustomToast(
                 context: context,
                 title: 'Error',
@@ -78,9 +81,8 @@ class _ChatViewState extends State<ChatView> {
             ).pushReplacement(context);
 
             // Clear the flag so it doesn't trigger again
-            context
-                .read<ChatBloc>()
-                .add(const SelectConversationEvent(conversationId: ''));
+            context.read<ChatBloc>().add(SelectConversationEvent(
+                conversationId: '', currentUserId: _currentUserId));
           }
         },
         child: Container(
@@ -94,8 +96,12 @@ class _ChatViewState extends State<ChatView> {
                     previous.status != current.status ||
                     previous.conversations != current.conversations ||
                     previous.selectedConversation !=
-                        current.selectedConversation,
+                        current.selectedConversation ||
+                    previous.availableUsers != current.availableUsers,
                 builder: (context, state) {
+                  final onlineParticipants = state.availableUsers
+                      .where((user) => user.status == ParticipantStatus.online)
+                      .toList();
                   if (state is ChatInitial ||
                       (state.status == ChatStatus.loading &&
                           state.conversations.isEmpty)) {
@@ -137,10 +143,13 @@ class _ChatViewState extends State<ChatView> {
                     selectedConversation: state.selectedConversation,
                     currentUserId: _currentUserId,
                     conversations: conversations,
+                    onlineParticipants: onlineParticipants,
                     onConversationTap: (conv) {
-                      print("Conversation tapped: ${conv.id}");
                       context.read<ChatBloc>().add(
-                          SelectConversationEvent(conversationId: conv.id));
+                            SelectConversationEvent(
+                                conversationId: conv.id,
+                                currentUserId: _currentUserId),
+                          );
                     },
                   );
                 },

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:employeeos/core/index.dart'
     show
         CustomDivider,
@@ -323,7 +324,7 @@ class _FileManagerSideMenuState extends State<FileManagerSideMenu> {
               CircleAvatar(
                 radius: 14,
                 backgroundColor: theme.dividerColor,
-                backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
+                backgroundImage: hasAvatar ? CachedNetworkImageProvider(avatarUrl) : null,
                 child: hasAvatar
                     ? null
                     : Text(
