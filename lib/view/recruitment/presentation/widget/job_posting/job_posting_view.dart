@@ -3,7 +3,7 @@ import 'package:employeeos/core/common/components/ui/custom_toast.dart';
 import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:employeeos/core/user/current_user_profile.dart';
 import 'package:employeeos/core/index.dart'
-    show CustomBreadCrumbs, CustomTextButton;
+    show CustomBreadCrumbs, CustomTextButton, EmptyContent;
 import 'package:employeeos/view/recruitment/domain/index.dart' show JobPosting;
 import 'package:employeeos/view/recruitment/presentation/bloc/job_posting/job_posting_bloc.dart';
 import 'package:flutter/material.dart';
@@ -308,6 +308,15 @@ class _JobPostingFeedBody extends StatelessWidget {
           builder: (context, allJobs) {
             if (allJobs == null) return const SizedBox.shrink();
             final jobs = applyJobPostingFiltersAndSort(allJobs, criteria);
+
+            if (jobs.isEmpty) {
+              return const Center(
+                child: EmptyContent(
+                  icon: 'assets/icons/empty/ic-folder-empty.svg',
+                  title: 'No jobs found',
+                ),
+              );
+            }
             return LayoutBuilder(
               builder: (context, constraints) {
                 final width = constraints.maxWidth;
