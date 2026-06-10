@@ -5,7 +5,6 @@ import 'package:employeeos/core/index.dart'
 import 'package:employeeos/core/user/user_info_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../domain/interview_scheduling/entities/interview_enums.dart';
@@ -18,8 +17,8 @@ import '../widget/index.dart'
         CandidatesTable,
         InterviewFilterPanel,
         InterviewRoundsTab;
-import '../utils/interview_calendar_event_copy.dart';
-import '../utils/calendar/open_google_calendar.dart';
+// import '../utils/interview_calendar_event_copy.dart';
+// import '../utils/calendar/open_google_calendar.dart';
 import '../widget/interview_scheduling/dialogs/schedule_interview_dialogs.dart';
 import '../widget/interview_scheduling/interview_scheduling_injection.dart';
 import '../widget/interview_scheduling/table/interview_table_action_tools.dart';
@@ -303,6 +302,12 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
                                           ),
                                           onSelectedIdsChanged:
                                               _onSelectionChanged,
+                                          onMenu: () => showCustomToast(
+                                              context: context,
+                                              type: ToastificationType.info,
+                                              title: 'Info',
+                                              description:
+                                                  'Action is not available in demo'),
                                         ),
                                       )
                                     : const Center(
@@ -356,58 +361,65 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
 
     if (!mounted || form == null) return;
 
-    final selectedCandidates = state.candidates
-        .where((candidate) => applicationIds.contains(candidate.id))
-        .toList();
-    final applicantEmails = selectedCandidates
-        .map((candidate) => candidate.email.trim())
-        .where(_looksLikeEmail)
-        .toSet()
-        .toList();
-    final organizerEmail =
-        Supabase.instance.client.auth.currentUser?.email?.trim() ?? '';
+    // final selectedCandidates = state.candidates
+    //     .where((candidate) => applicationIds.contains(candidate.id))
+    //     .toList();
+    // final applicantEmails = selectedCandidates
+    //     .map((candidate) => candidate.email.trim())
+    //     .where(_looksLikeEmail)
+    //     .toSet()
+    //     .toList();
+    // final organizerEmail =
+    //     Supabase.instance.client.auth.currentUser?.email?.trim() ?? '';
 
-    final interviewerName = _hrDisplayName(form.interviewer);
-    final assignedByName = _hrDisplayName(form.assignedBy);
+    // final interviewerName = _hrDisplayName(form.interviewer);
+    // final assignedByName = _hrDisplayName(form.assignedBy);
 
-    final candidateNamesSummary = selectedCandidates
-        .map((c) => c.name.trim())
-        .where((n) => n.isNotEmpty)
-        .join(', ');
+    // final candidateNamesSummary = selectedCandidates
+    //     .map((c) => c.name.trim())
+    //     .where((n) => n.isNotEmpty)
+    //     .join(', ');
 
-    final title = buildCalendarEventTitle(activeRound);
-    final details = buildCalendarEventDetails(
-      round: activeRound,
-      interviewerName: interviewerName,
-      assignedByName: assignedByName,
-      selectedCount: applicationIds.length,
-      candidateNamesSummary: candidateNamesSummary,
-    );
+    // final title = buildCalendarEventTitle(activeRound);
+    // final details = buildCalendarEventDetails(
+    //   round: activeRound,
+    //   interviewerName: interviewerName,
+    //   assignedByName: assignedByName,
+    //   selectedCount: applicationIds.length,
+    //   candidateNamesSummary: candidateNamesSummary,
+    // );
 
     // Guests: organizer (logged-in user) + selected applicants + interviewer.
     // [Set] dedupes so the same email is never added twice.
-    final guests = <String>{
-      if (_looksLikeEmail(organizerEmail)) organizerEmail,
-      ...applicantEmails,
-      if (_looksLikeEmail(form.interviewer.email))
-        form.interviewer.email.trim(),
-    }.toList();
+    // final guests = <String>{
+    //   if (_looksLikeEmail(organizerEmail)) organizerEmail,
+    //   ...applicantEmails,
+    //   if (_looksLikeEmail(form.interviewer.email))
+    //     form.interviewer.email.trim(),
+    // }.toList();
 
-    final ok = await openGoogleCalendarTemplateEvent(
-      title: title,
-      startLocal: form.startLocal,
-      endLocal: form.endLocal,
-      details: details,
-      guests: guests,
+    // final ok = await openGoogleCalendarTemplateEvent(
+    //   title: title,
+    //   startLocal: form.startLocal,
+    //   endLocal: form.endLocal,
+    //   details: details,
+    //   guests: guests,
+    // );
+
+    // if (!mounted) return;
+    // if (!ok) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Could not open Google Calendar')),
+    //   );
+    //   return;
+    // }
+
+    showCustomToast(
+      context: context,
+      type: ToastificationType.info,
+      title: 'Info',
+      description: 'Scheduling is not available in demo',
     );
-
-    if (!mounted) return;
-    if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open Google Calendar')),
-      );
-      return;
-    }
 
     final confirmed = await showMeetingScheduledConfirmationDialog(
       context: context,
@@ -437,11 +449,11 @@ class _InterviewSchedulingViewState extends State<InterviewSchedulingView>
     return '—';
   }
 
-  bool _looksLikeEmail(String value) {
-    final v = value.trim();
-    if (v.isEmpty) return false;
-    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v);
-  }
+  // bool _looksLikeEmail(String value) {
+  //   final v = value.trim();
+  //   if (v.isEmpty) return false;
+  //   return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v);
+  // }
 
   void _openFilterPanel(
     BuildContext context,

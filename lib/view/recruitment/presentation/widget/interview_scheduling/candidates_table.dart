@@ -17,6 +17,7 @@ class CandidatesTable extends StatefulWidget {
   final bool showRejectedRoundColumn;
   final bool showResumeColumn;
   final ScrollController? verticalController;
+  final VoidCallback onMenu;
 
   const CandidatesTable({
     super.key,
@@ -29,6 +30,7 @@ class CandidatesTable extends StatefulWidget {
     this.showResumeColumn = true,
     this.onSelectionChanged,
     this.verticalController,
+    required this.onMenu,
   });
 
   @override
@@ -234,13 +236,7 @@ class _CandidatesTableState extends State<CandidatesTable> {
                               }
                               _notifySelection();
                             }),
-                            onMenu: (action) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text('$action → ${candidate.name}')),
-                              );
-                            },
+                            onMenu: (action) => widget.onMenu.call(),
                           );
                         },
                       ),

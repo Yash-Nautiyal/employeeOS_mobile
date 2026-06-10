@@ -2,10 +2,8 @@ import 'package:employeeos/core/common/components/ui/custom_toast.dart';
 import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:toastification/toastification.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain/index.dart' show JobPosting;
 import '../../../bloc/job_posting/job_posting_detail_cubit.dart';
@@ -217,26 +215,38 @@ class _JobViewPageState extends State<JobViewPage> {
   }
 
   Future<void> _openResume(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    // final uri = Uri.tryParse(url);
+    // if (uri == null) return;
+    // await launchUrl(uri, mode: LaunchMode.externalApplication);
+    showCustomToast(
+      context: context,
+      type: ToastificationType.info,
+      title: 'Info',
+      description: 'Opening resume is not available in demo',
+    );
   }
 
   Future<void> _downloadResumes(JobPostingDetailState state) async {
-    final selected = state.applications
-        .where((a) => state.selectedApplicationIds.contains(a.id))
-        .toList(growable: false);
-    final targets = selected.isNotEmpty ? selected : state.applications;
-    if (targets.isEmpty) return;
+    // final selected = state.applications
+    //     .where((a) => state.selectedApplicationIds.contains(a.id))
+    //     .toList(growable: false);
+    // final targets = selected.isNotEmpty ? selected : state.applications;
+    // if (targets.isEmpty) return;
 
-    for (final app in targets) {
-      if (app.resumeUrl.trim().isEmpty) continue;
-      await FileDownloader.downloadFile(
-        url: app.resumeUrl,
-        name: '${app.fullName}_${app.id}.pdf',
-        notificationType: NotificationType.all,
-      );
-    }
+    // for (final app in targets) {
+    //   if (app.resumeUrl.trim().isEmpty) continue;
+    //   await FileDownloader.downloadFile(
+    //     url: app.resumeUrl,
+    //     name: '${app.fullName}_${app.id}.pdf',
+    //     notificationType: NotificationType.all,
+    //   );
+    // }
+    showCustomToast(
+      context: context,
+      type: ToastificationType.info,
+      title: 'Info',
+      description: 'Downloading resumes is not available in demo',
+    );
   }
 
   Future<void> _onShortlistSelected(JobPostingDetailCubit cubit) async {

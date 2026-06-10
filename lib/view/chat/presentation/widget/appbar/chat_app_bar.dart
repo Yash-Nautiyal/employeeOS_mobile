@@ -97,7 +97,8 @@ class _ChatAppBarState extends State<ChatAppBar> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final screenWidth = MediaQuery.of(context).size.width;
-    final showSearchbar = widget.conversation == null && widget.isNewChat;
+    final conversation = widget.conversation;
+    final showLoadingHeader = conversation == null && !widget.isNewChat;
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -112,7 +113,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
-          if (!showSearchbar) ...[
+          if (showLoadingHeader) ...[
             IconButton(
               onPressed: () => widget.onBack.call(),
               icon: SvgPicture.asset(
@@ -126,7 +127,35 @@ class _ChatAppBarState extends State<ChatAppBar> {
                 width: 18,
               ),
             ),
-            widget.conversation!.type == ConversationType.group
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Loading conversation...',
+                style: widget.theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ] else if (conversation != null) ...[
+            IconButton(
+              onPressed: () => widget.onBack.call(),
+              icon: SvgPicture.asset(
+                isPortrait
+                    ? 'assets/icons/arrow/ic-eva_arrow-ios-back-fill.svg'
+                    : 'assets/icons/common/solid/ic-mingcute_close-line.svg',
+                colorFilter: ColorFilter.mode(
+                  widget.theme.colorScheme.tertiary,
+                  BlendMode.srcIn,
+                ),
+                width: 18,
+              ),
+            ),
+            conversation.type == ConversationType.group
                 ? Container(
                     constraints: const BoxConstraints(maxWidth: 90),
                     width: screenWidth * 0.3,
@@ -134,8 +163,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                     child: AnimatedAvatarStack(
                       settings: RestrictedPositions(),
                       avatars: [
-                        for (var participant
-                            in widget.conversation!.participants)
+                        for (var participant in conversation.participants)
                           if (participant.id != widget.currentUserId)
                             CachedNetworkImageProvider(participant.avatarUrl),
                       ],
@@ -150,8 +178,7 @@ class _ChatAppBarState extends State<ChatAppBar> {
                         badges.BadgePosition.bottomEnd(end: -10, bottom: -1),
                     child: CircleAvatar(
                       radius: 20,
-                      backgroundImage: NetworkImage(widget
-                          .conversation!.participants
+                      backgroundImage: NetworkImage(conversation.participants
                           .firstWhere((p) => p.id != widget.currentUserId)
                           .avatarUrl),
                     ),
@@ -163,12 +190,12 @@ class _ChatAppBarState extends State<ChatAppBar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.conversation!.type == ConversationType.group
-                        ? widget.conversation!.participants
+                    conversation.type == ConversationType.group
+                        ? conversation.participants
                             .where((p) => p.id != widget.currentUserId)
                             .map((p) => p.name)
                             .join(", ")
-                        : widget.conversation!.participants
+                        : conversation.participants
                             .firstWhere((p) => p.id != widget.currentUserId)
                             .name,
                     style: widget.theme.textTheme.titleMedium?.copyWith(

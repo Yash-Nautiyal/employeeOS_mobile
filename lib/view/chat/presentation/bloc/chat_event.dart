@@ -36,6 +36,13 @@ final class ClearSelectedConversationEvent extends ChatEvent {
   List<Object?> get props => [];
 }
 
+final class ClearNewlyCreatedConversationIdEvent extends ChatEvent {
+  const ClearNewlyCreatedConversationIdEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 // ---------------- Thread Events ----------------
 
 final class SelectConversationEvent extends ChatEvent {

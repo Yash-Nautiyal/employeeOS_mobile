@@ -69,10 +69,14 @@ class AppRouterFactory {
                         currentUserId: '',
                       );
 
+                final conversationId =
+                    state.pathParameters['conversationId'] ?? '';
+
                 return BlocProvider.value(
                   value: sl<ChatBloc>(),
                   child: ThreadPage(
                     selectedConversation: extra.conversation,
+                    conversationId: conversationId,
                     conversations: extra.conversations,
                     currentUserId: extra.currentUserId,
                     onConversationTap: (_) {},
@@ -92,6 +96,7 @@ class AppRouterFactory {
                   value: sl<ChatBloc>(),
                   child: ThreadPage(
                     selectedConversation: null,
+                    conversationId: 'new',
                     conversations: extra.conversations,
                     currentUserId: extra.currentUserId,
                     onConversationTap: (_) {},

@@ -48,6 +48,7 @@ final class ChatState extends Equatable {
     List<Participant>? availableUsers,
     bool? isLoadingUsers,
     bool clearSelection = false,
+    bool clearNewlyCreatedConversationId = false,
   }) {
     return ChatState(
       conversations: conversations ?? this.conversations,
@@ -56,7 +57,9 @@ final class ChatState extends Equatable {
           : (selectedConversation ?? this.selectedConversation),
       status: status ?? this.status,
       lastAction: lastAction ?? this.lastAction,
-      newlyCreatedConversationId: newlyCreatedConversationId,
+      newlyCreatedConversationId: clearNewlyCreatedConversationId
+          ? null
+          : (newlyCreatedConversationId ?? this.newlyCreatedConversationId),
       availableUsers: availableUsers ?? this.availableUsers,
       isLoadingUsers: isLoadingUsers ?? this.isLoadingUsers,
     );

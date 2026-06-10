@@ -19,6 +19,7 @@ import '../../domain/entities/participant.dart';
 
 class ThreadPage extends StatefulWidget {
   final Conversation? selectedConversation;
+  final String? conversationId;
   final List<Conversation>? conversations;
   final String currentUserId;
   final Function onConversationTap;
@@ -27,6 +28,7 @@ class ThreadPage extends StatefulWidget {
   const ThreadPage({
     super.key,
     required this.selectedConversation,
+    this.conversationId,
     this.conversations,
     required this.currentUserId,
     required this.onConversationTap,
@@ -47,13 +49,41 @@ class _ThreadPageState extends State<ThreadPage> {
     super.initState();
     _currentUserId = widget.currentUserId;
 
-    // final isNewChat = widget.selectedConversation == null ||
-    //     widget.selectedConversation?.id == 'new';
-    // if (isNewChat) {
-    //   context
-    //       .read<ChatBloc>()
-    //       .add(LoadAvailableUsersEvent(currentUserId: _currentUserId));
-    // }
+    final targetId = _targetConversationId;
+    if (targetId != null && targetId != 'new') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        context.read<ChatBloc>().add(SelectConversationEvent(
+              conversationId: targetId,
+              currentUserId: _currentUserId,
+            ));
+      });
+    }
+  }
+
+  String? get _targetConversationId =>
+      widget.conversationId ?? widget.selectedConversation?.id;
+
+  void _onConversationCreated(BuildContext context, ChatState state) {
+    final newId = state.newlyCreatedConversationId;
+    if (newId == null) return;
+
+    context.read<ChatBloc>().add(SelectConversationEvent(
+          conversationId: newId,
+          currentUserId: _currentUserId,
+        ));
+    context.read<ChatBloc>().add(const ClearNewlyCreatedConversationIdEvent());
+
+    if (!widget.isEmbedded) {
+      AppChatThreadRoute(
+        conversationId: newId,
+        $extra: ChatThreadRouteExtra(
+          conversation: null,
+          conversations: state.conversations,
+          currentUserId: _currentUserId,
+        ),
+      ).pushReplacement(context);
+    }
   }
 
   void handleSwipeMessage(ChatMessage message) {
@@ -193,22 +223,32 @@ class _ThreadPageState extends State<ThreadPage> {
       return Scaffold(backgroundColor: theme.scaffoldBackgroundColor);
     }
 
-    return Container(
-      padding: EdgeInsets.only(
-          top: isPortrait ? MediaQuery.of(context).padding.top : 10),
-      color: theme.scaffoldBackgroundColor,
-      child: BlocBuilder<ChatBloc, ChatState>(
-        builder: (context, state) {
-          final String? targetId = widget.selectedConversation?.id;
-          final isNewChat = targetId == null || targetId == 'new';
+    return BlocListener<ChatBloc, ChatState>(
+      listenWhen: (previous, current) =>
+          previous.newlyCreatedConversationId !=
+              current.newlyCreatedConversationId &&
+          current.newlyCreatedConversationId != null,
+      listener: _onConversationCreated,
+      child: Container(
+        padding: EdgeInsets.only(
+            top: isPortrait ? MediaQuery.of(context).padding.top : 10),
+        color: theme.scaffoldBackgroundColor,
+        child: BlocBuilder<ChatBloc, ChatState>(
+          builder: (context, state) {
+            final String? targetId = _targetConversationId;
+            final isNewChat = targetId == null || targetId == 'new';
           ParticipantStatus? status;
           Conversation? liveConversation;
           if (!isNewChat) {
-            final index =
-                state.conversations.indexWhere((c) => c.id == targetId);
-            liveConversation = index != -1
-                ? state.conversations[index]
-                : widget.selectedConversation;
+            if (state.selectedConversation?.id == targetId) {
+              liveConversation = state.selectedConversation;
+            } else {
+              final index =
+                  state.conversations.indexWhere((c) => c.id == targetId);
+              liveConversation = index != -1
+                  ? state.conversations[index]
+                  : widget.selectedConversation;
+            }
             status = liveConversation?.type == ConversationType.oneToOne
                 ? liveConversation?.participants
                     .firstWhere(
@@ -312,7 +352,8 @@ class _ThreadPageState extends State<ThreadPage> {
               ]
             ],
           );
-        },
+          },
+        ),
       ),
     );
   }

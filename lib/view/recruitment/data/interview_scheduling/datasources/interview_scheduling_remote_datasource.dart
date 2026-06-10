@@ -90,7 +90,7 @@ applications!inner(
               .select('application_id')
               .maybeSingle();
           if (updated == null) {
-            throw RemoteDataException(
+            throw const RemoteDataException(
               kind: RemoteDataFailureKind.server,
               message:
                   'Could not save this schedule. The applicant may not be Eligible '
@@ -142,7 +142,7 @@ applications!inner(
                 .select('application_id')
                 .maybeSingle();
             if (updated == null) {
-              throw RemoteDataException(
+              throw const RemoteDataException(
                 kind: RemoteDataFailureKind.server,
                 message: _noMatchingRowMessage,
               );
@@ -161,13 +161,13 @@ applications!inner(
                 .select('application_id')
                 .maybeSingle();
             if (updated == null) {
-              throw RemoteDataException(
+              throw const RemoteDataException(
                 kind: RemoteDataFailureKind.server,
                 message: _noMatchingRowMessage,
               );
             }
           } else {
-            throw RemoteDataException(
+            throw const RemoteDataException(
               kind: RemoteDataFailureKind.server,
               message:
                   'Advance is only supported after telephone or technical.',
@@ -215,7 +215,7 @@ applications!inner(
               .select('application_id')
               .maybeSingle();
           if (updated == null) {
-            throw RemoteDataException(
+            throw const RemoteDataException(
               kind: RemoteDataFailureKind.server,
               message: _noMatchingRowMessage,
             );
@@ -262,7 +262,7 @@ applications!inner(
               .select('application_id')
               .maybeSingle();
           if (updated == null) {
-            throw RemoteDataException(
+            throw const RemoteDataException(
               kind: RemoteDataFailureKind.server,
               message: _noMatchingRowMessage,
             );
@@ -304,7 +304,7 @@ applications!inner(
               .select('application_id')
               .maybeSingle();
           if (deleted == null) {
-            throw RemoteDataException(
+            throw const RemoteDataException(
               kind: RemoteDataFailureKind.server,
               message: _noMatchingRowMessage,
             );

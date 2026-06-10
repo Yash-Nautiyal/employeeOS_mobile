@@ -1,10 +1,11 @@
-import 'package:employeeos/core/index.dart' show AppPallete, CustomTextButton;
+import 'package:employeeos/core/index.dart'
+    show AppPallete, CustomTextButton, showCustomToast;
 import 'package:employeeos/view/recruitment/domain/job_application/application_db_values.dart';
 import 'package:employeeos/view/recruitment/domain/job_application/entities/job_application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:toastification/toastification.dart';
 
 class JobApplicationCard extends StatelessWidget {
   final ThemeData theme;
@@ -33,14 +34,20 @@ class JobApplicationCard extends StatelessWidget {
   }
 
   Future<void> _openResume(BuildContext context) async {
-    final uri = Uri.tryParse(application.resumeUrl);
-    if (uri == null) return;
-    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open resume link')),
-      );
-    }
+    // final uri = Uri.tryParse(application.resumeUrl);
+    // if (uri == null) return;
+    // final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    // if (!ok && context.mounted) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Could not open resume link')),
+    //   );
+    // }
+    showCustomToast(
+      context: context,
+      type: ToastificationType.info,
+      title: 'Info',
+      description: 'Opening resume is not available in demo',
+    );
   }
 
   (Color bg, Color fg) _statusColors() {

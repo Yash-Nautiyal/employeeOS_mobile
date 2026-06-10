@@ -1,7 +1,6 @@
 import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:employeeos/core/di/service_locator.dart';
 import 'package:employeeos/core/index.dart' show showCustomToast;
-import 'package:employeeos/core/routing/app_routes.dart';
 import 'package:employeeos/view/chat/presentation/bloc/chat_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,42 +46,25 @@ class _ChatViewState extends State<ChatView> {
             previous.lastAction != current.lastAction &&
             current.lastAction != null,
         listener: (context, state) {
-          if (state.lastAction != null) {
-            final action = state.lastAction!;
-            if (action.type == UIActionType.success && action.message != null) {
-              showCustomToast(
-                context: context,
-                title: 'Success',
-                description: action.message!,
-                type: ToastificationType.success,
-              );
-            } else if (action.type == UIActionType.error &&
-                action.message != null) {
-              debugPrint("Error action received: ${action.message}");
-              showCustomToast(
-                context: context,
-                title: 'Error',
-                description: action.message!,
-                type: ToastificationType.error,
-              );
-            }
-          }
-          if (state.newlyCreatedConversationId != null) {
-            print(
-                "Newly created conversation ID: ${state.newlyCreatedConversationId}");
-            // Instantly replace the /app/chat/new route with the real database thread
-            AppChatThreadRoute(
-              conversationId: state.newlyCreatedConversationId!,
-              $extra: ChatThreadRouteExtra(
-                conversation: null, // Let it fetch fresh from the DB/stream
-                conversations: state.conversations,
-                currentUserId: _currentUserId,
-              ),
-            ).pushReplacement(context);
+          final action = state.lastAction;
+          if (action == null) return;
 
-            // Clear the flag so it doesn't trigger again
-            context.read<ChatBloc>().add(SelectConversationEvent(
-                conversationId: '', currentUserId: _currentUserId));
+          if (action.type == UIActionType.success && action.message != null) {
+            showCustomToast(
+              context: context,
+              title: 'Success',
+              description: action.message!,
+              type: ToastificationType.success,
+            );
+          } else if (action.type == UIActionType.error &&
+              action.message != null) {
+            debugPrint("Error action received: ${action.message}");
+            showCustomToast(
+              context: context,
+              title: 'Error',
+              description: action.message!,
+              type: ToastificationType.error,
+            );
           }
         },
         child: Container(

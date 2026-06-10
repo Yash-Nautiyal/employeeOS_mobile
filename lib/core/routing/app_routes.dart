@@ -104,6 +104,7 @@ class AppChatNewRoute extends GoRouteData {
       value: sl<ChatBloc>(),
       child: ThreadPage(
         selectedConversation: null,
+        conversationId: 'new',
         conversations: $extra.conversations,
         currentUserId: $extra.currentUserId,
         onConversationTap: (_) {},
@@ -137,6 +138,7 @@ class AppChatThreadRoute extends GoRouteData {
       value: sl<ChatBloc>(),
       child: ThreadPage(
         selectedConversation: selectedConversation,
+        conversationId: conversationId,
         conversations: conversations,
         currentUserId: currentUserId,
         onConversationTap: (_) {},

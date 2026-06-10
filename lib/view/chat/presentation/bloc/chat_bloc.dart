@@ -52,8 +52,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     on<LoadAvailableUsersEvent>(_onLoadAvailableUsers);
     on<ResetChatEvent>(_onResetChat);
-    on<ClearSelectedConversationEvent>(
-        _onClearSelectedConversation); // <--- Register it
+    on<ClearSelectedConversationEvent>(_onClearSelectedConversation);
+    on<ClearNewlyCreatedConversationIdEvent>(_onClearNewlyCreatedConversationId);
   }
 
   void _onStartListeningConversations(
@@ -106,6 +106,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         clearSelection: true)); // Use the copyWith flag we added earlier
   }
 
+  void _onClearNewlyCreatedConversationId(
+    ClearNewlyCreatedConversationIdEvent event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(state.copyWith(clearNewlyCreatedConversationId: true));
+  }
+
   void _onSelectConversation(
     SelectConversationEvent event,
     Emitter<ChatState> emit,
@@ -114,12 +121,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     final index =
         state.conversations.indexWhere((c) => c.id == event.conversationId);
-    if (index == -1) return;
+    final conv = index != -1 ? state.conversations[index] : null;
 
-    final conv = state.conversations[index];
-
-    emit(
-        state.copyWith(status: ChatStatus.loading, selectedConversation: conv));
+    emit(state.copyWith(
+      status: ChatStatus.loading,
+      selectedConversation: conv,
+    ));
     _threadSubscription?.cancel();
 
     _threadSubscription = listenToMessages(event.conversationId).listen(
