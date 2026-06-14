@@ -1,17 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
-import 'package:employeeos/core/auth/data/auth_repository.dart';
 import 'package:employeeos/core/common/components/ui/custom_bread_crumbs.dart';
 import 'package:employeeos/core/common/components/ui/custom_toast.dart';
-import 'package:employeeos/core/user/user_creation_service.dart';
 import 'package:employeeos/core/user/user_info_service.dart';
 import 'package:employeeos/core/user/user_role.dart';
 import 'package:employeeos/view/user_management/presentation/widgets/user_account_general.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
 import 'package:toastification/toastification.dart';
 
 class CreateUserPage extends StatefulWidget {
@@ -36,7 +31,6 @@ class _CreateUserPageState extends State<CreateUserPage> {
 
   String _role = UserRole.employee.name;
   Uint8List? _avatarBytes;
-  String? _avatarContentType;
   bool _isSubmitting = false;
   bool _isPickingAvatar = false;
 
@@ -53,6 +47,16 @@ class _CreateUserPageState extends State<CreateUserPage> {
     phoneController.addListener(_listener);
     passwordController.addListener(_listener);
     confirmPasswordController.addListener(_listener);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showCustomToast(
+        context: context,
+        type: ToastificationType.info,
+        title: 'Info',
+        description: 'Create user is not available in demo mode.',
+      );
+    });
   }
 
   @override
@@ -111,81 +115,80 @@ class _CreateUserPageState extends State<CreateUserPage> {
     }
     setState(() {
       _avatarBytes = Uint8List.fromList(bytes);
-      _avatarContentType = lookupMimeType(x.path) ?? 'image/jpeg';
     });
   }
 
-  Future<void> _createUser() async {
-    if (!_canSubmit || _isSubmitting) return;
-    setState(() => _isSubmitting = true);
-    try {
-      await context.read<UserCreationService>().createUser(
-            email: emailController.text.trim(),
-            password: passwordController.text,
-            firstName: firstNameController.text,
-            lastName: lastNameController.text,
-            role: _role,
-            phone: phoneController.text,
-            dateOfBirth: dateOfBirthController.text,
-            designation: designationController.text,
-            dateOfJoining: dateOfJoiningController.text,
-            dateOfRelieving: dateofRelievingController.text,
-            avatarBytes: _avatarBytes?.toList(),
-            avatarContentType: _avatarContentType,
-          );
-      if (!mounted) return;
-      context.read<AuthBloc>().add(AuthRefreshProfileRequested());
-      _clearForm();
-      showCustomToast(
-        context: context,
-        type: ToastificationType.success,
-        title: 'User created',
-        description:
-            'The new user can sign in with the email and password you set.',
-      );
-    } on AuthFailure catch (e) {
-      if (!mounted) return;
-      showCustomToast(
-        context: context,
-        type: ToastificationType.error,
-        title: 'Could not create user',
-        description: e.message,
-      );
-    } catch (e) {
-      if (!mounted) return;
-      showCustomToast(
-        context: context,
-        type: ToastificationType.error,
-        title: 'Could not create user',
-        description: e.toString(),
-      );
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
-    }
-  }
+  // Future<void> _createUser() async {
+  //   if (!_canSubmit || _isSubmitting) return;
+  //   setState(() => _isSubmitting = true);
+  //   try {
+  //     await context.read<UserCreationService>().createUser(
+  //           email: emailController.text.trim(),
+  //           password: passwordController.text,
+  //           firstName: firstNameController.text,
+  //           lastName: lastNameController.text,
+  //           role: _role,
+  //           phone: phoneController.text,
+  //           dateOfBirth: dateOfBirthController.text,
+  //           designation: designationController.text,
+  //           dateOfJoining: dateOfJoiningController.text,
+  //           dateOfRelieving: dateofRelievingController.text,
+  //           avatarBytes: _avatarBytes?.toList(),
+  //           avatarContentType: _avatarContentType,
+  //         );
+  //     if (!mounted) return;
+  //     context.read<AuthBloc>().add(AuthRefreshProfileRequested());
+  //     _clearForm();
+  //     showCustomToast(
+  //       context: context,
+  //       type: ToastificationType.success,
+  //       title: 'User created',
+  //       description:
+  //           'The new user can sign in with the email and password you set.',
+  //     );
+  //   } on AuthFailure catch (e) {
+  //     if (!mounted) return;
+  //     showCustomToast(
+  //       context: context,
+  //       type: ToastificationType.error,
+  //       title: 'Could not create user',
+  //       description: e.message,
+  //     );
+  //   } catch (e) {
+  //     if (!mounted) return;
+  //     showCustomToast(
+  //       context: context,
+  //       type: ToastificationType.error,
+  //       title: 'Could not create user',
+  //       description: e.toString(),
+  //     );
+  //   } finally {
+  //     if (mounted) setState(() => _isSubmitting = false);
+  //   }
+  // }
 
-  void _clearForm() {
-    firstNameController.clear();
-    lastNameController.clear();
-    emailController.clear();
-    phoneController.clear();
-    dateOfBirthController.clear();
-    designationController.clear();
-    dateOfJoiningController.clear();
-    dateofRelievingController.clear();
-    passwordController.clear();
-    confirmPasswordController.clear();
-    setState(() {
-      _role = UserRole.employee.name;
-      _avatarBytes = null;
-      _avatarContentType = null;
-    });
-  }
+  // void _clearForm() {
+  //   firstNameController.clear();
+  //   lastNameController.clear();
+  //   emailController.clear();
+  //   phoneController.clear();
+  //   dateOfBirthController.clear();
+  //   designationController.clear();
+  //   dateOfJoiningController.clear();
+  //   dateofRelievingController.clear();
+  //   passwordController.clear();
+  //   confirmPasswordController.clear();
+  //   setState(() {
+  //     _role = UserRole.employee.name;
+  //     _avatarBytes = null;
+  //     _avatarContentType = null;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final profile = context.watch<AuthBloc>().state.currentProfile;
+    // final profile = context.watch<AuthBloc>().state.currentProfile;
     // final allowed = profile != null && !profile.isEmployee;
 
     // if (!allowed) {
@@ -245,7 +248,12 @@ class _CreateUserPageState extends State<CreateUserPage> {
                 saveEnabled: _canSubmit,
                 isSaving: _isSubmitting,
                 isUploadingAvatar: _isPickingAvatar,
-                onSave: _createUser,
+                // onSave: _createUser,
+                onSave: () async => showCustomToast(
+                    context: context,
+                    type: ToastificationType.info,
+                    title: 'Info',
+                    description: 'Create user is not available in demo mode.'),
                 onAvatarTap: () async {
                   setState(() => _isPickingAvatar = true);
                   try {
