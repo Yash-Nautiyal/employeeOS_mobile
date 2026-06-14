@@ -14,6 +14,7 @@ import 'package:employeeos/core/auth/bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:flutter_quill/flutter_quill.dart';
@@ -22,7 +23,9 @@ import 'package:go_router/go_router.dart';
 
 void main() {
   runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
+    final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
       if (AuthErrorHandler.handleUnhandledError(error, stack)) {
         return true;
@@ -113,6 +116,13 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _router = AppRouterFactory.create(context.read<AuthBloc>());
+    _removeNativeSplashIfAuthResolved(context.read<AuthBloc>().state);
+  }
+
+  void _removeNativeSplashIfAuthResolved(AuthState authState) {
+    if (authState is! AuthInitial && authState is! AuthLoading) {
+      FlutterNativeSplash.remove();
+    }
   }
 
   @override
@@ -123,24 +133,29 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, state) => AnimatedTheme(
-        data: buildTheme(
-          preset: state.preset,
-          brightness: state.brightness,
-        ),
-        duration: const Duration(milliseconds: 100),
-        child: MaterialApp.router(
-          title: 'EmployeeOS',
-          debugShowCheckedModeBanner: false,
-          theme: state.themeData,
-          routerConfig: _router,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            FlutterQuillLocalizations.delegate,
-          ],
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (_, current) =>
+          current is! AuthInitial && current is! AuthLoading,
+      listener: (_, authState) => _removeNativeSplashIfAuthResolved(authState),
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) => AnimatedTheme(
+          data: buildTheme(
+            preset: state.preset,
+            brightness: state.brightness,
+          ),
+          duration: const Duration(milliseconds: 100),
+          child: MaterialApp.router(
+            title: 'EmployeeOS',
+            debugShowCheckedModeBanner: false,
+            theme: state.themeData,
+            routerConfig: _router,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
+            ],
+          ),
         ),
       ),
     );

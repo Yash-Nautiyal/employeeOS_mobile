@@ -59,7 +59,6 @@ dependencies:
   shared_preferences: ^2.5.3
   syncfusion_flutter_charts: ^29.2.9
   google_fonts: ^6.2.1
-  flutter_native_splash: ^2.4.6
   supabase_flutter: ^2.3.4
   postgrest: ^2.4.2
   flutter_dotenv: ^5.1.0
@@ -84,6 +83,7 @@ dependencies:
   flutter_quill_delta_from_html: ^1.5.3
   vsc_quill_delta_to_html: ^1.0.5
   dartz: ^0.10.1
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -151,3 +151,15 @@ flutter:
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_native_splash:
+  color: "#f0faf3"
+  color_dark: "#000000"
+  image: assets/logo/employeeos-logo.png
+  android: true
+  ios: false
+  web: false
+  android_12:
+    color: "#f0faf3"
+    color_dark: "#000000"
+    image: assets/logo/employeeos-logo.png
